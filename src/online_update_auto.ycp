@@ -30,6 +30,7 @@ import "AutoOnlineUpdate";
 import "Mode";
 import "Wizard";
 import "OnlineUpdateDialogs";
+import "Progress";
 
 any ret = nil;
 string func = "";
@@ -56,11 +57,19 @@ else if (func == "Reset") {
 }
 /* Change configuration (run AutoSequence) */
 else if (func == "Change") {
+    map exp1 = AutoOnlineUpdate::Export();
     ret = OnlineUpdateDialogs::SetupAutomatic();
+    map exp2 = AutoOnlineUpdate::Export();
+    if (exp1!=exp2)
+        AutoOnlineUpdate::SetModified();
 }
 /* Import configuration */
 else if (func == "Import") {
     ret = AutoOnlineUpdate::Import(param);
+}
+/* configuration modified? */
+else if (func == "Import") {
+    ret = AutoOnlineUpdate::GetModified();
 }
 /* Return actual state */
 else if (func == "Export") {
@@ -72,14 +81,12 @@ else if (func == "Packages") {
 }
 /* Read current state */
 else if (func == "Read") {
-    import "Progress";
     Progress::off();
     ret = AutoOnlineUpdate::Read();
     Progress::on();
 }
 /* Write givven settings */
 else if (func == "Write") {
-    import "Progress";
     Progress::off();
     AutoOnlineUpdate::write_only = true;
     ret = AutoOnlineUpdate::Write();

@@ -71,12 +71,34 @@ global string cronfile = "/etc/cron.d/yast2-online-update";
 
 
 
+/* default value of settings modified */
+global boolean modified = false;
+
+
+/**
+ * Function sets internal variable, which indicates, that any
+ * settings were modified, to "true"
+ */
+global define void SetModified () {
+    y2milestone("SetModified");
+    modified = true;
+}
+
+/**
+ * Functions which returns if the settings were modified
+ * @return boolean  settings were modified
+ */
+global define boolean GetModified () {
+    return modified;
+}
+
+
 global list<string> days =
     [
     _("Sunday"),
     _("Monday"),
     _("Tuesday"),
-    _("Wednsday"),
+    _("Wednesday"),
     _("Thursday"),
     _("Friday"),
     _("Saturday")
