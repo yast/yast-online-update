@@ -102,7 +102,7 @@ patches could not be installed.
 
   // set status and close update
   y2debug("ONLINE: close update with status: %1", lookup(user_settings, "ftp_ok", false) );
-  any ret = PKGINFO(`ftpCloseUpdate( lookup(user_settings, "ftp_ok", false)) );
+  any result = PKGINFO(`ftpCloseUpdate( lookup(user_settings, "ftp_ok", false)) );
 
   // Show results
   map last_status = PKGINFO(`ftpLastUpdateStatus() );

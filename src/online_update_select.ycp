@@ -120,8 +120,6 @@
     
     string help_text = "";
 
-    string help_text = "";
-
     // Helptext  "List of available patches"
     // This text is shown if patches will be installed from CD.
     string help_part01 = UI(_("<p>This dialog shows the patches from
