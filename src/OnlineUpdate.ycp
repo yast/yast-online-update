@@ -77,5 +77,10 @@ global string reloadServer = "yes";
  */
 global string you_url = "";
 
+/**
+ * should signatures be checked?
+ */
+global boolean signature_check = true;
+
 /* EOF */
 }

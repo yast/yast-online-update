@@ -81,6 +81,10 @@ packages were created by SuSE.
 	  OnlineUpdate::you_auto_install = true;
 	  OnlineUpdate::you_auto	 = true;
       }
+      else if (WFM::Args(arg_n) == .nosigcheck || WFM::Args(arg_n) == ".nosigcheck")
+      {
+	  OnlineUpdate::signature_check = false;
+      }
       else if ( WFM::Args(arg_n) == .url || WFM::Args(arg_n) == ".url" )
       {
           if ( arg_n + 1 < arg_max ) {

@@ -91,7 +91,7 @@ patches could not be installed.
   
   if ( size( patch ) == 0 ) {
     UI::ChangeWidget( `id(`log), `LastLine,
-                      _("No patches selected to be installed." ) );
+                      _("No new patches available." ) );
   } else {
     while( size( patch ) != 0 ) {
       UI::ChangeWidget( `id(`log), `LastLine,
@@ -99,18 +99,26 @@ patches could not be installed.
                             lookup( patch, "name", "unknown" ),
                             lookup( patch, "summary", "no summary" ) ) );
 
-      boolean ok = Pkg::YouGetCurrentPatch();
-      if ( ok ) {
+      string err = Pkg::YouGetCurrentPatch( OnlineUpdate::signature_check );
+      if ( size( err ) == 0 ) {
         UI::ChangeWidget( `id(`log), `LastLine, _("Ok\n") );
       } else {
-        UI::ChangeWidget( `id(`log), `LastLine, _("Error\n") );
+        UI::ChangeWidget( `id(`log), `LastLine, _("Error") );
         error = true;
+        if ( err == "media" ) {
+          UI::ChangeWidget( `id(`log), `LastLine, _(": Can't get files.") );
+        } else if ( err == "sig" ) {
+          UI::ChangeWidget( `id(`log), `LastLine, _(": Signature check failed.") );
+        } else {
+          y2error( "YouGetCurrentPatch Error: %1", err );
+        }
+        UI::ChangeWidget( `id(`log), `LastLine, _("\n") );
       }
 
       patch = Pkg::YouNextPatch();
     }
     
-    UI::ChangeWidget( `id(`log), `LastLine, _("Download complete\n\n") );
+    UI::ChangeWidget( `id(`log), `LastLine, _("Download finished.\n\n") );
 
     if ( error ) {
       UI::ErrorPopup( _("Download failed.") );
@@ -150,6 +158,8 @@ patches could not be installed.
 
           patch = Pkg::YouNextPatch();
         }
+
+        UI::ChangeWidget( `id(`log), `LastLine, _("Installation finished.\n") );
 
         if ( error ) {
           UI::ErrorPopup( _("Installation failed.") );

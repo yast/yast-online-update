@@ -84,7 +84,16 @@
   if ( size( you_url ) != 0 ) {
     you_server_list = add( you_server_list, you_url );
   } else {
-    you_server_list = Pkg::YouGetServers();
+    string err = Pkg::YouGetServers( you_server_list );
+    y2error( "Get Servers: %1", err );
+    if ( size( err ) != 0 ) {
+      if ( err == "get" ) {
+        UI::ErrorPopup(_("Cannot connect to www.suse.de. Check your connection."));
+      } else {
+        UI::ErrorPopup(_("Error getting servers."));
+      }
+      return `abort;
+    }
   }
 
   if ( size( you_server_list ) == 0 ) {
@@ -440,12 +449,29 @@ another FTP or HTTP server.</p>
 
       if (ret == `next)
       {
-          boolean ok = Pkg::YouGetPatches( you_server );
-          if ( !ok ) {
+          string err = Pkg::YouGetPatches( you_server,
+                                           OnlineUpdate::signature_check );
+          if ( size( err ) != 0 ) {
+            if ( err == "media" ) {
 	      UI::ErrorPopup(_("Initialization failed. Try again.
 If failure continues, choose
 another SuSE FTP/HTTP server.\n"));
-	      ret = `again;            
+	      ret = `again;
+            } else if ( err == "sig" ) {
+                UI::ErrorPopup(_("Signature check for patch info files failed.
+Can't load patch information.\n"));
+              ret = `again;
+            } else if ( err == "url" ) {
+                UI::ErrorPopup(_("URL is invalid."));
+            } else {
+              y2error( "YouGetPatches Error: %1", err );
+              // Message popup: yast2 component responsible for the you update cannot be initialised.
+              // This does not mean, connection failed to you server, but any other error occured.
+              UI::MessagePopup(_("Initialization of FTP/HTTP server failed:
+internal error.
+"));
+              return `abort;
+            }
           }
 /*
 	  you_dir 	 = select( lookup(you_server_map, you_server, ["",""]), 0, "" );
