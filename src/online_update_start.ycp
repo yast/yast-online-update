@@ -105,42 +105,47 @@
       SCR::Execute(.target.remove,"/etc/suseservers.bak" );	
   }
 
-  map you_server_map = read_suseservers ();
+  // read /etc/suseservers
+  map you_server_map 	= read_suseservers ();
 
-  string you_server 	= OnlineUpdate::you_server;
-  string you_serverkind = OnlineUpdate::you_serverkind;  
-  string default_server = "";
-  string default_serverkind = "";
+  y2debug( "/ETC/SUSESERVERS *** initial ***: %1", you_server_map );
   
-  // default server is first entry in file /etc/suseservers (instead of "ftp.suse.com")
-  if ( you_server == "" )
+  string you_server	= "";
+  string you_serverkind = "";
+  string you_dir 	= "";
+  
+  if ( Mode::youInstallMap != $[] && Mode::youInstallMap["you_serverkind"]:"" != "" )
   {
-      default_server = read_first_suseserver();
-      default_serverkind = read_first_suseserverkind();
+      you_server 	= Mode::youInstallMap["you_server"]:"";
+      you_serverkind 	= Mode::youInstallMap["you_serverkind"]:"";
+      you_dir 		= Mode::youInstallMap["you_dir"]:"";
   }
-
-  string you_dir =  OnlineUpdate::you_dir;
-
-  // look for default directory in server map (instead of "/pub/suse")
-  if ( you_dir == "" )
+  else
   {
-      you_dir = select( lookup(you_server_map, you_server, ["",""]), 0, "" );
-  }
-  if ( you_serverkind == "" )
-  {
+      // if no server/directory is set in Expert mode (inst_source), take the
+      // first entry in file /etc/suseservers (instead of "ftp.suse.com/pub/suse")
+      you_server     = read_first_suseserver();
+      y2debug( "FIRST SERVER: %1", you_server );
+      
       you_serverkind = select( lookup(you_server_map, you_server, ["",""]), 1, "" );
-  }  
-  y2milestone("YOU server: %1, directory: %2", you_server, you_dir );
+      you_dir        = select( lookup(you_server_map, you_server, ["",""]), 0, "" ); 
+  }
+
+  y2milestone("YOU Server: %1, directory: %2, kind: %3", you_server, you_dir, you_serverkind );
   
   // insert local server like CD, NFS ....
-  if ( you_server != "" && you_server != default_server )
+  if ( Mode::youInstallMap["you_serverkind"]:"" != "" )
   {
       list you_dir_list = [];
       you_dir_list = add ( you_dir_list, you_dir );
       you_dir_list = add ( you_dir_list, you_serverkind );      
       you_server_map = add(you_server_map, you_server, you_dir_list );
+
+      y2debug( "/ETC/SUSESERVERS *** extended ***: %1", you_server_map );
   }
-    
+
+  
+  // create list for the combo box installation source
   foreach(`server, `info, you_server_map, ``{
       you_server_list = add(you_server_list, server);
   });
@@ -262,24 +267,20 @@ another FTP/HTTP server.</p>
 	  return `abort;
       }
       string you_server = read_first_suseserver(); 
-      OnlineUpdate::you_server 	= you_server;
-
-      string you_dir = select( lookup(you_server_map, you_server, []), 0, "" );
-      OnlineUpdate::you_dir	= you_dir;
-
       string you_serverkind = read_first_suseserverkind(); 
-      OnlineUpdate::you_serverkind = you_serverkind;
+      string you_dir = select( lookup(you_server_map, you_server, ["",""]), 0, "" );
 
-      any retval = SCR::Execute( .you.setServer, $["kind":you_serverkind, "name":you_server, "path":you_dir]);
+      any retval = SCR::Execute( .you.setServer,
+				 $["kind":you_serverkind,
+				   "name":you_server,
+				   "path":you_dir]);
 		
       if (retval == nil || retval == false)
       {
+	  y2error("ONLINE: .you.setServer( %1, %2 %3) ): %4", you_server, you_dir, you_serverkind, retval );
 	  return `abort;
-	  y2error("ONLINE: .you.setServer( %1, %2 %3) ): %4",
-		  you_server, you_dir, you_serverkind, retval );
       }
-      y2debug("ONLINE: .you.setServer( %1, %2 %3) ): %4",
-	      you_server, you_dir, you_serverkind, retval );
+      y2debug("ONLINE: .you.setServer( %1, %2 %3) ): %4", you_server, you_dir, you_serverkind, retval );
       
       return `next;      
   }  
@@ -294,13 +295,18 @@ another FTP/HTTP server.</p>
   {
       // write settings for CD update and return `next
       OnlineUpdate::you_auto 	= false;
-      OnlineUpdate::you_server	= "cd";
-      OnlineUpdate::you_serverkind = "cd";
-      OnlineUPdate::you_dir	= "";            
 
-      any retval = SCR::Execute( .you.setServer, $["kind":you_serverkind, "name":you_server, "path":you_dir]);
-      y2debug("ONLINE: .you.setServer( %1, %2 %3) ): %4",
-	      you_server, you_dir, you_serverkind, retval );
+      any retval = SCR::Execute( .you.setServer,
+				 $["kind":you_serverkind,
+				  "name":you_server,
+				  "path":you_dir]);
+	
+      if (retval == nil || retval == false)
+      {
+	  y2error("ONLINE: .you.setServer( %1, %2 %3) ): %4", you_server, you_dir, you_serverkind, retval );
+	  return `abort;
+      }
+      y2debug("ONLINE: .you.setServer( %1, %2 %3) ): %4", you_server, you_dir, you_serverkind, retval );
       
       return `next;
   }
@@ -339,20 +345,20 @@ another FTP/HTTP server.</p>
 	  OnlineUpdate::you_auto = false;
       }
 
+      // which server is selected from combo box installation source ?
       string you_server =  UI::QueryWidget(`id(`you), `Value );
-      OnlineUpdate::you_server = you_server;
 	
       if (ret == `next)
       {
-	  you_dir = select( lookup(you_server_map, you_server, []), 0, "" );
-	  OnlineUpdate::you_dir 	= you_dir;
-	  you_serverkind = select( lookup(you_server_map, you_server, []), 1, "" );
-	  OnlineUpdate::you_serverkind = you_serverkind;
+	  you_dir 	 = select( lookup(you_server_map, you_server, ["",""]), 0, "" );
+	  you_serverkind = select( lookup(you_server_map, you_server, ["",""]), 1, "" );
 
-	  any retval = SCR::Execute( .you.setServer, $["kind":you_serverkind, "name":you_server, "path":you_dir]);
+	  any retval = SCR::Execute( .you.setServer,
+				     $["kind":you_serverkind,
+				       "name":you_server,
+				       "path":you_dir]);
 	      
-	  y2debug("ONLINE: .you.setServer( %1, %2 %3) ): %4",
-		  you_server, you_dir, you_serverkind, retval );
+	  y2debug("ONLINE: .you.setServer( %1, %2 %3) ): %4", you_server, you_dir, you_serverkind, retval );
 	      
 	  if (retval == nil || retval == false)
 	  {
@@ -390,27 +396,30 @@ another SuSE FTP/HTTP server.\n"));
       }
       else if ( ret == `expert )
       {
-	  you_dir = select( lookup(you_server_map, you_server, []), 0, "" );
-	  you_serverkind = select( lookup(you_server_map, you_server, []), 1, "" );
-	    
-	  OnlineUpdate::you_dir = you_dir;
-	  OnlineUpdate::you_serverkind = you_serverkind;
+	  you_dir 	 = select( lookup(you_server_map, you_server, ["",""]), 0, "" );
+	  you_serverkind = select( lookup(you_server_map, you_server, ["",""]), 1, "" );
 
-	  // TODO: why adding false ?????????????
-	  // user_settings = add ( user_settings,"post_install", false );
-
+          // set install information for inst_source  
+	  Mode::youInstallMap["you_dir"] 	= you_dir;
+	  Mode::youInstallMap["you_serverkind"] = you_serverkind;
+	  Mode::youInstallMap["you_server"]	= you_server;
+	  
 	  any retval = CallFunction(`inst_source( true, true ) );
 	  if ( retval == `abort )
 	      return `abort;
 
-	  you_server 	= OnlineUpdate::you_server;
-	  you_serverkind 	= OnlineUpdate::you_serverkind;	      
-	  you_dir 		= OnlineUpdate::you_dir;
+	  // get install information after erturning from inst_source
+	  you_server 		= Mode::youInstallMap["you_server"]:"";
+	  you_serverkind 	= Mode::youInstallMap["you_serverkind"]:"";	      
+	  you_dir 		= Mode::youInstallMap["you_dir"]:"";
 	      
-	  retval = SCR::Execute( .you.setServer, $["kind":you_serverkind, "name":you_server, "path":you_dir]);
+	  retval = SCR::Execute( .you.setServer,
+				 $["kind":you_serverkind,
+				  "name":you_server,
+				  "path":you_dir]);
       
-	  y2debug("ONLINE: .you.setServer( %1, %2 %3) ): %4",
-		  you_server, you_dir, you_serverkind, retval );		
+	  y2debug("ONLINE: .you.setServer( %1, %2 %3) ): %4", you_server, you_dir, you_serverkind, retval );
+	  
 	  if (retval == nil || retval == false)
 	  {
 	      UI::ErrorPopup(_("Initialization failed. Try again.

@@ -74,7 +74,7 @@ packages were created by SuSE.
       }
       else if (Args(arg_n) == .cd_default)
       {
-	  OnlineUpdate::you_serverkind 	= "cd";
+	  Mode::youInstallMap["you_serverkind"] = "cd";
 	  OnlineUpdate::cd_update	=  true;
       }
       else if (Args(arg_n) == .auto.get)

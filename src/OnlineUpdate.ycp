@@ -17,14 +17,6 @@
     import "Installation";
     import "Mode";
 
-    // ftp server for the online update
-    global string you_server	=   "ftp.suse.com";
-
-    // which kind of 'server'; possible values are: hd, nfs, cd, ftp, http
-    global string you_serverkind = "ftp";
-
-    // directory on the server
-    global string you_dir 	= "/pub/suse";
 
     // flag: do we do an update from CD?
     global boolean cd_update 	= false;

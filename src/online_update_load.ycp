@@ -29,9 +29,9 @@
   import "Arch";
   
   // selected you server
-  string you_server 	= OnlineUpdate::you_server;
-  string you_serverkind = OnlineUpdate::you_serverkind;  
-  string you_dir 	= OnlineUpdate::you_dir;
+  string you_server 	= Mode::youInstallMap["you_server"]:"";
+  string you_serverkind = Mode::youInstallMap["you_serverkind"]:"";  
+  string you_dir 	= Mode::youInstallMap["you_dir"]:"";
   
   // check installation mode
   boolean auto_mode 	= OnlineUpdate::you_auto;
