@@ -1,10 +1,7 @@
 /**
- * File:	clients/online_update_select.ycp
  * Package:	Online update
  * Summary:	Selection dialog
  * Authors:	Cornelius Schumacher <cschum@suse.de>
- *
- * $Id$
  *
  * Call the PackageSelector in YOU mode.
  */

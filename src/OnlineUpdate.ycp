@@ -1,11 +1,8 @@
 /**
- * File:	modules/OnlineUpdate.ycp
  * Package:	Online update
  * Summary:	Data used for Online Update
  * Authors:	Gabriele Strattner <gs@suse.de>
  *		Stefan Schubert <schubi@suse.de>
- *
- * $Id$
  */
 
 {

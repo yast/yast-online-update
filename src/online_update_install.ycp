@@ -1,25 +1,6 @@
 /*
- *************************************************************
- *
- *     YaST2      SuSE Labs                        -o)
- *     --------------------                        /\\
- *                                                _\_v
- *           www.suse.de / www.suse.com
- * ----------------------------------------------------------
- *
- * Author:        Cornelius Schumacher <cschum@suse.de>
- *
- * Purpose:
- *
- * Modify:
- *
- * external function:
- *
- *
- *************************************************************
-
- $Id$
-
+   Summary: YOU installation page
+   Authors: Cornelius Schumacher <cschum@suse.de>
 */
 
 {
@@ -307,8 +288,7 @@ abort the update?
             } else {
               string result = "skipped";
               if ( proceed != `all ) {
-                // FIXME: YouInstallCurrentPatch has to return a string.
-                if ( Pkg::YouInstallCurrentPatch() ) {
+                if ( Pkg::YouInstallCurrentPatch() == "" ) {
                   result = "";
                 } else {
                   result = "error";

@@ -1,12 +1,8 @@
 /**
- * File:	network/online-update/inst_you.ycp
  * Package:	online-update
  * Summary:	Call YOU during installation
  * Authors:	Arvin Schnell <arvin@suse.de>
- *
- * $Id$
  */
-
 {
 
     textdomain "online-update";

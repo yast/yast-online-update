@@ -4,8 +4,6 @@
  * Authors:		Cornelius Schumacher <cschum@suse.de>
  *
  * Purpose: 		provides the Callbacks for the online update
- *
- * $Id$
  */
 {
     module "OnlineUpdateCallbacks";

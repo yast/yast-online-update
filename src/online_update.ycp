@@ -1,12 +1,8 @@
 /**
- * File:	online_update.ycp
- * Package:	Online update
  * Summary:	Main file
  * Authors:	Gabriele Strattner <gs@suse.de>
  *		Stefan Schubert <schubi@suse.de>
  *              Cornelius Schumacher <cschum@suse.de>
- *
- * $Id$
  */
 
 {

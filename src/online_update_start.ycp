@@ -1,5 +1,4 @@
 /**
- * File:	clients/online_update_select.ycp
  * Package:	Online update
  * Summary:	Start update, display last update info, choose mode (auto|manual)
  * Authors:	Gabriele Strattner <gs@suse.de>
