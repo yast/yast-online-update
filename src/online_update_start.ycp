@@ -47,7 +47,7 @@
 						    ),
 					     `HBox (
 						    `HSpacing (0.5),
-						    `TextEntry ( `id(`password), _("&Password:"), password ),
+						    `Password ( `id(`password), _("&Password:"), password ),
 						    `HSpacing (0.5)
 						    ))),
 			      `VSpacing(0.2),
@@ -64,6 +64,8 @@
 			`HSpacing(1)
 			)
 		  );
+
+       UI::SetFocus( `id(`username) );
 
        do {
            any ret = UI::UserInput();
