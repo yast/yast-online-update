@@ -1,8 +1,0 @@
-#
-# While starting YOU ( YaST2-Online-Update ) the default ftp serverlist
-# will be updated by the call "wget" to www.suse.de. This list will be
-# stored under /etc/suseservers.
-# Set YAST2_LOADFTPSERVER to "no", if you do not want to  reload the 
-# ftp serverlist.
-#
-YAST2_LOADFTPSERVER="yes"
