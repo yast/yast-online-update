@@ -22,7 +22,7 @@
 
   boolean business	= false;
 
-  global define string GetPatches() ``{
+  global define string GetPatches( boolean reload ) ``{
 
     UI::OpenDialog( `opt( `decorated ),
       `VBox(
@@ -35,6 +35,7 @@
     );
 
     string err = Pkg::YouGetPatches( you_server,
+                                     reload,
                                      OnlineUpdate::signature_check );
 
     UI::CloseDialog();
@@ -136,23 +137,31 @@
       `VSpacing(1.0),
       `HBox(
         `HWeight(1, `Empty()),
-        `HWeight(10, `Frame (_("&Choice of update mode"),
+        `HWeight(10,
+          `Frame (_("&Choice of update mode"),
+            `VBox(
                 `RadioButtonGroup(`id(`choice),
-                `VBox(
+                  `VBox(
                       `VSpacing(0.3),
                       `HBox(`HSpacing(0.8),
-                      `Left(`RadioButton(`id(`automatic),`opt(`notify),
-                             _("Automatic &Update"), false) )
+                        `Left(`RadioButton(`id(`automatic),`opt(`notify),
+                              _("Automatic &Update"), false) )
                       ),
                       `VSpacing(0.3),
                       `HBox(`HSpacing(0.8),
-                      `Left(`RadioButton(`id(`manual),`opt(`notify),
+                        `Left(`RadioButton(`id(`manual),`opt(`notify),
                              _("&Manual Update") ,  false))
                       ),
                       `VSpacing(0.3)
-                      )
+                  )
+                ),
+                `HBox(`HSpacing(0.8),
+                  `Left(`CheckBox(`id(`reload),
+                        _("&Reload all patches from server"), true ) )
                 )
-                )),
+            )
+          )
+        ),
         `HWeight(1, `Empty())
       ),
       `VSpacing(1.0),
@@ -259,35 +268,40 @@ another FTP or HTTP server.</p>
 	      }
 	  }
 
-          string err = GetPatches();
+          boolean reload = UI::QueryWidget( `id( `reload ), `Value );
+
+          string err = GetPatches( reload );
 
           if ( size( err ) != 0 ) {
-            if ( err == "abort" ) ret = `this;
+            y2error( "GetPatches err: %1", err ); 
 
-            string msg = "";
-            string details = Pkg::ErrorDetails();
-            if ( err == "media" ) {
-              if ( cd_update ) {
-                msg = _("Initialization failed. Please check that
-you have inserted the correct CD.\n");
-              } else {
-	        msg = _("Initialization failed. Try again.
-If failure continues, choose
-another SuSE FTP/HTTP server.\n");
-              }
-            } else if ( err == "sig" ) {
-                msg = _("Signature check for patch info files failed.
-Can't load patch information.\n");
-                ret = `this;
-            } else if ( err == "url" ) {
-                msg = _("URL is invalid.");
-            } else {
-                msg = _("Getting patch information failed.");
-                details = Pkg::Error();
-            }
-            
-            UI::YouErrorPopup( msg, details );
             ret = `this;
+
+            if ( err != "abort" ) {
+              string msg = "";
+              string details = Pkg::ErrorDetails();
+              if ( err == "media" ) {
+                if ( cd_update ) {
+                  msg = _("Initialization failed. Please check that
+  you have inserted the correct CD.\n");
+                } else {
+	          msg = _("Initialization failed. Try again.
+  If failure continues, choose
+  another SuSE FTP/HTTP server.\n");
+                }
+              } else if ( err == "sig" ) {
+                  msg = _("Signature check for patch info files failed.
+  Can't load patch information.\n");
+                  ret = `this;
+              } else if ( err == "url" ) {
+                  msg = _("URL is invalid.");
+              } else {
+                  msg = _("Getting patch information failed.");
+                  details = err + "\n" + details;
+              }
+
+              UI::YouErrorPopup( msg, details );
+            }
           } else {
             Pkg::YouSelectPatches();
           }
