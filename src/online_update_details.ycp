@@ -102,9 +102,9 @@ last package update and about all patches
 installed on your system.
 </p>"));
     string help_part2 =  UI(_("<p>
-More detailed information about a special patch can
-be obtained. First, select the patch from the list
-then click on the <b>Show Patch Info</b> button.
+For more detailed information about a patch, 
+select the patch from the list
+then click <b>Show Patch Info</b>.
 </p>
 "));
 

@@ -118,24 +118,25 @@ After that, all selected patches will be copied to the
 hard disk.</p>
 "));
 
-  string help_part13 = UI(_("<p>YaST2 first gets the descriptions of
-the available patches from the FTP/HTTP server.
-After that, select the patches to
+  string help_part13 = UI(_("<p>After YaST2 retrieves the descriptions of
+the available patches from the FTP or HTTP server, 
+select the patches to
 download and install.</p>
 "));
   
   string help_part2 =  UI(_("<p>
 The fields above show information about the connection and
-time of data transfer.
-The box below displays data from the FTP/HTTP log file. If something
+the time for data transfer.
+The box below displays data from the FTP or HTTP log file. If something
 goes wrong, check this file for information. 
 </p>
 "));
   string help_part3 =  UI(_("<p>
 If you decide to <b>Abort Update</b>, the download of
 patches will be interrupted. No patch will be installed.
-The ftp/http connection will be closed. 
-</p>"));
+The FTP or HTTP connection will be closed. 
+</p>
+"));
 
   if ( cd_update )
   {
@@ -426,10 +427,10 @@ The ftp/http connection will be closed.
 
 	      if (  !auto_mode_get )
 	      {
-		  string msg_str = sformat(UI(_("Can't get patch \"%1\" from
+		  string msg_str = sformat(UI(_("Cannot get patch \"%1\" from
 server \"%2\".
-You may try to download remaining patches or
-go on with installation of downloaded ones.
+Try to download remaining patches or
+continue with installation of downloaded ones.
 ")),
 					   select(patch_list, index), lastErrorServer );
 	      
@@ -518,7 +519,7 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
 
       string gpg_warning = sformat(
 				   UI(_("Cannot check patch %1 because the GPG key is not installed or is corrupted.
-SuSE cannot guarantee that the packages has been created by SuSE.
+SuSE cannot guarantee that the packages were created by SuSE.
 ")),
 			       patch);
       
@@ -526,8 +527,9 @@ SuSE cannot guarantee that the packages has been created by SuSE.
       {
 	  // package gpg not found
 	  gpg_warning = sformat(
-		   UI(_("Cannot check patch %1 because the GPG package is not installed or is corrupted.
-SuSE cannot guarantee that the packages has been created by SuSE.
+		   UI(_("Cannot check patch %1 because the GPG package is not installed or is
+corrupted.
+SuSE cannot guarantee that the packages were created by SuSE.
 ")),
 		   patch);
       }
@@ -560,7 +562,7 @@ SuSE cannot guarantee that the packages has been created by SuSE.
 	      {
 		  string message = sformat(
 					   UI(_("Patch %1 will not be installed 
-because package %2 is corrupted
+because package %2 is corrupted.
 ")),
 					   patch, package );
 	      
@@ -705,7 +707,7 @@ because package %2 is corrupted
 	  {
 	      // not the correct YaST2 Verison
 	      string message = sformat(
-		UI(_("Patch %1 needs version %2 of YaST2.
+		UI(_("Patch %1 requires YaST2 version %2.
 You have installed version %3.
 ")),
 		patch,
@@ -869,8 +871,8 @@ SuSE cannot guarantee that the patch has been created by SuSE.
 	      //if ( lookup( user_settings, "you_server", "" ) == "CD" )
 	      if ( cd_update )
 	      {
-		  UI::MessagePopup(_("Can't get the patch descriptions.
-Please insert SuSE patch CD and
+		  UI::MessagePopup(_("Cannot access the patch descriptions.
+Insert the SuSE patch CD and
 restart the \"Patch CD Update\".
 "));
 		  return `abort;
@@ -924,8 +926,8 @@ Try to connect to another SuSE FTP/HTTP server.
       {
 	  if ( cd_update )
 	  {
-	      UI::MessagePopup(_("Can't get the patches from CD.
-Please insert the SuSE patch CD
+	      UI::MessagePopup(_("Cannot get the patches from CD.
+Insert the SuSE patch CD
 (check the version)
 or update your system with YaST2
 \"Online Update\".
@@ -934,8 +936,8 @@ or update your system with YaST2
 	  }
 	  else
 	  {
-	      UI::MessagePopup(_("Can't get the patches from server.
-Please try to get patches from another SuSE FTP/HTTP server.
+	      UI::MessagePopup(_("Cannot get the patches from the server.
+Try another SuSE FTP/HTTP server.
 "));   
 	      return `back;
 	  }
@@ -982,7 +984,7 @@ Please try to get patches from another SuSE FTP/HTTP server.
 	  // Message popup text: YaST2 patches found which should be installed first
 	  UI::MessagePopup(_("There are YaST2 patches available.
 These patches should be installed first.
-Please install these patches then run the YaST2 Online Update
+Install these patches then run the YaST2 Online Update
 again to install the rest of the packages.
 "));
       }
@@ -1005,7 +1007,7 @@ again to install the rest of the packages.
 	      // only greater than 1 MB
 	      string message = sformat (
 		UI(_("There are %1 patches on FTP/HTTP. Downloading may take a while.
- Do you really want to download the patches now?
+Download the patches now?
 ")),
 		size_text( disk_size ) );
 
@@ -1058,7 +1060,7 @@ again to install the rest of the packages.
 		  any ret = SCR::Execute( .you.disconnect, "");
 		  y2debug("ONLINE:  SCR::Execute(.you.disconnect): %1", ret );
 
-		  UI::MessagePopup(_("There is no patch to install."));
+		  UI::MessagePopup(_("No patch to install."));
 	      }
 	      return `abort;		// abort update
 	  }

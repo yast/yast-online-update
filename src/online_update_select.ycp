@@ -122,8 +122,8 @@
 
     // Helptext  "List of available patches"
     // This text is shown if patches will be installed from CD.
-    string help_part01 = UI(_("<p>This dialog shows the patches from
-SuSE patch CD that are not yet installed on your system.</p>
+    string help_part01 = UI(_("<p>This dialog shows the patches from the
+SuSE Patch CD that are not yet installed on your system.</p>
 "));
     // This is the text for you installation.
     string help_part02 =  UI(_("<p>This dialog shows all new patches available

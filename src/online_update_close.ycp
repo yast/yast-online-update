@@ -88,7 +88,7 @@ check the <b>Details</b> for more information.
 </p>
 "));
   string help_part3 =  UI(_("<p>
-Please try to do the update again if important
+Try to update again if important
 patches could not be installed.
 </p>
 "));

@@ -59,7 +59,7 @@
   list you_server_list = [];
 
   // initialize You Agent
-  UI::OpenDialog(`opt(`decorated ),`Label(_("Initializing for FTP/HTTP update; One moment please...")));
+  UI::OpenDialog(`opt(`decorated ),`Label(_("Initializing for FTP/HTTP update. One moment please...")));
 
   any retval = SCR::Execute(.you.setEnvironment, $[ "language":long_language,
 						  "rootpath":rootpath,
@@ -148,8 +148,8 @@
   {
       // Message popup: yast2 component responsible for the you update cannot be initialised.
       // This does not mean, connection failed to you server, but any other error occured.
-      UI::MessagePopup(_("Initialization of FTP/HTTP server failed
-(internal error).
+      UI::MessagePopup(_("Initialization of FTP/HTTP server failed:
+internal error.
 "));
       return `abort;
   }
@@ -222,9 +222,8 @@
   string help_text = "";
 
   // helptext dialog online update start screen 
-  string help_part1 =  UI(_("<p>
-SuSE Online Update is the easy way to get all recommended
-patches and security fixes from SuSE ftp/http server.<br>
+  string help_part1 =  UI(_("<p>SuSE Online Update is the easy way to get all recommended
+patches and security fixes from a SuSE ftp/http server.<br>
 <b>Automatic Update</b> will connect to the server,
 fetch the files, and install the patches.</p>
 "));
@@ -236,10 +235,9 @@ Information about the last update will be shown
 if you click on the <b>Details</b> button.
 </p>"));
 
-  string help_part3 =  UI(_("<p>
-If you click on button <b>Expert</b>, you can select an local
-installation source instead of an FTP/HTTP server or select another FTP/HTTP server.
-</p>
+  string help_part3 =  UI(_("<p>After clicking <b>Expert</b>, select a local
+installation source instead of an FTP/HTTP server or select 
+another FTP/HTTP server.</p>
 "));
     
     
@@ -358,10 +356,9 @@ installation source instead of an FTP/HTTP server or select another FTP/HTTP ser
 	      
 	      if (retval == nil || retval == false)
 	      {
-		  UI::DisplayMsgYou(_("Initialization failed -- please try again.
-If failure continues, please choose
-another SuSE FTP/HTTP server.
-"));
+		  UI::DisplayMsgYou(_("Initialization failed. Try again.
+If failure continues, choose
+another SuSE FTP/HTTP server.\n"));
 		  ret = `again;
 	      }
 	      else
@@ -415,10 +412,9 @@ another SuSE FTP/HTTP server.
 		      you_server, you_dir, you_serverkind, retval );		
 	      if (retval == nil || retval == false)
 	      {
-		  UI::DisplayMsgYou(_("Initialization failed -- please try again.
-If failure continues, please choose
-another SuSE FTP/HTTP server.
-"));
+		  UI::DisplayMsgYou(_("Initialization failed. Try again.
+If failure continues, choose
+another SuSE FTP/HTTP server.\n"));
 	      }
 	      ret = `again;
 	  }
