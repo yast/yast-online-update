@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Jan  8 18:05:06 CET 2001 - kkaempf@suse.de
+
+- provide scrconf/etc_suseservers.scr
+
+-------------------------------------------------------------------
 Mon Jan  8 17:57:02 CET 2001 - kkaempf@suse.de
 
 - provide include/suseservers.ycp
