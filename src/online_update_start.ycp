@@ -31,8 +31,6 @@
 
   // ftp_server_map = $[ "server" : [ "path", "type" ], ... ]
 
-  map ftp_server_map = read_suseservers ();
-
   string rootpath = "/";
   string yastpath = "/var/lib/YaST";
   string patchpath = "/var/lib/YaST/patches";
@@ -44,55 +42,6 @@
     //////////////////////////////////////////////////////////////////////////////////////
     //                                  P O P U P S                                     //
     //////////////////////////////////////////////////////////////////////////////////////
-
-  //
-  // Checking connection to ftp-server
-  //
-  define checkConnection( string ftpServer )``{
-      y2debug("Checking connection to  %1", ftpServer );
-
-      if ( ftpServer == "local" ||
-	   ftpServer == "Net" ||
-	   ftpServer == "CD" ||
-	   ftpServer == "Harddisk" )
-      {
-	  return  true ;
-      }
-      
-      integer ret_shell = SCR(`Execute(.target.bash,
-				       "/bin/ping -c 1 -q -w 5 " +
-				       ftpServer ));
-      y2milestone ( "command: /bin/ping -c 1 -q -w 5  %1 return %2",
-		    ftpServer, ret_shell );
-      any ret = true;
-      
-      while ( ret_shell != 0 &&
-	      ret == true )
-      {
-	  string message = UI(_("There is no connection to network; please connect manually."));
-
-	  ret = UI(`DisplayMsgFtp( message, _("Connect error"),
-				   _("&ok"), _("&cancel") ));
-	  if ( ret )
-	  {
-	      ret_shell = SCR(`Execute(.target.bash,
-				       "/bin/ping -c 1 -q -w 5 " +
-				       ftpServer ));
-	      y2milestone ( "command: /bin/ping -c 1 -q -w 5  %1 return %2",
-			    ftpServer, ret_shell );
-	      
-	  }
-      }
-
-      if ( ret_shell != 0 )
-      {
-	  return  false;
-      }
-      else
-      {
-	  return true;
-      }
-  };
 
 
     /////////////////////////////////////////////////////////////////////////////////////
@@ -111,8 +60,34 @@
 
     list ftp_server_list = [];
 
+    string reloadServer =  SCR(`Read(.rc.system.YAST2_LOADFTPSERVER));
+
+    y2milestone ( "YAST2_LOADFTPSERVER = %1", reloadServer );
+    
+    if ( reloadServer != "no" )
+    {
+	// getting ftp-server-description from www.suse.de
+	SCR (`Execute(.target.bash,"/bin/cp /etc/suseservers /etc/suseservers.bak" ));
+	string command = "/usr/bin/wget -q --output-document="+
+	    SCR(`Read(.target.root))+
+	    "/etc/suseservers --tries=2 --timeout=5 http://www.suse.de/de/support/download/suseservers.txt";
+	if ( Shell( command ) != 0  )      
+	{
+	    y2error("command: %1", command);
+	    SCR (`Execute(.target.bash,
+			  "/bin/cp /etc/suseservers.bak /etc/suseservers" ));
+	}
+	else
+	{
+	    y2milestone("command %1 ok", command);
+	}
+	SCR (`Execute(.target.remove,"/etc/suseservers.bak" ));	
+    }
+
+    map ftp_server_map = read_suseservers ();
+
     // insert local server like CD, NFS ....
-    if ( ftp_server != "" )
+    if ( ftp_server != "" && ftp_server != "ftp.suse.com" )
     {
 	list ftp_dir_list = [];
 	ftp_dir_list = add ( ftp_dir_list, ftp_dir );
@@ -277,40 +252,21 @@ installation-source instead of a ftp-server or select another ftp-server.
 	    ftp_dir = select( lookup(ftp_server_map, ftp_server, []), 0 );
 	    user_settings = add(user_settings, "ftp_dir", ftp_dir);
 
-	    if ( checkConnection(ftp_server) )
-	    {
-		any retval = PKGINFO(`ftpSetServer( ftp_server,
+	    any retval = PKGINFO(`ftpSetServer( ftp_server,
 						ftp_dir ) );
-		y2debug("ONLINE: PKGINFO(`setFtpServer( %1, %2 ) ): %3",
-			ftp_server, ftp_dir, retval );
+	    y2debug("ONLINE: PKGINFO(`setFtpServer( %1, %2 ) ): %3",
+		    ftp_server, ftp_dir, retval );
 		
-		if (retval == nil || retval == false)
-		{
-		    UI(`DisplayMsgFtp(_(
-				"Initialization failed - please try again.
+	    if (retval == nil || retval == false)
+	    {
+		UI(`DisplayMsgFtp(_(
+				    "Initialization failed - please try again.
 If failure continues, please choose
 another SuSE ftp server.")));
-		    ret = `again;
-		}
-		
-		// getting ftp-server-description from www.suse.de
-		string command = "/usr/bin/wget -q --output-document="+
-		    SCR(`Read(.target.root))+
-		    "/etc/suseservers --tries=3 --wait=5 http://www.suse.de/de/support/download/suseservers.txt &";
-		if ( Shell( command ) != 0 )      
-		{
-		    y2error("command: %1", command);	
-		}
-		else
-		{
-		    y2milestone("command %1 ok", command);
-		}
-		
+		ret = `again;
 	    }
-	    else
-	    {
-		    ret = `again;		
-	    }
+		
+
 	}
 	else if ( ret == `details )
 	{

@@ -1,4 +1,18 @@
 -------------------------------------------------------------------
+Wed Mar  7 11:36:22 MET 2001 - schubi@suse.de
+
+- Checking connection via socket ( not ping )
+- Loading available server-list from http and load it BEFORE
+  the user can select one server.
+- Loading server-list can be switched off by a rc.config variable.
+- Setting progress-bars to zero after closing the connection
+- Updating YaST2 modules at first. Every further patch can only
+  installed by a second run.
+- The packages can stored on another ftp server ( e.g. nvidea)
+  although the patch desciption is e.g. on ftp.suse.com
+
+
+-------------------------------------------------------------------
 Sat Jan 20 15:27:32 MET 2001 - schubi@suse.de
 
 - server-path of uni-aachen changed

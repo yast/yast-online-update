@@ -43,6 +43,7 @@ make install
 
 %files
 
+/var/adm/fillup-templates/rc.config.y2c_online_update
 /etc/suseservers
 @YAST2DIR@/menuentries/menuentry_online_update.ycp
 @YAST2DIR@/include/suseservers.ycp
@@ -53,3 +54,11 @@ make install
 @YAST2DIR@/clients/online_update_load.ycp
 @YAST2DIR@/clients/online_update_select.ycp
 @YAST2DIR@/clients/online_update_start.ycp
+
+%post
+echo "Updating etc/rc.config..."
+if [ -x bin/fillup ] ; then bin/fillup -q -d = etc/rc.config var/adm/fillup-templates/rc.config.y2c_online_update
+else
+       echo "ERROR: fillup not found. This should not happen. Please compare"
+       echo "/etc/rc.config and /var/adm/fillup-templates/rc.config.y2c_online_update and update manually."
+fi

@@ -17,9 +17,7 @@
  *
  *
  *************************************************************
-
  $Id$
-
 */
 
 {
@@ -28,6 +26,7 @@
   
   // selected ftp server
   string ftp_server = lookup( user_settings, "ftp_server", "" );
+  string ftp_dir = lookup( user_settings, "ftp_dir", "" );
   
   // check installation mode
   boolean auto_mode 	= lookup( user_settings, "ftp_auto", false );
@@ -165,8 +164,7 @@ The ftp connection will be closed.
       integer index = 0;
       boolean go_on = true;
       integer patch_no = 0;
-
-
+      
       foreach( `patch, `patch_info, new_patches, ``{
 	  // only get the patch if marked with "X" or "G" 
 	  if ( select ( lookup(new_patches, patch, []), 3 ) == "X" || select ( lookup(new_patches, patch, []), 3 ) == "G")
@@ -181,17 +179,10 @@ The ftp connection will be closed.
 	  // nothing will do
 	  return ret_list;
       }
-      
+
       string connect_string = "Starting download of selected patches from "  + ftp_server + ".\n";
       UI(`ChangeWidget(`id(`log), `LastLine, connect_string ));
 
-      // connect
-
-      if ( !checkConnection(ftp_server) )
-      {
-	  return ret_list;
-      }
-      
       map  result_map = PKGINFO(`ftpConnect());
       y2debug("ONLINE:  PKGINFO(`ftpConnect()): %1", result_map );
       connect_string = lookup (result_map, "message", "" );
@@ -208,29 +199,132 @@ The ftp connection will be closed.
       
       while ( (index < patch_no) && go_on )
       {
-	  map result_map = $[];
-	  string patch =  select(patch_list, index);
+	  map patch_result = $[];
+	  string patch = select(patch_list, index);
+	  
 	  y2debug("Status of patch %1: %2", patch, select( lookup(new_patches, patch, []), 3 ));
 
 	  UI(`ChangeWidget(`id(`log), `LastLine, "Get packages for patch " +
 			   patch +
 			   "\n" ));
-
-	  result_map = PKGINFO( `ftpGetPatch( select(patch_list, index) ) );
-	  y2debug("ONLINE: PKGINFO(ftpGetPatch( %1 )): %2", select(patch_list, index), result_map );
-	  while ( lookup(result_map, "ok", false) == true &&
-		  lookup(result_map, "nextPackage","") != "" )
+	  
+	  patch_result = PKGINFO( `ftpGetPatch( select(patch_list, index) ) );
+	  y2debug("ONLINE: PKGINFO(ftpGetPatch( %1 )): %2", select(patch_list, index), patch_result );
+	  while ( lookup(patch_result, "ok", false) == true &&
+		  lookup(patch_result, "nextPackage","") != "" )
 	  {
-	      y2debug("ONLINE: PKGINFO(ftpGetPatch( %1 )): %2", select(patch_list, index), result_map );
+	      boolean otherServerConnect = false;
+	      
+	      y2debug("ONLINE: PKGINFO(ftpGetPatch( %1 )): %2", select(patch_list, index), patch_result );
 	      UI(`ChangeWidget(`id(`log), `LastLine, "Package " +
-			    lookup(result_map, "nextPackage","") +
+			    lookup(patch_result, "nextPackage","") +
 			   "\n" ));
-	      UI(`ChangeWidget(`id(`fileProgress), `ExpectedSize, lookup(result_map, "nextPackageSize",0)) );
-	      UI(`ChangeWidget(`id(`fileProgress), `Filename, lookup(result_map, "nextPackage","")) );
-	      result_map = PKGINFO( `ftpGetPatch( select(patch_list, index) ) );
-	  }
+	      UI(`ChangeWidget(`id(`fileProgress), `ExpectedSize, lookup(patch_result, "nextPackageSize",0)) );
+	      UI(`ChangeWidget(`id(`fileProgress), `Filename, lookup(patch_result, "nextPackage","")) );
 
-	  if ( !lookup(result_map, "ok", false) )
+	      string otherFtpServer = lookup ( patch_result, "nextFtpServer", "" );
+	      
+	      // Checking, if the package is on another server; not when the
+	      // source is CD, Harddisk....
+	      if ( ftp_server != "local" &&
+		   ftp_server != "Net" &&
+		   ftp_server != "CD" &&
+		   ftp_server != "Harddisk" &&
+		   size ( otherFtpServer ) > 0 )
+	      {
+		  map result = $[];
+
+		  otherServerConnect = true;
+		  
+		  // disconnect from the old server
+		  result = PKGINFO(`ftpDisconnect());
+		  y2debug("ONLINE:  PKGINFO(`ftpDisonnect()): %1", result );
+		  string last_logging = lookup(result, "message", "" );
+		  if ( size ( last_logging ) > 0 )
+		  {
+		      UI(`ChangeWidget(`id(`log), `LastLine, last_logging+"\n" ));
+		  }
+		  if ( lookup( result, "ok", false )  )
+		  {
+		      UI(`ChangeWidget(`id(`status), `Value, _("closed")) );
+		  }
+		  
+		  // connecting to other ftp-server
+
+		  any retval = PKGINFO(`ftpSetServer( otherFtpServer,"." ) );
+		  y2debug("ONLINE: PKGINFO(`setFtpServer( %1, %2 ) ): %3",
+			  otherFtpServer, ".", retval );
+		
+		  if (retval == nil || retval == false)
+		  {
+		      last_logging = sformat ( "Connection failed to %1\n", otherFtpServer );
+		      UI(`ChangeWidget(`id(`log), `LastLine, last_logging ));		      
+		  }
+		  else
+		  {
+		      // connect to new server
+		      result = PKGINFO(`ftpConnect());
+		      y2debug("ONLINE:  PKGINFO(`ftpConnect()): %1", result );
+		      string connect_string = lookup (result, "message", "" );
+		      if ( size ( connect_string ) > 0 )
+		      {
+			  UI(`ChangeWidget(`id(`log), `LastLine, connect_string+"\n" ));
+		      }
+		      if (lookup( result, "ok", false )  )
+		      {
+			  UI(`ChangeWidget(`id(`status), `Value, _("active")) );
+			  UI(`ChangeWidget(`id(`id1), `Value, otherFtpServer) );  			  
+		      }
+		  }
+	      }
+
+	      // Getting rpm
+	      patch_result = PKGINFO( `ftpGetPatch( select(patch_list, index) ) );
+	      
+	      if ( otherServerConnect )
+	      {
+		  //Reconnect to old server
+		  map result = $[];
+
+		  otherServerConnect = false;
+		  
+		  // disconnect from  server
+		  result = PKGINFO(`ftpDisconnect());
+		  y2debug("ONLINE:  PKGINFO(`ftpDisonnect()): %1", result );
+		  string last_logging = lookup(result, "message", "" );
+		  if ( size ( last_logging ) > 0 )
+		  {
+		      UI(`ChangeWidget(`id(`log), `LastLine, last_logging+"\n" ));
+		  }
+		  if ( lookup( result, "ok", false )  )
+		  {
+		      UI(`ChangeWidget(`id(`status), `Value, _("closed")) );
+		  }
+		  
+		  // setting to old ftp-server
+		  any retval = PKGINFO(`ftpSetServer( ftp_server,
+					 ftp_dir ) );
+		  y2debug("ONLINE: PKGINFO(`setFtpServer( %1, %2 ) ): %3",
+			  ftp_server, ftp_dir, retval );
+		
+		  if (retval == nil || retval == false)
+		  {
+		      last_logging = sformat ( "Connection failed to %1\n", ftp_server );
+		      UI(`ChangeWidget(`id(`log), `LastLine, last_logging ));		      
+		  }
+
+		  // connect to old server
+		  result = PKGINFO(`ftpConnect());
+		  y2debug("ONLINE:  PKGINFO(`ftpConnect()): %1", result );
+		  if (lookup( result, "ok", false )  )
+		  {
+		      UI(`ChangeWidget(`id(`status), `Value, _("active")) );
+		      UI(`ChangeWidget(`id(`id1), `Value, ftp_server) );  		      
+		  }
+	      }
+	  }
+	  
+	  if ( !lookup(patch_result, "ok", false) )
 	  {
 	      // set status to error
 	      PKGINFO( `ftpChangePatchUpdateStatus( select(patch_list, index), ERROR ) );
@@ -238,7 +332,7 @@ The ftp connection will be closed.
 	      user_settings = add(user_settings, "ftp_ok", false );
 	       
 	      // put logging into LogView Widget before showing popup
-	      string last_logging = lookup(result_map, "message", "" );
+	      string last_logging = lookup(patch_result, "message", "" );
 	      if ( size ( last_logging ) > 0 )
 	      {
 		  UI(`ChangeWidget(`id(`log), `LastLine, last_logging+"\n" ));
@@ -247,8 +341,7 @@ The ftp connection will be closed.
 	      string msg_str = sformat(UI(_("Can't get patch \"%1\" from
 server \"%2\".
 You may try to download remaining patches or
-go on with installing of already got ones.
-In manual mode click on Next to proceed.")),
+go on with installing of already got ones.")),
 				       select(patch_list, index), ftp_server );
 	      
 	      any ret = UI(`DisplayMsgFtp( msg_str, _("Notify"), _("&Download"), _("&Install") ));
@@ -265,7 +358,7 @@ In manual mode click on Next to proceed.")),
 	      // put logging into LogView Widget
 	  }
 
-	  string log_string = lookup(result_map, "message", "" );
+	  string log_string = lookup(patch_result, "message", "" );
 	  if ( log_string != "" )
 	  {
 	      UI(`ChangeWidget(`id(`log), `LastLine, log_string+"\n" ));
@@ -291,17 +384,20 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
 	  }
       }
       
-      ShowProgress( 100 );  
+      ShowProgress( 0 );
 
+      UI(`ChangeWidget(`id(`fileProgress), `Filename, "") );      
+      UI(`ChangeWidget(`id(`fileProgress), `ExpectedSize, 1024) );
+      
       // disconnect
-      result_map = PKGINFO(`ftpDisconnect());
-      y2debug("ONLINE:  PKGINFO(`ftpDisonnect()): %1", result_map );
-      string last_logging = lookup(result_map, "message", "" );
+      map result = PKGINFO(`ftpDisconnect());
+      y2debug("ONLINE:  PKGINFO(`ftpDisonnect()): %1", result );
+      string last_logging = lookup(result, "message", "" );
       if ( size ( last_logging ) > 0 )
       {
 	  UI(`ChangeWidget(`id(`log), `LastLine, last_logging+"\n" ));
       }
-      if (lookup( result_map, "ok", false )  )
+      if (lookup( result, "ok", false )  )
       {
 	  UI(`ChangeWidget(`id(`status), `Value, _("closed")) );
       }
@@ -368,6 +464,8 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
 		  
 		  if ( !dontAsk )
 		  {
+		      boolean ret = true;
+		      
 		      ret = UI(`DisplayMsgFtp( pgp_warning, _("Warning"),
 					       _("&Install"), _("&Don't install") ));
 		      if ( !ret )
@@ -386,55 +484,6 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
       return install;
   };
 
-  //
-  // Checking connection to ftp-server
-  //
-  define checkConnection( string ftpServer )``{
-      y2debug("Checking connection to  %1", ftpServer );
-
-      if ( ftpServer == "local" ||
-	   ftpServer == "Net" ||
-	   ftpServer == "CD" ||
-	   ftpServer == "Harddisk" )
-      {
-	  return  true ;
-      }
-      
-      integer ret_shell = SCR(`Execute(.target.bash,
-				       "/bin/ping -c 1 -q -w 5 " +
-				       ftpServer ));
-      y2milestone ( "command: /bin/ping -c 1 -q -w 5  %1 return %2",
-		    ftpServer, ret_shell );
-      any ret = true;
-      
-      while ( ret_shell != 0 &&
-	      ret == true )
-      {
-	  string message = UI(_("There is no connection to network; please connect manually."));
-
-	  ret = UI(`DisplayMsgFtp( message, _("Connect error"),
-				   _("&ok"), _("&cancel") ));
-	  if ( ret )
-	  {
-	      ret_shell = SCR(`Execute(.target.bash,
-				       "/bin/ping -c 1 -q -w 5 " +
-				       ftpServer ));
-	      y2milestone ( "command: /bin/ping -c 1 -q -w 5  %1 return %2",
-			    ftpServer, ret_shell );
-	      
-	  }
-      }
-
-      if ( ret_shell != 0 )
-      {
-	  return  false;
-      }
-      else
-      {
-	  return true;
-      }
-  };
-      
     
   //
   // InstallPatches
@@ -564,13 +613,6 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
 	  + ftp_server + ".\n";
       UI(`ChangeWidget(`id(`log), `LastLine, connect_string ));
 
-      // connect
-
-      if ( !checkConnection(ftp_server) )
-      {
-	  success = false;
-      }
-
       if ( success )
       {
 	  result_map = PKGINFO(`ftpConnect());
@@ -631,6 +673,8 @@ Please try to get connection to another SuSE ftp server.")));
       {
 	  UI(`ChangeWidget(`id(`log), `LastLine, disconnect_message +"\n" ));
       }
+
+      ShowProgress( 0 );      
   }
   
   if (success)
@@ -643,6 +687,48 @@ Please try to get connection to another SuSE ftp server.")));
 	  UI(`DisplayMessage(_("Can't get patches from server.
 Please try to get patches from another SuSE ftp server.")));
 	  return `back;
+  }
+
+  if ( !continue_mode )
+  {
+      // Evaluate, if there are YaST2 packages which have to be
+      // updated first
+
+      boolean yast2found = false;
+      boolean notyast2found = false;
+      map yast2map = $[];
+      foreach( `patch, `patch_info, new_patches, ``{
+	  if (  select ( patch_info, 3 ) == "X" &&
+		select ( patch_info, 0 ) == "YaST2" )
+	  {
+	      yast2found = true;
+	      yast2map = add ( yast2map, patch, patch_info );
+	  }
+	  else
+	  {
+	      if ( select ( patch_info, 3 ) == "X" )
+	      {
+		  notyast2found = true;
+	      }
+	      list dummy = [];
+	      dummy = add ( dummy, select ( patch_info, 0 ) );
+	      dummy = add ( dummy, select ( patch_info, 1 ) );
+	      dummy = add ( dummy, select ( patch_info, 2 ) );
+	      dummy = add ( dummy, " " );
+	      yast2map = add ( yast2map, patch, dummy );
+	  }
+      });
+
+      if ( yast2found && notyast2found )
+      {
+	  new_patches = yast2map;
+	  y2milestone( " YaST2 patches found; only install %1",
+		       new_patches );
+	  UI(`DisplayMessage(_("There have been found YaST2 patches.
+These patches should be installed at first.
+Please install these patches and call YaST2 online update once
+again to install the rest of the packages.")));
+      }
   }
   
   if ( auto_mode )
@@ -731,7 +817,7 @@ Please try to get patches from another SuSE ftp server.")));
       {
 	  // do not set the CloseUpdate status -> no patch is installed
 	  PKGINFO(`ftpDisconnect());
-	  y2debug("ONLINE:  PKGINFO(`ftpDisconnect()): %1", ret );
+	  y2debug("ONLINE:  PKGINFO(`ftpDisconnect())" );
 	  UI(`DisplayMessage(_("No patch will be installed.")));
 	  
 	  return `abort;		// abort update  
