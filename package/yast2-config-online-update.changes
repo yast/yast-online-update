@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Sep 18 16:59:20 CEST 2001 - gs@suse.de
+
+- Internal changes ( obsolete defines removed or replaced )
+- checking for YaST2 version works correctly now
+
+-------------------------------------------------------------------
 Fri Aug 24 14:06:27 MEST 2001 - schubi@suse.de
 
 - YOU has and batchmode
