@@ -22,7 +22,7 @@ Packager:     @MAINTAINER@
 Summary:      YaST2 SCR YOU agent
 Version:      @VERSION@
 Source0:      @RPMNAME@-@VERSION@.tar.bz2
-Requires:     libpkg y2a_ftp y2a_http
+Requires:     libpkg yast2-agent-http yast2-agent-ftp
 %description
 -
 
