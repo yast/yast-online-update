@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Dec 18 17:51:24 CET 2000 - kkaempf@suse.de
+
+- provide list of SuSE servers in /etc/suseservers (standard-URL format)
+
+-------------------------------------------------------------------
 Mon Dec 18 13:21:00 CET 2000 - kkaempf@suse.de
 
 - keep list of servers in /etc/suseservers file
