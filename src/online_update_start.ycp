@@ -493,8 +493,6 @@ without the need of user interaction.</p>
   map server = you_server_list[ 1 ]:$[];
   UI::ChangeWidget( `id(`url), `Value, server[ "url" ]:"" );
 
-  boolean blockUrlEdit = true;
-
 
   //  Loop for User Input ....
 
@@ -516,14 +514,9 @@ without the need of user interaction.</p>
 
       if ( ret == `server ) {
         UI::ChangeWidget( `id(`url), `Value, server[ "url" ]:"" );
-        blockUrlEdit = true;
       } else if ( ret == `url ) {
-        if ( blockUrlEdit ) {
-          blockUrlEdit = false;
-        } else {
-          if ( serverId != 0 ) {
-            UI::ChangeWidget( `id(`server), `Value, 0 );
-          }
+        if ( serverId != 0 ) {
+          UI::ChangeWidget( `id(`server), `Value, 0 );
         }
       } else if ( ret == `newserver || ret == `editserver ) {
           string url = "";
@@ -533,6 +526,7 @@ without the need of user interaction.</p>
           url = editUrl( url );
           if ( size( url ) > 0 ) {
             UI::ChangeWidget( `id(`url), `Value, url );
+            UI::ChangeWidget( `id(`server), `Value, 0 );
           }
       } else if ( ret == `automatic ) {
           SetupAutomatic();
