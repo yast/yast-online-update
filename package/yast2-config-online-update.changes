@@ -1,4 +1,14 @@
 -------------------------------------------------------------------
+Fri Apr 13 12:18:15 MEST 2001 - gs@suse.de
+
+- Patch installation from CD starts with screen Available Patches  
+
+-------------------------------------------------------------------
+Fri Apr  6 15:21:34 MEST 2001 - gs@suse.de
+
+- default installation source is CD if module is called with .cd_default
+
+-------------------------------------------------------------------
 Wed Mar  7 11:36:22 MET 2001 - schubi@suse.de
 
 - Checking connection via socket ( not ping )
