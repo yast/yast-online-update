@@ -130,7 +130,7 @@
 	  y2error("command: %1", command);
 	  if ( SCR::Read(.you.isBusiness) )
 	  {
-	      UI::ErrorPopup(_("Cannot connect to www.suse.de. Please check connection."));
+	      UI::ErrorPopup(_("Cannot connect to www.suse.de. Check your connection."));
 	      return  `abort;
 	  }
 	  else
@@ -285,8 +285,8 @@ if you click on the <b>Details</b> button.
 </p>");
 
   string help_part3 =  _("<p>After clicking <b>Expert</b>, select a local
-installation source instead of an FTP/HTTP server or select
-another FTP/HTTP server.</p>
+installation source instead of an FTP or HTTP server or select
+another FTP or HTTP server.</p>
 ");
 
 
