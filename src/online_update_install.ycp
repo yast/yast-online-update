@@ -245,7 +245,7 @@ data is no longer needed. To delete this data, activate
         UI::ChangeWidget( `id(`log), `LastLine, _("\n") );
       
         string msg = sformat( _("Error downloading patch '%1'.
-Try again to download patch, skip this patch or
+Try again to download the patch, skip this patch, or
 abort the update?
 "), patchName );
       
@@ -323,7 +323,7 @@ abort the update?
                 if ( result == "abort" ) {
                   msg = sformat( _("Installation of patch was aborted by user.
   
-Warning! This can cause an inconsistent system. Please select 'Try Again' to
+Warning: This can cause an inconsistent system. Select 'Try Again' to
 repeat installation of this patch.
 "), patchName );
                 } else {

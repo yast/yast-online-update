@@ -38,7 +38,7 @@
 			      `Left(`Heading( headline )),
 			      `VSpacing(0.2),
 			      `Label( message ),
-			      `Frame (_("Authentification data"),
+			      `Frame (_("Authentication Data"),
 				      `VBox (
 					     `HBox (
 						    `HSpacing (0.5),
@@ -51,9 +51,9 @@
 						    `HSpacing (0.5)
 						    ))),
 			      `VSpacing(0.2),
-			      `CheckBox(`id(`keep), _("&Keep authentification data"), false ),
+			      `CheckBox(`id(`keep), _("&Keep Authentication Data"), false ),
 			      `VSpacing(0.2),
-                              `PushButton(`id(`clear), _("&Clear inputs")),
+                              `PushButton(`id(`clear), _("&Clear Inputs")),
                               `VSpacing(0.2),
 			      `HBox(`PushButton(`id(`login), `opt(`default), _("&Login") ),
 				    `PushButton(`id(`abort), CancelButtonLabel() )
@@ -341,7 +341,7 @@ the update takes place.
 
   boolean manualSelection = true;
   if ( OnlineUpdate::you_auto || 
-       SCR::Read( .sysconfig.onlineupdate.YOU_MANUAL_SELECTION ) == "no" ) {
+       SCR::Read( .sysconfig.onlineupdate.YOU_MANUAL_SELECTION ) == "no") {
     manualSelection = false;
   }
 
