@@ -25,13 +25,17 @@
 
 {
   textdomain "online_update";
-   
-  boolean test_mode    = lookup ( user_settings, "test_mode", false );
-  boolean business = false;  
+
+  import "Arch";
+  import "Mode";
+  import "OnlineUpdate";
   
+  boolean test_mode    	= Mode::test;
+  boolean business 	= false;  
+
   // constant settings
   include "suseservers.ycp";
-
+  
   // you_server_map = $[ "server" : [ "path", "type" ], ... ]
 
   string rootpath = "/";
@@ -48,14 +52,13 @@
   map last_status = $[];
   string default_language = "en";
 
+  // TODO language ???????????
   map lang2yast1 = SCR::Read (.target.yast2, "lang2yast1.ycp");  
   
-  string language 	= lookup( user_settings, "language", default_language );
-  boolean cd_update 	= lookup( user_settings, "cd_update", false );
+  string language 	= Mode::language;
+  boolean cd_update 	= OnlineUpdate::cd_update;
   string long_language 	= lookup(lang2yast1, language, "english");  
   
-  string architecture 	= lookup( user_settings, "architecture", "i386" );
-
   list you_server_list = [];
 
   // initialize You Agent
@@ -63,7 +66,7 @@
 
   any retval = SCR::Execute(.you.setEnvironment, $[ "language":long_language,
 						  "rootpath":rootpath,
-						  "architecture":architecture,
+						  "architecture":Arch::architecture,
 						  "yastpath":yastpath,
 						  "patchpath":patchpath] );
 
@@ -77,7 +80,7 @@
 
   if ( SCR::Read(.you.isBusiness) )
   {
-      user_settings = add( user_settings, "business", true );
+      OnlineUpdate::business = true;
       business = true;
       serverdescr_file = "suseservers_http.txt"; 
   }
@@ -105,8 +108,8 @@
 
   map you_server_map = read_suseservers ();
 
-  string you_server =   lookup(user_settings, "you_server", "" );
-  string you_serverkind =   lookup(user_settings, "you_serverkind", "" );  
+  string you_server 	= OnlineUpdate::you_server;
+  string you_serverkind = OnlineUpdate::you_serverkind;  
   string default_server = "";
   string default_serverkind = "";
   
@@ -117,7 +120,7 @@
       default_serverkind = read_first_suseserverkind();
   }
 
-  string you_dir =  lookup(user_settings, "you_dir", "" );
+  string you_dir =  OnlineUpdate::you_dir;
 
   // look for default directory in server map (instead of "/pub/suse")
   if ( you_dir == "" )
@@ -243,7 +246,7 @@ another FTP/HTTP server.</p>
     
   help_text = help_part1 + help_part2 + help_part3;
 
-  if ( lookup( user_settings, "you_auto_install", false ) )
+  if ( OnlineUpdate::you_auto_install )
   {
       // auto mode; install patches which are currently on the server
       // Do not use internet
@@ -251,7 +254,7 @@ another FTP/HTTP server.</p>
       return `next;      
   }  
 
-  if ( lookup( user_settings, "you_auto_get", false ) )
+  if ( OnlineUpdate::you_auto_get )
   {
       // auto mode; get patch descriptions and packages, but do not install patches
       if ( size ( you_server_list ) <= 0 )
@@ -260,13 +263,13 @@ another FTP/HTTP server.</p>
 	  return `abort;
       }
       string you_server = read_first_suseserver(); 
-      user_settings = add(user_settings, "you_server", you_server);
+      OnlineUpdate::you_server 	= you_server;
 
       string you_dir = select( lookup(you_server_map, you_server, []), 0, "" );
-      user_settings = add(user_settings, "you_dir", you_dir);
+      OnlineUpdate::you_dir	= you_dir;
 
       string you_serverkind = read_first_suseserverkind(); 
-      user_settings = add(user_settings, "you_serverkind", you_serverkind);
+      OnlineUpdate::you_serverkind = you_serverkind;
 
       any retval = SCR::Execute( .you.setServer, $["kind":you_serverkind, "name":you_server, "path":you_dir]);
 		
@@ -291,10 +294,10 @@ another FTP/HTTP server.</p>
   else
   {
       // write settings for CD update and return `next
-      user_settings = add (user_settings, "you_auto", false);
-      user_settings = add(user_settings, "you_server", "CD" );
-      user_settings = add(user_settings, "you_serverkind", "CD" );
-      user_settings = add(user_settings, "you_dir", "" );            
+      OnlineUpdate::you_auto 	= false;
+      OnlineUpdate::you_server	= "cd";
+      OnlineUpdate::you_serverkind = "cd";
+      OnlineUPdate::you_dir	= "";            
 
       any retval = SCR::Execute( .you.setServer, $["kind":you_serverkind, "name":you_server, "path":you_dir]);
       y2debug("ONLINE: .you.setServer( %1, %2 %3) ): %4",
@@ -304,7 +307,7 @@ another FTP/HTTP server.</p>
   }
   
 
-  if ( lookup(user_settings, "you_auto", false ) )
+  if ( OnlineUpdate::you_auto )
   {
       UI::ChangeWidget(`id(`automatic), `Value, true );
       UI::ChangeWidget(`id(`manual), `Value, false );
@@ -324,111 +327,110 @@ another FTP/HTTP server.</p>
 
   symbol ret = `next;
 
-  repeat
-      {
-	  ret= UI::UserInput();
+  repeat {
+      
+      ret= UI::UserInput();
 
-	  if ( UI::QueryWidget(`id(`automatic), `Value ) ) 
+      if ( UI::QueryWidget(`id(`automatic), `Value ) ) 
+      {
+	  OnlineUpdate::you_auto = true;
+      }
+      else
+      {
+	  OnlineUpdate::you_auto = false;
+      }
+
+      string you_server =  UI::QueryWidget(`id(`you), `Value );
+      OnlineUpdate::you_server = you_server;
+	
+      if (ret == `next)
+      {
+	  you_dir = select( lookup(you_server_map, you_server, []), 0, "" );
+	  OnlineUpdate::you_dir 	= you_dir;
+	  you_serverkind = select( lookup(you_server_map, you_server, []), 1, "" );
+	  OnlineUpdate::you_serverkind = you_serverkind;
+
+	  any retval = SCR::Execute( .you.setServer, $["kind":you_serverkind, "name":you_server, "path":you_dir]);
+	      
+	  y2debug("ONLINE: .you.setServer( %1, %2 %3) ): %4",
+		  you_server, you_dir, you_serverkind, retval );
+	      
+	  if (retval == nil || retval == false)
 	  {
-	      user_settings = add (user_settings, "you_auto", true);
+	      UI::ErrorPopup(_("Initialization failed. Try again.
+If failure continues, choose
+another SuSE FTP/HTTP server.\n"));
+	      ret = `again;
 	  }
 	  else
 	  {
-	      user_settings = add (user_settings, "you_auto", false);
-	  }
-
-	  // add you_server to user_settings
-	  string you_server =  UI::QueryWidget(`id(`you), `Value );
-	  user_settings = add(user_settings, "you_server", you_server);
-	
-	  if (ret == `next)
-	  {
-
-	      you_dir = select( lookup(you_server_map, you_server, []), 0, "" );
-	      user_settings = add(user_settings, "you_dir", you_dir);
-	      you_serverkind = select( lookup(you_server_map, you_server, []), 1, "" );
-	      user_settings = add(user_settings, "you_serverkind", you_serverkind);
-
-	      any retval = SCR::Execute( .you.setServer, $["kind":you_serverkind, "name":you_server, "path":you_dir]);
-	      
-	      y2debug("ONLINE: .you.setServer( %1, %2 %3) ): %4",
-	      you_server, you_dir, you_serverkind, retval );
-	      
-	      if (retval == nil || retval == false)
+	      // Show popup to get the registration and password in case of business product
+	      // and no local installation
+	      if ( business
+		   && you_serverkind != "CD"
+		   && you_serverkind != "Harddisk"
+		   && you_serverkind != "Net" )
 	      {
-		  UI::DisplayMsgYou(_("Initialization failed. Try again.
-If failure continues, choose
-another SuSE FTP/HTTP server.\n"));
-		  ret = `again;
-	      }
-	      else
-	      {
-		  // Show popup to get the registration and password in case of business product
-		  // and no local installation
-		  if ( business
-		       && you_serverkind != "CD"
-		       && you_serverkind != "Harddisk"
-		       && you_serverkind != "Net" )
+		  // get, check and possibly save the registration and password
+		  boolean success = CheckAuthorization( );
+
+		  if ( !success )
 		  {
-		      // get, check and possibly save the registration and password
-		      boolean success = CheckAuthorization( );
-
-		      if ( !success )
-		      {
-			  return `abort;
-		      }
+		      return `abort;
 		  }
-	      }	      
-	  }
-	  else if ( ret == `details )
-	  {
-	      any retval = CallFunction(`online_update_details( true, false ) );
-	      if ( retval == `abort )
-		  return `abort;
+	      }
+	  }	      
+      }
+      else if ( ret == `details )
+      {
+	  any retval = CallFunction(`online_update_details( true, false ) );
+	  if ( retval == `abort )
+	      return `abort;
 	    
-	      ret = `again;
-	  }
-	  else if ( ret == `expert )
-	  {
-	      you_dir = select( lookup(you_server_map, you_server, []), 0, "" );
-	      you_serverkind = select( lookup(you_server_map, you_server, []), 1, "" );
+	  ret = `again;
+      }
+      else if ( ret == `expert )
+      {
+	  you_dir = select( lookup(you_server_map, you_server, []), 0, "" );
+	  you_serverkind = select( lookup(you_server_map, you_server, []), 1, "" );
 	    
-	      user_settings = add ( user_settings, "you_dir", you_dir );
-	      user_settings = add ( user_settings, "you_serverkind", you_serverkind );	      
-	      user_settings = add ( user_settings,"post_install", false );
-	      any retval = CallFunction(`inst_source( true, true ) );
-	      if ( retval == `abort )
-		  return `abort;
+	  OnlineUpdate::you_dir = you_dir;
+	  OnlineUpdate::you_serverkind = you_serverkind;
 
-	      you_server = lookup ( user_settings, "you_server", "" );
-	      you_serverkind = lookup ( user_settings, "you_serverkind", "" );	      
-	      you_dir = lookup ( user_settings, "you_dir", "" );
+	  // TODO: why adding false ?????????????
+	  // user_settings = add ( user_settings,"post_install", false );
+
+	  any retval = CallFunction(`inst_source( true, true ) );
+	  if ( retval == `abort )
+	      return `abort;
+
+	  you_server 	= OnlineUpdate::you_server;
+	  you_serverkind 	= OnlineUpdate::you_serverkind;	      
+	  you_dir 		= OnlineUpdate::you_dir;
 	      
-	      retval = SCR::Execute( .you.setServer, $["kind":you_serverkind, "name":you_server, "path":you_dir]);
+	  retval = SCR::Execute( .you.setServer, $["kind":you_serverkind, "name":you_server, "path":you_dir]);
       
-	      y2debug("ONLINE: .you.setServer( %1, %2 %3) ): %4",
-		      you_server, you_dir, you_serverkind, retval );		
-	      if (retval == nil || retval == false)
-	      {
-		  UI::DisplayMsgYou(_("Initialization failed. Try again.
+	  y2debug("ONLINE: .you.setServer( %1, %2 %3) ): %4",
+		  you_server, you_dir, you_serverkind, retval );		
+	  if (retval == nil || retval == false)
+	  {
+	      UI::ErrorPopup(_("Initialization failed. Try again.
 If failure continues, choose
 another SuSE FTP/HTTP server.\n"));
-	      }
-	      ret = `again;
 	  }
-	  else if ( ret == `back)
-	  {
+	  ret = `again;
+      }
+      else if ( ret == `back)
+      {
 
-	  }
-	  else if ( ret == `abort && UI::ConfirmAbortUpdate(`painless) )
-	      return  `abort;
+      }
+      else if ( ret == `abort && UI::ConfirmAbortUpdate(`painless) )
+	  return  `abort;
 	
-      } until (ret == `back || ret == `next || ret == `again);
+  } until (ret == `back || ret == `next || ret == `again);
 
   y2debug("Return START: %1", ret );
     
   return ret;
 }
-
-
 

@@ -22,37 +22,34 @@
 
 {
   textdomain "online_update";
-  
-  // Testmode
-  boolean test_mode    = lookup ( user_settings, "test_mode", false );
 
-  boolean business    = lookup( user_settings, "business", false );  
+  import "Mode";
+  import "OnlineUpdate";
+  import "InstMedia";
+  import "Arch";
   
   // selected you server
-  string you_server = lookup( user_settings, "you_server", "" );
-  string you_serverkind = lookup( user_settings, "you_serverkind", "" );  
-  string you_dir = lookup( user_settings, "you_dir", "" );
+  string you_server 	= OnlineUpdate::you_server;
+  string you_serverkind = OnlineUpdate::you_serverkind;  
+  string you_dir 	= OnlineUpdate::you_dir;
   
   // check installation mode
-  boolean auto_mode 	= lookup( user_settings, "you_auto", false );
-  boolean continue_mode = lookup( user_settings, "you_continue", false );
-  boolean auto_mode_get = lookup( user_settings, "you_auto_get", false );
-  boolean auto_mode_install = lookup( user_settings, "you_auto_install",
-				      false );
-  boolean cd_update 	= lookup( user_settings, "cd_update", false );
+  boolean auto_mode 	= OnlineUpdate::you_auto;
+  boolean continue_mode = OnlineUpdate::you_continue;
+  boolean auto_mode_get = OnlineUpdate::you_auto_get;
+  boolean auto_mode_install = OnlineUpdate::you_auto_install;
+  boolean cd_update 	= OnlineUpdate::cd_update;
   
   // prepare for inst_rpmcopy
-  user_settings = add(user_settings, "post_install", true );
-  map installMap = $[];
-  installMap 	= add(installMap, "bootmode", "Harddisk" );
-  user_settings = add(user_settings, "installMap", installMap );
+  Mode::normal = true;
+  InstMedia::installmode = "hd";
 
-  // possible status information
-  string ERROR = "error";
-  string INSTALLED = "installed";
-  string LOAD = "load";
   
-  user_settings = add(user_settings, "you_ok", true );
+  // possible status information
+  string ERROR 	= "error";
+  string INSTALLED = "installed";
+  string LOAD 	= "load";
+  
   
   //////////////////////////////////////////////////////////////////////////////
   //                                  P O P U P S                             //
@@ -205,11 +202,12 @@ The FTP or HTTP connection will be closed.
       integer patch_no = 0;
       string batchkind = "";
 
-      batchkind = lookup ( user_settings, "you_auto_batchkind", "all" );
+      batchkind = OnlineUpdate::you_auto_batchkind;
 
       foreach( `patch, `patch_info, new_patches, ``{
 	  // only get the patch if marked with "X" or "G" 
-	  if ( select ( lookup(new_patches, patch, []), 3, "" ) == "X" || select ( lookup(new_patches, patch, []), 3, "" ) == "G")
+	  if ( select ( lookup(new_patches, patch, []), 3, "" ) == "X"
+	       || select ( lookup(new_patches, patch, []), 3, "" ) == "G")
 	   {
 	       if ( batchkind == "all" ||
 		    batchkind == select ( lookup(new_patches, patch, []), 0, "" ) )
@@ -417,7 +415,7 @@ The FTP or HTTP connection will be closed.
 	      // set status to error
 	      SCR::Write(.you.patchUpdateStatus, patch, ERROR );
 	      y2debug("ONLINE:  SCR::Write(.you.patchUpdateStatus,%1, %2)", patch, ERROR );
-	      user_settings = add(user_settings, "you_ok", false );
+	      OnlineUpdate::you_ok = false;
 	       
 	      // put logging into LogView Widget before showing popup
 	      string last_logging = lookup(patch_result, "message", "" );
@@ -691,7 +689,7 @@ because package %2 is corrupted.
 		      y2debug("ONLINE:  SCR::Write(.you.patchUpdateStatus,%1, %2)",
 			      patch, ERROR );		      
 
-		      user_settings = add(user_settings, "you_ok", false );
+		      OnlineUpdate::you_ok = false;
 		      // ********************* foreach abbrechen **************
 		      return `cancel;
 		  }
@@ -718,8 +716,7 @@ You have installed version %3.
 	  }
       });
 
-      user_settings = add ( user_settings, "you_updated_packages",
-			    package_count );
+      OnlineUpdate::you_updated_packages = package_count;
       
       return `ok;
   };
@@ -770,14 +767,14 @@ You have installed version %3.
 	  if ( SCR::Read (.you.isBusiness) )
 	  {
 	      patch_path = sformat("/var/lib/YaST/patches/%1/update/%2/%3/patches/",
-				   lookup(user_settings, "architecture", "i386"),
+				   Arch::architecture,
 				   lookup( productInfo, "Product_Name", "" ),
 				   lookup( productInfo, "Product_Version", "" ));
 	  }
 	  else
 	  {
 	      patch_path = sformat("/var/lib/YaST/patches/%1/update/%2/patches/",
-				   lookup(user_settings, "architecture", "i386"),
+				   Arch::architecture,
 				   lookup( productInfo, "Distribution_Version", "" ));
 	  }
 	  
@@ -869,7 +866,6 @@ SuSE cannot guarantee that the patch has been created by SuSE.
 	      // Patch CD udpate: no CD in drive, mount failed
 	      // Online Update: connecting to you server failed
 	  
-	      //if ( lookup( user_settings, "you_server", "" ) == "CD" )
 	      if ( cd_update )
 	      {
 		  UI::MessagePopup(_("Cannot access the patch descriptions.
@@ -1023,7 +1019,8 @@ Download the patches now?
       
       if ( auto_mode_install )
       {
-	  string batchkind = lookup ( user_settings, "you_auto_batchkind", "all" );
+	  string batchkind = OnlineUpdate::you_auto_batchkind;
+	  
 	  // only use patches which already have been loaded from server
 	  foreach( `patch, `patch_info, new_patches, ``{
 	      // only get the patch if marked with "X" or "G" 
@@ -1069,28 +1066,28 @@ Download the patches now?
       else
       {
 	  // Patches has been get only; Finish you update
-	  y2debug("ONLINE: close update with status: %1", lookup(user_settings, "you_ok", false) );
-	  SCR::Execute(.you.closeUpdate, lookup(user_settings, "you_ok", false)); 	  
+	  y2debug("ONLINE: close update with status: %1", OnlineUpdate::you_ok );
+	  SCR::Execute(.you.closeUpdate, OnlineUpdate::you_ok); 	  
 	  return `abort;
       }
   }
   else if ( !continue_mode )
   {
-      // write new_patches to user_settings -> table input online_update_select
-      user_settings = add(user_settings, "you_patches", new_patches );
-      y2debug( "Wrote list of new patches to user_settings: %1", new_patches );
+      // store map with new patches -> table input online_update_select
+      OnlineUpdate::you_patches = new_patches;
+      y2debug( "Wrote list of new patches: %1", new_patches );
 
       // prepare for second call in manual mode 
-      user_settings = add(user_settings, "you_continue", true );
+      OnlineUpdate::you_continue = true;
 
-      // got patches and write new_patches to user_settings -> go `next if CD update
+      // got patches -> go `next if CD update
       if ( cd_update )
 	  return `next;
   }
   else if ( continue_mode )
   {
-      // get selected patches (written to user_settings from online_update_select)
-      map get_patches = lookup( user_settings, "you_patches", $[] );
+      // get selected patches (written from online_update_select)
+      map get_patches = OnlineUpdate::you_patches;
 
       list install_patches = GetAllPatches( get_patches );
 
@@ -1165,7 +1162,7 @@ Download the patches now?
 	  if ( ret == `back)
 	  {
 	      // RESET continue mode
-	      user_settings = add(user_settings, "you_continue", false );
+	      OnlineUpdate::you_continue = false;
 	  }
 
       } until (ret == `next || ret == `back || ret == `cancel);

@@ -21,13 +21,17 @@
 {
   textdomain "online_update";
   
-  import "Installation";
+  import "Version";
   import "Wizard";
+  import "Mode";
+  import "OnlineUpdate";
 
   include "ui/common_popups.ycp";
   include "ui/common_functions.ycp";
   include "ui/common_messages.ycp";
 
+  string version = Version::yast2;
+  
   Wizard::CreateDialog();
 
   // dummy message, which will be used in the future, but have to be
@@ -53,12 +57,8 @@ packages were created by SuSE.
 ");
   
   
-  // definition of map user_settings  
-  map user_settings = $[];    
-
-  
   //
-  // test_mode will be set, if menu is called with arg .test ( y2bignfat menu '(.test)' qt )
+  // test_mode will be set, if menu is called with arg .test ( y2base menu '(.test)' qt )
   // or online_update is called directly ( /sbin/yast2 online_update '(.test)' ) 
   // test_mode means: get the patches, but do not install (inst_rpmcopy runs with test_mode)
   
@@ -72,31 +72,31 @@ packages were created by SuSE.
       }
       else if (Args(arg_n) == .cd_default)
       {
-	  // write server, dir, partition  to user_settings:
-	  user_settings = add( user_settings, "you_serverkind", "CD" );
-	  user_settings = add( user_settings, "cd_update", true );
+	  OnlineUpdate::you_serverkind 	= "cd";
+	  OnlineUpdate::cd_update	=  true;
       }
       else if (Args(arg_n) == .auto.get)
       {
-	  user_settings = add( user_settings, "you_auto_get", true );
-	  user_settings = add( user_settings, "you_auto", true );
+	  OnlineUpdate::you_auto_get	= true;
+	  OnlineUpdate::you_auto	= true;
       }
       else if (Args(arg_n) == .auto.install)
       {
-	  user_settings = add( user_settings, "you_auto_install", true );
-	  user_settings = add( user_settings, "you_auto", true );	  
+	  OnlineUpdate::you_auto_install = true;
+	  OnlineUpdate::you_auto	 = true;	  
       }
       else
       {
 	  // batch kind like security,.....
-	  user_settings = add( user_settings, "you_auto_batchkind", sformat("%1", Args(arg_n)) );
+	  OnlineUpdate::you_auto_batchkind = sformat("%1", Args(arg_n) );
 	  y2milestone( "Getting patches for kind %1 only",  Args(arg_n) );
       }
 	  
       arg_n = arg_n - 1;
   }
-  user_settings = add( user_settings, "test_mode", test_mode );
-  y2debug("ONLINE: Testmode %1", test_mode );
+  Mode::test = true;
+  
+  y2debug("ONLINE: Testmode %1", Mode::test );
 
   
 UI(``{
@@ -426,17 +426,12 @@ server data.
       return success;
   };
 
-  
-  // check architecture
-  string architecture = SCR::Read(.probe.architecture);
-  user_settings = add (user_settings, "architecture", architecture );
-
   // check language
 
   // TODO: use long_language (lang2yast1.ycp)  ?????
   
   string language = UI::GetLanguage(true);
-  user_settings = add( user_settings, "language", language );
+  Mode::language = language;
 
   // setting targetroot - NOT USED anymore 
 
@@ -473,17 +468,18 @@ server data.
 
       term module_name = select( select( dialog, id, [] ), 0, `nomodule(false, false) );
       symbol module_mode = select( select( dialog, id, [] ), 1, `none );
+      
       y2debug( "ONLINE: Module: %1 Mode: %2", module_name, module_mode );
-
-      if ( lookup ( user_settings, "you_updated_packages", 0 ) > 0
-	   || module_name != `inst_suseconfig(false, true) )
+      
+      if ( OnlineUpdate::you_updated_packages > 0
+	   || symbolof(module_name) != `inst_suseconfig )
       {
 	  // call all modules in manual mode 
-	  if ( !lookup(user_settings, "you_auto", true ) )
+	  if ( !OnlineUpdate::you_auto )
 	  {
 	      result = CallFunction( module_name );
 	  }
-	  else if (  select( select(dialog, id, 0), 1, `none ) == `always )
+	  else if ( select( select(dialog, id, []), 1, `none ) == `always )
 	  {
 	      result = CallFunction( module_name );
 	  }

@@ -26,11 +26,9 @@
 
   textdomain "online_update";
 
-  ////////////////////////////////////////////////////////////
-  // Testmode, for example fo screenshots
-  boolean test_mode    = lookup ( user_settings, "test_mode", false );
-
-  boolean auto_mode_install = lookup( user_settings, "you_auto_install", false );
+  import "OnlineUpdate";
+  
+  boolean auto_mode_install = OnlineUpdate::you_auto_install;
 
   //////////////////////////////////////////////////////////////////////////////////////
   //                                  P O P U P S                                     //
@@ -103,9 +101,9 @@ patches could not be installed.
   UI::ChangeWidget(`id(`abort), `Enabled,  false );
 
   // set status and close update
-  y2debug("ONLINE: close update with status: %1", lookup(user_settings, "you_ok", false) );
+  y2debug("ONLINE: close update with status: %1", OnlineUpdate::you_ok );
   any result = SCR::Execute (.you.closeUpdate,
-			     lookup(user_settings, "you_ok", false));
+			     OnlineUpdate::you_ok);
 
   if ( auto_mode_install )
   {
@@ -169,7 +167,7 @@ patches could not be installed.
 		  if ( select(patch_list, index+4, "") == "installed" )
 		  {
 		      SCR::Execute(.you.deletePackages,
-				   select(patch_list, index));
+				   select(patch_list, index, ""));
 		  }
 		  index = index+5;
 	      };

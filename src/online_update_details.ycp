@@ -24,15 +24,13 @@
 
 {
    textdomain "online_update";
-   
-  ////////////////////////////////////////////////////////////
-    // Testmode, for example fo screenshots
-    boolean test_mode    = lookup ( user_settings, "test_mode", false );
-  
-    map last_status = $[];
 
-    // get last update status 
-    last_status = SCR::Read( .you.lastUpdateStatus); 
+   import "OnlineUpdate";
+   
+   map last_status = $[];
+
+   // get last update status 
+   last_status = SCR::Read( .you.lastUpdateStatus); 
 
 
     //////////////////////////////////////////////////////////////////////////////////////

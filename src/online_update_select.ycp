@@ -28,20 +28,21 @@
 
 {
   textdomain "online_update";
-  
-    // Testmode
-    boolean test_mode    = lookup ( user_settings, "test_mode", false );
 
-    boolean cd_update 	= lookup( user_settings, "cd_update", false );
-      
-    // map you_patches contains information about all available patches, e.g.
-    //
-    // $["patch-001":["recommended", "Patch for NFS server", "234", "X"],
-    //   "patch-002":["security", "Noch ein weiterer patch", "565", " "]];
-    //
-    // status information from all patches must be stored, because if the user
-    // deselects a patch and selects it again we must know whether it was "X" or "G"
-    map all_patches = lookup( user_settings, "you_patches", $[] );
+  import "OnlineUpdate";
+  
+  boolean cd_update 	= OnlineUpdate::cd_update;
+
+  
+  // map you_patches contains information about all available patches, e.g.
+  //
+  // $["patch-001":["recommended", "Patch for NFS server", "234", "X"],
+  //   "patch-002":["security", "Noch ein weiterer patch", "565", " "]];
+  //
+  // status information from all patches must be stored, because if the user
+  // deselects a patch and selects it again we must know whether it was "X" or "G"
+  
+    map all_patches = OnlineUpdate::you_patches;
     y2debug("ONLINE: %1", all_patches );
     
     // if the user doesn't do any changes and the current YaST2 has the right versin, the user
@@ -291,8 +292,8 @@ double-click the line (or select it and use Alt + A).
 	{
 	    y2debug("ONLINE: get patches: %1", get_patches );
 
-	    // write patch info to user_settings
-	    user_settings = add(user_settings, "you_patches", get_patches);
+	    // store map of patches
+	    Online::you_patches = get_patches;
 	}
 
 	if ( ret == `back)
