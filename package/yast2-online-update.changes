@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Aug 12 14:42:32 CEST 2003 - gs@suse.de
+
+- merge texts from proofread 
+
+-------------------------------------------------------------------
 Fri Jul 25 13:59:54 CEST 2003 - cschum@suse.de
 
 - Make configurable in /etc/sysconfig/online_update if manual patch
