@@ -25,7 +25,6 @@
   
   string version = Installation::version;
 
-  include "package_utils.ycp";
   include "ui/wizard_dialog.ycp";
   include "ui/common_popups.ycp";
   include "ui/common_functions.ycp";
@@ -274,9 +273,7 @@ You will need to do the update again.");
   string language = UI( `GetLanguage(true) );
   user_settings = add( user_settings, "language", language );
 
-  // setting targetroot
-  string targetroot            = SCR(`Read(.target.root));
-  user_settings = add( user_settings, "targetroot", targetroot );  
+  // setting targetroot - NOT USED anymore 
 
   /*
    * Main dialog cycle
