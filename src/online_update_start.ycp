@@ -41,24 +41,22 @@
   string ftp_dir = lookup(user_settings, "ftp_dir", "/pub/suse" );  
 
 
-  //////////////////////////////////////////////////////////////////////////////////////
-  //                                  P O P U P S                                     //
-  //////////////////////////////////////////////////////////////////////////////////////
-
-
   /////////////////////////////////////////////////////////////////////////////////////
   // MAIN:
   /////////////////////////////////////////////////////////////////////////////////////
-    
+
+  
   map last_status = $[];
   string default_language = "en";
      
   map lang2yast1 = ReadY2("lang2yast1.ycp");
 
-  string language 	 = lookup( user_settings, "language", default_language );
-  string long_language = lookup(lang2yast1, language, "english");
+  string language 	= lookup( user_settings, "language", default_language );
+  boolean cd_update 	= lookup( user_settings, "cd_update", false );
+  
+  string long_language 	= lookup(lang2yast1, language, "english");
 
-  string architecture = lookup( user_settings, "architecture", "i386" );
+  string architecture 	= lookup( user_settings, "architecture", "i386" );
 
   list ftp_server_list = [];
 
@@ -206,11 +204,25 @@ installation-source instead of a ftp-server or select another ftp-server.
     
     
   help_text = help_part1 + help_part2 + help_part3;
-			    
-  UI(`SetWizardContents(_("Welcome to SuSE Package Update"), contents, help_text, Args(0), Args(1) ));
 
-  UI(`ChangeWidget(`id(`abort), `Label, _("&Abort Update")) );
-    
+  if ( !cd_update )
+  {
+      UI(`SetWizardContents(_("Welcome to SuSE Package Update"), contents, help_text, Args(0), Args(1) ));
+
+      UI(`ReplaceWizardAbortButton( `PushButton(`id(`abort), _("&Abort Update"))) );
+  }
+  else
+  {
+      // write settings for CD update and return `next
+      user_settings = add (user_settings, "ftp_auto", false);
+      user_settings = add(user_settings, "ftp_server", "CD" );
+	
+      any retval = PKGINFO(`ftpSetServer( "CD", "" ) );
+      y2debug("ONLINE: PKGINFO(`setFtpServer( \"CD\", \"\" ) ): %1", retval );
+
+      return `next;
+  }
+  
 
   if ( lookup(user_settings, "ftp_auto", false ) )
   {

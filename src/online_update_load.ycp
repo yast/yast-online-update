@@ -34,6 +34,8 @@
   boolean auto_mode 	= lookup( user_settings, "ftp_auto", false );
   boolean continue_mode = lookup( user_settings, "ftp_continue", false );
 
+  boolean cd_update 	= lookup( user_settings, "cd_update", false );
+  
   // prepare for inst_rpmcopy
   user_settings = add(user_settings, "post_install", true );
   map installMap = $[];
@@ -117,13 +119,14 @@ The ftp connection will be closed.
 
   help_text = help_part1 + help_part2 + help_part3;
     
-  // using SetContents (define in online_update.ycp)
-  UI(`SetWizardContents(_("Connection and Data transfer"), contents, help_text, Args(0), Args(1) ));
 
-  // TODO: get values from PKGINFO 
-  UI(`ChangeWidget(`id(`id1), `Value, ftp_server) );  
-  UI(`ChangeWidget(`id(`status), `Value, _("closed") ));
+  if ( !cd_update || continue_mode )
+  {
+      UI(`SetWizardContents(_("Connection and Data transfer"), contents, help_text, Args(0), Args(1) ));
 
+      UI(`ChangeWidget(`id(`id1), `Value, ftp_server) );  
+      UI(`ChangeWidget(`id(`status), `Value, _("closed") ));
+  }
 
   // Fake getting of patches for fake_mode (NOT USED)
   integer test_id = 0;
@@ -562,7 +565,7 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
 		      "ONLINE:  PKGINFO( `ftpChangePatchUpdateStatus(%1, %2)",
 		      patch, ERROR );
 		      user_settings = add(user_settings, "ftp_ok", false );
-
+		      // ********************* foreach abbrechen **************
 		      return `cancel;
 		  }
 		  else if ( ret == `next )
@@ -654,14 +657,15 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
 	  if ( lookup( user_settings, "ftp_server", "" ) == "CD" )
 	  {
 	      UI(`MessagePopup(_("Can't get patch descriptions.
-Please insert SuSE patch CD.")));  
+Please insert SuSE patch CD.")));
+	      return `abort;
 	  }
 	  else
 	  {
 	      UI(`MessagePopup(_("Connection to ftp server failed.
 Please try to get connection to another SuSE ftp server.")));
+	      return `back;  
 	  }
-	  return `back;  
       }
 
       // disconnect 
@@ -788,6 +792,9 @@ again to install the rest of the packages.")));
       // prepare for second call in manual mode 
       user_settings = add(user_settings, "ftp_continue", true );
 
+      // got patches and write new_patches to user_settings -> go `next if CD update
+      if ( cd_update )
+	  return `next;
   }
   else if ( continue_mode )
   {

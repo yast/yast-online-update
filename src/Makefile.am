@@ -18,6 +18,7 @@ modules_DATA = online_update_start.ycp	\
 		 online_update_close.ycp  \
 		  online_update.ycp
 
-menu_DATA = menuentry_online_update.ycp
+menu_DATA = menuentry_online_update.ycp	\
+		menuentry_cd_update.ycp
 
 EXTRA_DIST = $(modules_DATA) $(menu_DATA) $(etc_DATA) $(adm_DATA)

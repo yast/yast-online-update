@@ -68,6 +68,7 @@
       }
       else if (Args(arg_n) == .cd_default) {
 	  user_settings = add( user_settings, "ftp_server", "CD" );
+	  user_settings = add( user_settings, "cd_update", true );
       }
 	  
       arg_n = arg_n - 1;
