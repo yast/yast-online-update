@@ -32,7 +32,7 @@
   string yastpath = "/var/lib/YaST";
   string patchpath = "/var/lib/YaST/patches";
   string logpath = "/var/log/y2ftp";
-  string ftp_server = lookup(user_settings, "ftp_server", "" );
+  string ftp_server = lookup(user_settings, "ftp_server", "ftp.suse.com" );
 
   
 

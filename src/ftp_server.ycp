@@ -1,5 +1,14 @@
 // file ftp_server.ycp
 // ftp-server for patch-update
  $["mack"		: ["/update-test/suse"],
-  "ftp.suse.com"	: ["/usr/patches"],
-  "ftp.suse.de"	: ["/patchroot"] ];
+  "ftp.suse.com"	: ["/pub/suse"],
+  "ftp.suse.de"	: ["/pub/suse"],
+  "ftp.hilton.rwth-aachen.de":["/pub/mirror/suse"],
+  "ftp.tu-chemnitz.de" :["/pub/linux/suse/ftp.suse.com/suse"],
+  "ftp.tuwien.ac.at":["/linux/suse.com/suse"],
+  "ftp.tu-graz.ac.at":["/mirror/suse-linux/ftp.suse.com/suse"],
+  "ftp.funet.fi":["/pub/Linux/mirrors/suse/ftp.suse.com/suse"],
+  "ftp.esat.net":["/mirrors/ftp.suse.com/pub/suse"],
+  "ftp.task.gda.pl":["/mirror/ftp.suse.com/pub/suse"],
+  "ftp.mirror.ac.uk":["/sites/ftp.suse.com/pub/suse"]
+ ];
