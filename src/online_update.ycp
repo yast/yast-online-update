@@ -307,7 +307,7 @@ You will need to do the update again.");
       else if (result == `back)
 	  id = id - 1;
       else if ( result == `finish )
-	  break;
+	  id = size(dialog)-1;				// call last module
 
   }
   

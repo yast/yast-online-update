@@ -101,10 +101,16 @@
 
   string help_text = "";
 
-  // helptext  "main dialog online_update" 
-  string help_part1 =  UI(_("<p>After connecting to SuSE server,
-YaST2 will download all available patches.
+  // helptext  "Connection and Data transfer" 
+  string help_part11 =  UI(_("<p>After connecting to SuSE server,
+YaST2 will download all selected patches.
 This could take some time. Several details are shown.</p>"));
+
+  string help_part12 = UI(_("<p>The patches will be copied
+to the harddisk.<br>
+Informations about the ftp connection are not relevant
+for CD installation.</p>"));
+  
   string help_part2 =  UI(_("<p>
 The fields above show information about the connection and
 time of data transfer.
@@ -117,8 +123,14 @@ patches will be interrupted. No patch will be installed.
 The ftp connection will be closed. 
 </p>"));
 
-  help_text = help_part1 + help_part2 + help_part3;
-    
+  if ( !cd_update )
+  {
+      help_text = help_part11 + help_part2 + help_part3;
+  }
+  else
+  {
+      help_text = help_part12 + help_part2 + help_part3;
+  }
 
   if ( !cd_update || continue_mode )
   {
@@ -832,8 +844,9 @@ again to install the rest of the packages.")));
 	  PKGINFO(`ftpDisconnect());
 	  y2debug("ONLINE:  PKGINFO(`ftpDisconnect())" );
 	  UI(`MessagePopup(_("No patch will be installed.")));
-	  
-	  return `abort;		// abort update  
+
+	  return `finish;
+	  //return `abort;
       }
   }
   else

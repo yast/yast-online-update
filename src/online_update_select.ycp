@@ -29,9 +29,11 @@
 {
   textdomain "online_update";
   
-  // Testmode
+    // Testmode
     boolean test_mode    = lookup ( user_settings, "test_mode", false );
-    
+
+    boolean cd_update 	= lookup( user_settings, "cd_update", false );
+      
     // map ftp_patches contains information about all available patches, e.g.
     //
     // $["patch-001":["recommended", "Patch for NFS server", "234", "X"],
@@ -118,14 +120,23 @@
     
     string help_text = "";
 
-    // helptext  "main dialog online_update"
     string help_text = "";
-    
-    string help_part1 =  UI(_("<p>This dialog shows all patches which are
-available for download on SuSE ftp server.<br>
-Mode \"recommended\" means you should install the patch.
+
+    // Helptext  "List of available patches"
+    // This text is shown if patches will be installed from CD.
+    string help_part01 = UI(_("<p>This dialog shows the patches on
+SuSE patch CD which are not yet installed on your system.<br>"));
+    // This is the text for ftp installation.
+    string help_part02 =  UI(_("<p>This dialog shows all new patches which are
+available for download on SuSE ftp server.<br>"));
+    // Don't translate "recommended" and "security". The patch mode is shown in a list
+    // and will always be english text.
+    string help_part1 = UI(_("Mode \"recommended\" means you should install the patch.
 \"security\" is a security patch and it is highly recommended to install it.
+\"YaST2\" patches are always installed first, other patches are only fetched
+and must be installed on a second run.
 </p>"));
+    
     string help_part2 =  UI(_("<p>Meaning of the status flags:</p>
 <p>
 <b>X</b>: Patches concerning your installation are preselected.
@@ -133,17 +144,27 @@ They will be downloaded and installed on your system.
 If you don't want a certain patch, double
 click on line to deselect it (or select line and use Crtl A).
 </p>"));
+
     string help_part3 =  UI(_("<p>
 <b>G</b>: patch is available but not relevant for your installation
 (concerns packages which are not installed).
 You can download the patch but it will not be installed.
-</p>
-<p>
-<b>_</b>: you have deselected this patch, it will neither
-be downloaded nor installed.
+</p>"));
+    
+    string help_part4 = UI(_("<p>
+<b>_</b>: this patch is not selected, it will neither
+be downloaded nor installed. To select the patch, double
+click on line (or select line and use Crtl A).
 </p>"));
 
-    help_text = help_part1 + help_part2 + help_part3;
+    if ( cd_update )
+    {
+	help_text = help_part01 + help_part1 + help_part2 + help_part3 + help_part4;
+    }
+    else
+    {
+	help_text = help_part02 + help_part1 + help_part2 + help_part3 + help_part4;
+    }
     
     // using SetContents (define in online_update.ycp)
     UI(`SetWizardContents(_("List of available patches"), contents, help_text, Args(0), Args(1) ));
