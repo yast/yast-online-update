@@ -82,5 +82,11 @@ global string you_url = "";
  */
 global boolean signature_check = true;
 
+
+/**
+  Force reload of all patches?
+*/  
+global boolean reload = true;
+
 /* EOF */
 }

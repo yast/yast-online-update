@@ -22,7 +22,7 @@
 
   boolean business	= false;
 
-  global define string GetPatches( boolean reload ) ``{
+  global define string GetPatches() ``{
 
     UI::OpenDialog( `opt( `decorated ),
       `VBox(
@@ -35,7 +35,7 @@
     );
 
     string err = Pkg::YouGetPatches( you_server,
-                                     reload,
+                                     OnlineUpdate::reload,
                                      OnlineUpdate::signature_check );
 
     UI::CloseDialog();
@@ -52,7 +52,7 @@
 
   map last_status = $[];
 
-  boolean cd_update 	= OnlineUpdate::cd_update;
+  boolean cd_update = OnlineUpdate::cd_update;
 
   list you_server_list = [];
 
@@ -240,14 +240,8 @@ another FTP or HTTP server.</p>
 
       ret= UI::UserInput();
 
-      if ( UI::QueryWidget(`id(`automatic), `Value ) )
-      {
-	  OnlineUpdate::you_auto = true;
-      }
-      else
-      {
-	  OnlineUpdate::you_auto = false;
-      }
+      OnlineUpdate::you_auto = UI::QueryWidget( `id( `automatic ), `Value );
+      OnlineUpdate::reload = UI::QueryWidget( `id( `reload ), `Value );
 
       // which server is selected from combo box installation source ?
       string you_server =  UI::QueryWidget(`id(`you), `Value );
@@ -268,9 +262,7 @@ another FTP or HTTP server.</p>
 	      }
 	  }
 
-          boolean reload = UI::QueryWidget( `id( `reload ), `Value );
-
-          string err = GetPatches( reload );
+          string err = GetPatches();
 
           if ( size( err ) != 0 ) {
             y2error( "GetPatches err: %1", err ); 

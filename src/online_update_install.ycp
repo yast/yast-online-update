@@ -103,7 +103,8 @@ option 'Remove source packages after update.'</p>");
                             lookup( patch, "name", "unknown" ),
                             lookup( patch, "summary", "no summary" ) ) );
 
-      string err = Pkg::YouGetCurrentPatch( OnlineUpdate::signature_check );
+      string err = Pkg::YouGetCurrentPatch( OnlineUpdate::reload,
+                                            OnlineUpdate::signature_check );
       if ( size( err ) == 0 ) {
         UI::ChangeWidget( `id(`log), `LastLine, _("Ok\n") );
       } else {
