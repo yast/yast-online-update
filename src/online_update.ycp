@@ -350,12 +350,9 @@ You will need to do the update again.");
       string reg_password = "";
       string reg_code = "";
       
-      if ( file_exist( "/var/lib/support/rc.business_registration" ) )
-      {
-	  // try to get the data from /var/lib/support/business_registration
-	  reg_password = SCR::Read(.rc.business_registration.REG_PASSWORD);
-	  reg_code = SCR::Read(.rc.business_registration.REG_CODE);
-      }
+      // try to get the data from /etc/sysconfig/onlineupdate
+      reg_password = SCR::Read(.sysconfig.onlineupdate.REG_PASSWORD);
+      reg_code = SCR::Read(.sysconfig.onlineupdate.REG_CODE);
 
       while ( go_on )
       {
@@ -379,20 +376,20 @@ You will need to do the update again.");
 		  if ( lookup( registration_map, "keep_reg_data", false ))
 		  {
 		      // write registration data
-		      SCR::Write(.rc.business_registration.REG_PASSWORD,
+		      SCR::Write(.sysconfig.onlineupdate.REG_PASSWORD,
 				 lookup( registration_map, "reg_password", ""));
-		      SCR::Write(.rc.business_registration.REG_CODE,
+		      SCR::Write(.sysconfig.onlineupdate.REG_CODE,
 				 lookup( registration_map, "reg_code", ""));
 
-		      SCR::Write(.rc.business_registration, nil);
+		      SCR::Write(.sysconfig.onlineupdate, nil);
 		  }
-		  else if ( file_exist( "/var/lib/support/rc.business_registration" ) )
+		  else
 		  {
 		      // reset entries in registration file
-		      SCR::Write(.rc.business_registration.REG_PASSWORD, "");
-		      SCR::Write(.rc.business_registration.REG_CODE, "");
+		      SCR::Write(.sysconfig.onlineupdate.REG_PASSWORD, "");
+		      SCR::Write(.sysconfig.onlineupdate.REG_CODE, "");
 
-		      SCR::Write(.rc.business_registration, nil);
+		      SCR::Write(.sysconfig.onlineupdate, nil);
 		  }
 	      }
 	      else	// let the user try again to enter the correct registration/password
