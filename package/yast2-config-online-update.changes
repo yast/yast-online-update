@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Aug 20 17:22:52 CEST 2001 - gs@suse.de
+
+- Patch CD Update: write the information to install from CD
+  to /var/lib/YaST/install.inf  
+
+-------------------------------------------------------------------
 Mon Aug  6 12:13:00 CEST 2001 - gs@suse.de
 
 - Patch CD Update shows correct error popup if the patch CD is not found
