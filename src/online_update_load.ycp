@@ -170,6 +170,22 @@ The ftp connection will be closed.
       boolean go_on = true;
       integer patch_no = 0;
 
+
+      foreach( `patch, `patch_info, new_patches, ``{
+	  // only get the patch if marked with "X" or "G" 
+	  if ( select ( lookup(new_patches, patch, []), 3 ) == "X" || select ( lookup(new_patches, patch, []), 3 ) == "G")
+	   {
+	       patch_list = add(patch_list, patch);
+	   }
+      });
+      patch_no = size(patch_list);
+
+      if ( patch_no == 0 )
+      {
+	  // nothing will do
+	  return ret_list;
+      }
+      
       string connect_string = "Starting download of selected patches from "  + ftp_server + ".\n";
       UI(`ChangeWidget(`id(`log), `LastLine, connect_string ));
 
@@ -183,15 +199,6 @@ The ftp connection will be closed.
 	  UI(`ChangeWidget(`id(`status), `Value, _("active")) );
       }
 
-      foreach( `patch, `patch_info, new_patches, ``{
-	  // only get the patch if marked with "X" or "G" 
-	  if ( select ( lookup(new_patches, patch, []), 3 ) == "X" || select ( lookup(new_patches, patch, []), 3 ) == "G")
-	   {
-	       patch_list = add(patch_list, patch);
-	   }
-      });
-      patch_no = size(patch_list);
-      
       while ( (index < patch_no) && go_on )
       {
 	  map result_map = $[];
@@ -449,23 +456,31 @@ Please try to get patches from another SuSE ftp server.")));
       {
 	  y2debug( "ONLINE: manual mode, installing: %1", install_patches );
 
-	  while (true)
+	  if ( size ( install_patches ) > 0 )
 	  {
-	      any r = UI(`UserInput());
-	      if ( r == `next )
+	      while (true)
 	      {
-		  // install selected patches
-		  any ret = InstallPatches( install_patches );
-		  return `next;
+		  any r = UI(`UserInput());
+		  if ( r == `next )
+		  {
+		      // install selected patches
+		      any ret = InstallPatches( install_patches );
+		      return `next;
+		  }
+		  else if ( r == `abort  && UI(`ConfirmAbortUpdate(`incomplete)) )
+		  {
+		      // set CloseUpdate status to false (installation NOT complete)
+		      PKGINFO(`ftpCloseUpdate(false) );
+		      PKGINFO(`ftpDisconnect());
+		      y2debug("ONLINE:  PKGINFO(`ftpDisconnect()): %1", ret );
+		      return `abort;	// abort update
+		  }
 	      }
-	      else if ( r == `abort  && UI(`ConfirmAbortUpdate(`incomplete)) )
-	      {
-		  // set CloseUpdate status to false (installation NOT complete)
-		  PKGINFO(`ftpCloseUpdate(false) );
-		  PKGINFO(`ftpDisconnect());
-		  y2debug("ONLINE:  PKGINFO(`ftpDisconnect()): %1", ret );
-		  return `abort;	// abort update
-	      }
+	  }
+	  else
+	  {
+	      y2debug( "There will be no patch installed --> return" );	      
+	      return `next;	      
 	  }
       }
       else
