@@ -1,5 +1,6 @@
 Makefile
 Makefile.in
+Makefile.am
 configure
 config.h
 config.h.in

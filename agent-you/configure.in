@@ -60,6 +60,6 @@ AC_OUTPUT(Makefile
 	package/yast2-agent-you.spec:yast2-agent-you.spec.in
 	src/Makefile
 	doc/Makefile
-dnl	doc/autodocs/Makefile
 	conf/Makefile
-	testsuite/Makefile)
+	testsuite/Makefile
+)

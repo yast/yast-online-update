@@ -1,10 +1,11 @@
 #
-# Makefile.cvs for you-agent
+# Makefile.cvs for y2a_targetpkg
 #
 configure: all
 	./configure
 
 all:
+	y2tool y2automake
 	aclocal
 	autoconf
 	autoheader
