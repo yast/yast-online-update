@@ -84,9 +84,9 @@
 			    )
 		  ),
 	    `HBox(
-		  `HWeight( 50,`VBox(`Left(`Label(_("Total connection time"))),
-				     `Left(`Label(`id(`id3),`opt(`outputField), "                              ")) )
-			    ),
+//		  `HWeight( 50,`VBox(`Left(`Label(_("Total connection time"))),
+//				     `Left(`Label(`id(`id3),`opt(`outputField), "                              ")) )
+//			    ),
 		  `HWeight( 50,`VBox(`Left(`Label(_("Progress"))),
 				     `Left(`Label(`id(`progress),`opt(`outputField), "                              ")) )
 			    )
@@ -125,7 +125,7 @@ The ftp connection will be closed.
   // TODO: get values from PKGINFO 
   UI(`ChangeWidget(`id(`id1), `Value, ftp_server) );  
   UI(`ChangeWidget(`id(`status), `Value, _("closed") ));
-  UI(`ChangeWidget(`id(`id3), `Value, _(".........") ));
+//  UI(`ChangeWidget(`id(`id3), `Value, _(".........") ));
 
 
   // Fake getting of patches for fake_mode (NOT USED)
@@ -489,7 +489,7 @@ Please try to get patches from another SuSE ftp server.")));
       {
 	  any ret = PKGINFO(`ftpDisconnect());
 	  y2debug("ONLINE:  PKGINFO(`ftpDisconnect()): %1", ret );
-	  UI(`DisplayMessage(_("No patch will be installed.")));	  
+	  UI(`DisplayMessage(_("There is no patch which will have to be installed.")));	  
 	  return `abort;		// abort update
       }
   }
