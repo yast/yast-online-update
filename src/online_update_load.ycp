@@ -275,6 +275,7 @@ loaded patches or abort update completely." ), _("Warning"), _("&Install"), _("&
       list package_list = [];
       string pre_info = "";
       integer no = 1;
+      integer package_count = 0;
       
       foreach ( `patch, patch_list, ``{
 	  any|symbol ret = nil;
@@ -294,6 +295,7 @@ loaded patches or abort update completely." ), _("Warning"), _("&Install"), _("&
 	  {
 	      ret = CallFunction(`inst_rpmcopy(false, false, package_list ));
 	      y2debug("ONLINE: %1. call of inst_rpmcopy returns: %2", no, ret );
+	      package_count = package_count + size ( package_list );
 	      no = no+1;
 	  }
 	  // do not set error status - let patch status NEW
@@ -314,6 +316,9 @@ loaded patches or abort update completely." ), _("Warning"), _("&Install"), _("&
 	      y2debug("ONLINE:  PKGINFO( `ftpChangePatchUpdateStatus(%1, %2)", patch, INSTALLED );
 	  }
       });
+
+      user_settings = add ( user_settings, "ftp_updated_packages",
+			    package_count );
       
       return `ok;
   };

@@ -410,14 +410,18 @@ You will need to do the update again." );
       symbol module_mode =  select( select(dialog, id), 1);
       y2debug( "ONLINE: Module: %1 Mode: %2", select( select(dialog, id), 0), select( select(dialog, id), 1) );
 
-      // call all modules in maunual mode 
-      if ( !lookup(user_settings, "ftp_auto", true ) )
+      if ( lookup ( user_settings, "ftp_updated_packages", 0 ) > 0 ||
+	   select(select(dialog, id), 0 ) != `inst_suseconfig(false, true) )
       {
-	  result = CallFunction(select(select(dialog, id), 0 ));
-      }
-      else if (  select( select(dialog, id), 1) == `always )
-      {
-	  result = CallFunction(select(select(dialog, id), 0 ));
+	  // call all modules in manual mode 
+	  if ( !lookup(user_settings, "ftp_auto", true ) )
+	  {
+	      result = CallFunction(select(select(dialog, id), 0 ));
+	  }
+	  else if (  select( select(dialog, id), 1) == `always )
+	  {
+	      result = CallFunction(select(select(dialog, id), 0 ));
+	  }
       }
 
       if (result == `again )
