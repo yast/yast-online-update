@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Feb  7 16:03:37 CET 2003 - cschum@suse.de
+
+- Return correct return value when module is finished.
+- Removed obsolete test code.
+- Include .pot file in source RPM.
+
+-------------------------------------------------------------------
 Wed Jan 29 13:44:49 CET 2003 - cschum@suse.de
 
 - Merged proofread texts.
