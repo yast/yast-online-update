@@ -30,15 +30,16 @@
     define read_suseservers () ``{
 	map serversmap = $[];
 	list serverslist = SCR(`Read(.etc.suseservers));
-	if (size (list) <= 0) {
+
+	if (size (serverslist) <= 0) {
 	    return serversmap;
 	}
 
 	foreach (`entry, serverslist, ``{
 	    string server = lookup (entry, "server", "");
 	    string type = lookup (entry, "type", "");
-	    string path = lookup (entry, "path", "");
-	    serversmap = add (serversmap, server, [ path, type ]);
+	    string spath = lookup (entry, "path", "");
+	    serversmap = add (serversmap, server, [ spath, type ]);
 	});
 
 	return serversmap;
@@ -46,6 +47,10 @@
 
 
     // write map to .etc.suseservers
+    //   handle special cases:
+    //		"ftp", "http" need "//"
+    //
+
     define write_suseservers (map serversmap) ``{
 	boolean retval = false;
 
@@ -55,17 +60,20 @@
 
 	list serverslist = [];
 
-	foreach (`server, `value, serversmap, ``{
-	    string path = select (value, 0);
+	foreach (`key, `value, serversmap, ``{
+	    string server = key;
+	    string spath = select (value, 0);
 	    string type = select (value, 1);
+	    string sep = ":/";
 
 	    // ftp and http need double-slash
 
-	    if ((type == "ftp") || (type == "http"))
-		path = "/" + path;
+	    if ((type == "ftp") || (type == "http")) {
+		sep = "://";
+	    }
 
 	    serverslist = add (serverslist,
-			   $[ "path" : path, "server" : server, "type" : type ]);
+			   $[ "path" : spath, "sep" : sep, "server" : server, "type" : type ]);
 	});
 
 	return SCR(`Write(.etc.suseservers, serverslist));
