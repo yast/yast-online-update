@@ -215,7 +215,7 @@ the update takes place.");
                 UI::ChangeWidget( `id( `details ), `Label, detailsStringOff );
             } else {
                 UI::ReplaceWidget( `id( `rp ), `HBox( `HSpacing( 0.5 ),
-                                                      `HWeight( 1, `RichText( details ) ),
+                                                      `HWeight( 1, `RichText(`opt(`plainText), details ) ),
                                                       `HSpacing( 0.5 ) )
                                                      );
                 UI::ChangeWidget( `id( `details ), `Label, detailsStringOn );
