@@ -198,7 +198,9 @@ abort the update?"), patchName );
 Do you want to skip this patch or abort
 the update?"), patchName );
 
-              boolean proceed = UI::YouSkipPopup( msg, Pkg::Error() );
+              string errorMsg = Pkg::Error() + "\n" + Pkg::ErrorDetails();
+
+              boolean proceed = UI::YouSkipPopup( msg, errorMsg );
               if ( !proceed ) return `abort;
             }
           }
