@@ -24,6 +24,7 @@
 */
 
 {
+
   textdomain "online_update";
 
   import "Language";
@@ -31,13 +32,13 @@
   import "Mode";
   import "OnlineUpdate";
 
-  boolean business 	= false;
+  boolean business	= false;
 
-  // constant settings
-  include "suseservers.ycp";
+  include "onlineupdate/suseservers.ycp";
 
   // you_server_map = $[ "server" : [ "path", "type" ], ... ]
 
+  // constant settings
   string rootpath = "/";
   string yastpath = "/var/lib/YaST";
   string patchpath = "/var/lib/YaST/patches";

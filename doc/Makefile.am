@@ -4,8 +4,7 @@
 
 SUBDIRS = autodocs
 
-docdir = @DOCDIR@
-htmldir = $(docdir)
+htmldir = @docdir@
 
 html_DATA = y2c_online_update.html
 

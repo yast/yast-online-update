@@ -1,66 +1,39 @@
-#
-# spec file for package @RPMNAME@
-# 
-# Copyright  (c)  2000  SuSE GmbH  Nuernberg, Germany.
-#
-# please send bugfixes or comments to @MAINTAINER@
-#
+@HEADER-COMMENT@
+# neededforbuild yast2-devtools autoconf automake ydoc
 
-# neededforbuild yast2-devtools  autoconf automake ydoc
-
-Vendor:       SuSE GmbH, Nuernberg, Germany
-Distribution: SuSE Linux 6.4 (i386)
-Name:         @RPMNAME@
-Release:      1
-Copyright:    (c) 2000 SuSE GmbH
-Group:        System Environment/YaST
+@HEADER@
 Requires:	yast2-trans-online-update  yast2  yast2-agent-you  yast2-agent-ftp  yast2-agent-http
-BuildArchitectures: noarch
 
-Packager:     @MAINTAINER@
-
-Summary:      YaST2 Modules for installation
-Version:      @VERSION@
-Source0:      @RPMNAME@-@VERSION@.tar.bz2
 Provides:	y2c_online_update
 Obsoletes:	y2c_online_update
+
+BuildArchitectures: noarch
+
+Summary:	YaST2 online update
 
 %description
 -
 
-%prep
+@PREP@
 
-%setup -n @RPMNAME@-@VERSION@
+@BUILD-YCP@
 
-%build
+@INSTALL-YCP@
 
-./configure
-make
-
-%install
-
-make install
-
-%{?suse_check}
+@CLEAN@
 
 %files
-
+%defattr(-,root,root)
 /var/adm/fillup-templates/sysconfig.onlineupdate
 /etc/suseservers
-@YAST2DIR@/menuentries/menuentry_online_update.y2cc
-@YAST2DIR@/menuentries/menuentry_cd_update.y2cc
-@YAST2DIR@/include/suseservers.ycp
-@YAST2DIR@/scrconf/etc_suseservers.scr
-@YAST2DIR@/scrconf/cfg_onlineupdate.scr
-@YAST2DIR@/clients/online_update.ycp
-@YAST2DIR@/clients/online_update_close.ycp
-@YAST2DIR@/clients/online_update_details.ycp
-@YAST2DIR@/clients/online_update_load.ycp
-@YAST2DIR@/clients/online_update_select.ycp
-@YAST2DIR@/clients/online_update_start.ycp
-@YAST2DIR@/modules/OnlineUpdate.ycp
-%doc @DOCDIR@
+@configdir@/online_update.y2cc
+@configdir@/cd_update.y2cc
+@yncludedir@/onlineupdate/suseservers.ycp
+@scrconfdir@/*.scr
+@clientdir@/online*.ycp
+@moduledir@/OnlineUpdate.ycp
 /usr/lib/YaST2/images/online_update_long.png
+%doc @docdir@
 
 %post
 %{fillup_only -n onlineupdate}

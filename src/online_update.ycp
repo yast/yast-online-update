@@ -1,38 +1,29 @@
-/*
- *
- * Module:              online_update.ycp
- *
- * Author:      	Gabriele Strattner (gs@suse.de)
- *
- * Submodules:		online_update_start	
- *			online_update_load
- *			online_update_select
- *			online_update_load
- *			online_update_close 
- *
- * Purpose:		contains dialog loop for online update
- *
- * Modify:
- *
+/**
+ * File:	clients/online_update.ycp
+ * Package:	Online update
+ * Summary:	Main file
+ * Authors:	Gabriele Strattner <gs@suse.de>
+ *		Stefan Schubert <schubi@suse.de>
  *
  * $Id$
  */
 
 {
+
   textdomain "online_update";
-  
+
   import "Version";
   import "Wizard";
   import "Mode";
   import "OnlineUpdate";
-  
+
   include "ui/common_popups.ycp";
   include "ui/common_functions.ycp";
   include "ui/common_messages.ycp";
   include "ui/wizard_dialog.ycp";
 
   string version = Version::yast2;
-  
+
   Wizard::CreateDialog();
 
   // show the special YOU image
@@ -59,15 +50,15 @@ Install anyway?
 or key has been found. SuSE cannot guarantee that the
 packages were created by SuSE.
 ");
-  
-  
+
+
   //
   // Mode::test will be set, if menu is called with arg .test ( y2base menu '(.test)' qt )
-  // or online_update is called directly ( /sbin/yast2 online_update '(.test)' ) 
+  // or online_update is called directly ( /sbin/yast2 online_update '(.test)' )
   // test mode means: get the patches, but do not install (inst_rpmcopy runs with test mode)
-  
+
   integer arg_n = size(Args()) - 1;
-  
+
   while (arg_n >= 0) {
       if (Args(arg_n) == .test || Args(arg_n) == ".test")
       {
@@ -87,7 +78,7 @@ packages were created by SuSE.
       else if (Args(arg_n) == .auto.install || Args(arg_n) == ".auto.install")
       {
 	  OnlineUpdate::you_auto_install = true;
-	  OnlineUpdate::you_auto	 = true;	  
+	  OnlineUpdate::you_auto	 = true;
       }
       else
       {
@@ -95,15 +86,15 @@ packages were created by SuSE.
 	  OnlineUpdate::you_auto_batchkind = sformat("%1", Args(arg_n) );
 	  y2milestone( "Getting patches for kind %1 only",  Args(arg_n) );
       }
-	  
+
       arg_n = arg_n - 1;
   }
-  
+
   y2debug("ONLINE: Testmode %1", Mode::test );
 
-  
+
 UI(``{
-    
+
     //  ConfirmAbortUpdate has same layout as/but different text than ConfirmAbort
    global define ConfirmAbortUpdate( symbol how_to ) ``{
 	  string what_will_happen = "";
@@ -224,7 +215,7 @@ You will need to do the update again.");
    global define DisplayRegistrationPopup(string reg_password, string reg_code,
 					  string headline, string message ) ``{
        map ret_map = $[];
-       
+
        UI::OpenDialog(
 		  `opt(`decorated),
 		  `HBox(
@@ -254,14 +245,14 @@ You will need to do the update again.");
 				    `PushButton(`id(`abort), AbortButtonLabel() )
 				    ),
 			      `VSpacing(0.2)
-				
+
 			      ),
 			`HSpacing(1)
 			)
 		  );
-       
+
        any ret = UI::UserInput();
-	  
+
        if ( ret == `login )
        {
 	   ret_map = add(ret_map, "reg_code", UI::QueryWidget(`id(`code), `Value));
@@ -273,12 +264,12 @@ You will need to do the update again.");
        {
 	   ret_map =  add(ret_map, "login", false);
        }
-	  
+
        UI::CloseDialog();
-       
+
        return ret_map;
    };
-      
+
 
 
   //
@@ -291,7 +282,7 @@ You will need to do the update again.");
       info_map = SCR::Read( .you.patchInformation, patch_name );
 
       string infotext = lookup(info_map, "description", "");
-      
+
       list table_input = [];
       foreach (`pac, `info_list, lookup(info_map, "packages", $[] ), ``{
 	  table_input = add(table_input, `item(`id(pac), pac, select(info_list, 1, ""),
@@ -310,7 +301,7 @@ You will need to do the update again.");
 						    30)	// lines to store,
 					   ),
 				 `VSpacing(0.5),
-				 `VWeight( 3, `Table(`id(`table_pac),`opt(`hvstretch), 
+				 `VWeight( 3, `Table(`id(`table_pac),`opt(`hvstretch),
 						     `header( _("Name"), _("Installed"), _("New Version"), _("Description") ),
 						     table_input
 						     )),
@@ -318,13 +309,13 @@ You will need to do the update again.");
 				 )
 			   )
 		     );
-      UI::ChangeWidget(`id(`infotext), `Value, infotext );      
+      UI::ChangeWidget(`id(`infotext), `Value, infotext );
       UI::SetFocus(`id(`ok_info));
-	  
+
       any r = UI::UserInput();
       UI::CloseDialog();
-       
-      return (r); 
+
+      return (r);
   };
 
   //
@@ -335,7 +326,7 @@ You will need to do the update again.");
        boolean file_found = (SCR::Execute (.target.bash, fileCommand) == 0);
        return file_found;
    };
-     
+
   //
   // Check/get the registration and password in case of a business product
   //
@@ -349,7 +340,7 @@ You will need to do the update again.");
       string msg_string = _("Enter the registration data.");
       string reg_password = "";
       string reg_code = "";
-      
+
       // try to get the data from /etc/sysconfig/onlineupdate
       reg_password = SCR::Read(.sysconfig.onlineupdate.REG_PASSWORD);
       reg_code = SCR::Read(.sysconfig.onlineupdate.REG_CODE);
@@ -365,14 +356,14 @@ You will need to do the update again.");
 	      // try to get connection to the server
 	      reg_password = lookup( registration_map, "reg_password", "");
 	      reg_code = lookup( registration_map, "reg_code", "");
-	      
+
 	      login_status = SCR::Execute( .you.checkAuthorization, reg_password, reg_code );
-	      
+
 	      if ( login_status == "ok" ) 	// registration was successful
 	      {
 		  success = true;
 		  go_on = false;
-		      
+
 		  if ( lookup( registration_map, "keep_reg_data", false ))
 		  {
 		      // write registration data
@@ -422,7 +413,7 @@ server data.
 	  }
       }
       y2milestone( "Return  CheckAuthorization: %1", success );
-      
+
       return success;
   };
 
@@ -431,7 +422,7 @@ server data.
   string language = UI::GetLanguage(true);
   Mode::language = language;
 
-  // setting targetroot - NOT USED anymore 
+  // setting targetroot - NOT USED anymore
 
   /*
    * Main dialog cycle
@@ -445,12 +436,12 @@ server data.
 		 [`online_update_load(false, true), 		`manual ],
 		 [`inst_suseconfig(false, true), 		`always ],
 		 [`online_update_close(false, true), 		`always ]
-		 
+
   ];
 
-  /* 
+  /*
    *  Additional used modules
-   *  
+   *
    * "online_update_info" is called in module:
    * - online_update_start
    * - online_update_close
@@ -458,7 +449,7 @@ server data.
    * - online_update_load
    *
    */
-  
+
   integer id = 0;
   any result = `next;
 
@@ -466,13 +457,13 @@ server data.
 
       term module_name = select( select( dialog, id, [] ), 0, `nomodule(false, false) );
       symbol module_mode = select( select( dialog, id, [] ), 1, `none );
-      
+
       y2debug( "ONLINE: Module: %1 Mode: %2", module_name, module_mode );
-      
+
       if ( OnlineUpdate::you_updated_packages > 0
 	   || symbolof(module_name) != `inst_suseconfig )
       {
-	  // call all modules in manual mode 
+	  // call all modules in manual mode
 	  if ( !OnlineUpdate::you_auto )
 	  {
 	      result = CallFunction( module_name );
@@ -495,7 +486,8 @@ server data.
 	  id = size(dialog)-1;				// call last module
 
   }
-  
+
   return UI::CloseDialog();
 
+/* EOF */
 }

@@ -1,64 +1,76 @@
 /**
- * Module:              OnlineUpdate.ycp
- *
- * Authors:             Gabriele Strattner (gs@suse.de)
- *                      Stefan Schubert (schubi@suse.de)
- *
- * Purpose:             Provides data used for Online Update
- *
+ * File:	modules/OnlineUpdate.ycp
+ * Package:	Online update
+ * Summary:	Data used for Online Update
+ * Authors:	Gabriele Strattner <gs@suse.de>
+ *		Stefan Schubert <schubi@suse.de>
  *
  * $Id$
  */
 
 {
-    module "OnlineUpdate";
 
-    import "Arch";
-    import "Installation";
-    import "Mode";
+textdomain "online_update";
+module "OnlineUpdate";
 
+import "Arch";
+import "Installation";
+import "Mode";
 
-    // flag: do we do an update from CD?
-    global boolean cd_update 	= false;
+/**
+ * flag: do we do an update from CD?
+ */
+global boolean cd_update = false;
 
-    // flag: YOU automatic get mode?
-    global boolean you_auto_get = false;
+/**
+ * flag: YOU automatic get mode?
+ */
+global boolean you_auto_get = false;
 
-    // flag: YOU automatic install mode?
-    global boolean you_auto_install = false;
+/**
+ * flag: YOU automatic install mode?
+ */
+global boolean you_auto_install = false;
 
-    // flag: Automatic Update
-    global boolean you_auto	= false;
+/**
+ * flag: Automatic Update
+ */
+global boolean you_auto	= false;
 
-    // flag: Continue mode?
-    global boolean you_continue = false;
-    
-    // batch kind like security,.....
-    global string you_auto_batchkind = "all";
+/**
+ * flag: Continue mode?
+ */
+global boolean you_continue = false;
 
-    // flag: updating a business product?
-    global boolean business = false ;
-    
-    // already updated packages
-    global integer you_updated_packages = 0;
+/**
+ * batch kind like security,.....
+ */
+global string you_auto_batchkind = "all";
 
-    // flag: YOU ok?
-    global boolean you_ok	= true;
+/**
+ * flag: updating a business product?
+ */
+global boolean business = false ;
 
-    // map containing the new patches
-    global map you_patches = $[];
+/**
+ * already updated packages
+ */
+global integer you_updated_packages = 0;
 
-    // reloading serverlist form www.suse.de
-    global string reloadServer = "yes";
+/**
+ * flag: YOU ok?
+ */
+global boolean you_ok	= true;
 
-    //
-    // Constructor
-    //
-    global define OnlineUpdate() ``{
-	return;
-    }
+/**
+ * map containing the new patches
+ */
+global map you_patches = $[];
 
-    
+/**
+ * reloading serverlist form www.suse.de
+ */
+global string reloadServer = "yes";
+
+/* EOF */
 }
-
-
