@@ -57,6 +57,7 @@ make install
 @YAST2DIR@/clients/online_update_load.ycp
 @YAST2DIR@/clients/online_update_select.ycp
 @YAST2DIR@/clients/online_update_start.ycp
+%doc @DOCDIR@
 
 %post
 echo "Updating etc/rc.config..."
