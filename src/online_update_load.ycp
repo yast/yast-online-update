@@ -521,6 +521,12 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
 SuSE cannot guarantee that the packages were created by SuSE.
 "),
 			       patch);
+
+      map patchDescription = $[];
+      map packageMap = $[];
+      
+      patchDescription = PKGINFO( `ftpGetPatchInformation(patch) );
+      packageMap = lookup( patchDescription, "packages", $[] );      
       
       if ( !(SCR::Read (.targetpkg.installed, "gpg")) )
       {
@@ -552,6 +558,9 @@ SuSE cannot guarantee that the packages were created by SuSE.
 		      if ( !ret )
 		      {
 			  install = false;
+		      }
+		      else
+		      {
 			  y2warning ( "installing anyway" );
 		      }
 		      dontAsk = true;
@@ -588,14 +597,92 @@ because package %2 is corrupted.
 		      if ( !ret )
 		      {
 			  install = false;
+		      }
+		      else
+		      {
 			  y2warning ( "installing anyway" );
 		      }
+		      
 		      dontAsk = true;
 		  }
 	      }
 	  }
 	  
-	  SCR::Execute (.target.bash, "/bin/rm " + tmpfile );	  
+	  SCR::Execute (.target.bash, "/bin/rm " + tmpfile );
+
+	  // checking the correct version of the rpm
+	  integer rpm_pos = findlastof ( package, "/" );	// find trailing slash
+	  string packageName = "";
+
+	  if ( rpm_pos > 0 )
+	  {
+	      // cut off trailing build no.
+	      packageName = substring( package, rpm_pos+1, size( package )-4 -rpm_pos -1 );
+	  }
+	  else
+	  {
+	      packageName = substring( package, 0, size( package )-4 );
+	  }
+
+	  list packageList = lookup ( packageMap, packageName, [] );
+	  
+	  if ( size ( packageList ) > 0 )
+	  {
+	      y2milestone ( "Checking package %1 with version %2: %3",
+			    packageName,
+			    select ( packageList, 2, ""),
+                            packageList );
+	      
+	      string command = "MYVER="+
+			select ( packageList, 2, "") +
+			";/usr/bin/test \"$MYVER\" = `/bin/rpm -qp --qf \"%{VERSION}-%{RELEASE}\\n\" " + package +"`";
+	      y2milestone( "check-command %1", command );
+	      if ( SCR (`Execute (.target.bash, command ) ) != 0 )
+	      {
+		  boolean ret = true;
+
+		  y2warning ( "package %1 (%2) returned an release error",
+			      package, packageName );
+		  if ( !dontAsk )
+		  {
+		      ret = UI(`DisplayMsgFtp( "There will be not installed the correct version of the package !\nSo SuSE cannot guarantee that the patch has been created by SuSE", _("Warning"),
+					       _("&Install"), _("&Don't install") ));
+		      if ( !ret )
+		      {
+			  install = false;
+		      }
+		      else
+		      {
+			  y2warning ( "installing anyway" );
+		      }
+		      
+		      dontAsk = true;
+		  }		  
+	      }
+	  }
+	  else
+	  {
+	      boolean ret = true;
+
+	      y2warning ( "package %1 (%2) not found in the patch description",
+			  package,
+			  packageName );
+	      if ( !dontAsk )
+	      {
+		  ret = UI(`DisplayMsgFtp( "There will be not installed the correct version of the package !\nSo SuSE cannot guarantee that the patch has been created by SuSE", _("Warning"),
+					   _("&Install"), _("&Don't install") ));
+		  if ( !ret )
+		  {
+		      install = false;
+		  }
+		  else
+		  {
+		      y2warning ( "installing anyway" );
+		  }
+		  
+		  dontAsk = true;
+	      }
+	  }	  
       });
       
       return install;
