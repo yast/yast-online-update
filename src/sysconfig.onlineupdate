@@ -1,28 +1,16 @@
 #
-# While starting YOU ( YaST2-Online-Update ) the default ftp serverlist
-# will be updated by the call "wget" to www.suse.de. This list will be
-# stored under /etc/suseservers.
-# Set YAST2_LOADFTPSERVER to "no", if you do not want to  reload the 
-# ftp serverlist.
+# While starting YOU ( YaST2-Online-Update ) the default server list will be
+# updated from a "master" server, usually www.suse.de. This list will be stored
+# under /var/lib/YaST2/you/youservers. User specific servers can be added to
+# /etc/youservers.
+# Set YAST2_LOADFTPSERVER to "no", if you do not want to reload the server list.
 #
 YAST2_LOADFTPSERVER="yes"
 
 #
-# Registration code for business products
+# REG_CODE and REG_PASSWORD are now stored in /var/lib/YaST2/you/password.
+#
+
+#
+# PROXY_USER and PROXY_PASSWORD are now handled by yast2-network
 # 
-REG_CODE=""
-
-#
-# Registration password for business products
-#
-REG_PASSWORD=""
-
-#
-# User for used proxy
-#
-PROXY_USER=""
-
-#
-# Password for used proxy
-#
-PROXY_PASSWORD=""
