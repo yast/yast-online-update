@@ -762,6 +762,91 @@ because package %2 is corrupted.
       integer package_count = 0;
 
       UI::OpenDialog(`opt(`decorated ),`Label(_("Checking packages. One moment please...")));
+
+      // sorting patches by name
+      integer i = 0;
+      integer j = 0;
+      y2milestone ( "Ordering following patches : %1", patch_list );      
+
+      while ( i < size( patch_list ) )
+      {
+	  j = 0;
+	  while ( j < size( patch_list ) -1)
+	  {
+	      string patch1 = select ( patch_list, j, "" );
+	      integer pos = findlastof ( patch1, "-" );
+	      string patchname1 = "";
+	      integer version1 = 0;
+
+	      if ( pos > 0 )
+	      {
+		  // splitting name and version
+		  patchname1 = substring( patch1, 0, pos );
+		  version1 = tointeger( substring( patch1, pos+1, size( patch1 ) -pos -1 ) );
+	      }
+	      else
+	      {
+		  patchname1 = patch1;
+	      }
+	      
+	      string patch2 = select ( patch_list, j+1, "" );
+	      pos = findlastof ( patch2, "-" );
+	      string patchname2 = "";
+	      integer version2 = 0;
+
+	      if ( pos > 0 )
+	      {
+		  // splitting name and version
+		  patchname2 = substring( patch2, 0, pos );
+		  version2 = tointeger( substring( patch2, pos+1, size( patch2 ) -pos -1 ) );
+	      }
+	      else
+	      {
+		  patchname2 = patch2;
+	      }
+
+	      boolean switch = false;
+	      if ( patchname1 == patchname2
+		   && version1 > version2 )
+	      {
+		  switch = true;
+	      }
+	      if ( patchname1 > patchname2 )
+	      {
+		  switch = true;
+	      }
+
+	      if ( switch )
+	      {
+		  // switching element in patch_list
+		  list dummyList = [];
+		  integer counter = 0;
+		  while ( counter < size( patch_list ) )
+		  {
+		      if ( counter == j )
+		      {
+			  dummyList = add ( dummyList, select( patch_list, j+1, "" ));
+		      }
+		      else if ( counter == j+1 )
+		      {
+			  dummyList = add ( dummyList, select( patch_list, j, "" ));
+		      }
+		      else
+		      {
+			  dummyList = add ( dummyList, select( patch_list, counter, "" ));
+		      }
+		      counter = counter +1;		      
+		  }
+		  patch_list = dummyList;
+	      }
+
+	      j = j + 1;
+	  }
+	  i = i + 1;
+      }
+
+      y2milestone ( "Installing following patches in this order: %1", patch_list );
+
       
       // remove old rpm logging
       SCR::Execute(.target.bash, "/bin/rm /var/log/y2logRPMShort" );
