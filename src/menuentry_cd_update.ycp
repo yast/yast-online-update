@@ -51,7 +51,7 @@ to correct and improve your existing installation
       `helptext     : UI(_("Install patches from CD to correct and improve your existing installation.")),
    
       ////////////////////////////////////////////////////////////////////////////////
-      // leaf nil, experts only ;-)
+      // leave nil, experts only ;-)
       `codefragment : nil 
    
    ]

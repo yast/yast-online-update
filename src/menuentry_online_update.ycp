@@ -51,7 +51,7 @@ A patch updates, improves, or corrects your existing installation.
       `helptext     : UI(_("Get patches to correct and improve your existing installation")),
    
       ////////////////////////////////////////////////////////////////////////////////
-      // leaf nil, experts only ;-)
+      // leave nil, experts only ;-)
       `codefragment : nil 
    
    ]
