@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Jan 24 21:44:33 CET 2005 - nashif@suse.de
+
+- Adapted to new argument map when going back during installation
+- 2.11.6
+
+-------------------------------------------------------------------
 Wed Jan 12 15:05:32 CET 2005 - mir@suse.de
 
 - bugfix: checkbox "enable automatic update" remained checked
