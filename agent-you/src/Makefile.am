@@ -11,7 +11,7 @@ lib_LTLIBRARIES = liby2ag_you.la
 liby2ag_you_la_SOURCES = 			\
 	RpmDb.cc RpmDb.h			\
 	PatchInfo.cc PatchInfo.h		\
-	YouAgentCalls.cc YouAgentCalls.h	\
+	YouAgentCalls.cc \
 	YouAgent.cc YouAgent.h
 liby2ag_you_la_LDFLAGS = -version-info 2:0
 
