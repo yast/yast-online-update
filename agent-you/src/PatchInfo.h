@@ -54,6 +54,7 @@ struct PatchElement {
    string state;
    string date;
    RawPackageInfo *rawPackageInfo;
+   bool updateOnlyInstalled;    
 };
 
 typedef map<string,struct PatchElement> PatchList;

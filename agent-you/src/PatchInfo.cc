@@ -19,6 +19,9 @@
 
 /*
  * $Log$
+ * Revision 1.3  2001/12/11 11:21:32  schubi
+ * new flag UpdateOnlyInstalled
+ *
  * Revision 1.2  2001/11/26 13:42:25  schubi
  * new Flag in Patchfile: Installtrigger
  *
@@ -85,7 +88,7 @@
 #define BUILDTIME		"buildtime"
 #define PACKAGES		"Packages"
 #define DEFAULT			"english"
-
+#define UPDATEONLYINSTALLED	"UpdateOnlyInstalled"
 
 
 #define BUFFERLEN	1100
@@ -225,6 +228,10 @@ PatchInfo::PatchInfo( const string path, const string desc_language )
 	   buildtimeElement.values = buildtimeValues;
 	   buildtimeElement.multiLine = false;
 
+	   Values updateOnlyInstalledValues;
+	   Element updateOnlyInstalledElement;
+	   updateOnlyInstalledElement.values = updateOnlyInstalledValues;
+	   updateOnlyInstalledElement.multiLine = false;	   
 
 	   entries.insert(pair<const string, const Element>
 			  ( KIND, kindElement ) );
@@ -282,12 +289,14 @@ PatchInfo::PatchInfo( const string path, const string desc_language )
 	   entries.insert(pair<const string, const Element>
 			  ( BUILDTIME, buildtimeElement ) );
 
-
+	   entries.insert(pair<const string, const Element>
+			 ( UPDATEONLYINSTALLED, updateOnlyInstalledElement ) );
+	   
 	   patchEntries.readFile ( entries, " :" );
 	   Entries::iterator posEntries;
 
 	   posEntries = entries.find ( KIND );
-	   if ( posEntries != entries.end() );
+	   if ( posEntries != entries.end() )
 	   {
 	      Values values = (posEntries->second).values;
 	      Values::iterator posValues;
@@ -299,7 +308,7 @@ PatchInfo::PatchInfo( const string path, const string desc_language )
 	   }
 
 	   posEntries = entries.find ( SHORTDESCRIPTION+desc_language );
-	   if ( posEntries != entries.end() );
+	   if ( posEntries != entries.end() )
 	   {
 	      Values values = (posEntries->second).values;
 	      Values::iterator posValues;
@@ -315,7 +324,7 @@ PatchInfo::PatchInfo( const string path, const string desc_language )
 	      string default_str = SHORTDESCRIPTION;
 	      default_str += DEFAULT;
 	      posEntries = entries.find ( default_str );
-	      if ( posEntries != entries.end() );
+	      if ( posEntries != entries.end() )
 	      {
 		 Values values = (posEntries->second).values;
 		 Values::iterator posValues;
@@ -328,7 +337,7 @@ PatchInfo::PatchInfo( const string path, const string desc_language )
 	   }
 
 	   posEntries = entries.find ( LONGDESCRIPTION+desc_language );
-	   if ( posEntries != entries.end() );
+	   if ( posEntries != entries.end() )
 	   {
 	      Values values = (posEntries->second).values;
 	      Values::iterator posValues;
@@ -344,7 +353,7 @@ PatchInfo::PatchInfo( const string path, const string desc_language )
 	      string default_str = LONGDESCRIPTION;
 	      default_str += DEFAULT;
 	      posEntries = entries.find ( default_str );
-	      if ( posEntries != entries.end() );
+	      if ( posEntries != entries.end() )
 	      {
 		 Values values = (posEntries->second).values;
 		 Values::iterator posValues;
@@ -357,7 +366,7 @@ PatchInfo::PatchInfo( const string path, const string desc_language )
 	   }
 
 	   posEntries = entries.find ( PREINFORMATION + desc_language );
-	   if ( posEntries != entries.end() );
+	   if ( posEntries != entries.end() )
 	   {
 	      Values values = (posEntries->second).values;
 	      Values::iterator posValues;
@@ -373,7 +382,7 @@ PatchInfo::PatchInfo( const string path, const string desc_language )
 	      string default_str = PREINFORMATION;
 	      default_str += DEFAULT;
 	      posEntries = entries.find ( default_str );
-	      if ( posEntries != entries.end() );
+	      if ( posEntries != entries.end() )
 	      {
 		 Values values = (posEntries->second).values;
 		 Values::iterator posValues;
@@ -386,7 +395,7 @@ PatchInfo::PatchInfo( const string path, const string desc_language )
 	   }
 
 	   posEntries = entries.find ( POSTINFORMATION+desc_language );
-	   if ( posEntries != entries.end() );
+	   if ( posEntries != entries.end() )
 	   {
 	      Values values = (posEntries->second).values;
 	      Values::iterator posValues;
@@ -402,7 +411,7 @@ PatchInfo::PatchInfo( const string path, const string desc_language )
 	      string default_str = POSTINFORMATION;
 	      default_str += DEFAULT;
 	      posEntries = entries.find ( default_str );
-	      if ( posEntries != entries.end() );
+	      if ( posEntries != entries.end() )
 	      {
 		 Values values = (posEntries->second).values;
 		 Values::iterator posValues;
@@ -415,7 +424,7 @@ PatchInfo::PatchInfo( const string path, const string desc_language )
 	   }
 
 	   posEntries = entries.find ( INSTALLTRIGGER );
-	   if ( posEntries != entries.end() );
+	   if ( posEntries != entries.end() )
 	   {
 	       Values values = (posEntries->second).values;
 	       Values::iterator posValues;
@@ -427,7 +436,7 @@ PatchInfo::PatchInfo( const string path, const string desc_language )
 	   }
 
 	   posEntries = entries.find ( LANGUAGE );
-	   if ( posEntries != entries.end() );
+	   if ( posEntries != entries.end() )
 	   {
 	      Values values = (posEntries->second).values;
 	      Values::iterator posValues;
@@ -439,7 +448,7 @@ PatchInfo::PatchInfo( const string path, const string desc_language )
 	   }
 
 	   posEntries = entries.find ( DISTRIBUTION );
-	   if ( posEntries != entries.end() );
+	   if ( posEntries != entries.end() )
 	   {
 	      Values values = (posEntries->second).values;
 	      Values::iterator posValues;
@@ -451,7 +460,7 @@ PatchInfo::PatchInfo( const string path, const string desc_language )
 	   }
 
 	   posEntries = entries.find ( SIZE );
-	   if ( posEntries != entries.end() );
+	   if ( posEntries != entries.end() )
 	   {
 	      Values values = (posEntries->second).values;
 	      Values::iterator posValues;
@@ -463,7 +472,7 @@ PatchInfo::PatchInfo( const string path, const string desc_language )
 	   }
 
 	   posEntries = entries.find ( BUILDTIME );
-	   if ( posEntries != entries.end() );
+	   if ( posEntries != entries.end() )
 	   {
 	      Values values = (posEntries->second).values;
 	      Values::iterator posValues;
@@ -475,7 +484,7 @@ PatchInfo::PatchInfo( const string path, const string desc_language )
 	   }
 
 	   posEntries = entries.find ( MINYAST1VERSION );
-	   if ( posEntries != entries.end() );
+	   if ( posEntries != entries.end() )
 	   {
 	      Values values = (posEntries->second).values;
 	      Values::iterator posValues;
@@ -487,7 +496,7 @@ PatchInfo::PatchInfo( const string path, const string desc_language )
 	   }
 
 	   posEntries = entries.find ( MINYAST2VERSION );
-	   if ( posEntries != entries.end() );
+	   if ( posEntries != entries.end() )
 	   {
 	      Values values = (posEntries->second).values;
 	      Values::iterator posValues;
@@ -496,6 +505,31 @@ PatchInfo::PatchInfo( const string path, const string desc_language )
 	      {
 		 patchElement.minYaST2Version += *posValues;
 	      }
+	   }
+
+	   posEntries = entries.find ( UPDATEONLYINSTALLED );
+	   if ( posEntries != entries.end() )
+	   {
+	      Values values = (posEntries->second).values;
+	      Values::iterator posValues;
+	      string dummy = "";
+	      for ( posValues = values.begin(); posValues != values.end() ;
+		    ++posValues )
+	      {
+		  dummy += *posValues;
+	      }
+	      if ( dummy == "true" )
+	      {
+		  patchElement.updateOnlyInstalled = true;
+	      }
+	      else
+	      {
+		  patchElement.updateOnlyInstalled = false;		  
+	      }
+	   }
+	   else
+	   {
+	       patchElement.updateOnlyInstalled = false;		  
 	   }
 
 	   pos = filename.find_last_of(".");
@@ -539,6 +573,14 @@ PatchInfo::PatchInfo( const string path, const string desc_language )
 	   y2debug("      minYaST2Version :%s", patchElement.minYaST2Version.c_str());
 	   y2debug("      state :%s", patchElement.state.c_str());
 	   y2debug("      date :%s", patchElement.date.c_str());
+	   if ( patchElement.updateOnlyInstalled )
+	   {
+	       y2debug("      updateOnlyInstalled : true" );
+	   }
+	   else
+	   {
+	       y2debug("      updateOnlyInstalled : false" );
+	   }
 
 	   patchElement.rawPackageInfo->closeMedium();
 	}
@@ -579,6 +621,7 @@ PatchElement::PatchElement ( const string patchPath,
    minYaST2Version = "";
    state = "";
    date = "";
+   updateOnlyInstalled = false;   
    rawPackageInfo = new RawPackageInfo ( patchPath, "",
 					 patchFile );
 }

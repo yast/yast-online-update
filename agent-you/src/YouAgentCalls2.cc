@@ -152,24 +152,38 @@ YCPValue YouAgent::newPatchList ( void )
 		     }
 		     else
 		     {
-			 // Checking if a provides is installed
-			 PackList packageList = patchElement.rawPackageInfo->getProvides(
-									  packageKey.name()
-									  );
-			 PackList::iterator posList;
-			 for ( posList = packageList.begin();
-			       posList != packageList.end();
-			       ++posList )
-			 {
-			     YCPPath path = ".targetpkg.installed";
-	   
-			     YCPValue ret = mainscragent->Read( path,
-					YCPString( *posList) );
+			 // Checking if category is a installed package
+			 string packageName = packageKey.name();
+			 string shortDescription;
+			 string longDescription;
+			 string notify;
+			 string delDescription;
+			 string category;
+			 int size;
 
-			     if ( ret->isBoolean() 	// success
-				  && ret->asBoolean()->value() )
+			 patchElement.rawPackageInfo->getRawPackageDescritption(
+						packageName,
+						shortDescription,
+						longDescription,
+						notify,
+						delDescription,
+						category,
+						size);
+			 if ( category.length() > 0 )
+			 {
+			     string rpmVersion = "";
+			     YCPPath path = ".targetpkg.info.version";
+	   
+			     YCPValue retpkg = mainscragent->Read( path,
+								   YCPString( category ) );
+			     if ( retpkg->isString()
+				  && retpkg->asString()->value() != "" )	// success
 			     {
-				 packageInstalled = true;
+				 packageInstalled = true;				 
+			     }
+			     else
+			     {
+				 y2error("<.targetpkg.info.version> System agent returned nil.");
 			     }
 			 }
 		     }
@@ -322,6 +336,7 @@ YCPValue YouAgent::getPatchInformation ( const YCPString patchName )
  * <package-path>, "nextPackageSize", <byte>]
  *--------------------------------------------------------------------------*/
 static string lastPatch = "";
+static bool updateOnlyInstalled = false;
 static PackVersList packageList;
 static PackVersList::iterator posPackageList;
 
@@ -373,6 +388,7 @@ YCPValue YouAgent::getPatch ( const YCPString patchName )
 	       // Error
 	       ok = false;
 	    }
+	    updateOnlyInstalled = patchElement.updateOnlyInstalled;    
 	 }
 	 lastPatch = patchName->value();
       }
@@ -852,6 +868,125 @@ YCPValue YouAgent::getPatch ( const YCPString patchName )
       }
    }
 
+   if ( updateOnlyInstalled
+	&& ok
+	&& posPackageList != packageList.end() )
+   {
+       // installing only installed packages or packages
+       // which have an alias to a installed package
+       y2milestone ( "Updateing only installed packages" );
+       bool packageInstall = false;
+       PatchList patchList = currentPatchInfo->getRawPatchList();
+       PatchList::iterator patchPos;
+
+       patchPos = patchList.find( patchName->value());
+
+       if ( patchPos != patchList.end() )
+       {
+	   PatchElement patchElement = patchPos->second;
+
+	   while ( !packageInstall
+		   && posPackageList != packageList.end() )
+	   {
+	       PackageKey packageKey = *posPackageList;
+	       
+	       string rpmVersion = "";
+	       YCPPath path = ".targetpkg.info.version";
+	       
+	       YCPValue ret = mainscragent->Read( path,
+						  YCPString( packageKey.name() ) );
+
+	       if ( ret->isString() )	// success
+	       {
+		   rpmVersion = ret->asString()->value();
+	       }
+	       else
+	       {
+		   y2error("<.targetpkg.info.version> System agent returned nil.");
+	       }
+	       
+	       if (  rpmVersion != "" )
+	       {
+		   string packageName = packageKey.name();
+		   bool basePackage;
+		   int installationPosition;
+		   int cdNr;
+		   string instPath;
+		   string version;
+		   long buildTime;
+		   int rpmSize;
+
+		   patchElement.rawPackageInfo->getRawPackageInstallationInfo(
+						packageName,
+						basePackage,
+						installationPosition,
+						cdNr,
+						instPath,
+						version,
+						buildTime, rpmSize );
+		   y2milestone ( "Package %s; %s<->%s",
+				 packageName.c_str(),
+				 version.c_str(),
+				 rpmVersion.c_str() );
+		   if ( CompVersion ( version, rpmVersion ) == V_NEWER )
+		   {
+		       packageInstall = true;
+		       y2milestone ( "--->installing" );
+		   }
+	       }
+	       else
+	       {
+		  // Checking if category is a installed package
+		  string packageName = packageKey.name();		   
+		  string shortDescription;
+		  string longDescription;
+		  string notify;
+		  string delDescription;
+		  string category;
+		  int size;
+
+		  patchElement.rawPackageInfo->getRawPackageDescritption(
+						packageName,
+						shortDescription,
+						longDescription,
+						notify,
+						delDescription,
+						category,
+						size);
+
+		  if ( category.length() > 0 )
+		  {
+		      y2milestone ( "Checking category : %s", category.c_str() );
+		      YCPPath path = ".targetpkg.info.version";
+		      string rpmVersion = "";
+	       
+		      YCPValue ret = mainscragent->Read( path,
+							 YCPString( category ) );
+
+		      if ( ret->isString() )	// success
+		      {
+			  rpmVersion = ret->asString()->value();
+		      }
+		      else
+		      {
+			  y2error("<.targetpkg.info.version> System agent returned nil.");
+		      }
+		      
+		      if (  rpmVersion != "" )
+		      {
+			  packageInstall = true;
+			  y2milestone ( "--->installing" );			   
+		      }
+		  }
+	       }
+	       if ( !packageInstall )
+	       {
+		   posPackageList++;
+	       }
+	   }
+       }
+   }
+
    if ( ok && posPackageList != packageList.end() )
    {
       PatchList patchList = currentPatchInfo->getRawPatchList();
@@ -1059,7 +1194,14 @@ YCPValue YouAgent::getPackages ( const YCPString patchName )
 	       long buildTime;
 	       string serie;
 	       int rpmSize;
+	       int size;
+	       string shortDescription;
+	       string longDescription;
+	       string notify;
+	       string delDescription;
+	       string category;
 	       YCPList packageList;
+	       bool packageInstall = true;	       	       
 
 	       patchElement.rawPackageInfo->getRawPackageInstallationInfo(
 					 packageName,
@@ -1070,37 +1212,92 @@ YCPValue YouAgent::getPackages ( const YCPString patchName )
 					 version,
 					 buildTime,
 					 rpmSize );
-	       
-	       string shortDescription =
+	       patchElement.rawPackageInfo->getRawPackageDescritption(
+						packageName,
+						shortDescription,
+						longDescription,
+						notify,
+						delDescription,
+						category,
+						size);
+	       shortDescription =
 		   patchElement.rawPackageInfo->getLabel( packageName );
 	       
 	       serie = patchElement.rawPackageInfo->getSerieOfPackage(
 								 packageName );
-
-	       string compString = "ftp://";
-	       if ( instPath.substr ( 0, 6 ) == compString   )
+	       if ( patchElement.updateOnlyInstalled )
 	       {
-		  // rpm has been token from another server and has been stored
-		  // under others/<rpm>
-		  packageList->add ( YCPString ( destPatchPath + "/" + OTHERS +
+		   // installing only installed packages or packages
+		   // which have an alias to a installed package
+		   packageInstall = false;
+		   string rpmVersion = "";
+		   YCPPath path = ".targetpkg.info.version";
+	       
+		   YCPValue ret = mainscragent->Read( path,
+						      YCPString( packageName ) );
+
+		   if ( ret->isString() )	// success
+		   {
+		       rpmVersion = ret->asString()->value();
+		   }
+		   else
+		   {
+		       y2error("<.targetpkg.info.version> System agent returned nil.");
+		   }
+		   
+		   if (  rpmVersion != ""
+			 && CompVersion ( version, rpmVersion ) == V_NEWER )
+		   {
+		       packageInstall = true;
+		   }
+		   else
+		   {
+		       // Checking if the category is a installed package
+		       if ( category.length() > 0 )
+		       {
+			   y2milestone ( "Checking category : %s", category.c_str() );
+			   YCPValue ret = mainscragent->Read( path,
+							      YCPString( category ) );
+
+			   if ( ret->isString()
+				&& ret->asString()->value() != "" )	// success
+			   {
+			       packageInstall = true;			       
+			   }
+			   else
+			   {
+			       y2error("<.targetpkg.info.version> System agent returned nil.");
+			   }
+		       }
+		   }
+	       }
+	       
+	       if ( packageInstall
+		    && serie != SCRIPT )
+	       {
+		   // only packages will be returned ( no scripts )
+		   string compString = "ftp://";
+		   if ( instPath.substr ( 0, 6 ) == compString   )
+		   {
+		       // rpm has been token from another server and has been stored
+		       // under others/<rpm>
+		       packageList->add ( YCPString ( destPatchPath + "/" + OTHERS +
 					 "/" + packageName + ".rpm" ));
-	       }
-	       else
-	       {
-		  packageList->add ( YCPString ( destPatchPath + "/" + instPath ));
-	       }
-	       packageList->add ( YCPString ( shortDescription ));
+		   }
+		   else
+		   {
+		       packageList->add ( YCPString (
+						 destPatchPath + "/" + instPath ));
+		   }
+		   packageList->add ( YCPString ( shortDescription ));
 
-	       if ( serie != SCRIPT )
-	       {
-		   // only packages will be returned
 		   ret->add ( YCPList ( packageList ) );
 		   y2debug ( "%s added (%s)",
 			     packageName.c_str(),
 			     serie.c_str());
 	       }
-	    }
-	 }
+	   }
+       }
    }
    else
    {
