@@ -44,9 +44,8 @@ make install
 %files
 
 /etc/suseservers
-%dir @YAST2DIR@/menuentries
 @YAST2DIR@/menuentries/menuentry_online_update.ycp
-%dir @YAST2DIR@/clients
+@YAST2DIR@/include/suseservers.ycp
 @YAST2DIR@/clients/online_update.ycp
 @YAST2DIR@/clients/online_update_close.ycp
 @YAST2DIR@/clients/online_update_details.ycp
