@@ -10,10 +10,39 @@
 <p>The ftp update has a patch structure. Each patch has a patch description
 file and n RPM packages. 
 <h2>Description</h2>
+<h3>Location of the patchdescription files ( source )</h3>
+<h4>Box Product OR Business Produkt ?</h4>
+<p>YOU will be started for a business product if following the flags have been set in
+<br>in  /var/lib/YaST/update.inf:
+<p>   Product_Name:           SuSE-SLES   ( not "SuSE Linux" )
+<br>   Product_Version:        7
+<br>
+<br>The distribution version will be set by the Flag "Distribution_Version".
+<br>
+<h4>Box Product</h4>
 The patch description files are located on the ftp server in the directory:
-<p>/pub/suse/{ARCHITECTURE}/update/{SuSE-Version}/patches
+<p>/var/lib/YaST/patches/&lt;ARCHITECTURE&gt;/update/&lt;SuSE-Version&gt;/patches
+<p>The concerning packages are stored on http server in the directories:
+<p>/var/lib/YaST/patches/&lt;ARCHITECTURE&gt;/update/&lt;SuSE-Version&gt;/&lt;Serie&gt;
+<p>
+<h4>Business Product</h4>
+The patch description files are located in the directory:
+<p>/var/lib/YaST/patches/&lt;architecture&gt;/update/&lt;product_name&gt;/&lt;product_version&gt;/patches
+<p>The concerning packages are stored in the directories:
+<p>/var/lib/YaST/patches/&lt;architecture&gt;/update/&lt;product_name&gt;/&lt;product_version&gt;/&lt;serie&gt;/&lt;packagename&gt;.rpm
+<p>
+<h3>Location of the patchdescription files on the client ( destination )</h3>
+<h4>Box Product</h4>
+The patch description files are located in the directory:
+<p>/pub/suse/&lt;ARCHITECTURE&gt;/update/&lt;SuSE-Version&gt;/patches
 <p>The concerning packages are stored on ftp server in the directories:
-<p>/pub/suse/{ARCHITECTURE}/update/{SuSE-Version}/{Serie}
+<p>/pub/suse/&lt;ARCHITECTURE&gt;/update/&lt;SuSE-Version&gt;/&lt;Serie&gt;
+<p>
+<h4>Business Product</h4>
+The patch description files are located on the http server in the directory:
+<p>http://sdb.suse.de/download/&lt;architecture&gt;/update/&lt;product_name&gt;/&lt;product_version&gt;/patches
+<p>The concerning packages are stored on ftp server in the directories:
+<p>http://sdb.suse.de/download/&lt;architecture&gt;/update/&lt;product_name&gt;/&lt;product_version&gt;/&lt;serie&gt;/&lt;packagename&gt;.rpm
 <p>
 <h3>Filename of the patch description files</h3>
 <p>&lt;shortcut&gt;-&lt;version number&gt;
@@ -22,7 +51,7 @@ The patch description files are located on the ftp server in the directory:
 <p>
 <h3>Format of the patch description file</h3>
 
-<p>Kind: [security|recommended|hotfix|document]
+<p>Kind: [security|recommended|optional|document|YaST2]
 
 <p>Shortdescription.&lt;language&gt; : &lt;short description; one line&gt;
 
@@ -48,6 +77,14 @@ Buildtime:     &lt; time in seconds&gt;
 
 <p>MinYaST1Version:&lt;minimal YaST1 version which is needed for installation&gt;
 <p>MinYaST2Version:&lt;minimal YaST2 version which is needed for installation&gt;
+<p>
+<p>UpdateOnlyInstalled: &lt;true/false; Only packages ( described in this patch ) will be updated which are installed. &gt;
+<p>
+<p>Installtrigger:
+<br>&lt;Script which will be execute in order to decide if the patch have to be installed.&gt;
+<br>&lt;return 0 --> patch will be installed. &gt;
+<br>Reggirtllatsni:
+<p>
 <p>Packages:
 <p>&lt;package description of the patch&gt;
 <p>.<br>
@@ -84,6 +121,48 @@ Oboletes:       ..<br>
 ..<br>
 .<br>
 <p>Segakcap:
+<p>
+<h3>Which patch will be preselected for installation?</h3>
+<p>There are some criterions for preselecting patches which will be installed
+<br>by YOU:
+<p> - The scripted defined in the patchdescription ( flag "Installtrigger" ) 
+<br>   returns true.
+<br> - One or more packages of patch are installed and have older versions.
+<br> - One or more packages have a flag ( "Category" ) which is a installed package.
+<p>
+<p>If the flag "UpdateOnlyInstalled" is not defined or is false, ALL packages of the
+<br>patch will be installed.
+<br>If this flag is "true", only packages will be updated which are already installed
+<br>and have a older version OR the package has a flag ( "Category" ) which is a installed package.
+<p>
+<h3>Executing scripts within a patch</h3>
+<p>There is the possibility to run single scripts while installing packages.
+<br>These scripts have to be defined in a packagedescription like:
+<p>##<br>
+## -----&gt; testscript &lt;-----<br>
+##<br>
+<p>Filename:      testscript<br>
+Label:         The GNU Bourne-Again Shell<br>
+Series:        script<br>
+Package:       scripts/testscript<br>
+Size:          2116014 838521<br>
+Buildtime:     973570238<br>
+BuiltFrom:     <br>
+Flag:          <br>
+Category:      <br>
+RpmGroup:      <br>
+Copyright:     <br>
+AuthorName:    <br>
+AuthorEmail:   <br>
+AuthorAddress: <br>
+Version:       2.04-81<br>
+StartCommand:  <br>
+Requires:      <br>   
+Provides:      <br>
+Conflicts      <br>
+Oboletes:      <br>
+<p>
+This description has to have "script" for the label "Series".
 <p>
 <h2>Example</h2>
 
