@@ -68,7 +68,7 @@
           else if ( proceed == `ok ) return "";
           else return "error";
         } else if ( type == "abort" ) {
-          if ( OnlineUpdateDialogs::ConfirmAbortUpdate( `painless ) ) return "abort";
+          if ( OnlineUpdateDialogs::ConfirmAbortUpdate( `incomplete ) ) return "abort";
           else return ""; 
         } else {
           string msg = text;

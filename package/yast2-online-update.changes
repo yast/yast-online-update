@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Mon Jan 10 19:06:20 CET 2005 - mir@suse.de
+
+- bugfix: aborting the installation displayed a misleading error 
+  message ("no packagage installed" instead of "incomplete") 
+  (#47869)
+- 2.11.4
+
+-------------------------------------------------------------------
 Mon Jan 10 16:54:09 CET 2005 - mir@suse.de
 
 - bugfix: aborting the selection went back instead of aborting
