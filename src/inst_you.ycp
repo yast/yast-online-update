@@ -18,7 +18,7 @@
 	return `auto;
 
     boolean already_up = false;
-    if (!Mode::test)
+    if (!Mode::test())
         already_up = Internet::Status ();
 
     boolean i_set_demand = false;

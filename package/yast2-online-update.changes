@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Nov  4 15:51:58 CET 2004 - kkaempf@suse.de
+
+- adapt to new Mode:: API
+- 2.11.1
+
+-------------------------------------------------------------------
 Wed Oct  6 10:48:28 CEST 2004 - jsrain@suse.cz
 
 - append slash to the end of URL if it is missing (#46631)

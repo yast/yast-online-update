@@ -30,7 +30,7 @@ the update takes place.");
                     return i;
                 });
 
-	if (!Mode::config)
+	if (!Mode::config())
 	{
 	    AutoOnlineUpdate::Read();
 	}
@@ -59,7 +59,8 @@ the update takes place.");
                         random_time),
                     `HStretch()
                  );
-        if (!Mode::config) {
+        if (!Mode::config())
+	{
             random_dialog = `Empty();
         }
 
@@ -142,7 +143,7 @@ the update takes place.");
 			      `PushButton( `id( `abort ), Label::CancelButton() )
 			      );
 
-	if (Mode::config)
+	if (Mode::config())
 	{
 	    term dlg_contents = `Top( content);
 	    Wizard::CreateDialog();
@@ -223,7 +224,7 @@ the update takes place.");
                             (boolean)UI::QueryWidget(`id(`random), `Value );
 		    AutoOnlineUpdate::enabled = true;
 		    AutoOnlineUpdate::modified = true;
-		    if (!Mode::config)
+		    if (!Mode::config())
 		    {
 			AutoOnlineUpdate::Write();
 		    }

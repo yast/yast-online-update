@@ -179,7 +179,7 @@ global define boolean Import (map settings)
     enabled = settings["enable_autoupdate"]:false;
     random_time = settings["update_time", "random_time"]:false;
 
-    if (random_time && Mode::autoinst)
+    if (random_time && Mode::autoinst())
     {
         hour = random( 24 );
         minute = random( 60 );

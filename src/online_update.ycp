@@ -55,7 +55,7 @@ packages were created by SuSE.
 
       if ( arg == .test || arg == ".test" )
       {
-	  Mode::test = true;
+	  Mode::SetTest (true);
       }
       else if ( arg == .cd_default || arg == ".cd_default" )
       {
@@ -117,7 +117,7 @@ packages were created by SuSE.
     return result;
   }
 
-  y2debug("ONLINE: Testmode %1", Mode::test );
+  y2debug("ONLINE: Testmode %1", Mode::test() );
 
   Wizard::CreateDialog();
   Wizard::SetDesktopIcon("online_update");
@@ -172,9 +172,12 @@ packages were created by SuSE.
       else if (result == `back)
 	  id = id - 1;
       else if ( result == `finish )
-          if ( !Mode::installation && !Mode::update ) { 
+          if ( !Mode::installation() && !Mode::update() )
+	  { 
 	      id = size(dialog)-1;		// call last module
-          } else {
+          }
+	  else
+	  {
               result = `next;
               break;
           }
