@@ -2,10 +2,7 @@
 # Makefile.am for online_update/src
 #
 
-etcdir = /etc
 admdir = /var/adm/fillup-templates
-
-etc_DATA = suseservers
 
 adm_DATA = sysconfig.onlineupdate
 
@@ -23,5 +20,5 @@ config_DATA =			\
 	online_update.y2cc	\
 	cd_update.y2cc
 
-EXTRA_DIST = $(client_DATA) $(module_DATA) $(config_DATA) $(etc_DATA)	\
+EXTRA_DIST = $(client_DATA) $(module_DATA) $(config_DATA) \
 	$(adm_DATA)
