@@ -36,7 +36,7 @@ Spezifikation YOU Patches 8.1
 
      Für die Erstellung des YCP-Moduls werden Beispiele (und evtl. eine
      Bibilothek mit den wichtigsten Funktionen) zur Verfügung gestellt.
-
+ 
   4. Logausgaben müssen vom Skript/Programm auf stdout ausgegeben werden.
      YOU leitet stdout und stderr in ein Logfile mit Namen:
      /var/log/patches/<patchname.log> um.
@@ -52,17 +52,22 @@ Spezifikation YOU Patches 8.1
 - Abhängigkeiten für Patches können angegeben werden:
 -----------------------------------------------------
   
-  Requires:  patch-<no_X1> patch-<no_X2> ...
+  Die Patches werden durch die MD5 Summe im Header identifiziert.
+  Bei der Angabe der Patch-Abhängigkeiten wird die MD5 Summe angegeben, da zu dem Zeitpunkt
+  der Erstellung der Patchbeschreibung der Name des Patches evtl. noch nicht feststeht
+  (falls es sich ebenfalls um einen neuen Patch handelt).  
+  
+  Requires:  <MD5 sum of patch-no1>  <MD5 sum of patch-no2> ...
              Die Installation des Patches setzt die Installation von
- 	     patch-<no_X1>, patch-<no_X2> ... voraus.
+ 	     patch-no1, patch-no2 ... voraus.
 
-  Obsoletes: patch-<no_Y1> patch-<no_Y2> ...
-             Die patches patch-<no_Y1>, patch-<no_Y2> ... müssen nicht installiert
+  Obsoletes: <MD5 sum of patch-no1>  <MD5 sum of patch-no2> ... 
+             Die patches patch-no1, patch-no2 ... müssen nicht installiert
 	      werden, d.h. werden nicht zur Installation vorgeschlagen.
 
-  Conflict:  patch-<no_Z1> patch-<no_Z2> ...
+  Conflict:  <MD5 sum of patch-no1>  <MD5 sum of patch-no2> ... 
              Die Installtion des Patches würde einen Konflikt mit den
-             (bereits installierten) patch-<no_Z1>, patch-<no_Z2> ... auslösen.
+             (bereits installierten) patch-no1, patch-no2 ... auslösen.
 
 - Paketabhängigkeiten:
 ----------------------
@@ -74,4 +79,21 @@ Spezifikation YOU Patches 8.1
   werden.
 
 
- 
+- Änderungen:
+-------------
+
+Angaben zum Paket:
+
+Package:        <package name> <package type: rpm|src.rpm|nosrc.rpm|patch.rpm>  # separated by whitespace!
+Version:        <package version-release>
+Requires:       <package dependencies>
+Provides:       <package dependencies>
+Conflicts:      <package dependencies>
+Obsoletes:      <package dependencies>
+InstPath:       <location of the RPMpackage relative to the installation path. (whereever/whatever-name.rpm)>
+Label.<langcode>:<short description of the script>	
+PatchVersions:  <package versions; If the installed package has one of these versions only the patch
+                 defined in "Package" (.patch.rpm) will be installed. If not the RPM defined in "Package" (.rpm) will
+                 be installed>
+
+  
