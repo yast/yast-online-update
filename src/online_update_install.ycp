@@ -170,7 +170,9 @@ option 'Remove source packages after update.'</p>");
   string msgNoPatches = _( "No patches have been selected for installation." );
 
   integer installedPatches = 0;
-  
+
+  symbol proceed = `ok;
+
   if ( size( patch ) == 0 ) {
     UI::ChangeWidget( `id(`log), `LastLine, msgNoPatches );
   } else {
@@ -191,10 +193,16 @@ option 'Remove source packages after update.'</p>");
                             patchName,
                             lookup( patch, "summary", "no summary" ) ) );
 
-      string err = Pkg::YouGetCurrentPatch( OnlineUpdate::reload,
-                                            OnlineUpdate::signature_check );
+      string err = "skipped";
+      if ( proceed == `ok ) {
+        err = Pkg::YouGetCurrentPatch( OnlineUpdate::reload,
+                                       OnlineUpdate::signature_check );
+      }
+      
       if ( size( err ) == 0 ) {
         UI::ChangeWidget( `id(`log), `LastLine, _("Ok\n") );
+      } else if ( err == "skipped" ) {
+        UI::ChangeWidget( `id(`log), `LastLine, _("Skipped\n") );
       } else {
         UI::ChangeWidget( `id(`log), `LastLine, _("Error") );
         error = true;
@@ -215,9 +223,9 @@ Do you want to skip this patch or
 abort the update?"), patchName );
       
         string errorMsg = Pkg::Error() + "\n" + Pkg::ErrorDetails();
-      
-        boolean proceed = UI::YouSkipPopup( msg, errorMsg );
-        if ( !proceed ) return `abort;
+
+        proceed = UI::YouSkipPopup( msg, errorMsg );
+        if ( proceed == `abort ) return `abort;
       }
 
       patch = Pkg::YouNextPatch();
@@ -232,6 +240,7 @@ abort the update?"), patchName );
       patch =  Pkg::YouFirstPatch( false );
 
       error = false;
+      proceed = `ok;
 
       if ( size( patch ) == 0 ) {
         UI::ChangeWidget( `id(`log), `LastLine, msgNoPatches );
@@ -255,7 +264,9 @@ abort the update?"), patchName );
           if ( !install ) {
             UI::ChangeWidget( `id(`log), `LastLine, _("Skipped\n") );
           } else {
-            string result = Pkg::YouInstallCurrentPatch();
+            string result = "skipped";
+            if ( proceed == `ok ) result = Pkg::YouInstallCurrentPatch();
+
             if ( size( result ) == 0 ) {
               UI::ChangeWidget( `id(`log), `LastLine, _("Ok\n") );
               installedPatches = installedPatches + 1;
@@ -278,8 +289,8 @@ the update?"), patchName );
 
               string errorMsg = Pkg::Error() + "\n" + Pkg::ErrorDetails();
 
-              boolean proceed = UI::YouSkipPopup( msg, errorMsg );
-              if ( !proceed ) return `abort;
+              proceed = UI::YouSkipPopup( msg, errorMsg );
+              if ( proceed == `abort ) return `abort;
             }
           }
 

@@ -157,6 +157,7 @@ UI(``{
           buttons = `HBox(
                         detailsButton,
                         `PushButton( `id( `ok ), _("Skip patch") ),
+                        `PushButton( `id( `all ), _("Skip all") ),
                         `PushButton( `id( `abort ), _("Abort update") )
                     );
         } else {
@@ -179,7 +180,7 @@ UI(``{
         symbol ret = nil;
         boolean showDetails = false;
              
-        while( ret != `ok && ret != `abort ) {
+        while( ret != `ok && ret != `all && ret != `abort ) {
             ret = UserInput();
             
             if ( ret == `details ) {
@@ -199,8 +200,12 @@ UI(``{
         
         CloseDialog();
 
-        if ( ret ==  `ok ) return true;
-        else return false;
+        if ( skip ) {
+            return ret;
+        } else {
+            if ( ret ==  `ok ) return true;
+            else return false;
+        }
     }
 
     //  ConfirmAbortUpdate has same layout as/but different text than ConfirmAbort
