@@ -138,7 +138,10 @@
   last_status = PKGINFO(`ftpLastUpdateStatus() );
 
   y2debug("ONLINE: last update status: %1", last_status );
-          
+
+ integer num = tointeger( lookup( last_status, "days", "0" ));
+ string last_update = sformat( _( "Last update was executed\n %1 day ago.", "Last update was executed\n %1 days ago.", num), num );
+  
   // layout main dialog 
 
   term contents =
@@ -147,8 +150,7 @@
 	    `HBox(`HWeight(1, `Empty()),
 		  `HWeight(8, `Frame (_("Last update information"),
 				      `VBox(`VSpacing(0.8),
-					    `HBox(`HSpacing(0.8),`Left(`Label( sformat(UI(_("Last update was executed\n %1 days ago.")),
-										       lookup( last_status, "days", "--" )))),
+					    `HBox(`HSpacing(0.8),`Left(`Label(last_update)),
 						  `HSpacing(2.0),
 						  `PushButton( `id(`details), `opt(`notify), _("&Details"))
 						  ),
