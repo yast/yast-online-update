@@ -70,6 +70,7 @@
 #define NEXTSERVER	"nextServer"
 #define NEXTSERVERKIND	"nextServerKind"
 #define NEXTPACKAGESIZE "nextPackageSize"
+#define NEXTSERIE	"nextSerie"
 #define OTHERS		"others"
 #define OPTIONAL	"optional"
 #define NAME		"name"
@@ -90,7 +91,7 @@
 #define DISTRIBUTIONRELEASE "Distribution_Release"
 #define TRUE		"true"
 #define FALSE		"false"
-
+#define SCRIPT		"script"
 
 /*-------------------------------------------------------------*/
 /* Create all parent directories of @param name, as necessary  */
@@ -2290,6 +2291,13 @@ YCPValue YouAgent::getPatch ( const YCPString patchName )
 	 string version;
 	 long buildTime;
 	 int rpmSize;
+	 string shortDescription;
+	 string longDescription;
+	 string notify;
+	 string delDescription;
+	 string category;
+	 string serie;
+	 int size;
 
 	 patchElement.rawPackageInfo->getRawPackageInstallationInfo(
 				         packageName,
@@ -2300,6 +2308,17 @@ YCPValue YouAgent::getPatch ( const YCPString patchName )
 					 version,
 					 buildTime,
 					 rpmSize );
+	 patchElement.rawPackageInfo->getRawPackageDescritption(
+				         packageName,
+					 shortDescription,
+					 longDescription,
+					 notify,
+					 delDescription,
+					 category,
+					 size);
+
+	 serie = patchElement.rawPackageInfo->getSerieOfPackage(
+								packageName );
 
 	 if ( instPath.substr ( 0, strlen ( FTPADRESS ) ) == FTPADRESS   )
 	 {
@@ -2349,7 +2368,8 @@ YCPValue YouAgent::getPatch ( const YCPString patchName )
 	 }
 	 ret->add ( YCPString ( NEXTPACKAGESIZE ),
 		    YCPInteger ( rpmSize ));
-
+	 ret->add ( YCPString ( NEXTSERIE ),
+		    YCPString ( serie ));
       }
    }
 
@@ -2470,12 +2490,7 @@ YCPValue YouAgent::getPackages ( const YCPString patchName )
 	       string instPath;
 	       string version;
 	       long buildTime;
-	       string shortDescription;
-	       string longDescription;
-	       string notify;
-	       string delDescription;
-	       string category;
-	       int size;
+	       string serie;
 	       int rpmSize;
 	       YCPList packageList;
 
@@ -2488,6 +2503,14 @@ YCPValue YouAgent::getPackages ( const YCPString patchName )
 					 version,
 					 buildTime,
 					 rpmSize );
+	       
+	       string shortDescription;
+	       string longDescription;
+	       string notify;
+	       string delDescription;
+	       string category;
+	       int size;
+
 	       patchElement.rawPackageInfo->getRawPackageDescritption(
 						packageName,
 						shortDescription,
@@ -2496,6 +2519,10 @@ YCPValue YouAgent::getPackages ( const YCPString patchName )
 						delDescription,
 						category,
 						size);
+	       
+	       
+	       serie = patchElement.rawPackageInfo->getSerieOfPackage(
+								 packageName );
 
 	       string compString = "ftp://";
 	       if ( instPath.substr ( 0, 6 ) == compString   )
@@ -2511,7 +2538,14 @@ YCPValue YouAgent::getPackages ( const YCPString patchName )
 	       }
 	       packageList->add ( YCPString ( shortDescription ));
 
-	       ret->add ( YCPList ( packageList ) );
+	       if ( serie != SCRIPT )
+	       {
+		   // only packages will be returned
+		   ret->add ( YCPList ( packageList ) );
+		   y2debug ( "%s added (%s)",
+			     packageName.c_str(),
+			     serie.c_str());
+	       }
 	    }
 	 }
    }

@@ -268,7 +268,13 @@ The ftp/http connection will be closed.
 	      UI::ChangeWidget(`id(`fileProgress), `Filename, lookup(patch_result, "nextPackage",""));
 
 	      string otherYouServer = lookup ( patch_result, "nextServer", "" );
-	      string otherYouServerKind = lookup ( patch_result, "nextServerKind", "" );	      
+	      string otherYouServerKind = lookup ( patch_result, "nextServerKind", "" );
+	      string scriptName = "";
+
+	      if ( lookup ( patch_result, "nextSerie", "" ) == "script" )
+	      {
+		  scriptName = lookup(patch_result, "nextPackage","");
+	      }
 	      
 	      // Checking, if the package is on another server; not when the
 	      // source is CD, Harddisk....
@@ -381,6 +387,25 @@ The ftp/http connection will be closed.
 		  {
 		      UI::ChangeWidget(`id(`status), `Value, _("active"));
 		      UI::ChangeWidget(`id(`id1), `Value, you_server);   
+		  }
+	      }
+
+	      if ( scriptName != ""
+		   && select( lookup(new_patches, patch, []), 3 ) == "X" )
+	      {
+		  string command = "source " + scriptName;
+		  
+		  UI::ChangeWidget(`id(`log), `LastLine, "Execute script " + scriptName + "\n");
+		  
+		  integer doresult = SCR::Execute (.target.bash, command );
+
+		  if (doresult==0)
+		  {
+		      UI::ChangeWidget(`id(`log), `LastLine, "return ok\n");		      
+		  }
+		  else
+		  {
+		      UI::ChangeWidget(`id(`log), `LastLine, "return NOT ok\n");		      
 		  }
 	      }
 	  }
