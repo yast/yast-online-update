@@ -47,9 +47,10 @@
     }
     else
     {
-	 last_status = $["date":"12.10.2000", "days":"25", "status":"ok",
-			"patches":["patch-0-123", "recommended", "skdakdöak sdfsdfsdf", "05.10.2000",
-				  "sec-fix-988", "security", "salöda dsösld alsdäladä", "12.10.2000"]];
+	last_status = $["date":"12.10.2000", "days":"25", "status":"ok",
+		       "patches":["patch-0-123", "rec", "skdakdöak sdfsdfsdf", "05.10.2000",
+				 "sec-fix-988", "sec", "salöda dsösld alsdäladä", "12.10.2000",
+				 "sec-fix-123", "sec", "bbbbbb asdfg Gsdfksdf", "12.10.2000" ]];
     }
 
     y2debug("ONLINE: last update status: %1", last_status );
@@ -142,10 +143,9 @@ if you click on button <b>Details</b>.
 	    return `again;
 	}
 
-	if ( ret == `abort && ConfirmAbort(`painless) )
+	if ( ret == `abort && UI(`ConfirmAbort(`painless)) )
 	    return `abort;
 
-	
 	if ( ret == `back)
 	{
 

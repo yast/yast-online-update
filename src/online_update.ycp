@@ -27,8 +27,8 @@
   string ftpserver = "ftp.suse.de";
   string rootpath = "/";
   string yastpath = "/var/lib/YaST";
-  string patchpath = "var/lib/YaST/patches";
-
+  string patchpath = "/var/lib/YaST/patches";
+  string logpath = "/var/log/y2ftplog";
 
    
   // Menuentry for the YaST2 menu
@@ -98,7 +98,7 @@ improve your existing installation."))
 	SetFocus( `id(`next) );
       };
 
-	// This is a popup dialog for displaying (usually) error messages      
+    // This is a popup dialog for displaying (usually) error messages      
     define DisplayMessage(string message) ``{
 	    // ok pushbutton: confirm the dialog
 	OpenDialog(
@@ -120,49 +120,26 @@ improve your existing installation."))
     };
 
     
-    define DisplayMessage2(string message, integer code, string stack) ``{
-      // ok pushbutton: confirm the dialog
-      term t = `VBox();
-      t = add(t, `Left(`Label(message)));
-      if (code != 0)
-	// optional warning dialog text
-	t = add(t, `Left(`Label(sformat(_("Error code %1"), code))));
-      if (stack != "") 
-	t = add(t, `Left(`Label(stack)));
-	  // "OK" button: User confirmation
-      OpenDialog(`opt(`decorated), add(t, `PushButton(_("&OK"))));
-      UserInput();
+    // YES or NO
+    define YesOrNo(any message, string yes_button_message, string no_button_message) ``{
+      OpenDialog(`opt(`decorated),
+	`HBox(`HSpacing(1),
+	      `VBox(`VSpacing(0.2),
+		    `Label(message),
+		    `HBox(`PushButton(`id(`yes), `opt(`default), yes_button_message),
+			  `HSpacing(2),
+			  `PushButton( no_button_message )),
+		    `VSpacing(0.2)),
+	      `HSpacing(1)
+	));
+      any ret = UserInput();
       CloseDialog();
-    }; 
+      return (ret == `yes);
 
-	// This is a popup dialog with Yes/No question
-    define DisplayYesNo(string message, boolean d) ``{
-	
-	term t = `VBox();
-	t = add(t, `Left(`Label(message)));
-	term b = `HBox();
-	if (d) {
-		// "Yes" button: Answer to the dialog question
-	    b = add (b, `PushButton(`id(`yes), `opt (`default), _("&Yes")));
-		// "No" button: Answer to the dialog question
-	    b = add (b, `PushButton(`id(`no), _("&No")));
-	}
-	else {
-		// "No" button: Answer to the dialog question
-	    b = add (b, `PushButton(`id(`no), `opt (`default), _("&No")));
-		// "Yes" button: Answer to the dialog question
-	    b = add (b, `PushButton(`id(`yes), _("&Yes")));
-	}
-	
-	OpenDialog(`opt(`decorated), add(t, b));
-	any ui = UserInput();
-	CloseDialog();
-	
-	return (ui == `yes);
-	
     };
-
-   define ConfirmAbort( symbol how_to ) ``{
+    
+    //  ConfirmAbortUpdate has same layout as/but different text than ConfirmAbort
+   define ConfirmAbortUpdate( symbol how_to ) ``{
 	  locale|any what_will_happen = nil;
 
 	  if ( how_to == `painless )
@@ -191,7 +168,6 @@ You will need to do the update again." );
 	  {
 	      y2warning("Unknown symbol for what will happen when aborting - please correct in calling module" );
 	  }
-
 
 	  OpenDialog(
 		     `opt(`decorated),
@@ -227,25 +203,56 @@ You will need to do the update again." );
 
 	  return (ret == `really_abort);
       };
-    
-   define YesOrNo(any message, string yes_button_message, string no_button_message) ``{
-      OpenDialog(`opt(`decorated),
-	`HBox(`HSpacing(1),
-	      `VBox(`VSpacing(0.2),
-		    `Label(message),
-		    `HBox(`PushButton(`id(`yes), `opt(`default), yes_button_message),
-			  `HSpacing(2),
-			  `PushButton( no_button_message )),
-		    `VSpacing(0.2)),
-	      `HSpacing(1)
-	));
-      any ret = UserInput();
-      CloseDialog();
-      return (ret == `yes);
-    };
+
+
+  // show detailed information about one patch
+   define ShowPatchInfo ( string patch_name ) ``{
+
+       map info_map = $[];
+       if (!test_mode)
+       {
+	   info_map = PKGINFO( `getPatchInformation( patch_name ));
+       }
+       else
+       {
+	   info_map = $["description":"Dies ist eine Testbeschreibung zu einem Testpatch",
+		       "packages": $["netscape.rpm":	["Netscape", "1.00-34324", "1.00-78789"],
+				    "xyz-hgjj-dfa.rpm":	["XYCYXCYXC", "1.00-34324", "1.00-78789"]]
+	   ];
+       }
+       string infotext = sformat("<p>%1</p><p>%2</p>", patch_name, lookup(info_map, "description", "") );
+
+       list table_input = [];
+       foreach (`pac, `info_list, lookup(info_map, "packages", $[] ), ``{
+	   table_input = add(table_input, `item(`id(pac), pac, select(info_list, 1),
+						select(info_list, 2), select(info_list, 0)) );
+       });
+
+       OpenDialog(`opt(`decorated ),
+		  `HBox(`VSpacing(10),
+			`VBox(
+			      `HSpacing(50),
+			      `Left(`Heading( _("Patch information") )),
+			      `VWeight( 2, `RichText(`id(`infotext), infotext )),
+			      `VSpacing(0.5),
+			      `VWeight( 3, `Table(`id(`table_pac),`opt(`hvstretch), 
+						  `header( _("Name"), _("Installed"), _("New Version"), _("Description") ),
+						  table_input
+						  )),
+			      `PushButton(`id(`ok_info), `opt(`default), _("&OK") )
+			      )
+			)
+		  );
+       SetFocus(`id(`ok_info) );
+	  
+       any r = UserInput();
+       CloseDialog();
+       return (r); 
+   };
 
   });
-
+  
+  
   // check test_mode
   integer arg_n = size(Args()) - 1;
   boolean test_mode = false;
@@ -282,7 +289,8 @@ You will need to do the update again." );
 						"architecture":architecture,
 						"rootpath":rootpath,
 						"yastpath":yastpath,
-						"patchpath":patchpath ] ) );
+						"patchpath":patchpath,
+						"logfilename":logpath ] ) );
 
       y2debug( "ONLINE: Return  PKGINFO(`ftpsetEnvironment() %1", retval );
       UI(`CloseDialog());
@@ -300,7 +308,7 @@ You will need to do the update again." );
 		 [`online_update_start(false, true), `auto ],
 		 [`online_update_load(true, true), `auto ],
 		 [`online_update_select(true, true), `manual ],
-		 [`online_update_load(true, true), `manual ],
+		 [`online_update_load(false, true), `manual ],
 		 [`online_update_close(false, true), `auto ]
 		 
   ];
@@ -346,7 +354,7 @@ You will need to do the update again." );
       }
       else if (result == `again )
 	  continue;
-      else if (result == `cancel)
+      else if (result == `cancel || result == `abort)
 	  break;
       else if (result == `next)
 	  id = id + 1;
