@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Wed Feb 26 16:42:38 CET 2003 - cschum@suse.de
+
+- Use widget with scrollbars for pre/postinformation text (#24370).
+
+-------------------------------------------------------------------
 Wed Feb 26 15:57:41 CET 2003 - arvin@suse.de
 
 - fixed starting and stopping of internet connection for

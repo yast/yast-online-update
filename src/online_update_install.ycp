@@ -41,6 +41,8 @@
       if ( pre ) message = patch[ "preinformation" ]:"";
       else message = patch[ "postinformation" ]:"";
 
+      message = "<pre>" + message + "</pre>";
+
       string detailsStringOn = _("Patch &Details <<");
       string detailsStringOff = _("Patch &Details >>");
 
@@ -83,7 +85,7 @@
       UI::OpenDialog( `opt( `decorated ),
           `VBox(
               `VSpacing( 0.2 ),
-              `Label( message ),
+              `RichText( message ),
               `ReplacePoint( `id( `rp ), `Empty() ),
               buttons
           )
