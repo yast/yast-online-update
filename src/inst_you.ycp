@@ -53,7 +53,7 @@
     }
 
     // online_update returns integer values, 0 for success, !=0 for failure
-    integer ret = (integer) WFM::CallFunction ("online_update");
+    WFM::CallFunction ("online_update");
 
     if (!already_up)
     {
