@@ -22,7 +22,7 @@
    $[
      ////////////////////////////////////////////////////////////////////////////////
      // name of the entry, shon in curses menu and ycc                             //
-     `menuentry    : UI(_("CD Update")),
+     `menuentry    : UI(_("Patch CD Update")),
      
      ////////////////////////////////////////////////////////////////////////////////
      //leave blank,  experts only ;-)
