@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Feb  8 17:22:21 CET 2002 - gs@suse.de
+
+- bugfixes and internal changes (replace the user_settings,
+  initialize for package installation, change source medium
+  works correctly, Requires for new agents added ...) 
+
+-------------------------------------------------------------------
 Mon Feb  4 15:01:00 CET 2002 - gs@suse.de
 
 - rename rc.config.y2c_online_update to sysconfig.you
