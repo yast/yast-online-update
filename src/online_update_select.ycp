@@ -125,14 +125,14 @@ for download from the SuSE FTP/HTTP server.</p>
     // and will always be english text.
     string help_part1 = _("<p>Mode \"recommended\" means you should install the patch.
 \"security\" is a security patch and it is highly recommended to install it.
-\"YaST2\" patches will be always installed first, the other patches must be installed
+\"YaST2\" patches will be always installed first. The other patches must be installed
 on a second run.
 </p>");
 
     // Don't translate "optional". The patch mode is shown in a list
     // and will always be english text.
-    string help_part12 = _("It's up to you whether to install an \"optional\" patch
-or not (see patch description for details");
+    string help_part12 = _("It is up to you whether to install an \"optional\" patch
+or not (see the patch description for details");
 
     // Help on patch status "X" (selected for installation)
     string help_part2 =  _("<p>Meaning of the status flags:</p>") +
@@ -146,7 +146,7 @@ the line to deselect it (or select the line and use Alt + A).
     // Help on patch status "G" (get the patch) 
     string help_part3 =  _("<p>
 <b>G</b>: means <i>get</i> the patch but do not install it. Patches concerning packages
-which are not installed on the system are not preselected but you can get the patch
+which are not installed on the system are not preselected, but you can get the patch
 (or even install it if you double-click again).
 </p>");
 
