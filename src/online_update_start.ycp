@@ -95,7 +95,7 @@
   // look for default directory in server map (instead of "/pub/suse")
   if ( ftp_dir == "" )
   {
-      ftp_dir = select( lookup(ftp_server_map, ftp_server, []), 0 );
+      ftp_dir = select( lookup(ftp_server_map, ftp_server, [""]), 0 );
   }
   y2milestone("FTP server: %1, directory: %2", ftp_server, ftp_dir );
   
