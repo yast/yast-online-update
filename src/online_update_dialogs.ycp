@@ -10,6 +10,131 @@
   import "Label";
   import "Popup";
 
+
+  global define symbol SetupAutomatic() ``{
+
+    string heading = _("YOU Automatic Mode Setup");
+
+    string txt = _("Automatic update is executed by a daily cronjob. 
+A network connection must be available when
+the update takes place.");
+
+
+	AutoOnlineUpdate::Read();
+	boolean enabled = AutoOnlineUpdate::enabled;
+	boolean autoget = AutoOnlineUpdate::autoget;
+	integer minute = AutoOnlineUpdate::minute;
+	integer hour = AutoOnlineUpdate::hour;
+
+	term head = `VBox(
+        `VSpacing( 0.2 ),
+        `Heading( heading ),
+        `VSpacing( 0.2 ),
+        `Label( txt ),
+        `VSpacing( 0.6 )
+	);
+
+	term content =
+      `VBox(
+        `HBox(
+          `HSpacing( 0.8 ),
+          `Left(
+            `CheckBox( `id( `enable ), `opt( `notify ), _("Enable Automatic Update"), enabled )
+          )
+        ),
+        `VSpacing( 0.2 ),
+        `HBox(
+          `HSpacing( 0.8 ),
+          `Left(
+            `Frame( `id( `settings ), "",
+              `VBox(
+                `HBox(
+                  `HSpacing( 0.8 ),
+                  `Left(
+                    `Label( `id( `crontime ), _("Time when update is performed:") )
+                  ),
+                  `HSpacing( 0.8 )
+                ),
+                `HBox(
+                    `HStretch(),
+                    `IntField( `id( `hour ), _("Hour"), 0, 23, hour ),
+                    `IntField( `id( `minute ), _("Minute"), 0, 59, minute ),
+                    `HStretch()
+                ),
+                `VSpacing( 0.2 ),
+                `HBox(
+                  `HSpacing( 0.8 ),
+                  `Left(
+                    `CheckBox( `id( `autoget ), _("Only Download Patches"), autoget )
+                  ),
+                  `HSpacing( 0.8 )
+                ),
+                `VSpacing( 0.5 )
+              )
+            )
+          ),
+          `HSpacing( 0.8 )
+        ),
+
+        `VSpacing( 0.2 )
+      );
+
+    term buttons =  `HBox(
+          `PushButton( `id( `next ), Label::OKButton() ),
+          `PushButton( `id( `abort ), Label::CancelButton() )
+        );
+
+	if (Mode::config) {
+		term dlg_contents = `Top( content);
+		Wizard::CreateDialog();
+		Wizard::SetContentsButtons(heading, dlg_contents, txt,
+				Label::BackButton(), Label::FinishButton());
+
+	} else {
+
+		term all = `VBox(head, content, buttons);
+		UI::OpenDialog( `opt( `decorated ), all
+				);
+	}
+
+    UI::ChangeWidget( `id( `autoget ), `Enabled, enabled );
+    UI::ChangeWidget( `id( `crontime ), `Enabled, enabled );
+
+    symbol ret = `enable;
+
+    repeat {
+        enabled = (boolean)UI::QueryWidget( `id( `enable ), `Value );
+
+        if ( ret == `enable ) {
+            UI::ChangeWidget( `id( `autoget ), `Enabled, enabled );
+            UI::ChangeWidget( `id( `crontime ), `Enabled, enabled );
+            UI::ChangeWidget( `id( `hour ), `Enabled, enabled );
+            UI::ChangeWidget( `id( `minute ), `Enabled, enabled );
+        }
+
+        ret = (symbol)UI::UserInput();
+
+        if (  ret == `next) {
+            if ( enabled )
+			{
+                AutoOnlineUpdate::minute = (integer)UI::QueryWidget( `id( `minute ), `Value );
+                AutoOnlineUpdate::hour = (integer)UI::QueryWidget( `id( `hour ), `Value );
+                AutoOnlineUpdate::autoget = (boolean)UI::QueryWidget( `id( `autoget ), `Value );
+				AutoOnlineUpdate::enabled = true;
+				if (!Mode::config) {
+					AutoOnlineUpdate::Write();
+				}
+            } else {
+                SCR::Execute( .target.remove, AutoOnlineUpdate::cronfile );
+            }
+        }
+    } until ( ret == `next || ret == `abort  || ret == `back );
+
+    UI::CloseDialog();
+	return ret;
+  }
+
+
   global define any YouErrorPopupGeneric( string message, string details,
                                           symbol type )
   ``{

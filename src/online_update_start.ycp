@@ -16,6 +16,7 @@
   import "OnlineUpdate";
   import "Popup";
   import "Wizard";
+  import "AutoOnlineUpdate";
 
   include "inst_source_dialogs.ycp";
   include "online_update_dialogs.ycp";
@@ -25,7 +26,7 @@
    // Request username/password from user (or regcode/password in case of
    // maintanance web).
    global define map DisplayLoginPopup( string username, string password,
-			  	        string headline, string message,
+				        string headline, string message,
                                         boolean regcode ) ``{
        map ret_map = $[];
 
@@ -146,145 +147,13 @@
       err = Pkg::YouGetPatches( OnlineUpdate::reload,
                                 OnlineUpdate::signature_check );
     }
-    
+
     UI::CloseDialog();
 
     return err;
 
   };
 
-  global define void SetupAutomatic() ``{
-
-    string heading = _("YOU Automatic Mode Setup");
-
-    string txt = _("Automatic update is executed by a daily cronjob. 
-A network connection must be available when
-the update takes place.");
-
-    string cronfile = "/etc/cron.d/yast2-online-update";
-
-    string cronjob = (string)SCR::Read( .target.string, cronfile );
-    y2debug("cronjob: %1",cronjob);
-
-    integer hour = 0;
-    integer minute = 0;
-
-    boolean autoget = false;
-
-    boolean enabled = false;
-    if ( size( cronjob ) > 0 ) {
-      enabled = true;
-
-      string h = regexpsub( cronjob, "[0-9]+ ([0-9]+) ", "\\1" );
-      string m = regexpsub( cronjob, "([0-9]+) ([0-9]+) ", "\\1" );
-
-      y2debug("TIME: %1 %2", h, m );
-
-      hour = tointeger( h );
-      minute = tointeger( m );
-
-      if ( regexpmatch( cronjob, "-g" ) ) autoget = true;
-    } else {
-      hour = random( 24 );
-      minute = random( 60 );
-    }
-
-    UI::OpenDialog( `opt( `decorated ),
-      `VBox(
-        `VSpacing( 0.2 ),
-        `Heading( heading ),
-        `VSpacing( 0.2 ),
-        `Label( txt ),
-        `VSpacing( 0.6 ),
-        `HBox(
-          `HSpacing( 0.8 ),
-          `Left(
-            `CheckBox( `id( `enable ), `opt( `notify ), _("Enable Automatic Update"), enabled )
-          )
-        ),
-        `VSpacing( 0.2 ),
-        `HBox(
-          `HSpacing( 0.8 ),
-          `Left(
-            `Frame( `id( `settings ), "",
-              `VBox(
-                `HBox(
-                  `HSpacing( 0.8 ),
-                  `Left(
-                    `Label( `id( `crontime ), _("Time when update is performed:") )
-                  ),
-                  `HSpacing( 0.8 )
-                ),
-                `HBox(
-                    `HStretch(),
-                    `IntField( `id( `hour ), _("Hour"), 0, 23, hour ),
-                    `IntField( `id( `minute ), _("Minute"), 0, 59, minute ),
-                    `HStretch()
-                ),
-                `VSpacing( 0.2 ),
-                `HBox(
-                  `HSpacing( 0.8 ),
-                  `Left(
-                    `CheckBox( `id( `autoget ), _("Only Download Patches"), autoget )
-                  ),
-                  `HSpacing( 0.8 )
-                ),
-                `VSpacing( 0.5 )
-              )
-            )
-          ),
-          `HSpacing( 0.8 )
-        ),
-
-        `VSpacing( 0.2 ),
-        
-        `HBox(
-          `PushButton( `id( `ok ), Label::OKButton() ),
-          `PushButton( `id( `cancel ), Label::CancelButton() )
-        )
-      )
-    );
-
-    UI::ChangeWidget( `id( `autoget ), `Enabled, enabled );
-    UI::ChangeWidget( `id( `crontime ), `Enabled, enabled );
-  
-    symbol ret = `enable;
-
-    repeat {
-        enabled = (boolean)UI::QueryWidget( `id( `enable ), `Value );
-
-        if ( ret == `enable ) {
-            UI::ChangeWidget( `id( `autoget ), `Enabled, enabled );
-            UI::ChangeWidget( `id( `crontime ), `Enabled, enabled );
-            UI::ChangeWidget( `id( `hour ), `Enabled, enabled );
-            UI::ChangeWidget( `id( `minute ), `Enabled, enabled );
-        }
-    
-        ret = (symbol)UI::UserInput();
-
-        if ( ret == `ok ) {
-            if ( enabled ) {
-                minute = (integer)UI::QueryWidget( `id( `minute ), `Value );
-                hour = (integer)UI::QueryWidget( `id( `hour ), `Value );
-                autoget = (boolean)UI::QueryWidget( `id( `autoget ), `Value );
-
-                string options = (string)SCR::Read( .sysconfig.onlineupdate.CMDLINE_OPTIONS );
-
-                string cronjob = sformat( "%1 %2 * * * root online_update %3", minute, hour, options );
-                
-                if ( autoget ) cronjob = cronjob + " -g";
-
-                cronjob = cronjob + "\n";
-                
-                SCR::Write( .target.string, cronfile, cronjob );
-            } else {
-                SCR::Execute( .target.remove, cronfile );
-            }
-        }
-    } until ( ret == `ok || ret == `cancel );
-
-    UI::CloseDialog();
-  }
 
   /////////////////////////////////////////////////////////////////////////////////////
   // MAIN:

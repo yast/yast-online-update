@@ -36,6 +36,7 @@ Summary:    	YaST2 online update
 @yncludedir@/online_update*.ycp
 @moduledir@/OnlineUpdate*.ycp
 @moduledir@/OnlineUpdate*.ybc
+@moduledir@/AutoOnlineUpdate*.ybc
 %doc @docdir@
 /etc/httpd/modules/you_server
 /etc/httpd/you_server.conf

@@ -8,6 +8,7 @@ ynclude_DATA = online_update_dialogs.ycp
 
 client_DATA =				\
 	online_update_start.ycp		\
+	online_update_auto.ycp		\
 	online_update_select.ycp 	\
 	online_update_install.ycp       \
 	online_update.ycp		\
@@ -17,6 +18,7 @@ client_DATA =				\
 
 module_DATA =				\
 	OnlineUpdate.ycp		\
+	AutoOnlineUpdate.ycp		\
 	OnlineUpdateCallbacks.ycp
 
 config_DATA =				\
