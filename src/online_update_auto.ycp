@@ -53,15 +53,12 @@ if(func == "Summary") {
 /* Reset configuration */
 else if (func == "Reset") {
     AutoOnlineUpdate::Import($[]);
+    AutoOnlineUpdate::modified = false;
     ret = $[];
 }
 /* Change configuration (run AutoSequence) */
 else if (func == "Change") {
-    map exp1 = AutoOnlineUpdate::Export();
     ret = OnlineUpdateDialogs::SetupAutomatic();
-    map exp2 = AutoOnlineUpdate::Export();
-    if (exp1!=exp2)
-        AutoOnlineUpdate::SetModified();
 }
 /* Import configuration */
 else if (func == "Import") {

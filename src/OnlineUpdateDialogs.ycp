@@ -222,6 +222,7 @@ the update takes place.");
 		        AutoOnlineUpdate::random_time =
                             (boolean)UI::QueryWidget(`id(`random), `Value );
 		    AutoOnlineUpdate::enabled = true;
+		    AutoOnlineUpdate::modified = true;
 		    if (!Mode::config)
 		    {
 			AutoOnlineUpdate::Write();
