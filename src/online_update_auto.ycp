@@ -68,7 +68,7 @@ else if (func == "Import") {
     ret = AutoOnlineUpdate::Import(param);
 }
 /* configuration modified? */
-else if (func == "Import") {
+else if (func == "GetModified") {
     ret = AutoOnlineUpdate::GetModified();
 }
 /* Return actual state */
