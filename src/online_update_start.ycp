@@ -132,6 +132,8 @@ the update takes place.
                 string cronjob = sformat( "%1 %2 * * * root online_update %3", minute, hour, options );
                 
                 if ( autoget ) cronjob = cronjob + " -g";
+
+                cronjob = cronjob + "\n";
                 
                 SCR::Write( .target.string, cronfile, cronjob );
             } else {
