@@ -1,0 +1,58 @@
+[Desktop Entry]
+Type=Application
+Categories=Qt;X-SuSE-YaST-Software;
+
+X-KDE-ModuleType=Library
+X-KDE-RootOnly=true
+X-KDE-HasReadOnlyMode=true
+X-KDE-Library=yast2
+X-KDE-FactoryName=online_update__cd_default
+
+X-SuSE-YaST-Group=Software
+X-SuSE-YaST-Argument=.cd_default
+X-SuSE-YaST-RootOnly=true
+X-SuSE-YaST-AutoInst=
+X-SuSE-YaST-Geometry=
+X-SuSE-YaST-SortKey=
+X-SuSE-YaST-AutoinstResource=
+
+Icon=cdupdate
+Exec=/sbin/yast2 online_update .cd_default
+
+Name=Patch CD Update
+GenericName=Install patches from CD to correct and improve your existing installation.
+Name[cs]=Aktualizace programu z CD
+GenericName[cs]=Nainstalování novinek z CD k aktualizaci vaší instalace.
+Name[de]=Patch CD-Update
+GenericName[de]=Patches von CD installieren, um die vorhandene Installation zu berichtigen oder zu verbessern.
+Name[es]=Actualización con el CD de parches
+GenericName[es]=Instale los parches del CD para corregir y mejorar la instalación existente.
+Name[hu]=Frissítés Patch CD-ről
+GenericName[hu]=Frissítőcsomagok telepítése CD-ről a meglévő rendszer bővítéséhez és javításához.
+Name[it]=Aggiornamento dal CD delle patch
+GenericName[it]=Installa le patch dal CD per correggere e migliorare il Vostro sistema.
+Name[ko]=패치 씨디 업데이트
+GenericName[ko]=현재 시스템의 교정과 개선을 위하여 CD로 부터 패치를 설치합니다.
+Name[nl]=Patch CD update
+GenericName[nl]=Installeer patches van CD om uw bestaande installatie te corrigeren en te verbeteren.
+Name[pt]=Atualização CD Patch
+GenericName[pt]=Instalar patches do CD para corrigir e melhorar sua instalação existente.
+Name[sk]=Aktualizácia z CD
+GenericName[sk]=Inštalácia opráv z CD pre opravu alebo vylepšenie existujúceho systému.
+Name[sv]=Uppdatera med programfix-cd
+GenericName[sv]=Installera programfixar från cd-skiva för att korrigera och förbättra befintligt system
+Name[da]=Opdatér med programrettelses-cd
+GenericName[da]=Hent rettelser fra cd for at rette og forbedre din eksisterende installation.
+Name[el]=Ενημέρωση μέσω του CD Διορθώσεων
+GenericName[el]=Εγκαταστήστε τις διορθώσεις από CD για να διορθώσετε και να βελτιώσετε την υπάρχουσα εγκατάσταση.
+Name[fr]=Mise à jour avec le CD de patches
+GenericName[fr]=Installez les patches du CD pour corriger ou améliorer votre installation.
+Name[ja]=パッチ CD によるアップデート
+GenericName[ja]=あなたのシステムを修正するために、CD によりパッチをインストールする。
+Name[lt]=Atnaujinimas iš pataisų CD
+GenericName[lt]=Įdiegti pataisas iš CD, norint pakoreguoti ir ištaisyti jūsų esamą sistemą.
+Name[ru]=Обновление с patch CD
+Name[sl]=Posodobitev s CD-ja
+GenericName[sl]=Namestite popravke s CD-ja za popravilo in izboljšanje vaše obstoječe namestitve.
+Name[tr]=Yama CD'sinden-güncelleme
+GenericName[tr]=Mevcut kurulumu düzeltmek ve güncellemek için CD'den yama yükleme
