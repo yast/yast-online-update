@@ -74,21 +74,6 @@
   y2debug("ONLINE: YaST2-version %1", version );  
 
   
-  // Menuentry for the YaST2 menu
-  if (Args() == [ "get_menuentry" ]) 
-    return [ "online_update", $[
-			`menuentry    : UI(_("Online Update")),
-			`arguments    : [ ],
-			`widget       : `RichText(
-				// 
-				UI(_("Launch this module to get patches (online update).
-A patch updates, improves or corrects your existing installation."))
-				+
-				UI(_("<p>You need to be logged in as <i>root</i> in order to do this.</p>"))), 
-			`codefragment : nil ]
-    ];
-
-
   UI(``{
 
        /**
