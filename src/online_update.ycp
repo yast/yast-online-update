@@ -185,7 +185,5 @@ packages were created by SuSE.
 
   if ( result == `abort ) result = `auto; 
 
-//  return result;
-
-  return 0;
+  return result;
 }
