@@ -415,6 +415,8 @@ Cannot load patch information.
               }
 
               UI::YouErrorPopup( msg, details );
+              
+              UI::ChangeWidget( `id( `reload ), `Value, true );              
             }
           } else {
             Pkg::YouSelectPatches();
