@@ -391,7 +391,7 @@ the update takes place.
                       )),
                       `HBox(
                           `HSpacing(0.8),
-                          `TextEntry( `id(`url), `opt(`notify), _("URL"), "" ),
+                          `TextEntry( `id(`url), `opt(`notify), _("Location"), "" ),
                           `HSpacing(1.2)
                       ),
                       `HBox(
@@ -411,9 +411,8 @@ the update takes place.
                       ),
                       `VSpacing( 0.5 ),
                       `HBox(
-                          `HSpacing( 0.8 ),
-                          `Left( `PushButton( `id( `automatic ),
-                                 _("&Configure Fully Automatic Update...") ) )
+                          `PushButton( `id( `automatic ),
+                                 _("&Configure Fully Automatic Update...") )
                       ),
                       `VSpacing( 0.3 )
                   )
