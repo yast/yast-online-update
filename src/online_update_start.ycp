@@ -10,7 +10,6 @@
 
   textdomain "online-update";
 
-  import "Arch";
   import "Label";
   import "Mode";
   import "OnlineUpdate";
