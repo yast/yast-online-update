@@ -151,7 +151,7 @@ global define string Summary() ``{
 
     string timestr = sformat(_("Daily at %1:%2"), hour_str, minute_str);
 
-    summary = Summary::AddHeader(summary, _("Time of Scheduled Online Update?"));
+    summary = Summary::AddHeader(summary, _("Time of Scheduled Online Update"));
     summary = Summary::AddLine(summary, (hour!=-1 && minute!= -1 ) ? timestr  : nc );
 
     summary = Summary::AddHeader(summary, _("Only Download Patches"));

@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Apr 16 13:43:59 CEST 2004 - cschum@suse.de
+
+- Ask for "Username" instead of "Code" as the registration code
+  isn't longer used as YOU login for the maintenance web.
+- 2.9.12
+
+-------------------------------------------------------------------
 Mon Apr  5 09:48:21 CEST 2004 - gs@suse.de
 
 - fixed cd_update.desktop for ncurses menu (bug #38088)

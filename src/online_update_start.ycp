@@ -23,15 +23,12 @@
 
   map server = $[ "url": "" ];
 
-   // Request username/password from user (or regcode/password in case of
-   // maintanance web).
+   // Request username/password from user
    global define map DisplayLoginPopup( string username, string password,
-				        string headline, string message,
-                                        boolean regcode ) ``{
+				        string headline, string message ) ``{
        map ret_map = $[];
 
        string usernameLabel = _("&Username:");
-       if ( regcode ) usernameLabel = _("&Code:");
 
        UI::OpenDialog(
 		  `opt(`decorated),
@@ -123,15 +120,8 @@
       string headline = _("Authorization");
       string msg_string = _("Enter the registration data.");
 
-      boolean regcode = false;
-      string server_url = server[ "url" ]: "";
-      if ( substring( server_url, 0, 18 ) == "http://sdb.suse.de" ) {
-        regcode = true;
-      }
-
       map registration_map = DisplayLoginPopup( username, password,
-                                                headline, msg_string,
-                                                regcode );
+                                                headline, msg_string );
 
       if ( registration_map[ "login" ]: false ) {
         Pkg::YouSetUserPassword( registration_map[ "username" ]:"",
