@@ -1,14 +1,5 @@
 -------------------------------------------------------------------
-Thu Dec  7 13:29:18 CET 2000 - arvin@suse.de
+Mon Dec 11 08:31:26 MET 2000 - schubi@suse.de
 
-- use bz2 instead of gz
+- ftp-server-settings added
 
--------------------------------------------------------------------
-Wed Nov 29 14:24:25 MET 2000 - gs@suse.de
-
-- version 1.0.1 - runs initially - but needs more testing 
-
--------------------------------------------------------------------
-Sun Nov 17 12:00:00 MET 2000 - gs@suse.de
-
-- initial version
