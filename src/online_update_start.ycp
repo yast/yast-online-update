@@ -113,7 +113,7 @@
 	UI(`CloseDialog());
 	// Popup is shown if the yast2 component responsible for the ftp update cannot be initialised.
 	// This does not mean, connection failed to ftp server, but any other error occured.
-	if (!retval && UI(`DisplayMessage(_("Initialisation of ftp server failed.\n
+	if (!retval && UI(`MessagePopup(_("Initialisation of ftp server failed.\n
 Please check www.suse.de
 for further information ."))) )
 	    return `abort;

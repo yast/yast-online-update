@@ -49,7 +49,7 @@
   //                                  P O P U P S                             //
   //////////////////////////////////////////////////////////////////////////////
 
-  define ShowProgress( integer percent )``{
+  global define ShowProgress( integer percent )``{
       
       y2debug("PROGRESS: %1", percent );
       UI(`ChangeWidget(`id(`progress), `Value, percent ));
@@ -60,7 +60,7 @@
   // MAIN:
   ///////////////////////////////////////////////////////////////////////////////
 
-  any|term download = nil;
+  term download = nil;
   
   if ( UI(`HasSpecialWidget(`DownloadProgress ) ))
   {
@@ -125,7 +125,7 @@ The ftp connection will be closed.
 
   // Fake getting of patches for fake_mode (NOT USED)
   integer test_id = 0;
-  define FakeGetPatch( string patch) ``{
+  global define FakeGetPatch( string patch) ``{
       integer counter = 0;
       string log = "";
       map result = $[];
@@ -158,7 +158,7 @@ The ftp connection will be closed.
   };
 
   // get patches from ftp server
-  define GetAllPatches( map new_patches ) ``{
+  global define GetAllPatches( map new_patches ) ``{
       list ret_list = [];
       list patch_list = [];
       integer index = 0;
@@ -408,7 +408,7 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
   //
   // Checking packages for consistents and original SuSE-packages
   //
-  define checkPackages( list package_list, string patch ) ``{
+  global define checkPackages( list package_list, string patch ) ``{
       boolean install = true;
       boolean dontAsk = false;
 
@@ -489,7 +489,7 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
   // InstallPatches
   // call inst_rpmcopy for every patch with list of packages belonging to the patch
   //
-  define InstallPatches( list patch_list ) ``{
+  global define InstallPatches( list patch_list ) ``{
       list package_list = [];
       string pre_info = "";
       string post_info = "";
@@ -501,7 +501,7 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
       SCR(`Execute(.target.bash, "/bin/rm /var/log/y2logRPM" ));      
       
       foreach ( `patch, patch_list, ``{
-	  any|symbol ret = nil;
+	  symbol ret = nil;
 	  boolean go_on  = true;
 
 	  map check_version = PKGINFO(`ftpCheckYaST2Version(version,patch));
@@ -653,7 +653,7 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
 	  UI(`ChangeWidget(`id(`log), `LastLine,
 			   lookup (result_map, "message", "" ) )); 
 	  
-	  UI(`DisplayMessage(_("Connection to ftp server failed.
+	  UI(`MessagePopup(_("Connection to ftp server failed.
 Please try to get connection to another SuSE ftp server.")));
 	  return `back;  
       }
@@ -684,7 +684,7 @@ Please try to get connection to another SuSE ftp server.")));
   }
   else
   {
-	  UI(`DisplayMessage(_("Can't get patches from server.
+	  UI(`MessagePopup(_("Can't get patches from server.
 Please try to get patches from another SuSE ftp server.")));
 	  return `back;
   }
@@ -724,7 +724,7 @@ Please try to get patches from another SuSE ftp server.")));
 	  new_patches = yast2map;
 	  y2milestone( " YaST2 patches found; only install %1",
 		       new_patches );
-	  UI(`DisplayMessage(_("There have been found YaST2 patches.
+	  UI(`MessagePopup(_("There have been found YaST2 patches.
 These patches should be installed at first.
 Please install these patches and call YaST2 online update once
 again to install the rest of the packages.")));
@@ -769,7 +769,7 @@ again to install the rest of the packages.")));
       {
 	  any ret = PKGINFO(`ftpDisconnect());
 	  y2debug("ONLINE:  PKGINFO(`ftpDisconnect()): %1", ret );
-	  UI(`DisplayMessage(_("There is no patch which will have to be installed.")));	  
+	  UI(`MessagePopup(_("There is no patch which will have to be installed.")));	  
 	  return `abort;		// abort update
       }
   }
@@ -818,7 +818,7 @@ again to install the rest of the packages.")));
 	  // do not set the CloseUpdate status -> no patch is installed
 	  PKGINFO(`ftpDisconnect());
 	  y2debug("ONLINE:  PKGINFO(`ftpDisconnect())" );
-	  UI(`DisplayMessage(_("No patch will be installed.")));
+	  UI(`MessagePopup(_("No patch will be installed.")));
 	  
 	  return `abort;		// abort update  
       }

@@ -27,7 +27,7 @@
 
     // read .etc.suseservers, return map
 
-    define read_suseservers () ``{
+    global define read_suseservers () ``{
 	map serversmap = $[];
 	list serverslist = SCR(`Read(.etc.suseservers));
 

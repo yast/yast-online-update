@@ -76,8 +76,8 @@
 UI(``{
     
     //  ConfirmAbortUpdate has same layout as/but different text than ConfirmAbort
-   define ConfirmAbortUpdate( symbol how_to ) ``{
-	  locale|any what_will_happen = nil;
+   global define ConfirmAbortUpdate( symbol how_to ) ``{
+	  string what_will_happen = "";
 
 	  if ( how_to == `painless )
 	  {
@@ -142,7 +142,7 @@ You will need to do the update again.");
       };
 
 
-   define DisplayMsgFtp( string message, string header, string yes_button, string no_button ) ``{
+   global define DisplayMsgFtp( string message, string header, string yes_button, string no_button ) ``{
           OpenDialog(
                      `opt(`decorated),
                      `HBox(
@@ -164,7 +164,7 @@ You will need to do the update again.");
       };
 
 
-   define DisplayMsgFtpOk( string message, string header, string ok_button ) ``{
+   global define DisplayMsgFtpOk( string message, string header, string ok_button ) ``{
           OpenDialog(
                      `opt(`decorated),
                      `HBox(
@@ -189,7 +189,7 @@ You will need to do the update again.");
   //
   // Show detailed information about the patch
   //
-  define ShowPatchInfo ( string patch_name ) ``{
+  global define ShowPatchInfo ( string patch_name ) ``{
 
       map info_map = $[];
 
@@ -232,37 +232,6 @@ You will need to do the update again.");
        
       return (r); 
   };
-
-  //
-  // Returns nice size string
-  //
-  define my_size_text (integer bytes) ``{
-
-      if ( bytes == nil )
-	  return "";
-      
-      float whole = tofloat (bytes) / 1024.0 / 1024.0;
-      string unit = UI(_("MB"));
-
-      // nnn.nn  999.99 MB
-      
-      string size_str = tostring (whole, 2);
-      integer num = size(size_str);
-      integer anz = 6 - num;
-
-      if ( anz <= 0 )
-      {
-	  return ( size_str + " " + unit + " " );
-      }  
-      else if ( anz == 1 )
-      {
-	  return ( " " + size_str + " " + unit+ " " );
-      }
-      else
-      {
-	  return ( "  " + size_str + " " + unit+ " " );
-      }  
-  }; 
 
   // check architecture
   string architecture = SCR(`Read(.probe.architecture));
