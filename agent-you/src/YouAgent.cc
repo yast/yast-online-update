@@ -35,6 +35,7 @@
 #define CLOSEUPDATE "closeUpdate"	//Execute
 #define CHECKYAST2VERSION "checkYaST2Version"	//Execute
 #define DELETEPACKAGES "deletePackages"	//Execute
+#define ISBUSINESS "isBusiness" //READ
 
 /*==========================================================================
  * Public member functions
@@ -212,7 +213,12 @@ YCPValue YouAgent::Read(const YCPPath& path, const YCPValue& arg = YCPNull())
        {
 	   ret = getPackages( arg->asString() );
        }
-   }            
+   }
+   else if (  path_name  == ISBUSINESS )
+   {
+       // Returns true if the installed system is a business product.
+       ret = YCPBoolean ( isBusiness() ); 
+   }               
    else
    {
       y2error ( "Path %s not found", path_name.c_str() );
