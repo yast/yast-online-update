@@ -193,7 +193,11 @@ The ftp connection will be closed.
       
       map  result_map = PKGINFO(`ftpConnect());
       y2debug("ONLINE:  PKGINFO(`ftpConnect()): %1", result_map );
-      UI(`ChangeWidget(`id(`log), `LastLine, lookup (result_map, "message", "" )+"\n" ));
+      connect_string = lookup (result_map, "message", "" );
+      if ( size ( connect_string ) > 0 )
+      {
+	  UI(`ChangeWidget(`id(`log), `LastLine, connect_string+"\n" ));
+      }
       if (lookup( result_map, "ok", false )  )
       {
 	  UI(`ChangeWidget(`id(`status), `Value, _("active")) );
@@ -220,7 +224,11 @@ The ftp connection will be closed.
 	      user_settings = add(user_settings, "ftp_ok", false );
 	       
 	      // put logging into LogView Widget before showing popup
-	      UI(`ChangeWidget(`id(`log), `LastLine, lookup(result_map, "message", "" )+"\n" ));
+	      string last_logging = lookup(result_map, "message", "" );
+	      if ( size ( last_logging ) > 0 )
+	      {
+		  UI(`ChangeWidget(`id(`log), `LastLine, last_logging+"\n" ));
+	      }
 	      
 	      string msg_str = sformat(UI(_("Can't get patch \"%1\" from
 server \"%2\".
@@ -265,7 +273,11 @@ loaded patches or abort update completely." ), _("Warning"), _("&Install"), _("&
       // disconnect
       result_map = PKGINFO(`ftpDisconnect());
       y2debug("ONLINE:  PKGINFO(`ftpDisonnect()): %1", result_map );
-      UI(`ChangeWidget(`id(`log), `LastLine, lookup (result_map, "message", "" )+"\n" ));
+      string last_logging = lookup(result_map, "message", "" );
+      if ( size ( last_logging ) > 0 )
+      {
+	  UI(`ChangeWidget(`id(`log), `LastLine, last_logging+"\n" ));
+      }
       if (lookup( result_map, "ok", false )  )
       {
 	  UI(`ChangeWidget(`id(`status), `Value, _("closed")) );
@@ -309,15 +321,15 @@ loaded patches or abort update completely." ), _("Warning"), _("&Install"), _("&
 	      y2debug("ONLINE: %1. call of inst_rpmcopy returns: %2", no, ret );
 	      package_count = package_count + size ( package_list );
 	      no = no+1;
+	      post_info = PKGINFO(`ftpGetPostInstallInformation(patch));
+
+	      if ( post_info != "" )
+	      {
+		  go_on = UI(`DisplayMsgFtpOk( post_info,
+					       _("Information"), _("&Ok")));
+	      }
 	  }
 
-	  post_info = PKGINFO(`ftpGetPostInstallInformation(patch));
-
-	  if ( post_info != "" )
-	  {
-	      go_on = UI(`DisplayMsgFtpOk( post_info, _("Information"), _("&Ok")));
-	  }
-	  
 	  // do not set error status - let patch status NEW
       
 	  if (ret == `abort )
@@ -366,9 +378,12 @@ loaded patches or abort update completely." ), _("Warning"), _("&Install"), _("&
       result_map = PKGINFO(`ftpConnect());
       success = lookup( result_map, "ok", false );
       y2debug("ONLINE:  PKGINFO(`ftpConnect()): %1", result_map );
-
-      UI(`ChangeWidget(`id(`log),
-		       `LastLine, lookup (result_map, "message", "" )+"\n" ));
+      string last_logging = lookup(result_map, "message", "" );
+      if ( size ( last_logging ) > 0 )
+      {
+	  UI(`ChangeWidget(`id(`log),
+			   `LastLine, last_logging+"\n" ));
+      }
 
 
       if (success)
@@ -414,7 +429,10 @@ Please try to get connection to another SuSE ftp server.")));
       }
 
       string disconnect_message = lookup (disconnect_map, "message", "" );
-      UI(`ChangeWidget(`id(`log), `LastLine, disconnect_message +"\n" ));
+      if ( size ( disconnect_message ) > 0 )
+      {
+	  UI(`ChangeWidget(`id(`log), `LastLine, disconnect_message +"\n" ));
+      }
   }
   
   if (success)
