@@ -148,7 +148,7 @@ packages were created by SuSE.
                module_args, module_mode );
 
       if ( id == size( dialog ) - 1 ) {
-          UI::ChangeWidget(`id(`next), `Label, Label::FinishButton() );
+          Wizard::SetNextButton(`next, Label::FinishButton() );
       }
 
       if ( !OnlineUpdate::you_auto )
