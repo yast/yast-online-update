@@ -1,39 +1,28 @@
-/*
- *************************************************************
+/**
+ * File:	clients/online_update_select.ycp
+ * Package:	Online update
+ * Summary:	Selection dialog
+ * Authors:	Gabriele Strattner <gs@suse.de>
+ *		Stefan Schubert <schubi@suse.de>
  *
- *     YaST2      SuSE Labs                        -o)
- *     --------------------                        /\\
- *                                                _\_v
- *           www.suse.de / www.suse.com
- * ----------------------------------------------------------
+ * $Id$
  *
- * Author:        Gabriele Strattner <gs@suse.de>
- *
- * Purpose:	Dialog displays a list with all available patches.
- *		The user can select or deselect patches for download.
- *		Patches marked with "X" will be installed afterwards,
- *		patches marked with "G" will be downloaded, but not
- *		installed because they are not relevant for the system.
- *		
- * Modify:	
- *
- * external function:
- *
- *
- *************************************************************
-
- $Id$
-
-*/
+ * Dialog displays a list with all available patches.
+ * The user can select or deselect patches for download.
+ * Patches marked with "X" will be installed afterwards,
+ * patches marked with "G" will be downloaded, but not
+ * installed because they are not relevant for the system.
+ */
 
 {
+
   textdomain "online_update";
 
   import "OnlineUpdate";
-  
-  boolean cd_update 	= OnlineUpdate::cd_update;
 
-  
+  boolean cd_update	= OnlineUpdate::cd_update;
+
+
   // map you_patches contains information about all available patches, e.g.
   //
   // $["patch-001":["recommended", "Patch for NFS server", "234", "X"],
@@ -41,10 +30,10 @@
   //
   // status information from all patches must be stored, because if the user
   // deselects a patch and selects it again we must know whether it was "X" or "G"
-  
+
     map all_patches = OnlineUpdate::you_patches;
     y2debug("ONLINE: %1", all_patches );
-    
+
     // if the user doesn't do any changes and the current YaST2 has the right versin, the user
     // get all patches
     map get_patches = $[];
@@ -58,7 +47,7 @@
 	}
     }));
 
-    
+
     //////////////////////////////////////////////////////////////////////////////////////
     //  Popups and Defines			                                        //
     //////////////////////////////////////////////////////////////////////////////////////
@@ -75,7 +64,7 @@
 			  {
       			      UI::ChangeWidget(`id(`patch_table), `Item( patch, 0 ), " ok" );
 			      get_patches = add( get_patches, patch,
-						 [select(value, 0,""), select(value,1,""), select(value,2,"" ), "X"] );			      
+						 [select(value, 0,""), select(value,1,""), select(value,2,"" ), "X"] );
 			  }
 			  else
 			  {
@@ -86,13 +75,13 @@
 		      }
 		      }));
     };
-    
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     // MAIN:
     /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  
-    
+
+
     // create table input, e.g.
     // [`item(`id(patch-001), " X ", "recommended", "patch1", "356", "Patch for NFS server"),
     //  `item(`id(patch-002), "   ", "security", "patch2", "2560", "Noch ein weiterer patch") ];
@@ -108,10 +97,10 @@
 				   );
 
     term contents =
-	    // main dialog: 
+	    // main dialog:
 	`VBox(
 	      `VSpacing( 0.2 ),
-	       `Table(`id(`patch_table),`opt(`notify, `hvstretch), 
+	       `Table(`id(`patch_table),`opt(`notify, `hvstretch),
 		      `header( " ", _("Mode"), _("Patch"), _("Size"), _("Description") ),
 		      table_contents
 			      ),
@@ -120,7 +109,7 @@
 		    ),
 	      `VSpacing( 0.2 )
 	      );
-    
+
     string help_text = "";
 
     // Helptext  "List of available patches"
@@ -139,28 +128,26 @@ for download from the SuSE FTP/HTTP server.</p>
 \"YaST2\" patches will be always installed first, other patches will be only
 downloaded and must be installed on a second run.
 </p>");
-    
-    string help_part2 =  _("<p>Meaning of the status flags:</p>
-<p>
+
+    string help_part2 =  _("<p>Meaning of the status flags:</p>") +
+_("<p>
 <b>X</b>: Patches concerning your installation are preselected.
 They will be downloaded and installed on your system.
 If you do not want a certain patch, double-click
 the line to deselect it (or select the line and use Alt + A).
-</p>
-");
+</p>");
 
     string help_part3 =  _("<p>
 <b>G</b>: patch is available but not relevant for your installation
 (concerns packages which are not installed).
 You can download the patch but it will not be installed.
 </p>");
-    
+
     string help_part4 = _("<p>
 <b>_</b>: This patch is not selected. It will not
 be downloaded or installed. To select the patch,
 double-click the line (or select it and use Alt + A).
-</p>
-");
+</p>");
 
     if ( cd_update )
     {
@@ -170,11 +157,11 @@ double-click the line (or select it and use Alt + A).
     {
 	help_text = help_part02 + help_part1 + help_part2 + help_part3 + help_part4;
     }
-    
+
     // using SetContents (define in online_update.ycp)
     Wizard::SetContents(_("List of available patches"), contents, help_text, Args(0), Args(1) );
 
-      
+
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////  Loop for User Input ....
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -221,7 +208,7 @@ double-click the line (or select it and use Alt + A).
 		{
 		    string header = sformat(_("Warning for patch %1"),
 					    patch_name );
-		      
+
 		    go_on = UI::DisplayMsgYou( pre_info,
 					       header,
 					       InstallButtonLabel(),
@@ -255,7 +242,7 @@ double-click the line (or select it and use Alt + A).
 		    if ( select( patch_info, 1, "" ) == " G " )
 		    {
 			// was "G" before -> mark with "X"
-			UpdateGetPatches( patch_name, "X" ,select ( patch_info, 2, "" ) );	
+			UpdateGetPatches( patch_name, "X" ,select ( patch_info, 2, "" ) );
 		    }
 		    else
 		    {
@@ -267,7 +254,7 @@ double-click the line (or select it and use Alt + A).
 			{
 			    string header = sformat(_("Warning for patch %1"),
 						    patch_name );
-		      
+
 			    go_on = UI::DisplayMsgYou( pre_info,
 						       header,
 						       InstallButtonLabel(),
@@ -305,9 +292,8 @@ double-click the line (or select it and use Alt + A).
 	}
 
     } until (ret == `next || ret == `back || ret == `cancel || ret == `abort);
-    
+
    return ret;
+
+/* EOF */
 }
-
-
-

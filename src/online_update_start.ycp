@@ -1,27 +1,12 @@
-/*
- *************************************************************
+/**
+ * File:	clients/online_update_select.ycp
+ * Package:	Online update
+ * Summary:	Start update, display last update info, choose mode (auto|manual)
+ * Authors:	Gabriele Strattner <gs@suse.de>
+ *		Stefan Schubert <schubi@suse.de>
  *
- *     YaST2      SuSE Labs                        -o)
- *     --------------------                        /\\
- *                                                _\_v
- *           www.suse.de / www.suse.com
- * ----------------------------------------------------------
- *
- * Author:        Gabriele Strattner <gs@suse.de>
- *
- * Purpose:	start module for you update
- *		display last update info
- *		possibility to choose automatic or manual mode
- * Modify:
- *
- * external function:
- *
- *
- *************************************************************
-
- $Id$
-
-*/
+ * $Id$
+ */
 
 {
 
@@ -522,5 +507,6 @@ another SuSE FTP/HTTP server.\n"));
   y2debug("Return START: %1", ret );
 
   return ret;
-}
 
+/* EOF */
+}

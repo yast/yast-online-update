@@ -239,7 +239,7 @@ You will need to do the update again.");
 						    `HSpacing (0.5)
 						    ))),
 			      `VSpacing(0.2),
-			      `CheckBox(`id(`keep), _("Keep registration data"), true ),
+			      `CheckBox(`id(`keep), _("&Keep registration data"), true ),
 			      `VSpacing(0.2),
 			      `HBox(`PushButton(`id(`login), `opt(`default), _("&Login") ),
 				    `PushButton(`id(`abort), AbortButtonLabel() )
