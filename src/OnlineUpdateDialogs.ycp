@@ -38,6 +38,7 @@ the update takes place.");
 	boolean autoget = AutoOnlineUpdate::autoget;
 	integer minute = AutoOnlineUpdate::minute;
 	integer hour = AutoOnlineUpdate::hour;
+    integer day = AutoOnlineUpdate::day;
 
 	symbol timing = AutoOnlineUpdate::timing;
         boolean random_time = AutoOnlineUpdate::random_time;
@@ -186,6 +187,7 @@ the update takes place.");
 		UI::ChangeWidget( `id( `minute ), `Enabled, enabled &&
                         !AutoOnlineUpdate::random_time);
 		UI::ChangeWidget( `id( `day ), `Enabled, enabled && enable_days);
+        UI::ChangeWidget( `id( `day ), `Value, day );
                 if (UI::WidgetExists(`id(`random)))
 		    UI::ChangeWidget( `id( `random ), `Enabled, enabled );
 	    }

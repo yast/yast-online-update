@@ -124,7 +124,7 @@ global define boolean Read()
         enabled = true;
         string h  = regexpsub( cronjob, "[0-9]+ ([0-9]+) ", "\\1" );
         string m = regexpsub( cronjob, "([0-9]+) ([0-9]+) ", "\\1" );
-        string d = regexpsub( cronjob, "[0-9]+ [0-9]+ [0-9]+ [0-9]+ ([0-9]+)", "\\1" );
+        string d = regexpsub( cronjob, "[0-9*]+ [0-9*]+ [0-9*]+ [0-9*]+ ([0-9*]+)", "\\1" );
         hour = tointeger( h );
         minute = tointeger( m );
         if (d != "*")
@@ -135,8 +135,9 @@ global define boolean Read()
     }
     else
     {
-        hour = random( 24 );
-        minute = random( 60 );
+        enabled = false;
+        if ( hour == -1 ) hour = random( 24 );
+        if ( minute == -1 ) minute = random( 60 );
     }
     y2milestone("hour: %1, minutes: %2", hour, minute );
     return true;
@@ -151,7 +152,7 @@ global define boolean Write()
 {
 
     string cronjob = "";
-    if (timing == `weeklyi && day >= 0 && day <= 7) {
+    if (timing == `weekly && day >= 0 && day <= 7) {
         cronjob = sformat( "%1 %2 * * %3 root online_update %4", minute, hour,
                 day, options );
     } else {
