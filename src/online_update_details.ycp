@@ -134,7 +134,7 @@ click on button <b>Show Patch Info</b>.
 	if ( ret == `info )
 	{
 	    string patch = UI(`QueryWidget(`id(`patch_table), `CurrentItem ) );
-	    UI(`ShowPatchInfo( patch ));
+	    ShowPatchInfo( patch );
 	}
         else if (ret == `next)
         {

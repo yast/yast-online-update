@@ -20,6 +20,15 @@
  */
 
 {
+  // includes for wizard dialog
+  // include "ui/wizard_dialog.ycp";
+  // include "ui/wizard_error.ycp";
+  // include "ui/wizard_flow.ycp";
+  // include "ui/wizard_message.ycp";
+  // include "ui/wizard_misc.ycp";
+
+  // UI(`CreateWizardDialog());
+  
   // definition of map user_settings  
   map user_settings = $[];    
 
@@ -288,55 +297,89 @@ You will need to do the update again." );
           return (ret == `yes);
       };
  
-  // show detailed information about one patch
-   define ShowPatchInfo ( string patch_name ) ``{
 
-       map info_map = $[];
-       if (!fake_mode)
-       {
-	   info_map = PKGINFO( `ftpGetPatchInformation( patch_name ));
-       }
-       else
-       {
-	   info_map = $["description":"Dies ist eine Testbeschreibung zu einem Testpatch",
-		       "packages": $["netscape.rpm":	["Netscape", "1.00-34324", "1.00-78789"],
-				    "xyz-hgjj-dfa.rpm":	["XYCYXCYXC", "1.00-34324", "1.00-78789"]]
-	   ];
-       }
-       string infotext = sformat("<p>%1</p><p>%2</p>", patch_name, lookup(info_map, "description", "") );
-
-       list table_input = [];
-       foreach (`pac, `info_list, lookup(info_map, "packages", $[] ), ``{
-	   table_input = add(table_input, `item(`id(pac), pac, select(info_list, 1),
-						select(info_list, 2), select(info_list, 0)) );
-       });
-
-       OpenDialog(`opt(`decorated ),
-		  `HBox(`VSpacing(10),
-			`VBox(
-			      `HSpacing(50),
-			      `Left(`Heading( _("Patch information") )),
-			      `VWeight( 2, `RichText(`id(`infotext), infotext )),
-			      `VSpacing(0.5),
-			      `VWeight( 3, `Table(`id(`table_pac),`opt(`hvstretch), 
-						  `header( _("Name"), _("Installed"), _("New Version"), _("Description") ),
-						  table_input
-						  )),
-			      `PushButton(`id(`ok_info), `opt(`default), _("&OK") )
-			      )
-			)
-		  );
-       SetFocus(`id(`ok_info) );
-	  
-       any r = UserInput();
-       CloseDialog();
-       return (r); 
-   };
 
   });
   
-  
- 
+  //
+  // Show detailed information about the patch
+  //
+  define ShowPatchInfo ( string patch_name ) ``{
+
+      map info_map = $[];
+      if (!fake_mode)
+      {
+	  info_map = PKGINFO( `ftpGetPatchInformation( patch_name ));
+      }
+      else
+      {
+	  info_map = $["description":"Dies ist eine Testbeschreibung zu einem Testpatch",
+		      "packages": $["netscape.rpm":	["Netscape", "1.00-34324", "1.00-78789"],
+				   "xyz-hgjj-dfa.rpm":	["XYCYXCYXC", "1.00-34324", "1.00-78789"]]
+	  ];
+      }
+      string infotext = sformat("<p>%1</p><p>%2</p>", patch_name, lookup(info_map, "description", "") );
+
+      list table_input = [];
+      foreach (`pac, `info_list, lookup(info_map, "packages", $[] ), ``{
+	  table_input = add(table_input, `item(`id(pac), pac, select(info_list, 1),
+					       select(info_list, 2), select(info_list, 0)) );
+      });
+
+      UI( ``{ OpenDialog(`opt(`decorated ),
+			 `HBox(`VSpacing(20),
+			       `VBox(
+				     `HSpacing(50),
+				     `Left(`Heading( _("Patch information") )),
+				     `VWeight( 4, `RichText(`id(`infotext), infotext )),
+				     `VSpacing(0.5),
+				     `VWeight( 4, `Table(`id(`table_pac),`opt(`hvstretch), 
+							 `header( _("Name"), _("Installed"), _("New Version"), _("Description") ),
+							 table_input
+							 )),
+				     `PushButton(`id(`ok_info), `opt(`default), _("&OK") )
+				     )
+			       )
+			 );
+      });
+      UI(`SetFocus(`id(`ok_info)));
+	  
+      any r = UI(`UserInput());
+      UI(`CloseDialog());
+       
+      return (r); 
+  };
+
+  //
+  // Returns nice size string
+  //
+  define my_size_text (integer bytes) ``{
+
+      if ( bytes == nil )
+	  return "";
+      
+      float whole = tofloat (bytes) / 1024.0 / 1024.0;
+      string unit = UI(_("MB"));
+
+      // nnn.nn  999.99 MB
+      
+      string size_str = tostring (whole, 2);
+      integer num = size(size_str);
+      integer anz = 6 - num;
+
+      if ( anz <= 0 )
+      {
+	  return ( size_str + " " + unit + " " );
+      }  
+      else if ( anz == 1 )
+      {
+	  return ( " " + size_str + " " + unit+ " " );
+      }
+      else
+      {
+	  return ( "  " + size_str + " " + unit+ " " );
+      }  
+  }; 
 
   // check architecture
   string architecture = SCR(`Read(.probe.architecture));

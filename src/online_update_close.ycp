@@ -36,9 +36,9 @@
     // None at the moment
     
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////
     // MAIN:
-    /////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
 
 
     term contents =
@@ -47,11 +47,16 @@
 	      `VSpacing( 0.2 ),
 	      `Frame( _("Package Update information"),
 		      `VBox(`VSpacing(0.5),
-			    `Label(_("Update is finished.")),
-			    `Label(`id(`error), " " ),
-			    `Label(`id(`sec), " " ),
-			    `Label(`id(`rec), " " ),
-
+			    `Left(`Label(_("Update is finished."))),
+			    `HBox(`HWeight( 3,`Left(`Label(_("Status of update: ") ))),
+				  `HWeight( 1,`Left(`Label(`id(`error), " " )))
+				  ),
+			    `HBox(`HWeight( 3,`Left(`Label(_("Installed security patches: ")))),
+				  `HWeight( 1,`Left(`Label(`id(`rec), " " )))
+				  ),
+			    `HBox(`HWeight( 3,`Left(`Label(_("Installed recommended patches: ")))),
+				  `HWeight( 1,`Left(`Label(`id(`sec), " " )))
+				  ),
 			    `VSpacing(0.5),
 			    `PushButton(`id(`details), `opt(`notify),
 					_("&Details") ),
@@ -103,10 +108,9 @@ patches could not be installed.
 	 index = index+5;
      };
 
-     UI(`ChangeWidget(`id(`error), `Value, sformat(_("Status of update: %1"),  lookup(last_status, "status", "--" ))));
-     UI(`ChangeWidget(`id(`error), `Value, sformat(_("Installed security patches: %1"), sec_no )));
-
-     UI(`ChangeWidget(`id(`error), `Value, sformat(_("Installed recommended patches: %1"), rec_no )));
+     UI(`ChangeWidget(`id(`error), `Value, lookup(last_status, "status", "--" ) ));
+     UI(`ChangeWidget(`id(`sec), `Value, sformat("%1", sec_no)) );
+     UI(`ChangeWidget(`id(`rec), `Value, sformat("%1", rec_no)) );
      
    /////////////////////////////////////////////////////////////////////////////////////////
    ////  Loop for User Input ....
@@ -117,13 +121,17 @@ patches could not be installed.
     {
         ret= UI(`UserInput());
 	
-        if (ret == `next)
+        if (ret == `details)
         {
-
+	    any retval = CallFunction(`online_update_details( true, false ) );
+	    if ( retval == `abort )
+		return `abort;
+	    
+	    ret = `again;
 	}
 
 	
-    } until (ret == `next || ret == `back || ret == `abort);
+    } until (ret == `next || ret == `back || ret == `abort || ret == `again );
 
     // Close connection
     PKGINFO(`ftpCloseUpdate());

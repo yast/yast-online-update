@@ -313,8 +313,8 @@ loaded patches or abort update completely." ), _("Warning"), _("&Install"), _("&
 	      go_on = lookup (result_map, "continue", false );
 	      
 	      UI(`ChangeWidget(`id(`log), `LastLine, lookup (result_map, "message", "" )+"\n" ));
-
-	      ShowProgress( lookup (result_map, "progress", 0 ) );
+	      if (go_on)
+		  ShowProgress( lookup (result_map, "progress", 0 ) );
 	  }
 	  
 	  success = lookup( result_map, "ok", false );

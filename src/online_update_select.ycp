@@ -33,13 +33,14 @@
     
     // map ftp_patches contains information about all available patches, e.g.
     //
-    // $["patch-001":["rec", "Patch for NFS server", "234", "X"],
-    //   "patch-002":["rec", "Noch ein weiterer patch", "565", " "]];
+    // $["patch-001":["recommended", "Patch for NFS server", "234", "X"],
+    //   "patch-002":["security", "Noch ein weiterer patch", "565", " "]];
     //
     // status information from all patches must be stored, because if the user
     // deselects a patch and selects it again we must know whether it was "X" or "G"
     map all_patches = lookup( user_settings, "ftp_patches", $[] );
-
+    y2debug("ONLINE: %1", all_patches );
+    
     // if the user doesn't do any changes, get all patches
     map get_patches = all_patches;
     
@@ -67,15 +68,15 @@
   
     
     // create table input, e.g.
-    // [`item(`id(patch-001), " X ", "rec", "03:56", "Patch for NFS server"),
-    //  `item(`id(patch-002), "   ", "rec", "02:56", "Noch ein weiterer patch") ];
+    // [`item(`id(patch-001), " X ", "recommended", "patch1", "356", "Patch for NFS server"),
+    //  `item(`id(patch-002), "   ", "security", "patch2", "2560", "Noch ein weiterer patch") ];
     //
     list table_contents = maplist( `key, `value, all_patches,
 				   ``(`item(`id(key),
 					    sformat( " %1 ", select(value, 3) ),
 					    select(value,0),
 					    key,
-					    select(value,2),
+					    my_size_text( tointeger(select(value,2))),
 					    select(value,1))
 				      )
 				   );
@@ -85,7 +86,7 @@
 	`VBox(
 	      `VSpacing( 0.2 ),
 	       `Table(`id(`patch_table),`opt(`notify, `hvstretch), 
-		      `header( " ", _("Patch"), _("Mode"), _("Download"), _("Description") ),
+		      `header( " ", _("Mode"), _("Patch"), _("Size"), _("Description") ),
 		      table_contents
 			      ),
 	      `HBox(`Left(`PushButton(`id(`apply), _("&Apply"))),
@@ -101,8 +102,8 @@
     
     string help_part1 =  UI("<p>This dialog shows all patches which are
 available for download on SuSE ftp server.<br>
-The shortcut \"rec\" means it is recommended to install the patch.
-\"sec\" is a security patch and it is highly recommended to install it.
+Mode \"recommended\" means you should install the patch.
+\"security\" is a security patch and it is highly recommended to install it.
 </p>");
     string help_part2 =  UI("<p>Meaning of the status flags:</p>
 <p>
@@ -167,7 +168,7 @@ downloaded nor installed.
 	else if ( ret == `info )
 	{
 	    string patch = UI(`QueryWidget(`id(`patch_table), `CurrentItem ) );
-	    UI(`ShowPatchInfo( patch ));   
+	    ShowPatchInfo( patch );
 	}
 	else if (ret == `next)
 	{
