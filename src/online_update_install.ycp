@@ -47,6 +47,8 @@
       `VBox(
 	    `VSpacing( 0.2 ),
             `LogView(`id(`log), _("Package Update information"), 5, 0 ),
+	    `VSpacing( 0.5 ),
+	    `Left(`CheckBox(`id(`remove_packages),_("&Remove source packages after update."), false)),
 	    `VSpacing( 0.2 )
 	    );
     
@@ -197,7 +199,6 @@ patches could not be installed.
   repeat
       {
 	  ret= UI::UserInput();
-
 /*	
 	  if (ret == `details)
 	  {
@@ -215,22 +216,12 @@ patches could not be installed.
 	    
 	      ret = `again;
 	  }
+*/
 	  if ( ret == `next && UI::QueryWidget(`id(`remove_packages),`Value ) )
 	  {
 	      y2debug( "Removing old rpm-packages" );	    
-	      // removing rpm s
-	      index = 0;
-	      while (index < size(patch_list) )
-	      {
-		  if ( select(patch_list, index+4, "") == "installed" )
-		  {
-		      SCR::Execute(.you.deletePackages,
-				   select(patch_list, index, ""));
-		  }
-		  index = index+5;
-	      };
+              Pkg::YouRemovePackages();
 	  }
-*/
 
       } until (ret == `next || ret == `back || ret == `abort || ret == `again );
 
