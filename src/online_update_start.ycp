@@ -290,7 +290,7 @@ the update takes place.");
 
   boolean cd_update = OnlineUpdate::cd_update;
 
-  list you_server_list = [ $[ "url": "", "name": "User-defined Location" ] ];
+  list you_server_list = [ $[ "url": "", "name": _("User-defined Location") ] ];
 
   string you_url = OnlineUpdate::you_url;
 
