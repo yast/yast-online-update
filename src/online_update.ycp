@@ -72,7 +72,7 @@ packages were created by SuSE.
       {
 	  Mode::test = true;
       }
-      else if (Args(arg_n) == .cd_default)
+      else if (Args(arg_n) == .cd_default || Args(arg_n) == ".cd_default")
       {
 	  Mode::youInstallMap["you_serverkind"] = "cd";
 	  OnlineUpdate::cd_update	=  true;

@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Feb  8 18:27:45 CET 2002 - lnussel@suse.de
+
+- command line argument is of type string
+
+-------------------------------------------------------------------
 Fri Feb  8 17:22:21 CET 2002 - gs@suse.de
 
 - bugfixes and internal changes (replace the user_settings,
