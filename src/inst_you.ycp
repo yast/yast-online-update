@@ -8,9 +8,12 @@
  */
 
 {
+
     textdomain "online-update";
 
+    import "Mode";
     import "Internet";
+    import "Wizard";
 
     if (WFM::Args (2) == true)	// called backwards
         return `auto;

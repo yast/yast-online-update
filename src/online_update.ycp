@@ -13,17 +13,14 @@
 
   textdomain "online-update";
 
-  import "Version";
-  import "Wizard";
+  import "Directory";
+  import "Label";
   import "Mode";
   import "OnlineUpdate";
-  import "Directory";
-
   import "OnlineUpdateCallbacks";
-  
   import "Popup";
-  include "ui/common_functions.ycp";
-  import "Label";
+  import "Version";
+  import "Wizard";
 
   string version = Version::yast2;
 
@@ -115,9 +112,9 @@ packages were created by SuSE.
       command = command + " -i";
     }
     command = command + " " + OnlineUpdate::you_auto_batchkind;
-    
+
     y2debug( "COMMAND: %1", command );
-    
+
     integer result = SCR::Execute( .target.bash, command );
 
     return result;
@@ -188,14 +185,14 @@ UI(``{
                 buttons
             )
         );
-        
+
         symbol ret = nil;
         boolean showDetails = false;
-             
+
         while( ret != `ok && ret != `tryagain && ret != `all &&
                ret != `abort && ret != `skip ) {
             ret = UserInput();
-            
+
             if ( ret == `details ) {
                 if ( showDetails ) {
                     UI::ReplaceWidget( `id( `rp ), `Empty() );
@@ -210,7 +207,7 @@ UI(``{
                 showDetails = !showDetails;
             }
         }
-        
+
         CloseDialog();
 
         if ( type != `plain ) {

@@ -26,8 +26,11 @@
 
   textdomain "online-update";
 
+  import "Label";
   import "OnlineUpdate";
-  
+  import "Popup";
+  import "Wizard";
+
   boolean auto_mode_install = OnlineUpdate::you_auto_install;
 
   //////////////////////////////////////////////////////////////////////////////////////

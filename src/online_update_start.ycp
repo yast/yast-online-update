@@ -12,8 +12,11 @@
   textdomain "online-update";
 
   import "Arch";
+  import "Label";
   import "Mode";
   import "OnlineUpdate";
+  import "Popup";
+  import "Wizard";
 
   include "ui/file_popups.ycp";
   include "inst_source_dialogs.ycp";
