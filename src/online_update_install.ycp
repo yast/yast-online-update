@@ -191,9 +191,9 @@ option <b>Remove source packages after update</b></p>");
       string patchName = lookup( patch, "name", "unknown" );
     
       UI::ChangeWidget( `id(`log), `LastLine,
-                        sformat ( _( "Retrieving %1: \"%2\" " ),
+                        sformat ( _( "Retrieving %1: \"%2\"" ),
                             patchName,
-                            lookup( patch, "summary", "no summary" ) ) );
+                            lookup( patch, "summary", "no summary" ) ) + " " );
 
       string err = "skipped";
       if ( proceed == `ok ) {
@@ -206,16 +206,16 @@ option <b>Remove source packages after update</b></p>");
       } else if ( err == "skipped" ) {
         UI::ChangeWidget( `id(`log), `LastLine, _("Skipped\n") );
       } else {
-        UI::ChangeWidget( `id(`log), `LastLine, _("Error") );
         error = true;
         if ( err == "abort" ) {
+          UI::ChangeWidget( `id(`log), `LastLine, _("Aborted") );
           if ( UI::ConfirmAbortUpdate( `painless ) ) return `abort;
-        }
-        if ( err == "media" ) {
-          UI::ChangeWidget( `id(`log), `LastLine, _(": Can't get files.") );
+        } else if ( err == "media" ) {
+          UI::ChangeWidget( `id(`log), `LastLine, _("Error: Can't get files.") );
         } else if ( err == "sig" ) {
-          UI::ChangeWidget( `id(`log), `LastLine, _(": Signature check failed.") );
+          UI::ChangeWidget( `id(`log), `LastLine, _("Error: Signature check failed.") );
         } else {
+          UI::ChangeWidget( `id(`log), `LastLine, _("Error") );
           y2error( "YouGetCurrentPatch Error: %1", err );
         }
         UI::ChangeWidget( `id(`log), `LastLine, _("\n") );
