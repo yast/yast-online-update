@@ -23,7 +23,7 @@
           UI::ChangeWidget( `id( `progress ), `Value, num );
         }
 
-        symbol ret = UI::PollInput();
+        symbol ret = (symbol)UI::PollInput();
 
         if ( ret == `abort || ret == `cancel ) {
             return false;
@@ -43,7 +43,7 @@
           UI::ChangeWidget( `id( `patchprogress ), `Value, num );
         }
 
-        symbol ret = UI::PollInput();
+        symbol ret =(symbol) UI::PollInput();
 
         if ( ret == `abort || ret == `cancel ) {
             return false;
@@ -59,7 +59,7 @@
     ``{
         y2milestone("ExecuteYcpScriptCallback");
 
-        return CallModule( script, [] );
+        return (boolean)WFM::call( script, [] );
     }
 
     /**
@@ -69,7 +69,7 @@
     ``{
         y2milestone("ScriptProgressCallback");
 
-        symbol ret = UI::PollInput();
+        symbol ret = (symbol)UI::PollInput();
 
         if ( ret == `abort || ret == `cancel ) {
             return false;

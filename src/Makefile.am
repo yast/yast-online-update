@@ -26,3 +26,6 @@ desktop_DATA =				\
 	cd_update.desktop
 
 EXTRA_DIST = $(client_DATA) $(module_DATA) $(config_DATA) $(desktop_DATA)
+
+
+include $(top_srcdir)/Makefile.am.common
