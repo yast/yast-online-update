@@ -2,6 +2,9 @@
 Fri Sep  6 17:00:41 CEST 2002 - cschum@suse.de
 
 - Added Provides/Obsoletes for y2t_online_update.
+- Start with cd URL when called as PatchCD-Update.
+- Reenabled Expert button for choosing URL via dialogs.
+- Removed obsolete code.
 
 -------------------------------------------------------------------
 Thu Sep  5 18:16:54 CEST 2002 - cschum@suse.de
