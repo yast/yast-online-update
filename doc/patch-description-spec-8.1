@@ -30,23 +30,23 @@ Spezifikation YOU Patches 8.1
      Ausführung mit YOU:
      ------------------
      Falls Benutzereingaben erforderlich sind, wird ein YCP Modul (Popup)
-     mit den entsprechenden Eingabefeldern zur Verfügung gestellt.
+     mit den entsprechenden Eingabefeldern aufgerufen.
      Das Script wird in einer bash-Shell ausgeführt.
      Logausgaben+Fehlermeldungen werden in ein Logfile geleitet.
 
-     Für die Erstellung des YCP-Moduls werden Beispiele und eine
-     Bibilothek mit den wichtigsten Funktionen zur Verfügung gestellt.
+     Für die Erstellung des YCP-Moduls werden Beispiele (und evtl. eine
+     Bibilothek mit den wichtigsten Funktionen) zur Verfügung gestellt.
 
   4. Logausgaben müssen vom Script/Programm auf stdout ausgegeben werden.
      YOU leitet stdout und stderr in ein Logfile mit Namen:
      /var/log/patches/<patchname.log> um.
 
-  5. Es wird ein "uninstall" Aufruf für die Scripten vorgesehen, d.h. Scripten können 
-     entweder mit Parameter "install" oder "uninstall" aufgerufen werden.  
+  5. Es wird ein "uninstall" Aufruf für die Scripten vorgesehen, d.h. Scripten
+     können entweder mit Parameter "install" oder "uninstall" aufgerufen werden.
 
-  6. Scripten können in der Patchbeschreibung bei 'Prescript:' (wird vor der Installation
-     der Pakete ausgeführt) und/oder 'Postscript:' (Ausführung nach der Paketinstallation)
-     angegeben werden.
+  6. Scripten können in der Patchbeschreibung bei 'Prescript:' (wird vor der 
+     Installation der Pakete ausgeführt) und/oder 'Postscript:' (Ausführung 
+     nach der Paketinstallation) angegeben werden.
 
      
 - Abhängigkeiten für Patches können angegeben werden:
@@ -57,8 +57,8 @@ Spezifikation YOU Patches 8.1
  	     patch-<no_X1>, patch-<no_X2> ... voraus.
 
   Obsoletes: patch-<no_Y1> patch-<no_Y2> ...
-             Die patches patch-<no_Y1>, patch-<no_Y2> ... müssen nicht installiert werden, 
-             d.h. werden nicht zur Installation vorgeschlagen.
+             Die patches patch-<no_Y1>, patch-<no_Y2> ... müssen nicht installiert
+	      werden, d.h. werden nicht zur Installation vorgeschlagen.
 
   Conflict:  patch-<no_Z1> patch-<no_Z2> ...
              Die Installtion des Patches würde einen Konflikt mit den
@@ -69,8 +69,9 @@ Spezifikation YOU Patches 8.1
 
   Die Abhängigkeiten der Pakete werden ebenfalls berücksichtigt.
 
-  Die Reihenfolge der Paketinstallation ist nicht festgelegt, insbesondere ist nicht
-  festgelegt, wann die Abhängigkeiten der Pakete untereinander aufgelöst werden.
+  Die Reihenfolge der Paketinstallation ist nicht festgelegt, insbesondere ist 
+  nicht festgelegt, wann die Abhängigkeiten der Pakete untereinander aufgelöst 
+  werden.
 
 
  
