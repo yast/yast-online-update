@@ -1,4 +1,26 @@
 -------------------------------------------------------------------
+Thu Dec 19 14:25:57 CET 2002 - cschum@suse.de
+
+- Removed obsolete code (online_update_load.ycp,
+  online_update_details.ycp, online_update_close.ycp).
+- Added progress callbacks (OnlineUpdateCallbacks.ycp).
+- Removed suseservers.ycp. /etc/suseservers is now accessed via the
+  packagemanager.
+- Added option to choose if patches are all reloaded from the
+  server or if previously downloaded files are reused.
+- Added details information to most error dialog.
+- Added option to skip download/installation of patches to
+  download/installation error dialogs.
+- Save user name and password in /var/lib/YaST2/you/password
+  instead of /etc/sysconfig/online-update.
+- Added progress display for patch download and installation.
+- Don't call SuSEconfig if no patches have been installed.
+- Added dialog to setup automatic update by cron job.
+- Show when last successfull update has been performed.
+- Removed obsolete entries from sysconfig.online-update.
+- 2.7.1
+
+-------------------------------------------------------------------
 Mon Dec  2 11:20:49 CET 2002 - cschum@suse.de
 
 - Fixed wrong assignment of username and password in
