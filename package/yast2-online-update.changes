@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Mar 10 13:33:22 CET 2003 - arvin@suse.de
+
+- during installation wait with starting of you until connection
+  is really up (bug #24354)
+
+-------------------------------------------------------------------
 Wed Feb 26 16:42:38 CET 2003 - cschum@suse.de
 
 - Use widget with scrollbars for pre/postinformation text (#24370).
