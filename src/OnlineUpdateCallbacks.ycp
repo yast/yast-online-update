@@ -49,6 +49,16 @@
     }
 
     /**
+      Callback for executing YCP scripts in YOU.
+    */
+    global define boolean ExecuteYcpScriptCallback( string script )
+    ``{
+        y2milestone("ExecuteYcpScriptCallback");
+
+        return CallFile( script, [] );
+    }
+
+    /**
       Constructor
     */
     global define void OnlineUpdateCallbacks()
@@ -57,5 +67,6 @@
 
 	Pkg::CallbackYouProgress ("OnlineUpdateCallbacks::ProgressCallback");
 	Pkg::CallbackYouPatchProgress ("OnlineUpdateCallbacks::PatchProgressCallback");
+	Pkg::CallbackYouExecuteYcpScript ("OnlineUpdateCallbacks::ExecuteYcpScriptCallback");
     }
 }
