@@ -2,6 +2,7 @@
 # sample /etc/suseservers
 #
 ftp://ftp.suse.com/pub/suse
+ftp://ftp.gwdg.de/pub/linux/suse/ftp.suse.com/suse
 ftp://ftp.hilton.rwth-aachen.de/pub/mirror/suse
 ftp://ftp.nl.uu.net/pub/linux/suse/suse
 ftp://ftp.sunet.se/pub/Linux/distributions/suse/suse

@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Sep 24 18:11:49 CEST 2001 - gs@suse.de
+
+- first server entry in /etc/suseservers is default ftp server 
+
+-------------------------------------------------------------------
 Tue Sep 18 16:59:20 CEST 2001 - gs@suse.de
 
 - Internal changes ( obsolete defines removed or replaced )
