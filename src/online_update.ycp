@@ -404,6 +404,9 @@ some of them might not work as expected.");
       reg_password = SCR::Read(.sysconfig.onlineupdate.REG_PASSWORD);
       reg_code = SCR::Read(.sysconfig.onlineupdate.REG_CODE);
 
+      if ( reg_password == nil ) reg_password = "";
+      if ( reg_code == nil ) reg_code = "";
+
       while ( go_on )
       {
 	  // show the registration data to allow changes

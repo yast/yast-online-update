@@ -44,6 +44,101 @@
 
   };
 
+  global define SetupAutomatic() ``{
+
+    string txt = _("Automatic update is executed by a daily cronjob. Note
+that a network connection has to be available when
+the update takes place.");
+
+    string cronfile = "/etc/cron.d/yast2-online-update";
+
+    string cronjob = SCR::Read( .target.string, cronfile );
+    y2debug("cronjob: %1",cronjob);
+
+    integer hour = 0;
+    integer minute = 0;
+
+    boolean autoget = false;
+
+    boolean enabled = false;
+    if ( size( cronjob ) > 0 ) {
+      enabled = true;
+
+      string h = regexpsub( cronjob, "[0-9]+ ([0-9]+) ", "\\1" );
+      string m = regexpsub( cronjob, "([0-9]+) ([0-9]+) ", "\\1" );
+
+      y2debug("TIME: %1 %2", h, m );
+
+      hour = tointeger( h );
+      minute = tointeger( m );
+
+      if ( regexpmatch( cronjob, "-g" ) ) autoget = true;
+    } else {
+      hour = random( 24 );
+      minute = random( 60 );
+    }
+
+    UI::OpenDialog( `opt( `decorated ),
+      `VBox(
+        `VSpacing( 0.2 ),
+        `Label( txt ),
+        `VSpacing( 0.2 ),
+        `CheckBox( `id( `enable ), `opt( `notify ), _("Enable automatic update"), enabled ),
+        `VSpacing( 0.2 ),
+        `CheckBox( `id( `autoget ), _("Only download patches."), autoget ),
+        `VSpacing( 0.2 ),
+        `Label( `id( `crontime ), _("Time when update is performed:") ),
+        `HBox(
+            `HStretch(),
+            `IntField( `id( `hour ), _("Hour"), 0, 23, hour ),
+            `IntField( `id( `minute ), _("Minute"), 0, 59, minute ),
+            `HStretch()
+        ),
+        `VSpacing( 0.2 ),
+        
+        `HBox(
+          `PushButton( `id( `ok ), OKButtonLabel() ),
+          `PushButton( `id( `cancel ), CancelButtonLabel() )
+        )
+      )
+    );
+
+    UI::ChangeWidget( `id( `autoget ), `Enabled, enabled );
+    UI::ChangeWidget( `id( `crontime ), `Enabled, enabled );
+  
+    symbol ret = `enable;
+
+    repeat {
+        enabled = UI::QueryWidget( `id( `enable ), `Value );
+
+        if ( ret == `enable ) {
+            UI::ChangeWidget( `id( `autoget ), `Enabled, enabled );
+            UI::ChangeWidget( `id( `crontime ), `Enabled, enabled );
+            UI::ChangeWidget( `id( `hour ), `Enabled, enabled );
+            UI::ChangeWidget( `id( `minute ), `Enabled, enabled );
+        }
+    
+        ret = UI::UserInput();
+
+        if ( ret == `ok ) {
+            if ( enabled ) {
+                minute = UI::QueryWidget( `id( `minute ), `Value );
+                hour = UI::QueryWidget( `id( `hour ), `Value );
+                autoget = UI::QueryWidget( `id( `autoget ), `Value );
+
+                string cronjob = sformat( "%1 %2 * * * root online_update", minute, hour );
+                
+                if ( autoget ) cronjob = cronjob + " -g";
+                
+                SCR::Write( .target.string, cronfile, cronjob );
+            } else {
+                SCR::Execute( .target.remove, cronfile );
+            }
+        }
+    } until ( ret == `ok || ret == `cancel );
+
+    UI::CloseDialog();
+  }
 
   /////////////////////////////////////////////////////////////////////////////////////
   // MAIN:
@@ -238,7 +333,7 @@ another FTP or HTTP server.</p>
 
   repeat {
 
-      ret= UI::UserInput();
+      ret = UI::UserInput();
 
       OnlineUpdate::you_auto = !UI::QueryWidget( `id( `manual ), `Value );
       OnlineUpdate::reload = UI::QueryWidget( `id( `reload ), `Value );
@@ -304,6 +399,9 @@ Can't load patch information.\n");
           string url = getUrl( "" );
 
           UI::ChangeWidget( `id(`you), `Value, url );
+      }
+      else if ( ret == `automatic ) {
+          SetupAutomatic();
       }
       else if ( ret == `abort && UI::ConfirmAbortUpdate(`painless) )
 	  return  `abort;
