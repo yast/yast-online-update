@@ -4,6 +4,11 @@ Wed Feb  4 11:28:07 CET 2004 - nashif@suse.de
 - Enable automatic online-update with autoyast
 
 -------------------------------------------------------------------
+Tue Feb  3 10:12:18 CET 2004 - cschum@suse.de
+
+- Fixed retrieval of server list.
+
+-------------------------------------------------------------------
 Mon Feb  2 18:24:53 CET 2004 - cschum@suse.de
 
 - Fixed neededforbuild and file list.
