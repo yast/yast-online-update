@@ -12,6 +12,9 @@
 
     import "Internet";
 
+    if (WFM::Args (2) == true)	// called backwards
+        return `auto;
+
     if (!Internet::do_you)	// nothing to do
 	return `auto;
 
