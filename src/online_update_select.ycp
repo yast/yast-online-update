@@ -15,7 +15,7 @@
   import "Wizard";
 
   UI::OpenDialog(`opt(`defaultsize), `PackageSelector(`id(`selector), `opt(`youMode)) );
-  symbol ret = UI::RunPkgSelection(`id(`selector) );
+  symbol ret = (symbol)UI::RunPkgSelection(`id(`selector) );
   UI::CloseDialog();
 
   Wizard::ClearContents();

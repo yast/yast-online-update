@@ -18,7 +18,6 @@
   import "Mode";
   import "OnlineUpdate";
   import "OnlineUpdateCallbacks";
-  import "Popup";
   import "Version";
   import "Wizard";
 
@@ -56,34 +55,36 @@ packages were created by SuSE.
   integer arg_max = size( WFM::Args() );
 
   while (arg_n < arg_max ) {
-      if (WFM::Args(arg_n) == .test || WFM::Args(arg_n) == ".test")
+      any arg = WFM::Args( arg_n );
+
+      if ( arg == .test || arg == ".test" )
       {
 	  Mode::test = true;
       }
-      else if (WFM::Args(arg_n) == .cd_default || WFM::Args(arg_n) == ".cd_default")
+      else if ( arg == .cd_default || arg == ".cd_default" )
       {
 	  Mode::youInstallMap["you_server"]	= "CD";		// text for output field
 	  Mode::youInstallMap["you_serverkind"] = "cd";
 	  OnlineUpdate::cd_update	=  true;
       }
-      else if (WFM::Args(arg_n) == .auto.get || WFM::Args(arg_n) == ".auto.get")
+      else if ( arg == .auto.get || arg == ".auto.get" )
       {
 	  OnlineUpdate::you_auto_get	= true;
 	  OnlineUpdate::you_auto	= true;
       }
-      else if (WFM::Args(arg_n) == .auto.install || WFM::Args(arg_n) == ".auto.install")
+      else if ( arg == .auto.install || arg == ".auto.install" )
       {
 	  OnlineUpdate::you_auto_install = true;
 	  OnlineUpdate::you_auto	 = true;
       }
-      else if (WFM::Args(arg_n) == .nosigcheck || WFM::Args(arg_n) == ".nosigcheck")
+      else if ( arg == .nosigcheck || arg == ".nosigcheck" )
       {
 	  OnlineUpdate::signature_check = false;
       }
-      else if ( WFM::Args(arg_n) == .url || WFM::Args(arg_n) == ".url" )
+      else if ( arg == .url || arg == ".url" )
       {
           if ( arg_n + 1 < arg_max ) {
-              OnlineUpdate::you_url = WFM::Args( arg_n + 1 );
+              OnlineUpdate::you_url = (string)WFM::Args( arg_n + 1 );
           }
           arg_n = arg_n + 1;
       }
@@ -115,7 +116,7 @@ packages were created by SuSE.
 
     y2debug( "COMMAND: %1", command );
 
-    integer result = SCR::Execute( .target.bash, command );
+    integer result = (integer)SCR::Execute( .target.bash, command );
 
     return result;
   }
@@ -125,232 +126,7 @@ packages were created by SuSE.
   Wizard::CreateDialog();
 
   // show the special YOU image
-  Wizard::SetImage( Read (.local.byte, Directory::themedir + "/current/online_update_long.png") );
-
-UI(``{
-
-    global define YouIgnoreWarningPopup( string message, string details )
-    ``{
-        return YouErrorPopupGeneric( message, details, `ignorewarning );
-    }
-
-    global define YouIgnorePopup( string message, string details )
-    ``{
-        return YouErrorPopupGeneric( message, details, `ignore );
-    }
-
-    global define YouSkipPopup( string message, string details )
-    ``{
-        return YouErrorPopupGeneric( message, details, `skip );
-    }
-
-    global define YouErrorPopup( string message, string details )
-    ``{
-        return YouErrorPopupGeneric( message, details, `plain );
-    }
-
-    global define YouErrorPopupGeneric( string message, string details,
-                                        symbol type ) ``{
-
-        if ( size( details ) == 0 ) details = _("No details available.");
-
-        string detailsStringOn = _("&Details <<");
-        string detailsStringOff = _("&Details >>");
-
-        term detailsButton = `PushButton( `id( `details ), detailsStringOff );
-
-        string heading = _("Error");
-
-        term buttons = nil;
-        if ( type == `skip ) {
-          buttons = `HBox(
-                        detailsButton,
-                        `PushButton( `id( `tryagain ), _("Try again") ),
-                        `PushButton( `id( `skip ), _("Skip Patch") ),
-                        `PushButton( `id( `all ), _("Skip All") ),
-                        `PushButton( `id( `abort ), _("Abort Update") )
-                    );
-        } else if ( type == `ignore ) {
-          buttons = `HBox(
-                        detailsButton,
-                        `PushButton( `id( `ok ), WFM::Label::IgnoreButton() ),
-                        `PushButton( `id( `abort ), _("Abort Update") )
-                    );
-        } else if ( type == `ignorewarning ) {
-          heading = _("Warning");
-          buttons = `HBox(
-                        detailsButton,
-                        `PushButton( `id( `retry ), WFM::Label::RetryButton() ),
-                        `PushButton( `id( `ok ), WFM::Label::IgnoreButton() ),
-                        `PushButton( `id( `abort ), _("Abort Update") )
-                    );
-        } else {
-          buttons = `HBox(
-                        detailsButton,
-                        `PushButton( `id( `ok ), WFM::Label::OKButton() )
-                    );
-        }
-
-        OpenDialog( `opt( `decorated ),
-            `VBox(
-                `HBox( `HSpacing( 0.5 ), `Left( `Heading( heading ) ) ),
-                `VSpacing( 0.2 ),
-                `Label( message ),
-                `ReplacePoint( `id( `rp ), `Empty() ),
-                buttons
-            )
-        );
-
-        symbol ret = nil;
-        boolean showDetails = false;
-
-        while( ret != `ok && ret != `tryagain && ret != `all &&
-               ret != `abort && ret != `skip && ret != `retry ) {
-            ret = UserInput();
-
-            if ( ret == `details ) {
-                if ( showDetails ) {
-                    UI::ReplaceWidget( `id( `rp ), `Empty() );
-                    UI::ChangeWidget( `id( `details ), `Label, detailsStringOff );
-                } else {
-                    UI::ReplaceWidget( `id( `rp ), `HBox( `HSpacing( 0.5 ),
-                                                          `HWeight( 1, `RichText( details ) ),
-                                                          `HSpacing( 0.5 ) )
-                                                         );
-                    UI::ChangeWidget( `id( `details ), `Label, detailsStringOn );
-                }
-                showDetails = !showDetails;
-            }
-        }
-
-        CloseDialog();
-
-        if ( type != `plain ) {
-            return ret;
-        } else {
-            if ( ret ==  `ok ) return true;
-            else return false;
-        }
-    }
-
-    //  ConfirmAbortUpdate has same layout as/but different text than ConfirmAbort
-   global define ConfirmAbortUpdate( symbol how_to ) ``{
-	  string what_will_happen = "";
-
-	  if ( how_to == `painless )
-	  {
-	      // Warning text for aborting the update before a patch is installed
-	      what_will_happen = _("If you abort the installation now, no patch will be installed.
-Your installation will remain untouched.
-");
-	  }
-	  else if ( how_to == `incomplete )
-	  {
-	      // Warning text for aborting if some patches are installed, some not
-	      what_will_happen = _("Patch download and installation in progress.
-If you abort the installation now, the update is incomplete.
-Repeat the update, including the download, if desired.
-");
-	  }
-	  else if ( how_to == `unusable )
-	  {
-	      // Warning text for aborting an installation during the install process
-	      what_will_happen = _("If you abort the installation now,
-at least one patch is not installed correctly.
-You will need to do the update again.");
-	  }
-          else if ( how_to == `suseconfig )
-          {
-              // Warning text for aborting an installation without running SuSEconfig
-              what_will_happen = _("If you abort the installation now, SuSEconfig will
-not be run. The patches have been installed
-correctly, but without running SuSEconfig
-some of them might not work as expected.");
-          }
-	  else
-	  {
-	      y2warning("Unknown symbol for what will happen when aborting - please correct in calling module" );
-	  }
-
-	  OpenDialog(
-		     `opt(`decorated),
-		     `HBox(
-			   `HSpacing(1),
-			   `VBox(
-				 `VSpacing(0.2),
-				 `HCenter(
-					  `HSquash(
-						   `VBox(
-							 // Confirm user request to abort installation
-							 `Left( `Label( _("Really abort YaST Online Update?") ) ),
-							 `Left( `Label( what_will_happen ) )
-							 )
-						   )
-					  ),
-				 `HBox(
-				       // Button that will really abort the installation
-				       `PushButton(`id(`really_abort), _("&Abort Update") ),
-				       `HStretch(),
-
-				       // Button that will continue with the installation
-				       `PushButton(`id(`continue), `opt(`default), _("&Continue Update") )
-				       ),
-				 `VSpacing(0.2)
-				 ),
-			   `HSpacing(1)
-			   )
-		     );
-
-	  any ret = UserInput();
-	  CloseDialog();
-
-	  return (ret == `really_abort);
-      };
-
-   global define DisplayMsgYou( string message, string header, string yes_button, string no_button ) ``{
-          OpenDialog(
-                     `opt(`decorated),
-                     `HBox(
-                           `HSpacing(1),
-                           `VBox(
-				 `Left(`Heading( header)),
-				 `VSpacing(0.2),
-                                 `Label(message),
-				 `HBox(`PushButton(`id(`yes), yes_button ),
-				       `PushButton(`id(`no), `opt(`default), no_button )),
-                                 `VSpacing(0.2)
-                                 ),
-                           `HSpacing(1)
-                           )
-                     );
-          any ret = UserInput();
-          CloseDialog();
-          return (ret == `yes);
-      };
-
-
-   global define DisplayMsgYouOk( string message, string header, string ok_button ) ``{
-          OpenDialog(
-                     `opt(`decorated),
-                     `HBox(
-                           `HSpacing(1),
-                           `VBox(
-				 `Left(`Heading( header)),
-				 `VSpacing(0.2),
-                                 `Label(message),
-				 `HBox(`PushButton(`id(`ok), `opt(`default), ok_button )),
-                                 `VSpacing(0.2)
-                                 ),
-                           `HSpacing(1)
-                           )
-                     );
-          any ret = UserInput();
-          CloseDialog();
-          return (ret == `ok);
-      };
-
-  });
-
+  Wizard::SetImage( (byteblock)SCR::Read (.local.byte, Directory::themedir + "/current/online_update_long.png") );
 
   /*
    * Main dialog cycle
@@ -358,21 +134,25 @@ some of them might not work as expected.");
    */
 
   list dialog = [
-    [`online_update_start(false, true), `always ],
-    [`online_update_select(false, true), `manual ],
-    [`online_update_install(false, true), `always ],
-    [`inst_suseconfig(false, false), `always ]
+    [ "online_update_start", [ false, true ], `always ],
+    [ "online_update_select", [ false, true ], `manual ],
+    [ "online_update_install", [ false, true ], `always ],
+    [ "inst_suseconfig", [ false, false ], `always ]
   ];
 
   integer id = 0;
   any result = `next;
 
-  while ((id >= 0) && (id < size (dialog))) {
+  while ( ( id >= 0 ) && ( id < size( dialog ) ) ) {
 
-      term module_name = select( select( dialog, id, [] ), 0, `nomodule(false, false) );
-      symbol module_mode = select( select( dialog, id, [] ), 1, `none );
+      list page = dialog[ id ]:[];
 
-      y2debug( "ONLINE: Module: %1 Mode: %2", module_name, module_mode );
+      string module_name = page[ 0 ]:"";
+      list module_args = page[ 1 ]:[];
+      symbol module_mode = page[ 2 ]:`none;
+
+      y2debug( "ONLINE: Module: %1 Args: %2 Mode: %3", module_name,
+               module_args, module_mode );
 
       if ( id == size( dialog ) - 1 ) {
           UI::ChangeWidget(`id(`next), `Label, Label::FinishButton() );
@@ -380,12 +160,14 @@ some of them might not work as expected.");
 
       if ( !OnlineUpdate::you_auto )
       {
-	  result = WFM::CallFunction( module_name );
+	  result = WFM::CallFunction( module_name, module_args );
       }
-      else if ( select( select(dialog, id, []), 1, `none ) == `always )
+      else if ( module_mode == `always )
       {
-	  result = WFM::CallFunction( module_name );
+	  result = WFM::CallFunction( module_name, module_args );
       }
+      
+      if ( result == `nil ) return 1;
 
       if (result == `again )
 	  continue;
@@ -409,5 +191,7 @@ some of them might not work as expected.");
 
   if ( result == `abort ) result = `auto; 
 
-  return result;
+//  return result;
+
+  return 0;
 }
