@@ -415,7 +415,9 @@ You will need to do the update again.");
   string language = UI( `GetLanguage() );
   user_settings = add( user_settings, "language", language );
 
-
+  // setting targetroot
+  string targetroot            = SCR(`Read(.target.root));
+  user_settings = add( user_settings, "targetroot", targetroot );  
   
   /*
    * Main dialog cycle
