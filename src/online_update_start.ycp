@@ -5,8 +5,6 @@
  * Authors:	Gabriele Strattner <gs@suse.de>
  *		Stefan Schubert <schubi@suse.de>
  *              Cornelius Schumacher <cschum@suse.de>
- *
- * $Id$
  */
 
 {
@@ -151,10 +149,11 @@
 
   global define SetupAutomatic() ``{
 
+    string heading = _("YOU Automatic Mode Setup");
+
     string txt = _("Automatic update is executed by a daily cronjob. 
 A network connection must be available when
-the update takes place.
-");
+the update takes place.");
 
     string cronfile = "/etc/cron.d/yast2-online-update";
 
@@ -187,19 +186,50 @@ the update takes place.
     UI::OpenDialog( `opt( `decorated ),
       `VBox(
         `VSpacing( 0.2 ),
+        `Heading( heading ),
+        `VSpacing( 0.2 ),
         `Label( txt ),
-        `VSpacing( 0.2 ),
-        `CheckBox( `id( `enable ), `opt( `notify ), _("Enable Automatic Update"), enabled ),
-        `VSpacing( 0.2 ),
-        `CheckBox( `id( `autoget ), _("Only Download Patches"), autoget ),
-        `VSpacing( 0.2 ),
-        `Label( `id( `crontime ), _("Time when update is performed:") ),
+        `VSpacing( 0.6 ),
         `HBox(
-            `HStretch(),
-            `IntField( `id( `hour ), _("Hour"), 0, 23, hour ),
-            `IntField( `id( `minute ), _("Minute"), 0, 59, minute ),
-            `HStretch()
+          `HSpacing( 0.8 ),
+          `Left(
+            `CheckBox( `id( `enable ), `opt( `notify ), _("Enable Automatic Update"), enabled )
+          )
         ),
+        `VSpacing( 0.2 ),
+        `HBox(
+          `HSpacing( 0.8 ),
+          `Left(
+            `Frame( `id( `settings ), "",
+              `VBox(
+                `HBox(
+                  `HSpacing( 0.8 ),
+                  `Left(
+                    `Label( `id( `crontime ), _("Time when update is performed:") )
+                  ),
+                  `HSpacing( 0.8 )
+                ),
+                `HBox(
+                    `HStretch(),
+                    `IntField( `id( `hour ), _("Hour"), 0, 23, hour ),
+                    `IntField( `id( `minute ), _("Minute"), 0, 59, minute ),
+                    `HStretch()
+                ),
+                `VSpacing( 0.2 ),
+                `HBox(
+                  `HSpacing( 0.8 ),
+                  `Left(
+                    `CheckBox( `id( `autoget ), _("Only Download Patches"), autoget )
+                  ),
+                  `HSpacing( 0.8 )
+                ),
+                `VSpacing( 0.5 )
+              )
+            )
+          ),
+          `HSpacing( 0.8 )
+        ),
+
         `VSpacing( 0.2 ),
         
         `HBox(
