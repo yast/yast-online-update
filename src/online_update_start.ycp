@@ -116,9 +116,8 @@
   // This does not mean, connection failed to ftp server, but any other error occured.
   if (!retval)
   {
-      UI(`MessagePopup(_("Initialisation of ftp server failed.\n
-You may try to install the package
-\"yast2-online-update\" once again.\n")));
+      UI(`MessagePopup(_("Initialisation of ftp server failed
+(internal error).")));
       return `abort;
   }
   
