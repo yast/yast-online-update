@@ -1073,7 +1073,7 @@ YCPValue YouAgent::getPatchList (  )
 	      // client.
 
 	      string command = "ls " + destPatchPath +
-		  PATCH + "/" + patchname + ".*";
+		  PATCH + "/" + patchname + ".* >/dev/null 2>>/dev/null";
 	      YCPPath path = ".target.bash";
 	      YCPString value ( command );
 	      YCPValue ret = mainscragent->Execute( path, value );
@@ -1413,7 +1413,7 @@ YCPValue YouAgent::getPatchList (  )
 	      // client.
 
 	      string command = "ls " + destPatchPath +
-		  PATCH + "/" + patchname + ".*";
+		  PATCH + "/" + patchname + ".* >/dev/null 2>>/dev/null";
 	      YCPPath path = ".target.bash";
 	      YCPString value ( command );
 	      YCPValue ret = mainscragent->Execute( path, value );
