@@ -2,7 +2,7 @@
 # Makefile.am for module
 #
 
-SUBDIRS = src conf doc
+SUBDIRS = src conf doc testsuite
 
 VERSION = $(shell cat $(srcdir)/VERSION)
 
