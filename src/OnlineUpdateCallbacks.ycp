@@ -79,18 +79,16 @@
 	return "";
     }
 
-    global define string MessageCallback( string type, list patches )
+    global define string MessageCallback( string type, list<map> patches )
     ``{
         y2internal( "MessageCallback %1", type );
 
-        map patch = patches[ 0 ]:$[];
-
         if ( type == "preinfo" ) {
-          boolean install = YouMessagePopup( patch, true );
+          boolean install = YouMessagePopup( patches, true );
           if ( install ) return "";
           else return "skip";
         } else if ( type == "postinfo" ) {
-          YouMessagePopup( patch, false );
+          YouMessagePopup( patches, false );
           return "";
         } else {
           y2error( "Wrong message type: %1", type );

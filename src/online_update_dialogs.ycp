@@ -372,33 +372,48 @@ some of them might not work as expected.");
           return (ret == `ok);
   };
 
-  global define boolean YouMessagePopup( map patch, boolean pre )
+  global define boolean YouMessagePopup( list<map> patches, boolean pre )
   ``{
       string message = "";
-      
-      if ( pre ) message = patch[ "preinformation" ]:"";
-      else message = patch[ "postinformation" ]:"";
+      string details = "";
 
-      message = "<pre>" + message + "</pre>";
+      integer i = 0;
+      while ( i < size( patches ) ) {
+
+        map patch = patches[ i ]:$[];
+
+        string name = patch[ "name" ]:"";
+        string summary = patch[ "summary" ]:"";
+
+        string info = "";
+        if ( pre ) info = patch[ "preinformation" ]:"";
+        else info = patch[ "postinformation" ]:"";
+
+        string header = sformat( _("<b>Patch:</b> %1<br>"), name );
+        header = header + sformat( _("<b>Summary:</b> %1<br>"), summary );
+
+        message = message + header;
+        message = message + "<pre>" + info + "</pre>";
+
+        details = details + header;
+
+        list packages = patch[ "packages" ]:[];
+
+        details = details + _("<b>Packages:</b>");
+
+        details = details + "<ul>";
+
+        foreach( string p, packages, ``{ details = details + "<li>" + p + "</li>"; } );
+
+        details = details + "</ul>";
+
+        i = i + 1;
+      }
 
       string detailsStringOn = _("Patch &Details <<");
       string detailsStringOff = _("Patch &Details >>");
 
       term detailsButton = `PushButton( `id( `details ), detailsStringOff );
-
-      string details = sformat( _("<b>Patch:</b> %1<br>"), patch[ "name" ]:"" );
-      
-      details = details + sformat( _("<b>Summary:</b> %1<br>"), patch[ "summary" ]:"" );
-      
-      list packages = patch[ "packages" ]:[];
-
-      details = details + _("<b>Packages:</b>");
-        
-      details = details + "<ul>";
-
-      foreach( string p, packages, ``{ details = details + "<li>" + p + "</li>"; } );
-
-      details = details + "</ul>";
 
       term detailsTerm = 
         `HBox( `HSpacing( 0.5 ),
