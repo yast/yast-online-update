@@ -86,7 +86,7 @@ YCPValue YouAgent::setEnvironment ( YCPMap setMap )
       {
 	  // targetpkg is already initialized wirth targetroot /
 	   YCPPath path = ".targetpkg.dbTargetPath";
-	   
+
 	   YCPValue ret = mainscragent->Write( path,
 					YCPString( rootPath ) );
 
@@ -248,12 +248,12 @@ YCPValue YouAgent::setEnvironment ( YCPMap setMap )
 	  if ( fd >= 0 )
 	  {
 	      YCPParser parser( fd, "/var/lib/YaST2/infomap.ycp" );
-    
-	      parser.setBuffered();  
+
+	      parser.setBuffered();
 	      YCPValue contents = parser.parse();
 
 	      close( fd );
-	      
+
 	      if ( ! contents.isNull() &&
 		   contents->isMap() )
 	      {
@@ -271,19 +271,19 @@ YCPValue YouAgent::setEnvironment ( YCPMap setMap )
 		       dummyValue->isString() )
 		  {
 		      productVersion = dummyValue->asString()->value();
-		  }		  
+		  }
 	      }
 	  }
-	  if ( productVersion != "" 
+	  if ( productVersion != ""
 	       && productName != "" )
 	  {
 	      y2warning( "Taking default entries from infomap.ycp %s / %s",
 			 productName.c_str(), productVersion.c_str() );
-	      
+
 	      // saving into update.inf
-	      ConfigFile updateInf( yastPath + "/update.inf"  );      
+	      ConfigFile updateInf( yastPath + "/update.inf"  );
 	      Entries entriesUpdate;
-	      
+
 	      // Reading old udpate.inf
 	      Values values;
 	      Element element;
@@ -295,7 +295,7 @@ YCPValue YouAgent::setEnvironment ( YCPMap setMap )
 	      entriesUpdate.insert(pair<const string, const Element>
 				   ( NOTARX, element ) );
 	      entriesUpdate.insert(pair<const string, const Element>
-				   ( NOBACKUP, element ) ); 
+				   ( NOBACKUP, element ) );
 	      entriesUpdate.insert(pair<const string, const Element>
 				   ( DEFAULTINSTSRCFTP, element ) );
 	      entriesUpdate.insert(pair<const string, const Element>
@@ -309,9 +309,9 @@ YCPValue YouAgent::setEnvironment ( YCPMap setMap )
 				   ( BASESYSTEM, element ) );
 	      entriesUpdate.insert(pair<const string, const Element>
 				   (DISTRIBUTIONRELEASE , element ) );
-	      
+
 	      updateInf.readFile ( entriesUpdate, ":" );
-	      
+
 	      // changing whitespaces with -
 	      string::size_type productPos = productName.find_first_of ( " " );
 	      while ( productPos != string::npos )
@@ -327,7 +327,7 @@ YCPValue YouAgent::setEnvironment ( YCPMap setMap )
 	      element.multiLine = false;
 	      entriesUpdate.erase( PRODUCTNAME );
 	      entriesUpdate.insert(pair<const string, const Element>
-				   ( PRODUCTNAME, element ) ); 
+				   ( PRODUCTNAME, element ) );
 
 	      // PRODUCTVERSION
 	      values.clear();
@@ -359,7 +359,7 @@ YCPValue YouAgent::setEnvironment ( YCPMap setMap )
 	     productName.c_str(),
 	     productVersion.c_str(),
 	     distributionVersion.c_str() );
-   
+
    if ( ok->value() )
    {
       dummyValue = setMap->value(YCPString(PATCHPATH));
@@ -412,13 +412,13 @@ YCPValue YouAgent::setEnvironment ( YCPMap setMap )
        {
 	   httpProxyUser = ret->asString()->value();
 	   y2debug( "HTTP_PROXY_USER : %s",
-		    httpProxyUser.c_str() );	   
+		    httpProxyUser.c_str() );
        }
 
        YCPPath path = ".http.setProxyUser";
        ret = mainscragent->Execute( path,
 				    YCPString( httpProxyUser ),
-				    YCPString( httpProxyPassword ));       
+				    YCPString( httpProxyPassword ));
    }
 
    if ( ok->value() )
@@ -551,7 +551,7 @@ YCPValue YouAgent::lastUpdateStatus ( void )
    ret->add ( YCPString ( PATCHES ),
 	      patchList );
 
-   
+
    return ret;
 }
 
@@ -564,7 +564,7 @@ YCPValue YouAgent::setServer ( YCPMap setMap )
 {
    YCPBoolean ret ( true );
    YCPValue dummyValue = YCPVoid();
-   
+
    y2debug( "CALLING setServer" );
 
    dummyValue = setMap->value(YCPString(NAME));
@@ -617,13 +617,13 @@ YCPValue YouAgent::setServer ( YCPMap setMap )
    {
       serverKind = NO;
    }
-   
+
    if ( serverKind == NO )
    {
        y2error("Serverkind  not recognized" );
        ret = false;
-   }   
-   
+   }
+
    return ret;
 }
 
@@ -642,11 +642,11 @@ YCPValue YouAgent::connect ( )
 
    if ( serverKind == NO )
    {
-      return YCPError( "missing call setServer()", YCPVoid());      
+      return YCPError( "missing call setServer()", YCPVoid());
    }
 
    localSourcePath = "";
-   
+
    if ( serverKind == CD
 	|| serverKind == NFS )
    {
@@ -659,7 +659,7 @@ YCPValue YouAgent::connect ( )
 
 	   if ( serverKind == CD )
 	   {
-	       source = "/dev/";	   
+	       source = "/dev/";
 	       if ( sourcePath != "" )
 	       {
 		   source = source + sourcePath;
@@ -679,7 +679,7 @@ YCPValue YouAgent::connect ( )
 	   param->add( YCPString( source ) );
 	   param->add( YCPString( "/var/adm/mount" ) );
 	   param->add( YCPString( "/var/log/y2mountlog") );
-	   
+
 	   YCPValue ret = mainscragent->Execute( path, param );
 
 	   if ( ret->isBoolean() )	// success
@@ -688,7 +688,7 @@ YCPValue YouAgent::connect ( )
 	       {
 		   y2milestone( "%s to /var/adm/mount mounted",
 				source.c_str () );
-		   localSourcePath = "/var/adm/mount";		   
+		   localSourcePath = "/var/adm/mount";
 	       }
 	       else
 	       {
@@ -734,7 +734,7 @@ YCPValue YouAgent::connect ( )
 	       value->add( YCPString ( SERVER ), YCPString( server ));
 	       value->add( YCPString ( PROXY ), YCPString( proxy ));
 	       value->add( YCPString ( TIMEOUT ), YCPInteger(1));
-	   
+
 	       ret = mainscragent->Execute( path, value );
 
 	       if ( ret->isMap() )	// success ??
@@ -777,7 +777,7 @@ YCPValue YouAgent::connect ( )
 
 	       value->add( YCPString ( SERVER ), YCPString( server ));
 	       value->add( YCPString ( TIMEOUT ), YCPInteger(5));
-	   
+
 	       ret = mainscragent->Execute( path, value );
 
 	       if ( ret->isMap() )	// success ??
@@ -810,7 +810,7 @@ YCPValue YouAgent::connect ( )
 	       {
 		   y2error("<.ftp.connect_to> System agent returned nil.");
 		   ok = false;
-	       }	       
+	       }
 	   }
        }
        else
@@ -821,8 +821,8 @@ YCPValue YouAgent::connect ( )
    }
    else if ( serverKind == HD )
    {
-      localSourcePath = sourcePath;       
-   }   
+      localSourcePath = sourcePath;
+   }
 
    ret->add ( YCPString ( MESSAGE ), YCPString( message ));
    ret->add ( YCPString ( OK ), YCPBoolean ( ok ) );
@@ -843,10 +843,10 @@ YCPValue YouAgent::disconnect ( )
    string message = "Disconnected";
 
    y2debug( "CALLING Disconnect" );
-   
+
    if ( serverKind == NO )
    {
-      return YCPError( "missing call setServer()", YCPVoid());             
+      return YCPError( "missing call setServer()", YCPVoid());
    }
 
    if ( serverKind == CD
@@ -856,7 +856,7 @@ YCPValue YouAgent::disconnect ( )
        if ( mainscragent )
        {
 	   YCPPath path = ".target.umount";
-	   
+
 	   YCPValue ret = mainscragent->Execute( path,
 					YCPString( "/var/adm/mount" ) );
 
@@ -964,12 +964,12 @@ YCPValue YouAgent::getPatchList (  )
    {
       return YCPError( "missing call setServer()", YCPVoid());
    }
-   
+
    if ( !mainscragent )
    {
-      return YCPError( "No system agent installed", YCPVoid());       
+      return YCPError( "No system agent installed", YCPVoid());
    }
-   
+
    if ( serverKind == CD
 	|| serverKind == HD
 	|| serverKind == NFS )
@@ -979,17 +979,17 @@ YCPValue YouAgent::getPatchList (  )
       if ( ok && dirList->size() <= 0 )
       {
 	  // Reading Dirlist
-	  counter = 1;	  
+	  counter = 1;
 	  if ( localSourcePath.size() > 0 )
 	  {
 	      string source = localSourcePath + PATCH;
 	      bool found = false;
 
-	      // check directory 
+	      // check directory
 	      YCPPath path = ".target.dir";
 	      YCPString value ( source );
 	      YCPValue ret = mainscragent->Read( path, value );
-	 
+
 	      if ( !ret.isNull() && !ret->isVoid() )	// success
 	      {
 		  y2debug( "*** Path %s found",  source.c_str() );
@@ -999,10 +999,10 @@ YCPValue YouAgent::getPatchList (  )
 	      {
 		  y2error("<.target.dir> System agent returned nil.");
 	      }
-	 
+
 	      if ( !found )
 	      {
-		  // Checking other pathes
+		  // Checking other paths
 		  if ( isBusiness() )
 		  {
 		      source = localSourcePath + "/" +
@@ -1018,7 +1018,7 @@ YCPValue YouAgent::getPatchList (  )
 			  "/update/" +
 			  distributionVersion + PATCH;
 		  }
-	     
+
 		  value = YCPString( source );
 		  ret = mainscragent->Read( path, value );
 
@@ -1032,20 +1032,20 @@ YCPValue YouAgent::getPatchList (  )
 		      y2error("<.target.dir> System agent returned nil.");
 		  }
 	      }
-	 
+
 	      if ( found
 		   && ret->isList() )
 	      {
 		  // path found
 		  dirList = ret->asList();
 		  posDirList = 0;
-		  progress = 10;		     
+		  progress = 10;
 	      }
 	      else
 	      {
 		  ok = cont = false;
-		  message = "No SuSE-patch-CD or SuSE path found.";		  
-	      }		 
+		  message = "No SuSE-patch-CD or SuSE path found.";
+	      }
 	  }
 	  else
 	  {
@@ -1058,7 +1058,7 @@ YCPValue YouAgent::getPatchList (  )
       else
       {
 	  // Reading each patch description
-	  string patchname = ".";	  
+	  string patchname = ".";
 	  YCPValue dummyValue = dirList->value(posDirList++);
 	  if ( !dummyValue.isNull() && dummyValue->isString() )
 	  {
@@ -1079,7 +1079,7 @@ YCPValue YouAgent::getPatchList (  )
 	      YCPValue ret = mainscragent->Execute( path, value );
 
 	      if ( ret->isInteger()
-		   && ret->asInteger()->value() != 0 )	
+		   && ret->asInteger()->value() != 0 )
 	      {
 		  // does not exist --> fetch it from the local-source
 		  time_t     currentTime  = time( 0 );
@@ -1090,7 +1090,7 @@ YCPValue YouAgent::getPatchList (  )
 			    currentLocalTime->tm_year+1900,
 			    currentLocalTime->tm_mon+1,
 			    currentLocalTime->tm_mday );
-		      
+
 		  string command = "/bin/cp ";
 
 		  command += localSourcePath + "/" +
@@ -1116,24 +1116,24 @@ YCPValue YouAgent::getPatchList (  )
 			      patchname;
 			  checkpatch = destPatchPath + PATCH + "/" +
 			      patchname +
-			      "." + date + ".new";		
+			      "." + date + ".new";
 		      }
 		      else
 		      {
 			  y2error( "%s", command.c_str() );
 			  ok = false;
-			  message = "Could not copy patch-information";	
+			  message = "Could not copy patch-information";
 		      }
 		  }
 		  else
 		  {
 		      y2error("<.target.bash> System agent returned nil.");
 		      ok = false;
-		      message = "Could not copy patch-information";	
-		  }		      
+		      message = "Could not copy patch-information";
+		  }
 	      }
 	  }
-	  
+
 	  // setting progress-bar
 	  float prog = counter;
 	  progress = (int) (prog / dirList->size() * 100 +10);
@@ -1170,7 +1170,7 @@ YCPValue YouAgent::getPatchList (  )
 		     distributionVersion +
 		     PATCH;
 	     }
-	     
+
 	     YCPPath path = ".ftp.cd";
 	     YCPString value ( source );
 	     YCPValue ret = mainscragent->Execute( path, value );
@@ -1204,7 +1204,7 @@ YCPValue YouAgent::getPatchList (  )
 	     {
 		 // try direct path
 		 value = YCPString ( PATCH );
-		 
+
 		 YCPValue ret = mainscragent->Execute( path, value );
 		 if ( ret->isMap() )	// success
 		 {
@@ -1242,19 +1242,19 @@ YCPValue YouAgent::getPatchList (  )
 		 YCPPath path = ".ftp.getDirectory";
 		 YCPString value ( "" );
 		 YCPValue ret = mainscragent->Execute( path, value );
-		 
+
 		 if ( ret->isList() )	// success
 		 {
 		     dirList = ret->asList();
 		     posDirList = 0;
-		     progress = 10;		     
+		     progress = 10;
 		 }
 		 else
 		 {
 		     y2error("<.ftp.getDirectory> System agent returned nil.");
 		     ok = cont = false;
-		     message = "Cannot read directory";		     
-		 }		 
+		     message = "Cannot read directory";
+		 }
 	     }
 	 }
 	 else
@@ -1270,15 +1270,15 @@ YCPValue YouAgent::getPatchList (  )
 		     productVersion + PATCH + "/" + DIRECTORY;
 		 patchDirectory = HTTPADRESS + server + "/" + sourcePath + "/"+
 		     architecture + "/update/" + productName + "/" +
-		     productVersion + PATCH;		 
+		     productVersion + PATCH;
 	     }
 	     else
 	     {
 		 sourcefile = HTTPADRESS + server + "/" + sourcePath + "/"+
-		     architecture + "/update/" + 
+		     architecture + "/update/" +
 		     distributionVersion + PATCH + "/" + DIRECTORY;
 		 patchDirectory = HTTPADRESS + server + "/" + sourcePath + "/"+
-		     architecture + "/update/" + 
+		     architecture + "/update/" +
 		     distributionVersion + PATCH;
 	     }
 
@@ -1307,9 +1307,9 @@ YCPValue YouAgent::getPatchList (  )
 	     {
 		 y2error("<.http.getFile> System agent returned nil.");
 		 ok = false;
-		 message = "ERROR with wget";		 
+		 message = "ERROR with wget";
 	     }
-	     
+
 	     if ( !ok )
 	     {
 		 // trying not SuSE path
@@ -1350,7 +1350,7 @@ YCPValue YouAgent::getPatchList (  )
 		 {
 		     y2error("<.http.getFile> System agent returned nil.");
 		     ok = false;
-		     message = "ERROR with wget";		 
+		     message = "ERROR with wget";
 		 }
 	     }
 	     else
@@ -1383,15 +1383,15 @@ YCPValue YouAgent::getPatchList (  )
 			     {
 				 buffer[ strlen( buffer )-1 ] = 0;
 			     }
-			     
+
 			     dirList->add ( YCPString(  buffer ) );
 			 }
 		     } while ( file.good() );
 		 }
-     
+
 		 posDirList = 0;
 		 progress = 10;
-	     }	     	     
+	     }
 	 }
       }
       else if ( ok )
@@ -1442,7 +1442,7 @@ YCPValue YouAgent::getPatchList (  )
 									   "/" +
 									   patchname +
 									   "." + date + ".new"));
-			   
+
 			  if ( ret->isBoolean() )	// success
 			  {
 			      if (  !(ret->asBoolean()->value()) )
@@ -1468,7 +1468,7 @@ YCPValue YouAgent::getPatchList (  )
 				      "returned nil for %s.",
 				      patchname.c_str() );
 			      cont = ok = false;
-			      message = "Cannot get " + patchname;	
+			      message = "Cannot get " + patchname;
 			  }
 		      }
 		      else
@@ -1491,28 +1491,28 @@ YCPValue YouAgent::getPatchList (  )
 			  {
 			      YCPMap retMap = ret->asMap();
 			      YCPValue dummyValue = YCPVoid();
-			      
+
 			      dummyValue = retMap->value(YCPString(OK));
 			      if ( !dummyValue.isNull()
 				   && dummyValue->isBoolean()
 				   && dummyValue->asBoolean()->value() == false )
-			      {	
+			      {
 				  dummyValue = retMap->value(YCPString(MESSAGE));
 				  if ( !dummyValue.isNull()
 				       && dummyValue->isString()	)
 				  {
 				      message = dummyValue->asString()->value();
 				  }
-				  ok = cont =false;			      
+				  ok = cont =false;
 			      }
 			  }
 			  else
 			  {
 			      y2error("<.target.size> System agent returned nil.");
 			      ok = cont =false;
-			      message = "ERROR with wget";		 
+			      message = "ERROR with wget";
 			  }
-		      
+
 			  if ( ok )
 			  {
 			      message = sourcefile;
@@ -1537,7 +1537,7 @@ YCPValue YouAgent::getPatchList (  )
        cont = false;
        progress = 100;
        dirList= YCPList();
-	    
+
        // rereading patchinfo
        if ( currentPatchInfo != NULL )
        {
@@ -1545,12 +1545,12 @@ YCPValue YouAgent::getPatchList (  )
 	   currentPatchInfo = NULL;
        }
 
-       currentPatchInfo = new  PatchInfo ( destPatchPath + PATCH, language);	    
+       currentPatchInfo = new  PatchInfo ( destPatchPath + PATCH, language);
    }
 
    ret->add ( YCPString ( OK ), YCPBoolean ( ok ) );
    ret->add ( YCPString ( MESSAGE ), YCPString( message ) );
-   ret->add ( YCPString ( CHECKPATCH ), YCPString( checkpatch ) );   
+   ret->add ( YCPString ( CHECKPATCH ), YCPString( checkpatch ) );
    ret->add ( YCPString ( CONTINUE ), YCPBoolean( cont ) );
    ret->add ( YCPString ( PROGRESS ), YCPInteger ( progress ) );
 
