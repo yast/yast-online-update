@@ -2,7 +2,7 @@
 Wed Feb 26 15:57:41 CET 2003 - arvin@suse.de
 
 - fixed starting and stopping of internet connection for
-  online update run during installation
+  online update run during installation (bug #24354)
 
 -------------------------------------------------------------------
 Wed Feb 26 15:19:33 CET 2003 - cschum@suse.de
