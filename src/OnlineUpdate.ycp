@@ -35,7 +35,7 @@ global boolean you_auto_install = false;
 /**
  * flag: Automatic Update
  */
-global boolean you_auto	= true;
+global boolean you_auto	= false;
 
 /**
  * flag: Continue mode?

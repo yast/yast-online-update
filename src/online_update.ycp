@@ -24,11 +24,6 @@
 
   string version = Version::yast2;
 
-  Wizard::CreateDialog();
-
-  // show the special YOU image
-  Wizard::SetImage( Read (.local.byte, Directory::imagedir + "/online_update_long.png") );
-
   // dummy message, which will be used in the future, but have to be
   // translated into other languages.
   string d1 = _("Dialing....");
@@ -90,6 +85,7 @@ packages were created by SuSE.
           if ( arg_n + 1 < arg_max ) {
               OnlineUpdate::you_url = WFM::Args( arg_n + 1 );
           }
+          arg_n = arg_n + 1;
       }
       else
       {
@@ -101,7 +97,35 @@ packages were created by SuSE.
       arg_n = arg_n + 1;
   }
 
+  if ( OnlineUpdate::you_auto ) {
+    string command = "online_update";
+    if ( size( OnlineUpdate::you_url ) != 0 ) {
+      command = command + " -u " + OnlineUpdate::you_url;
+    }
+    if ( !OnlineUpdate::signature_check ) {
+      command = command + " -n";
+    }
+    if ( OnlineUpdate::you_auto_get ) {
+      command = command + " -g";
+    }
+    if ( OnlineUpdate::you_auto_install ) {
+      command = command + " -i";
+    }
+    command = command + " " + OnlineUpdate::you_auto_batchkind;
+    
+    y2debug( "COMMAND: %1", command );
+    
+    integer result = SCR::Execute( .target.bash, command );
+
+    return result;
+  }
+
   y2debug("ONLINE: Testmode %1", Mode::test );
+
+  Wizard::CreateDialog();
+
+  // show the special YOU image
+  Wizard::SetImage( Read (.local.byte, Directory::imagedir + "/online_update_long.png") );
 
 UI(``{
 
