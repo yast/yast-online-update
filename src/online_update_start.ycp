@@ -397,8 +397,9 @@ Can't load patch information.\n");
       else if ( ret == `expert )
       {
           string url = getUrl( "" );
-
-          UI::ChangeWidget( `id(`you), `Value, url );
+          if ( size( url ) > 0 ) {
+            UI::ChangeWidget( `id(`you), `Value, url );
+          }
       }
       else if ( ret == `automatic ) {
           SetupAutomatic();
