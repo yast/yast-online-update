@@ -22,10 +22,8 @@
   textdomain "online_update";
   
   import "Installation";
-  
-  string version = Installation::version;
-
   import "Wizard";
+
   include "ui/common_popups.ycp";
   include "ui/common_functions.ycp";
   include "ui/common_messages.ycp";
@@ -99,7 +97,6 @@ packages were created by SuSE.
   }
   user_settings = add( user_settings, "test_mode", test_mode );
   y2debug("ONLINE: Testmode %1", test_mode );
-  y2debug("ONLINE: YaST2-version %1", version );  
 
   
 UI(``{
