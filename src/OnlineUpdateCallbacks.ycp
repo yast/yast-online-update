@@ -17,13 +17,11 @@
     */
     global define boolean ProgressCallback( integer num )
     ``{
-        y2milestone("ProgressCallback %1", num);
+//        y2milestone("ProgressCallback %1", num);
 
         UI::ChangeWidget( `id( `progress ), `Value, num );
 
         symbol ret = UI::PollInput();
-
-        y2error( "PollInput: %1", ret );
 
         if ( ret == `abort ) {
             return false;
@@ -37,13 +35,11 @@
     */
     global define boolean PatchProgressCallback( integer num, string pkg )
     ``{
-        y2milestone("PatchProgressCallback %1", num);
+//        y2milestone("PatchProgressCallback %1", num);
 
         UI::ChangeWidget( `id( `patchprogress ), `Value, num );
 
         symbol ret = UI::PollInput();
-
-        y2error( "PollInput: %1", ret );
 
         if ( ret == `abort ) {
             return false;
@@ -58,6 +54,7 @@
     global define void OnlineUpdateCallbacks()
     ``{
 	y2milestone ( "OnlineUpdateCallbacks constructor" );
+
 	Pkg::CallbackYouProgress ("OnlineUpdateCallbacks::ProgressCallback");
 	Pkg::CallbackYouPatchProgress ("OnlineUpdateCallbacks::PatchProgressCallback");
     }

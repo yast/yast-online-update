@@ -172,6 +172,8 @@ UI(``{
                 showDetails = !showDetails;
             }
         }
+        
+        CloseDialog();
     }
 
     //  ConfirmAbortUpdate has same layout as/but different text than ConfirmAbort

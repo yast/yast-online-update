@@ -263,7 +263,9 @@ another FTP or HTTP server.</p>
 
           if ( size( err ) != 0 ) {
             if ( err == "abort" ) ret = `this;
+
             string msg = "";
+            string details = Pkg::ErrorDetails();
             if ( err == "media" ) {
               if ( cd_update ) {
                 msg = _("Initialization failed. Please check that
@@ -274,16 +276,17 @@ If failure continues, choose
 another SuSE FTP/HTTP server.\n");
               }
             } else if ( err == "sig" ) {
-                UI::ErrorPopup(_("Signature check for patch info files failed.
-Can't load patch information.\n"));
+                msg = _("Signature check for patch info files failed.
+Can't load patch information.\n");
                 ret = `this;
             } else if ( err == "url" ) {
                 msg = _("URL is invalid.");
             } else {
-                msg =  _("Getting patch information failed.");
+                msg = _("Getting patch information failed.");
+                details = Pkg::Error();
             }
             
-            UI::YouErrorPopup( msg, Pkg::ErrorDetails() );
+            UI::YouErrorPopup( msg, details );
             ret = `this;
           } else {
             Pkg::YouSelectPatches();
