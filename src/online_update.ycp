@@ -150,8 +150,6 @@ UI(``{
     global define YouErrorPopupGeneric( string message, string details,
                                         symbol type ) ``{
 
-        y2milestone( "tick %1", type );
-
         if ( size( details ) == 0 ) details = _("No details available.");
 
         string detailsStringOn = _("&Details <<");
@@ -168,21 +166,17 @@ UI(``{
                         `PushButton( `id( `abort ), _("Abort Update") )
                     );
         } else if ( type == `ignore ) {
-          y2milestone( "tick 1 %1", type );
           buttons = `HBox(
                         detailsButton,
                         `PushButton( `id( `ok ), IgnoreButtonLabel() ),
                         `PushButton( `id( `abort ), _("Abort Update") )
                     );
         } else {
-          y2milestone( "tick 2 %1", type );
           buttons = `HBox(
                         detailsButton,
                         `PushButton( `id( `ok ), OKButtonLabel() )
                     );
         }
-
-        y2milestone( "tick tick %1", type );
 
         OpenDialog( `opt( `decorated ),
             `VBox(
