@@ -223,7 +223,7 @@ the update takes place.");
       `HBox(
           `HWeight(1, `Empty()),
           `HWeight(10,
-              `Frame ( _("System &information"),
+              `Frame ( _("System &Information"),
                   `VBox(
                       `VSpacing(0.3),
                       `HBox(`HSpacing(0.8),
@@ -286,8 +286,8 @@ the update takes place.");
   string help_text = "";
 
   // helptext dialog online update start screen
-  string help_part1 =  _("<p>SuSE Online Update is the easy way to get all recommended
-patches and security fixes from a SuSE ftp/http server.
+  string help_part1 =  _("<p>YaST Online Update (YOU) is the easy way to get all recommended
+patches and security fixes from a SuSE update server.
 </p>
 ");
 
@@ -311,7 +311,7 @@ without the need of user interaction.</p>");
 
   help_text = help_part1 + help_part2 + help_part3 + help_part4;
 
-  Wizard::SetContents(_("Welcome to SuSE Package Update"), contents, help_text, WFM::Args(0), WFM::Args(1) );
+  Wizard::SetContents(_("Welcome to YaST Online Update"), contents, help_text, WFM::Args(0), WFM::Args(1) );
 
   Wizard::ReplaceAbortButton( `PushButton(`id(`abort), _("&Abort Update")));
 

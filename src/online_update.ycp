@@ -215,9 +215,7 @@ UI(``{
 	  if ( how_to == `painless )
 	  {
 	      // Warning text for aborting the update before a patch is installed
-	      what_will_happen = _("If you abort the installation now,
-no patch will be installed.
-An existing connection to the FTP/HTTP server will be closed.
+	      what_will_happen = _("If you abort the installation now, no patch will be installed.
 Your installation will remain untouched.
 ");
 	  }
@@ -259,7 +257,7 @@ some of them might not work as expected.");
 					  `HSquash(
 						   `VBox(
 							 // Confirm user request to abort installation
-							 `Left( `Label( _("Really abort Package Update?") ) ),
+							 `Left( `Label( _("Really abort YaST Online Update?") ) ),
 							 `Left( `Label( what_will_happen ) )
 							 )
 						   )

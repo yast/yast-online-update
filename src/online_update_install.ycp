@@ -137,9 +137,9 @@
     
   string help_text = "";
 
-  string help_part1 =  _("<p>After connecting to SuSE server,
+  string help_part1 =  _("<p>After connecting to the SuSE update server,
 YaST2 will download all selected patches.
-This could take some time. Several details are shown.</p>");
+This could take some time. Download details are shown in the log window.</p>");
 
   string help_part2 =  _("<p>When the download succesfully was finished, the
 patches will be installed. The progress is shown in the log window. If there
