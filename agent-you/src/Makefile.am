@@ -2,9 +2,6 @@
 # Makefile.am for y2a_you/src
 #
 
-plugindir = $(YAST2DIR)/plugin
-libdir = $(YAST2DIR)/lib
-
 plugin_LTLIBRARIES = libpy2ag_you.la
 lib_LTLIBRARIES = liby2ag_you.la
 
@@ -23,7 +20,6 @@ libpy2ag_you_la_LDFLAGS = -version-info 2:0
 libpy2ag_you_la_LIBADD =			\
 	-lpkg
 liby2ag_you_la_LIBADD = $(libpy2ag_you_la_LIBADD)
-
 
 INCLUDES = -I$(includedir)
 

@@ -4,9 +4,6 @@
 
 AUTOMAKE_OPTIONS = dejagnu
 
-plugindir = $(YAST2DIR)/plugin
-libdir = $(YAST2DIR)/lib
-
 INCLUDES = -I$(includedir)
 
 noinst_PROGRAMS = runyou

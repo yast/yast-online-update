@@ -18,3 +18,4 @@ install-sh
 mkinstalldirs
 missing
 depcomp
+configure.in
