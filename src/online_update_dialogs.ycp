@@ -9,7 +9,8 @@
 
   import "Label";
   import "Popup";
-
+  import "AutoOnlineUpdate";
+  import "Mode";
 
   global define symbol SetupAutomatic() ``{
 
