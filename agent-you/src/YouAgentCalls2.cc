@@ -1245,10 +1245,12 @@ YCPValue YouAgent::getPackages ( const YCPString patchName )
 		       y2error("<.targetpkg.info.version> System agent returned nil.");
 		   }
 		   
-		   if (  rpmVersion != ""
-			 && CompVersion ( version, rpmVersion ) == V_NEWER )
+		   if (  rpmVersion != "" )
 		   {
-		       packageInstall = true;
+		       if ( CompVersion ( version, rpmVersion ) == V_NEWER )
+		       {
+			   packageInstall = true;
+		       }
 		   }
 		   else
 		   {
