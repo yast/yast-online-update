@@ -142,8 +142,16 @@
       if ( SCR::Execute(.target.bash, command) != 0  )
       {
 	  y2error("command: %1", command);
-	  SCR::Execute(.target.bash,
-			"/bin/cp /etc/suseservers.bak /etc/suseservers" );
+	  if ( SCR::Read(.you.isBusiness) )
+	  {
+	      UI::ErrorPopup(_("Cannot connect to www.suse.de. Please check connection."));
+	      return  `abort;
+	  }
+	  else
+	  {
+	      SCR::Execute(.target.bash,
+			   "/bin/cp /etc/suseservers.bak /etc/suseservers" );
+	  }
       }
       else
       {
