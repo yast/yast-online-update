@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Sep 11 17:06:23 CEST 2002 - cschum@suse.de
+
+- Fixed problem of vanishing Expert button when there are long
+  URLs in the combo box. 
+
+-------------------------------------------------------------------
 Tue Sep 10 17:38:42 CEST 2002 - cschum@suse.de
 
 - Added correct status and error messages for Patch CD update.
