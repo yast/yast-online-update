@@ -26,6 +26,7 @@ Summary:	YaST2 online update
 /etc/suseservers
 @configdir@/online_update.y2cc
 @configdir@/cd_update.y2cc
+%dir @yncludedir@/onlineupdate
 @yncludedir@/onlineupdate/suseservers.ycp
 @scrconfdir@/*.scr
 @clientdir@/online*.ycp
