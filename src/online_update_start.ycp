@@ -54,7 +54,7 @@
                               `PushButton(`id(`clear), _("&Clear Inputs")),
                               `VSpacing(0.2),
 			      `HBox(`PushButton(`id(`login), `opt(`default), _("&Login") ),
-				    `PushButton(`id(`abort), CancelButtonLabel() )
+				    `PushButton(`id(`abort), Label::CancelButton() )
 				    ),
 			      `VSpacing(0.2)
 
@@ -99,7 +99,7 @@
         `VSpacing( 0.2 ),
         `ProgressBar( `id( `progress ), _("Retrieving information about new updates...") ),
         `VSpacing( 0.2 ),
-        `PushButton( `id( `abort ), AbortButtonLabel() ),
+        `PushButton( `id( `abort ), Label::AbortButton() ),
         `VSpacing( 0.2 )
       )
     );
@@ -233,8 +233,8 @@ the update takes place.");
         `VSpacing( 0.2 ),
         
         `HBox(
-          `PushButton( `id( `ok ), OKButtonLabel() ),
-          `PushButton( `id( `cancel ), CancelButtonLabel() )
+          `PushButton( `id( `ok ), Label::OKButton() ),
+          `PushButton( `id( `cancel ), Label::CancelButton() )
         )
       )
     );
@@ -334,7 +334,7 @@ the update takes place.");
   }
 
   if ( size( you_server_list ) == 0 ) {
-    UI::WarningPopup( _("No YOU server available.") );
+    Popup::Warning( _("No YOU server available.") );
   }
 
   UI::CloseDialog();

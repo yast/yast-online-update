@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Sep  1 17:16:04 CEST 2003 - cschum@suse.de
+
+- Use Label and Popup modules instead of common_messages.ycp and
+  common_popups.ycp. Fixes #29687.
+
+-------------------------------------------------------------------
 Tue Aug 20 10:55:04 CEST 2003 - cschum@suse.de
 
 - Close FTP connection after download (#28040).

@@ -78,7 +78,7 @@
       } else {
         buttons = `HBox(
                       detailsButton,
-                      `PushButton( `id( `ok ), OKButtonLabel() )
+                      `PushButton( `id( `ok ), Label::OKButton() )
                   );
       }
 
@@ -176,7 +176,7 @@ data is no longer needed. To delete this data, activate
   // using SetContents (define in online_update.ycp)
   Wizard::SetContents(_("Patch Download and Installation"), contents, help_text, WFM::Args(0), WFM::Args(1) );
 
-  Wizard::ReplaceNextButton( `PushButton( `id( `next ), FinishButtonLabel() ) );
+  Wizard::ReplaceNextButton( `PushButton( `id( `next ), Label::FinishButton() ) );
 
   UI::ChangeWidget(`id(`back), `Enabled, false );
   UI::ChangeWidget(`id(`next), `Enabled, false );
@@ -267,7 +267,7 @@ abort the update?
     y2milestone("Download finished.");
 
     if ( stop ) {
-      UI::ErrorPopup( _("Download failed.") );
+      Popup::Error( _("Download failed.") );
     } else {
     
       patch =  Pkg::YouFirstPatch( false );
@@ -363,7 +363,7 @@ the update?
         UI::ChangeWidget( `id(`log), `LastLine, msg );
 
         if ( stop ) {
-          UI::ErrorPopup( _("Installation failed.") );
+          Popup::Error( _("Installation failed.") );
         } else {
           Pkg::YouFinish();
         }
@@ -377,7 +377,7 @@ the update?
 
   if ( installedPatches == 0 ) {
     Wizard::DisableAbortButton();
-    Wizard::ReplaceNextButton( `PushButton( `id( `next ), CloseButtonLabel() ) );
+    Wizard::ReplaceNextButton( `PushButton( `id( `next ), Label::CloseButton() ) );
     UI::ChangeWidget( `id( `patchprogress ), `Value, 100 );
     UI::ChangeWidget( `id( `progress ), `Value, 100 );
   }

@@ -21,9 +21,9 @@
 
   import "OnlineUpdateCallbacks";
   
-  include "ui/common_popups.ycp";
+  import "Popup";
   include "ui/common_functions.ycp";
-  include "ui/common_messages.ycp";
+  import "Label";
 
   string version = Version::yast2;
 
@@ -169,13 +169,13 @@ UI(``{
         } else if ( type == `ignore ) {
           buttons = `HBox(
                         detailsButton,
-                        `PushButton( `id( `ok ), IgnoreButtonLabel() ),
+                        `PushButton( `id( `ok ), Label::IgnoreButton() ),
                         `PushButton( `id( `abort ), _("Abort Update") )
                     );
         } else {
           buttons = `HBox(
                         detailsButton,
-                        `PushButton( `id( `ok ), OKButtonLabel() )
+                        `PushButton( `id( `ok ), Label::OKButton() )
                     );
         }
 
@@ -363,7 +363,7 @@ some of them might not work as expected.");
       y2debug( "ONLINE: Module: %1 Mode: %2", module_name, module_mode );
 
       if ( id == size( dialog ) - 1 ) {
-          UI::ChangeWidget(`id(`next), `Label,  FinishButtonLabel() );
+          UI::ChangeWidget(`id(`next), `Label, Label::FinishButton() );
       }
 
       if ( !OnlineUpdate::you_auto )
