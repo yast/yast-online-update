@@ -133,8 +133,8 @@ available for download on SuSE ftp server.<br>"));
     // and will always be english text.
     string help_part1 = UI(_("Mode \"recommended\" means you should install the patch.
 \"security\" is a security patch and it is highly recommended to install it.
-\"YaST2\" patches are always installed first, other patches are only fetched
-and must be installed on a second run.
+\"YaST2\" patches will be always installed first, other patches will be only
+downloaded and must be installed on a second run.
 </p>"));
     
     string help_part2 =  UI(_("<p>Meaning of the status flags:</p>
