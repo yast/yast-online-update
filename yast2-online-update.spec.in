@@ -33,7 +33,6 @@ PreReq:    	%fillup_prereq
 @configdir@/online_update.y2cc
 @configdir@/cd_update.y2cc
 %dir @yncludedir@/onlineupdate
-@yncludedir@/onlineupdate/suseservers.ycp
 @scrconfdir@/*.scr
 @clientdir@/online*.ycp
 @moduledir@/OnlineUpdate.ycp
