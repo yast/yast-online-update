@@ -1,0 +1,18 @@
+.etc.suseservers
+
+`ag_anyagent(
+  Description (
+    ``(File("/etc/suseservers")),	// real file name
+    "#\n",				// Comment
+    false,				// read-only
+    ``(List (
+      Tuple (
+	`type (String("^:")), ":",
+	Separator ("/"),
+	`server (String ("^/")),
+	`path (String ("^\n"))
+      ),
+      "\n"
+    ))
+  )
+)
