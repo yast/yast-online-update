@@ -62,7 +62,8 @@
 			    `VSpacing(0.5)
 			    )
 		      ),
-	      `VSpacing( 0.2 )
+	      `VSpacing( 0.5 ),
+	      `Left(`CheckBox(`id(`remove_packages),_("Remove source-packages after update."), false))
 	      );
     
     string help_text = "";
@@ -139,8 +140,20 @@ patches could not be installed.
 	    
 	    ret = `again;
 	}
-
-	
+	if ( ret == `next && UI(`QueryWidget(`id(`remove_packages),`Value ) ) )
+	{
+	    y2debug( "Removing old rpm-packages" );	    
+	    // removing rpm s
+	    index = 0;
+	    while (index < size(patch_list) )
+	    {
+		if ( select(patch_list, index+4) == "installed" )
+		{
+		    PKGINFO(`ftpDeletePackages(select(patch_list, index)) );
+		}
+		index = index+5;
+	    };
+	}
 
     } until (ret == `next || ret == `back || ret == `abort || ret == `again );
 
