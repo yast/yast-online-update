@@ -47,8 +47,8 @@ make install
 
 /var/adm/fillup-templates/rc.config.y2c_online_update
 /etc/suseservers
-@YAST2DIR@/menuentries/menuentry_online_update.ycp
-@YAST2DIR@/menuentries/menuentry_cd_update.ycp
+@YAST2DIR@/menuentries/menuentry_online_update.y2cc
+@YAST2DIR@/menuentries/menuentry_cd_update.y2cc
 @YAST2DIR@/include/suseservers.ycp
 @YAST2DIR@/scrconf/etc_suseservers.scr
 @YAST2DIR@/clients/online_update.ycp
