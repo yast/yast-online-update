@@ -256,7 +256,7 @@ global define string Summary()
 
     summary = Summary::AddHeader(summary, _("Only Download Patches"));
     summary = Summary::AddLine(summary, autoget ? _("Yes") : _("No") );
-    summary = Summary::AddHeader(summary, _("Skip packages with pre-install information?"));
+    summary = Summary::AddHeader(summary, _("Skip packages with preinstall information?"));
     summary = Summary::AddLine(summary, skipPre ? _("Yes") : _("No") );
 
     return summary;

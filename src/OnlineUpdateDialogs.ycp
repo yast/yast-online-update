@@ -127,7 +127,7 @@ the update takes place.");
 						        `Left(`CheckBox( `id( `autoget ), _("Only Download Patches"), autoget )),
         						`HSpacing( 0.8 )),
                                                   `HBox(`HSpacing( 0.8 ),
-                                                        `Left(`CheckBox( `id( `skipPre), _("Skip patches with pre-install information"), skipPre)),
+                                                        `Left(`CheckBox( `id( `skipPre), _("Skip Patches with Preinstall Information"), skipPre)),
 						        `HSpacing( 0.8 ))
 						  ),
 					    `VSpacing( 0.5 )
