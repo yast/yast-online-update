@@ -292,6 +292,20 @@ If failure continues, please choose
 another SuSE ftp server.")));
 		    ret = `again;
 		}
+		
+		// getting ftp-server-description from www.suse.de
+		string command = "/usr/bin/wget -q --output-document="+
+		    SCR(`Read(.target.root))+
+		    "/etc/suseservers --tries=3 --wait=5 http://www.suse.de/de/support/download/suseservers.txt &";
+		if ( Shell( command ) != 0 )      
+		{
+		    y2error("command: %1", command);	
+		}
+		else
+		{
+		    y2milestone("command %1 ok", command);
+		}
+		
 	    }
 	    else
 	    {
