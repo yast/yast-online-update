@@ -1278,8 +1278,8 @@ YCPValue YouAgent::getPackages ( const YCPString patchName )
 		    && serie != SCRIPT )
 	       {
 		   // only packages will be returned ( no scripts )
-		   string compString = "ftp://";
-		   if ( instPath.substr ( 0, 6 ) == compString   )
+		   if ( instPath.substr ( 0, strlen( FTPADRESS ) ) == FTPADRESS
+			|| instPath.substr ( 0, strlen( HTTPADRESS ) ) == HTTPADRESS )
 		   {
 		       // rpm has been token from another server and has been stored
 		       // under others/<rpm>
@@ -1292,6 +1292,7 @@ YCPValue YouAgent::getPackages ( const YCPString patchName )
 						 destPatchPath + "/" + instPath ));
 		   }
 		   packageList->add ( YCPString ( shortDescription ));
+		   packageList->add ( YCPString ( packageName ));		   
 
 		   ret->add ( YCPList ( packageList ) );
 		   y2debug ( "%s added (%s)",

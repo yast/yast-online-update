@@ -52,7 +52,7 @@ make install
 %dir @YAST2DIR@/lib
 @YAST2DIR@/lib/liby2ag_you.so.*
 %dir @YAST2DIR@/scrconf
-@YAST2DIR@/scrconf/*.scr
+@YAST2DIR@/scrconf/you.scr
 
 %files devel
 %dir @YAST2DIR@/plugin

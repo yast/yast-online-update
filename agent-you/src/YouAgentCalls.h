@@ -83,6 +83,8 @@
 #define HTTPADRESS		"http://"
 #define PRODUCTNAME	"Product_Name"
 #define PRODUCTVERSION	"Product_Version"
+#define PRODUKTNAME     "produktname"
+#define PRODUKTVERSION  "produktversion"
 #define DIRECTORY	"directory"
 #define NOTARX 		"Notarx"
 #define NOBACKUP 	"Nobackup"

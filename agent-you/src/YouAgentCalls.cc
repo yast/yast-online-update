@@ -260,13 +260,13 @@ YCPValue YouAgent::setEnvironment ( YCPMap setMap )
 		  YCPMap dummymap = contents->asMap();
 		  YCPValue dummyValue = YCPVoid();
 
-		  dummyValue = dummymap->value(YCPString(PRODUCTNAME));
+		  dummyValue = dummymap->value(YCPString(PRODUKTNAME));
 		  if ( !dummyValue.isNull() &&
 		       dummyValue->isString() )
 		  {
 		      productName = dummyValue->asString()->value();
 		  }
-		  dummyValue = dummymap->value(YCPString( PRODUCTVERSION ));
+		  dummyValue = dummymap->value(YCPString( PRODUKTVERSION ));
 		  if ( !dummyValue.isNull() &&
 		       dummyValue->isString() )
 		  {
@@ -531,7 +531,6 @@ YCPValue YouAgent::lastUpdateStatus ( void )
    }
 
    currentPatchInfo = new  PatchInfo ( destPatchPath + PATCH, language);
-
    PatchList oldPatchList = currentPatchInfo->getRawPatchList();
    PatchList::iterator patchPos;
    YCPList patchList;
@@ -552,6 +551,7 @@ YCPValue YouAgent::lastUpdateStatus ( void )
    ret->add ( YCPString ( PATCHES ),
 	      patchList );
 
+   
    return ret;
 }
 
@@ -970,128 +970,138 @@ YCPValue YouAgent::getPatchList (  )
       return YCPError( "No system agent installed", YCPVoid());       
    }
    
-   if ( currentPatchInfo != NULL )
-   {
-      delete currentPatchInfo;
-      currentPatchInfo = NULL;
-   }
-
-   currentPatchInfo = new  PatchInfo ( destPatchPath + PATCH, language );
-
    if ( serverKind == CD
 	|| serverKind == HD
 	|| serverKind == NFS )
    {
       // installation from local source
-      message = "";
-      checkpatch = "";
-      cont = false;
-      progress = 100;
 
-      if ( localSourcePath.size() > 0 )
+      if ( ok && dirList->size() <= 0 )
       {
-	 string source = localSourcePath + PATCH;
-	 bool found = false;
+	  // Reading Dirlist
+	  counter = 1;	  
+	  if ( localSourcePath.size() > 0 )
+	  {
+	      string source = localSourcePath + PATCH;
+	      bool found = false;
 
-	 YCPPath path = ".target.size";
-	 YCPString value ( source );
-	 YCPValue ret = mainscragent->Execute( path, value );
-
-	 if ( ret->isInteger() )	// success
-	 {
-	     if (  ret->asInteger()->value() >= 0 )
-	     {
-		 found = true;
-	     }
-	 }
-	 else
-	 {
-	     y2error("<.target.size> System agent returned nil.");
-	 }
+	      // check directory 
+	      YCPPath path = ".target.dir";
+	      YCPString value ( source );
+	      YCPValue ret = mainscragent->Read( path, value );
 	 
-	 if ( !found )
-	 {
-	     // Checking other pathes
-	     if ( isBusiness() )
-	     {
-		 source = localSourcePath + "/" +
-		     architecture +
-		     "/update/" +
-		     productName + "/" +
-		     productVersion + PATCH;
-	     }
-	     else
-	     {
-		 source = localSourcePath + "/" +
-		     architecture +
-		     "/update/" +
-		     distributionVersion + PATCH;
-	     }
+	      if ( !ret.isNull() && !ret->isVoid() )	// success
+	      {
+		  y2debug( "*** Path %s found",  source.c_str() );
+		  found = true;
+	      }
+	      else
+	      {
+		  y2error("<.target.dir> System agent returned nil.");
+	      }
+	 
+	      if ( !found )
+	      {
+		  // Checking other pathes
+		  if ( isBusiness() )
+		  {
+		      source = localSourcePath + "/" +
+			  architecture +
+			  "/update/" +
+			  productName + "/" +
+			  productVersion + PATCH;
+		  }
+		  else
+		  {
+		      source = localSourcePath + "/" +
+			  architecture +
+			  "/update/" +
+			  distributionVersion + PATCH;
+		  }
 	     
-	     value = YCPString( source );
-	     YCPValue ret = mainscragent->Execute( path, value );
+		  value = YCPString( source );
+		  ret = mainscragent->Read( path, value );
 
-	     if ( ret->isInteger() )	// success
-	     {
-		 if (  ret->asInteger()->value() >= 0 )
-		 {
-		     found = true;
-		 }
-	     }
-	     else
-	     {
-		 y2error("<.target.size> System agent returned nil.");
-	     }
-	 }
-	  
-	 if ( found )
-	 {
-	    // path found
-	    PatchInfo patchInfo ( source, language );
+		  if ( !ret.isNull() && !ret->isVoid() )	// success
+		  {
+		      y2debug( "*** Path %s found",  source.c_str() );
+		      found = true;
+		  }
+		  else
+		  {
+		      y2error("<.target.dir> System agent returned nil.");
+		  }
+	      }
+	 
+	      if ( found
+		   && ret->isList() )
+	      {
+		  // path found
+		  dirList = ret->asList();
+		  posDirList = 0;
+		  progress = 10;		     
+	      }
+	      else
+	      {
+		  ok = cont = false;
+		  message = "No SuSE-patch-CD or SuSE path found.";		  
+	      }		 
+	  }
+	  else
+	  {
+	      y2error( "Could not find localSourcePath");
+	      ok = false;
+	      message = "internal error";
+	      cont = false;
+	  }
+      }
+      else
+      {
+	  // Reading each patch description
+	  string patchname = ".";	  
+	  YCPValue dummyValue = dirList->value(posDirList++);
+	  if ( !dummyValue.isNull() && dummyValue->isString() )
+	  {
+	      patchname = dummyValue->asString()->value();
+	  }
 
-	    PatchList patchList = patchInfo.getRawPatchList();
-	    PatchList::iterator patchPos;
-	    time_t     currentTime  = time( 0 );
-	    struct tm* currentLocalTime = localtime( &currentTime );
-	    char date[12];
-	    PatchList localPatchList = currentPatchInfo->getRawPatchList();
+	  if ( patchname != "." &&
+	       patchname != ".." &&
+	       patchname.find_first_of ("-") != string::npos )
+	  {
+	      // it is a patch-file. Check, if it does already exist on the
+	      // client.
 
-	    sprintf ( date, "%04d%02d%02d",
-		      currentLocalTime->tm_year+1900,
-		      currentLocalTime->tm_mon+1,
-		      currentLocalTime->tm_mday );
+	      string command = "ls " + destPatchPath +
+		  PATCH + "/" + patchname + ".*";
+	      YCPPath path = ".target.bash";
+	      YCPString value ( command );
+	      YCPValue ret = mainscragent->Execute( path, value );
 
-	    for ( patchPos = patchList.begin() ;
-		  patchPos != patchList.end();
-		  patchPos++ )
-	    {
-	       PatchElement patchElement = patchPos->second;
-
-	       PatchList::iterator pos = localPatchList.find(
-							   patchElement.id );
-
-	       if ( pos == localPatchList.end() )
-	       {
+	      if ( ret->isInteger()
+		   && ret->asInteger()->value() != 0 )	
+	      {
 		  // does not exist --> fetch it from the local-source
+		  time_t     currentTime  = time( 0 );
+		  struct tm* currentLocalTime = localtime( &currentTime );
+		  char date[12];
+
+		  sprintf ( date, "%04d%02d%02d",
+			    currentLocalTime->tm_year+1900,
+			    currentLocalTime->tm_mon+1,
+			    currentLocalTime->tm_mday );
+		      
 		  string command = "/bin/cp ";
 
 		  command += localSourcePath + "/" +
-		     architecture +
-		     "/update/" +
-		     distributionVersion + PATCH + "/" +
-		     patchElement.id;
-		  if ( patchElement.date.size() > 0 )
-		  {
-		     command+= "." + patchElement.date;
-		  }
-		  if ( patchElement.state.size() > 0 )
-		  {
-		     command+= "." + patchElement.state;
-		  }
+		      architecture +
+		      "/update/" +
+		      distributionVersion + PATCH + "/" +
+		      patchname;
 
 		  command += " " + destPatchPath + PATCH + "/" +
-		     patchElement.id +
-		     "." + date + ".new";
+		      patchname +
+		      "." + date + ".new";
 
 		  YCPPath path = ".target.bash";
 		  YCPString value ( command );
@@ -1099,12 +1109,14 @@ YCPValue YouAgent::getPatchList (  )
 
 		  if ( ret->isInteger() )	// success
 		  {
-		      if (  ret->asInteger()->value() >= 0 )
+		      if (  ret->asInteger()->value() == 0 )
 		      {
 			  y2debug( "%s ok", command.c_str() );
 			  message += "Reading patch-description " +
-			      patchElement.id + "\n";			  
-			  found = true;
+			      patchname;
+			  checkpatch = destPatchPath + PATCH + "/" +
+			      patchname +
+			      "." + date + ".new";		
 		      }
 		      else
 		      {
@@ -1118,25 +1130,16 @@ YCPValue YouAgent::getPatchList (  )
 		      y2error("<.target.bash> System agent returned nil.");
 		      ok = false;
 		      message = "Could not copy patch-information";	
-		  }
-	       }
-	    }
-	 }
-	 else
-	 {
-	    y2error( "Could not find localSourcePath %s",
-		     localSourcePath.c_str());
-	    ok = false;
-	    message = "No SuSE-patch-CD or SuSE path found.";
-	    cont = false;
-	 }
-      }
-      else
-      {
-	 y2error( "Could not find localSourcePath");
-	 ok = false;
-	 message = "internal error";
-	 cont = false;
+		  }		      
+	      }
+	  }
+	  
+	  // setting progress-bar
+	  float prog = counter;
+	  progress = (int) (prog / dirList->size() * 100 +10);
+	  if ( progress > 100 )
+	      progress = 100;
+	  counter++;
       }
    }
    else if ( serverKind == FTP
@@ -1395,141 +1398,154 @@ YCPValue YouAgent::getPatchList (  )
       {
 	 // fetch every patch-description-file from ftp or http server
 
-	 if ( posDirList == dirList->size() )
-	 {
-	    //last entry found
-	    cont = false;
-	    progress = 100;
-	    dirList= YCPList();
-	 }
-	 else
-	 {
-	     string patchname = ".";
-	     YCPValue dummyValue = dirList->value(posDirList++);
-	     if ( !dummyValue.isNull() && dummyValue->isString() )
-	     {
-		 patchname = dummyValue->asString()->value();
-	     }
+	  string patchname = ".";
+	  YCPValue dummyValue = dirList->value(posDirList++);
+	  if ( !dummyValue.isNull() && dummyValue->isString() )
+	  {
+	      patchname = dummyValue->asString()->value();
+	  }
 
-	    if ( patchname != "." &&
-		 patchname != ".." &&
-		 patchname.find_first_of ("-") != string::npos )
-	    {
-	       // it is a patch-file. Check, if it does already exist on the
-	       // client.
-	       PatchList patchList = currentPatchInfo->getRawPatchList();
-	       PatchList::iterator pos = patchList.find( patchname );
+	  if ( patchname != "." &&
+	       patchname != ".." &&
+	       patchname.find_first_of ("-") != string::npos )
+	  {
+	      // it is a patch-file. Check, if it does already exist on the
+	      // client.
 
-	       if ( pos == patchList.end() )
-	       {
-		  // does not exist --> fetch it from the ftp-server.
-		  time_t     currentTime  = time( 0 );
-		  struct tm* currentLocalTime = localtime( &currentTime );
-		  char date[12];
+	      string command = "ls " + destPatchPath +
+		  PATCH + "/" + patchname + ".*";
+	      YCPPath path = ".target.bash";
+	      YCPString value ( command );
+	      YCPValue ret = mainscragent->Execute( path, value );
 
-		  sprintf ( date, "%04d%02d%02d",
-			    currentLocalTime->tm_year+1900,
-			    currentLocalTime->tm_mon+1,
-			    currentLocalTime->tm_mday );
-
-		  if ( serverKind == FTP )
+	      if ( ret->isInteger() )	// success
+	      {
+		  if (  ret->asInteger()->value() != 0 ) // does not exist
 		  {
- 		      YCPPath path = ".ftp.getFile";
-		      YCPValue ret = mainscragent->Execute( path,
-					    YCPString( patchname ),
-					    YCPString( destPatchPath +
-						       PATCH +
-						       "/" +
-						       patchname +
-						       "." + date + ".new"));
+		      // does not exist --> fetch it from the ftp-server.
+		      time_t     currentTime  = time( 0 );
+		      struct tm* currentLocalTime = localtime( &currentTime );
+		      char date[12];
 
-		      if ( ret->isBoolean() )	// success
+		      sprintf ( date, "%04d%02d%02d",
+				currentLocalTime->tm_year+1900,
+				currentLocalTime->tm_mon+1,
+				currentLocalTime->tm_mday );
+
+		      if ( serverKind == FTP )
 		      {
-			  if (  !(ret->asBoolean()->value()) )
+			  YCPPath path = ".ftp.getFile";
+			  YCPValue ret = mainscragent->Execute( path,
+								YCPString( patchname ),
+								YCPString( destPatchPath +
+									   PATCH +
+									   "/" +
+									   patchname +
+									   "." + date + ".new"));
+			   
+			  if ( ret->isBoolean() )	// success
 			  {
-			      cont = ok = false;
-			      y2error ( "Cannot get %s",
-					patchname.c_str() );
-			      message = "Cannot get " + patchname;
+			      if (  !(ret->asBoolean()->value()) )
+			      {
+				  cont = ok = false;
+				  y2error ( "Cannot get %s",
+					    patchname.c_str() );
+				  message = "Cannot get " + patchname;
+			      }
+			      else
+			      {
+				  message = patchname;
+				  checkpatch =  destPatchPath +
+				      PATCH +
+				      "/" +
+				      patchname +
+				      "." + date + ".new";
+			      }
 			  }
 			  else
 			  {
-			      message = patchname;
-			      checkpatch =  destPatchPath +
-				  PATCH +
-				  "/" +
-				  patchname +
-				  "." + date + ".new";
+			      y2error("<.ftp.getFile> System agent "
+				      "returned nil for %s.",
+				      patchname.c_str() );
+			      cont = ok = false;
+			      message = "Cannot get " + patchname;	
 			  }
 		      }
 		      else
 		      {
-			  y2error("<.ftp.getFile> System agent "
-				  "returned nil for %s.",
-				  patchname.c_str() );
-			  cont = ok = false;
-			  message = "Cannot get " + patchname;	
-		      }
-		  }
-		  else
-		  {
-		      // HTTP
-		      string sourcefile;
-		      string destfile;
+			  // HTTP
+			  string sourcefile;
+			  string destfile;
 
-		      sourcefile = patchDirectory + "/" + patchname;
+			  sourcefile = patchDirectory + "/" + patchname;
 
-		      destfile = destPatchPath + PATCH + "/" + patchname +
-			  "." + date + ".new";
+			  destfile = destPatchPath + PATCH + "/" + patchname +
+			      "." + date + ".new";
 
-		      YCPPath path = ".http.getFile";
-		      YCPValue ret = mainscragent->Execute( path,
-						YCPString( sourcefile ),
-						YCPString( destfile ));
+			  YCPPath path = ".http.getFile";
+			  YCPValue ret = mainscragent->Execute( path,
+								YCPString( sourcefile ),
+								YCPString( destfile ));
 
-		      if ( ret->isMap() )	// success
-		      {
-			  YCPMap retMap = ret->asMap();
-			  YCPValue dummyValue = YCPVoid();
-
-			  dummyValue = retMap->value(YCPString(OK));
-			  if ( !dummyValue.isNull()
-			       && dummyValue->isBoolean()
-			       && dummyValue->asBoolean()->value() == false )
+			  if ( ret->isMap() )	// success
 			  {
-			      dummyValue = retMap->value(YCPString(MESSAGE));
+			      YCPMap retMap = ret->asMap();
+			      YCPValue dummyValue = YCPVoid();
+			      
+			      dummyValue = retMap->value(YCPString(OK));
 			      if ( !dummyValue.isNull()
-				   && dummyValue->isString()	)
-			      {
-				  message = dummyValue->asString()->value();
+				   && dummyValue->isBoolean()
+				   && dummyValue->asBoolean()->value() == false )
+			      {	
+				  dummyValue = retMap->value(YCPString(MESSAGE));
+				  if ( !dummyValue.isNull()
+				       && dummyValue->isString()	)
+				  {
+				      message = dummyValue->asString()->value();
+				  }
+				  ok = cont =false;			      
 			      }
-			      ok = cont =false;			      
+			  }
+			  else
+			  {
+			      y2error("<.target.size> System agent returned nil.");
+			      ok = cont =false;
+			      message = "ERROR with wget";		 
+			  }
+		      
+			  if ( ok )
+			  {
+			      message = sourcefile;
+			      checkpatch =  destfile;
 			  }
 		      }
-		      else
-		      {
-			  y2error("<.target.size> System agent returned nil.");
-			  ok = cont =false;
-			  message = "ERROR with wget";		 
-		      }
-		      
-		      if ( ok )
-		      {
-			  message = sourcefile;
-			  checkpatch =  destfile;
-		      }
 		  }
-	       }
-	    }
-
-	    // setting progress-bar
-	    float prog = counter;
-	    progress = (int) (prog / dirList->size() * 100 +10);
-	    if ( progress > 100 )
-	       progress = 100;
-	    counter++;
-	 }
+	      }
+	  }
+	  // setting progress-bar
+	  float prog = counter;
+	  progress = (int) (prog / dirList->size() * 100 +10);
+	  if ( progress > 100 )
+	      progress = 100;
+	  counter++;
       }
+   }
+
+   if ( posDirList == dirList->size() )
+   {
+       //last entry found
+       cont = false;
+       progress = 100;
+       dirList= YCPList();
+	    
+       // rereading patchinfo
+       if ( currentPatchInfo != NULL )
+       {
+	   delete currentPatchInfo;
+	   currentPatchInfo = NULL;
+       }
+
+       currentPatchInfo = new  PatchInfo ( destPatchPath + PATCH, language);	    
    }
 
    ret->add ( YCPString ( OK ), YCPBoolean ( ok ) );
