@@ -113,7 +113,7 @@
 		      table_contents
 			      ),
 	      `HBox(`Left(`PushButton(`id(`apply), _("&Apply"))),
-		    `Left(`PushButton(`id(`info), _("&Show description")))
+		    `Left(`PushButton(`id(`info), _("&Show description ...")))
 		    ),
 	      `VSpacing( 0.2 )
 	      );
