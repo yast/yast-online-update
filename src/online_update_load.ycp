@@ -23,26 +23,30 @@
 */
 
 {
-  // constant settings
-  string log_path = "/var/log/y2ftplog";
-
   // Testmode
   boolean test_mode    = lookup ( user_settings, "test_mode", false );
-
+  // selected ftp server
+  string ftp_server = lookup( user_settings, "ftp_server", "" );
+  
   // check installation mode
   boolean auto_mode = lookup( user_settings, "ftp_auto", false );
   boolean continue_mode = lookup( user_settings, "ftp_continue", false );
 
-    
-  //////////////////////////////////////////////////////////////////////////////////////
-  //                                  P O P U P S                                     //
-  //////////////////////////////////////////////////////////////////////////////////////
+  // prepare for inst_rpmcopy
+  user_settings = add(user_settings, "post_install", true );
+  map installMap = $[];
+  installMap = add(installMap, "bootmode", "Harddisk" );
+  user_settings = add(user_settings, "installMap", installMap );
+  
+  //////////////////////////////////////////////////////////////////////////////
+  //                                  P O P U P S                             //
+  //////////////////////////////////////////////////////////////////////////////
 
     
 
-  //////////////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////
   // MAIN:
-  //////////////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////
 
 
   term contents =
@@ -50,7 +54,7 @@
       `VBox(
 	    `VSpacing( 0.2 ),
 	    `HBox(
-		  `HWeight( 50,`VBox (`Left(`Label(_("Connection to:"))),
+		  `HWeight( 50,`VBox (`Left(`Label(_("Connected to"))),
 				      `Left(`Label(`id(`id1),`opt(`outputField), "                          ")) )
 			    ),
 		  `HWeight( 50,`VBox(`Left(`Label(_("Status of connection"))),
@@ -58,7 +62,7 @@
 			    )
 		  ),
 	    `HBox(
-		  `HWeight( 50,`VBox (`Left(`Label(_("Connection time"))),
+		  `HWeight( 50,`VBox (`Left(`Label(_("Total connection time"))),
 				      `Left(`Label(`id(`id3),`opt(`outputField), "                           ")) )
 			    ),
 		  `HWeight( 50,`VBox(`Left(`Label(_("Estimated time"))),
@@ -69,7 +73,7 @@
 	    `LogView(`id(`log),
 		     "Information about the activities",
 		     5,	// visible lines
-		     10),	// lines to store,
+		     100),	// lines to store,
 	    `VSpacing( 0.2 )
 	    );
 
@@ -96,95 +100,173 @@ closed.
   // using SetContents (define in online_update.ycp)
   UI(`SetWizardContents(_("Connection and Data transfer"), contents, help_text, Args(0), Args(1) ));
 
-  // TODO: get values from 
-  UI(`ChangeWidget(`id(`id1), `Value, lookup( user_settings, "ftp_server", "ftp.suse.com")));  
+  // TODO: get values from PKGINFO 
+  UI(`ChangeWidget(`id(`id1), `Value, ftp_server) );  
   UI(`ChangeWidget(`id(`id2), `Value, _("active") ));
   UI(`ChangeWidget(`id(`id3), `Value, _("30:34:32") ));
   UI(`ChangeWidget(`id(`id4), `Value, _("56:34:45") ));
 
 
+  // Fake the getting of patches for test_mode
   integer test_id = 0;
-
   define FakeGetPatch( string patch) ``{
       integer counter = 0;
       string log = "";
-
+      map result = $[];
+      
       while (counter < 300)
       {
 	  counter = counter + 1;
-	  log = sformat("Noch ein weitere Zeile im Logfile (no. %1)\n", counter ); 
-	  UI(`ChangeWidget(`id(`log), `LastLine, log ));
+	  UI(`ChangeWidget(`id(`log), `LastLine, "Neue Zeile ........\n" ));
       }
       test_id = test_id + 1;
 	 
-      y2debug("ONLINE: Get patch %1 ( test_mode ): %2", patch, test_id != 1 );
+      y2debug("ONLINE: Get patch %1 ( test_mode ): %2", patch, test_id != 3 );
 
-      if (test_id == 1)
+      if (test_id == 3)
       {
-	  return false;
+	  result = add(result, "ok", false );
+	  string msg =  sformat( "Download failed for patch %1.\nReasons are unknown.", patch );
+	  result = add( result, "message", msg );
       }
       else
       {
-	  return true;
+	  result = add(result, "ok", true );
+	  string msg = sformat("Download successful for patch %1.\n", patch );
+	  result = add( result, "message", msg );
       }
+      result = add(result, "progress", test_id*10);
+      result = add(result, "continue", false );
+      
+      return result;
   };
 
+  // get patches from ftp server
   define GetAllPatches( map new_patches ) ``{
-
-      map ret_map = $[];
-
-      // give the user a chance to abort the update between getting the certain patches 
-      any r = UI(`PollInput());
-	 
-      any retval = nil;
+      list ret_list = [];
+      list patch_list = [];
+      integer index = 0;
+      boolean go_on = true;
+      
       foreach( `patch, `patch_info, new_patches, ``{
+	  patch_list = add(patch_list, patch);
+      });
+
+      while ( index < size(patch_list) && go_on )
+      {
+	  map result_map = $[];
 
 	  if ( !test_mode )
 	  {
-	      retval = PKGINFO(`ftpGetPatch( patch ));
-	      y2debug("ONLINE: Get patch %1: %2", patch, retval );
+	      result_map = PKGINFO( `ftpGetPatch( select(patch_list, index) ) );
+	      y2debug("ONLINE: Get patch %1: %2", select(patch_list, index), retval );
 	  }
 	  else
 	  {
-	      retval = FakeGetPatch( patch );
+	      result_map = FakeGetPatch( select(patch_list, index) );
 	  }
 
-	  if ( !retval )
+	  if ( !lookup(result_map, "ok", false) )
 	  {
-	      string msg_str = sformat(UI(_("Can't get patch \"%1\" from ftp server.
-Try to get remaining patches.")), patch );
+	      string msg_str = sformat(UI(_("Can't get patch \"%1\" from
+server \"%2\".
+Try to get remaining patches.")), select(patch_list, index), ftp_server );
 	      
-	      UI(`DisplayMsgFtp( msg_str ));
+	      UI(`DisplayMsgFtp( msg_str, _("Notify") ));
 	      // TODO: Popup mit 2 Buttons OK -> weiter, Cancel Abbruch
 	  }
 	  else
 	  {
-	      ret_map = add(ret_map, patch, patch_info );
+	      // add patch to result list of successfully got patches
+	      ret_list = add( ret_list, select(patch_list, index) );
+	  }
+
+          // put logging into LogView Widget
+	  UI(`ChangeWidget(`id(`log), `LastLine, lookup(result_map, "message", "" )) ); 
+	  index = index+1;
+
+	  // Polling input to give the user a chance to stop the download  
+	  any r = UI(`PollInput());
+
+	  if ( r == `abort && UI(`DisplayMsgFtp( _("Download of patches will be stopped.
+Continue to install already loaded patches" ), _("Warning")) ) )
+	  {
+	      go_on = false;
+	  }
+      };
+
+      return ret_list;
+  };
+
+  
+  
+  define InstallPatches( list patch_list ) ``{
+      list package_list = [];
+      integer no = 1;
+      
+      foreach ( `patch, patch_list, ``{
+	  if ( !test_mode )
+	  {
+	      package_list = PKGINFO(`ftpGetPackageList( patch ) );
+	  }
+	  else
+	  {
+	      package_list = ["/var/lib/YaST/patches/abdnf.rpm", "/var/lib/YaST/patches/yxcxc.rpm"];
 	  }
 	  
-	  if ( r == `abort && UI(`ConfirmAbortUpdate( `incomplete )) )
-	  {
-	      return `cancel;
-	  }
-      });
+	  any ret = CallFunction(`inst_rpmcopy(false, false, package_list ));
 
-      return ret_map;
+	  y2debug("ONLINE: %1. call of inst_rpmcopy returns: %2", no, ret );
+	  no = no+1;
+    });
+      if (ret == `abort )
+      {
+	  return `cancel;
+      }
+
+      return `ok;
   };
 
-  define InstallPatches( map patch_map ) ``{
-      y2debug("Installing");
-  };
-
+  //  
+  // Several functions of PKGINFO return a map of result information, e.g. 
+  // $[ "ok": "true", "continue": false, "progress":"20", "message":"Download successful" ]
+  // (not all information is used on every call)
+  //  
+  map result_map = $[];
   map new_patches = $[];
+  boolean go_on = true;
   boolean success = true;
-
+  
   if ( !test_mode )
   {
-      //get list of patches (internal issue of pkginfo)
-      success = PKGINFO(`ftpGetPatchList( log_path ));
+      UI(`ChangeWidget(`id(`log), `LastLine, "Starting download of patch descriptions from ftp server.\n" ));
 
-      // TODO: show logfile in LogView widget
-      // UI(`ChangeWidget(`id(`log), `LastLine, logpath ));
+      result_map = PKGINFO(`ftpConnect());
+      success = lookup( result_map, "ok", false );
+
+      if (success)
+      {
+	  while (go_on)
+	  {
+              //get list of patches step by step
+	      get_result = PKGINFO(`ftpGetPatchList( ));
+
+	      go_on = lookup (result_map, "continue", false );
+	      
+	      UI(`ChangeWidget(`id(`log), `LastLine, lookup (result_map, "message", "" ) ));
+	      //UI(`ChangeWidget(`id(`progress), `LastLine, lookup (result_map, "progress", 0 ) ));
+	  }
+	  
+	  success = lookup( result_map, "ok", false );
+      }
+      else
+      {
+	  UI(`ChangeWidget(`id(`log), `LastLine, lookup (result_map, "message", "" ) )); 
+
+	  UI(`DisplayMsgFtp(_("Connection to ftp server failed.
+Please try to get connection to another SuSE ftp server.")));
+	  return `back;  
+      }
       
       if (success)
       {
@@ -193,28 +275,35 @@ Try to get remaining patches.")), patch );
       else
       {
 	  UI(`DisplayMsgFtp(_("Can't get patches from server.
-Please try to get connection to another SuSE ftp server.")));
+Please try to get patches from another SuSE ftp server.")));
 	  return `back;
       }
+
+      PKGINFO(`ftpClose() );
   }
   else
   {
+      UI(`ChangeWidget(`id(`log), `LastLine, "Starting download of patch descriptions from ftp server.\n" ));
+
       new_patches = $["patch-001":["rec", "Patch for NFS server", "03:56", "X"],
 		      "patch-002":["rec", "Noch einweiterer patch", "02:56", " "],
 		      "patch-003":["sec", "Security dfsdkfö", "02:12", "X"],
 		      "patch-004":["sec", "Nochmal security", "02:01", "X"] ];
+      UI(`ChangeWidget(`id(`log), `LastLine, "Download successful - got patch descriptions.\n" )); 
   }
 		     
   if ( auto_mode )
   {
       // get the patches
-      map got_patches = GetAllPatches( new_patches );
+      list got_patches = GetAllPatches( new_patches );
 
       if ( got_patches != `cancel )
       {
+	  y2debug( "ONLINE: automatic mode, installing: %1", got_patches );
+
 	  // go on and install all available patches in auto_mode
-	  
-	  y2debug( "ONLINE: autoinstall GetAllPatches(): %1", got_patches );
+	 any ret = InstallPatches( got_patches );
+	 return `next;
       }
       else
       {
@@ -224,23 +313,15 @@ Please try to get connection to another SuSE ftp server.")));
   }
   else if ( !continue_mode )
   {
-
       // write new_patches to user_settings -> table input online_update_select
       user_settings = add(user_settings, "ftp_patches", new_patches );
 
       // prepare for second call in manual mode 
       user_settings = add(user_settings, "ftp_continue", true );
       
-
       if (test_mode)
-
       {
-	  UI(`ChangeWidget(`id(`log), `LastLine, "Got list of patches:\nPKGINFO(`ftpGetPatchList( log_path )) called\n
-PKGINFO(`ftpNewPatchList( ) called \n") );
-	   
-
-	  string log = sformat( "Wrote list of new patches to user_settings: %1", new_patches );
-
+	  string log = sformat( "Wrote list of new patches to user_settings:\n %1", new_patches );
 	  UI(`ChangeWidget(`id(`log), `LastLine, log ) );
       }
   
@@ -252,12 +333,16 @@ PKGINFO(`ftpNewPatchList( ) called \n") );
       // get selected patches (written to user_settings from online_update_select)
       map install_patches = lookup( user_settings, "ftp_patches", $[] );
 
-      map got_patches = GetAllPatches( install_patches );
+      list got_patches = GetAllPatches( install_patches );
 
       if ( got_patches != `cancel )
       {
-	  // install selected patches
-	  UI(`InstallPatches( got_patches ));
+	  y2debug( "ONLINE: manual mode, installing: %1", got_patches );
+
+	  UI(`UserInput());
+          // install selected patches
+	  any ret = InstallPatches( got_patches );
+	  return `next;
       }
       else
       {

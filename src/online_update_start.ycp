@@ -27,9 +27,9 @@
   boolean test_mode    = lookup ( user_settings, "test_mode", false );
 
    // constant settings
-  map ftpservermap = $["ftp.suse.com"	: ["/usr/patches"],
+  map ftp_server_map = $["ftp.suse.com"	: ["/usr/patches"],
 		      "ftp.suse.de"	: ["/patchroot"] ];
-
+  string rootpath = "/";
   string yastpath = "/var/lib/YaST";
   string patchpath = "/var/lib/YaST/patches";
   string logpath = "/var/log/y2ftplog";
@@ -55,10 +55,10 @@
 
     string architecture = lookup( user_settings, "architecture", "i386" );
 
-    list ftpserver = [];
+    list ftp_server_list = [];
 
-    foreach(`server, `info, ftpservermap, ``{
-	ftpserver = add(ftpserver, server);
+    foreach(`server, `info, ftp_server_map, ``{
+	ftp_server_list = add(ftp_server_list, server);
     });
 	    
     if ( !test_mode )
@@ -66,7 +66,8 @@
 	// initialize PKGINFO
 	UI(`OpenDialog(`opt(`decorated ),`Label(_("Initializing for ftp update; One moment please..."))));
   
-	any retval = PKGINFO(`ftpSetEnvironment( $["language":long_language,
+	any retval = PKGINFO(`ftpSetEnvironment( $["rootpath":rootpath,
+						  "language":long_language,
 						  "architecture":architecture,
 						  "yastpath":yastpath,
 						  "patchpath":patchpath,
@@ -127,7 +128,7 @@
 								      ),
 								`VSpacing(0.3),
 								`HBox(`HSpacing(1.2),
-								      `Left(`ComboBox(`id(`ftp), "SuSE ftpserver", ftpserver ))
+								      `Left(`ComboBox(`id(`ftp), "SuSE ftpserver", ftp_server_list ))
 								      ),
 								`VSpacing(0.3) 
 								)
@@ -144,7 +145,7 @@
     string help_part1 =  UI(_("<p>
 SuSE online update is the easy way to get all recommended
 patches and security fixes from SuSE ftp server.<br>
-<b>Automatic Update</b> will connect to <i>ftp.suse.com</i>,
+<b>Automatic Update</b> will connect to the server,
 fetch the files and install the patches.</p>"));
     
     string help_part2 =  UI(_("<p>
@@ -160,7 +161,6 @@ if you click on button <b>Details</b>.
 
     UI(`ChangeWidget(`id(`abort), `Label, _("&Abort Update")) );
     
-   
 
     //  Loop for User Input ....
 
@@ -183,11 +183,13 @@ if you click on button <b>Details</b>.
 	    
 	    string ftp_server =  UI(`QueryWidget(`id(`ftp), `Value ));
 	    user_settings = add(user_settings, "ftp_server", ftp_server);
-	    
+
+	    string update_path = select( lookup(ftp_server_map, ftp_server, ""), 0 );
+	      
 	    if ( !test_mode )
 	    {
 		any retval = PKGINFO(`ftpSetServer( ftp_server,
-						    update_path) );
+						   update_path) );
 		y2debug("ONLINE: PKGINFO(`setFtpServer( %1, %2 ) ): %3", ftp_server, update_path, retval );
 		
 		if (retval == nil || retval == false)

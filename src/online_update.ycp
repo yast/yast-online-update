@@ -113,6 +113,47 @@ improve your existing installation."))
     };
 
     
+    /*
+     * Are your sure? with possibiltity to specify default-Button ( values: `no_default, `yes_default )
+     */
+
+     define YesNoOpt(any message, string yes_button_message, string no_button_message, symbol def_symbol) ``{
+	  term yes_button = `empty();
+	  term no_button = `empty();
+	  
+	  if ( def_symbol == `no_default )
+	  {
+	      yes_button = `PushButton( `id(`yes),  yes_button_message );
+	      no_button  = `PushButton( `id(`no_button), `opt(`default), no_button_message );
+	  }
+	  else
+	  {
+	      yes_button = `PushButton(`id(`yes), `opt(`default), yes_button_message);
+	      no_button = `PushButton( `id(`no_button), no_button_message );
+	  }
+	  
+          OpenDialog(
+		     `opt(`decorated),
+		     `HBox(
+			   `HSpacing(1),
+			   `VBox(
+				 `VSpacing(0.2),
+				 `Label(message),
+				 `HBox(
+				       yes_button,
+				       `HSpacing(2),
+				       no_button
+				       ),
+				 `VSpacing(0.2)
+				 ),
+			   `HSpacing(1)
+			   )
+		     );
+          any ret = UserInput();
+          CloseDialog();
+          return (ret == `yes);
+      };
+      
     // YES or NO
     define YesOrNo(any message, string yes_button_message, string no_button_message) ``{
       OpenDialog(`opt(`decorated),
@@ -198,13 +239,13 @@ You will need to do the update again." );
       };
 
 
-   define DisplayMsgFtp( string message ) ``{
+   define DisplayMsgFtp( string message, string header ) ``{
           OpenDialog(
                      `opt(`decorated),
                      `HBox(
                            `HSpacing(1),
                            `VBox(
-				 `Left(`Heading( _("Notify"))),
+				 `Left(`Heading( header)),
 				 `VSpacing(0.2),
                                  `Label(message),
                                    `PushButton(`id(`continue), `opt(`default), _("&OK")),
@@ -215,7 +256,7 @@ You will need to do the update again." );
                      );
           any ret = UserInput();
           CloseDialog();
-          return (ret);
+          return true;
       };
  
   // show detailed information about one patch
@@ -295,12 +336,12 @@ You will need to do the update again." );
    */
 
   list dialog = [
-		 [`online_update_start(false, true), 		`all ],
-		 [`online_update_load(true, true),	 	`all ],
+		 [`online_update_start(false, true), 		`always ],
+		 [`online_update_load(true, true),	 	`always ],
 		 [`online_update_select(true, true), 		`manual ],
 		 [`online_update_load(false, true), 		`manual ],
-		 //[`inst_suseconfig(false, true), 		`all ],
-		 [`online_update_close(false, true), 		`all ]
+		 //[`inst_suseconfig(false, true), 		`always ],
+		 [`online_update_close(false, true), 		`always ]
 		 
   ];
 
@@ -323,12 +364,12 @@ You will need to do the update again." );
       symbol module_mode =  select( select(dialog, id), 1);
       y2debug( "ONLINE: Module: %1 Mode: %2", select( select(dialog, id), 0), select( select(dialog, id), 1) );
 
-      // call all modules if NOT automatic mode 
+      // call all modules in maunual mode 
       if ( !lookup(user_settings, "ftp_auto", true ) )
       {
 	  result = CallFunction(select(select(dialog, id), 0 ));
       }
-      else if (  select( select(dialog, id), 1) == `all )
+      else if (  select( select(dialog, id), 1) == `always )
       {
 	  result = CallFunction(select(select(dialog, id), 0 ));
       }
