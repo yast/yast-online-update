@@ -110,7 +110,28 @@
 
     Pkg::YouSetServer( server );
 
-    map usermap = Pkg::YouGetUserPassword();
+    string url = server["url"]:"";
+    map parsed_url = URL::Parse (url);
+    string protocol = parsed_url["scheme"]:"";
+    boolean auth_set = false;
+    map usermap = $[];
+    if (protocol == "ftp" || protocol == "http" || protocol == "smb")
+    {
+	string username = parsed_url["user"]:"";
+	string password = parsed_url["pass"]:"";
+	auth_set = size (username) > 0;
+	if (auth_set)
+	{
+	    usermap = $[
+		"username" : username,
+		"password" : password,
+	   ];
+	};
+    }
+    if (! auth_set)
+    {
+	usermap = Pkg::YouGetUserPassword();
+    }
 
     string err = Pkg::YouGetDirectory();
 

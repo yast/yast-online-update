@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Sep 27 15:59:12 CEST 2004 - jsrain@suse.cz
+ 
+- don't access the FTP server anonymously if username and password
+  was given (#43731)
+
+-------------------------------------------------------------------
 Fri Aug 27 15:13:39 CEST 2004 - arvin@suse.de
 
 - merged proof read messages
