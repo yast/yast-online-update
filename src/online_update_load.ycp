@@ -715,10 +715,17 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
       {
 	  UI(`ChangeWidget(`id(`log), `LastLine,
 			   lookup (result_map, "message", "" ) )); 
-	  if ( lookup( user_settings, "ftp_server", "" ) == "CD" )
+
+          // Error popup if ftpConnect failed -
+	  // Patch CD udpate: no CD in drive, mount failed
+	  // Online Update: connecting to ftp server failed
+	  
+          //if ( lookup( user_settings, "ftp_server", "" ) == "CD" )
+	  if ( cd_update )
 	  {
-	      UI(`MessagePopup(_("Can't get patch descriptions.
-Please insert SuSE patch CD.")));
+	      UI(`MessagePopup(_("Can't get the patch descriptions.
+Please insert SuSE patch CD and
+restart the \"Patch CD-Update\".")));
 	      return `abort;
 	  }
 	  else
@@ -755,26 +762,25 @@ Please try to get connection to another SuSE ftp server.")));
   }
   else
   {
+      // Error popup if ftpGetPatchList failed -
+      // Patch CD update: wrong CD in drive (path must be: <architecture>/update/<version>
+      // Online Update: path on ftp server not found
+
       if ( cd_update )
       {
-	  // set cd_update false before going back - user must select CD installation first 
-	  user_settings = add (user_settings, "cd_update", false );
-	  user_settings = add (user_settings, "ftp_server", "ftp.suse.com" );
-	  
-	  UI(`MessagePopup(_("YaST2 can't get the patches
-because a different source media was
-used on previous installation.\n
-Please select button \"Expert\" on start
-page and select \"CD installation\" on
-appearing dialog. Insert the patch CD
-before proceeding.\n")));
+	  UI(`MessagePopup(_("Can't get the patches from CD.
+Please insert the SuSE patch CD
+(mind the correct version!) -
+or update your system with YaST2
+\"Online-Update\"."))); 
+	  return `abort;
       }
       else
       {
-	  UI(`MessagePopup(_("Can't get patches from server.
+	  UI(`MessagePopup(_("Can't get the patches from server.
 Please try to get patches from another SuSE ftp server.")));   
+	  return `back;
       }
-      return `back;
   }
 
   if ( !continue_mode )
