@@ -57,7 +57,7 @@
     {
 	patch_input = add( patch_input,
 			   `item(`id(select(patch_list, index)), select(patch_list, index+3),
-				 select(patch_list, index), select(patch_list, index+2)) );
+				 select(patch_list, index), select(patch_list, index+4), select(patch_list, index+2)) );
 	if ( select(patch_list, index+1) == "recommended" )    		rec_no = rec_no+1;
 	else if ( select(patch_list, index+1) == "security" )    	sec_no = sec_no+1;
 	
@@ -83,7 +83,7 @@
 	      `VSpacing(0.2),
 	      `Left(`Label(_("Informations about all installed patches"))),
 	      `VWeight( 4,`Table(`id(`patch_table),`opt(`hvstretch), 
-				 `header( _("Days"), _("Patch"), _("Description") ),
+				 `header( _("YYYY.MM.DD"), _("Patch"), _("Status"), _("Description") ),
 				 patch_input
 				 )
 			),

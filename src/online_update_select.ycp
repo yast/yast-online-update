@@ -75,7 +75,7 @@
 					    sformat( " %1 ", select(value, 3) ),
 					    select(value,0),
 					    key,
-					    my_size_text( tointeger(select(value,2))),
+					    my_size_text( tointeger(select(value,2))*1024 ),
 					    select(value,1))
 				      )
 				   );

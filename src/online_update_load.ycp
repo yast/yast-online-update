@@ -42,6 +42,7 @@
   // possible status information
   string ERROR = "error";
   string INSTALLED = "installed";
+  string LOAD = "load";
   
   user_settings = add(user_settings, "ftp_ok", true );
   
@@ -281,16 +282,9 @@ loaded patches or abort update completely." ), _("Warning"), _("&Install"), _("&
 	  {
 	      ret = CallFunction(`inst_rpmcopy(false, false, package_list ));
 	      y2debug("ONLINE: %1. call of inst_rpmcopy returns: %2", no, ret );
+	      no = no+1;
 	  }
-	  else
-	  {
-	    // set status to error
-	      PKGINFO( `ftpChangePatchUpdateStatus( patch, ERROR ) );
-	      y2debug("ONLINE:  PKGINFO( `ftpChangePatchUpdateStatus(%1, %2)", patch, ERROR );
-	      user_settings = add(user_settings, "ftp_ok", false );    
-	  }
-	  
-	  no = no+1;
+	  // do not set error status - let patch status NEW
       
 	  if (ret == `abort )
 	  {

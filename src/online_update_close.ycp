@@ -107,9 +107,11 @@ patches could not be installed.
      
      while (index < size(patch_list) )
      {
-	 if ( select(patch_list, index+1) == "recommended" )    	rec_no = rec_no+1;
-	 else if ( select(patch_list, index+1) == "security" )    	sec_no = sec_no+1;
-	
+	 if ( select(patch_list, index+4) == "installed" )
+	 {
+	     if ( select(patch_list, index+1) == "recommended" )    	rec_no = rec_no+1;
+	     else if ( select(patch_list, index+1) == "security" )    sec_no = sec_no+1;
+	 }
 	 index = index+5;
      };
 
