@@ -486,7 +486,7 @@ server data.
 	  {
 	      result = CallFunction( module_name );
 	  }
-	  else if (  select( select(dialog, id), 1, `none ) == `always )
+	  else if (  select( select(dialog, id, 0), 1, `none ) == `always )
 	  {
 	      result = CallFunction( module_name );
 	  }

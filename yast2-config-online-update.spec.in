@@ -51,6 +51,7 @@ make install
 @YAST2DIR@/menuentries/menuentry_cd_update.y2cc
 @YAST2DIR@/include/suseservers.ycp
 @YAST2DIR@/scrconf/etc_suseservers.scr
+@YAST2DIR@/scrconf/cfg_you.scr
 @YAST2DIR@/clients/online_update.ycp
 @YAST2DIR@/clients/online_update_close.ycp
 @YAST2DIR@/clients/online_update_details.ycp
