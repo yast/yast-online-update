@@ -2,14 +2,7 @@
 # sample /etc/suseservers
 #
 ftp://ftp.suse.com/pub/suse
-ftp://ftp.suse.de/pub/suse
-ftp://ftp.tu-chemnitz.de/pub/linux/suse/ftp.suse.com/suse
-ftp://ftp.tuwien.ac.at/linux/suse.com/suse
-ftp://ftp.tu-graz.ac.at/mirror/suse-linux/ftp.suse.com/suse
-ftp://ftp.funet.fi/pub/Linux/mirrors/suse/ftp.suse.com/suse
-ftp://ftp.esat.net/mirrors/ftp.suse.com/pub/suse
-ftp://ftp.task.gda.pl/mirror/ftp.suse.com/pub/suse
-ftp://ftp.mirror.ac.uk/sites/ftp.suse.com/pub/suse
-ftp://mack/update-test/suse
-ftp://ftp2.ruf.uni-freiburg.de/pub/.suse
-
+ftp://ftp.hilton.rwth-aachen.de/pub/mirror/suse/
+ftp://ftp.nl.uu.net/pub/linux/suse/suse
+ftp://ftp.sunet.se/pub/Linux/distributions/suse/suse
+ftp://gd.tuwien.ac.at/linux/suse.com/suse
