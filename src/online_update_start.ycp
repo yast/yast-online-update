@@ -127,7 +127,9 @@ the update takes place.
                 hour = UI::QueryWidget( `id( `hour ), `Value );
                 autoget = UI::QueryWidget( `id( `autoget ), `Value );
 
-                string cronjob = sformat( "%1 %2 * * * root online_update", minute, hour );
+                string options = SCR::Read( .sysconfig.onlineupdate.CMDLINE_OPTIONS );
+
+                string cronjob = sformat( "%1 %2 * * * root online_update %3", minute, hour, options );
                 
                 if ( autoget ) cronjob = cronjob + " -g";
                 
