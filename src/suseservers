@@ -10,6 +10,6 @@ ftp://ftp.funet.fi/pub/Linux/mirrors/suse/ftp.suse.com/suse
 ftp://ftp.esat.net/mirrors/ftp.suse.com/pub/suse
 ftp://ftp.task.gda.pl/mirror/ftp.suse.com/pub/suse
 ftp://ftp.mirror.ac.uk/sites/ftp.suse.com/pub/suse
-file:/mack/update-test/suse
-http://www.suse.de/pub/suse/update
-cd:/dev/cdrom
+ftp://mack/update-test/suse
+ftp://ftp2.ruf.uni-freiburg.de/pub/.suse
+
