@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Mon Feb 24 13:16:33 CET 2003 - cschum@suse.de
+
+- Activate "reload patches" check box, if signature check failed
+  (bug #23959).
+- Removed space which confused y2menu (bug #23714)
+- Read CMDLINE_OPTIONS variable from sysconfig/online_update.
+
+-------------------------------------------------------------------
 Thu Feb 20 18:27:42 CET 2003 - arvin@suse.de
 
 - don't start online-update during installation if no network
