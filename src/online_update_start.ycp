@@ -110,7 +110,7 @@
         `VSpacing( 0.2 )
       )
     );
-    
+
     Pkg::YouSetServer( server );
 
     map usermap = Pkg::YouGetUserPassword();
@@ -422,9 +422,10 @@ without the need of user interaction.</p>
       } else if (ret == `next) {
           if ( serverId == 0 ) {
             server[ "url" ] = UI::QueryWidget( `id( `url ), `Value );
+	    server[ "type" ] = "custom";
             you_server_list[ 0 ] = server;
           }
-      
+	  // Pkg::SetServer( server ) is called in GetPatches()
           string err = GetPatches();
 
           if ( size( err ) != 0 ) {
