@@ -39,6 +39,14 @@
 	    string server = lookup (entry, "server", "");
 	    string type = lookup (entry, "type", "");
 	    string spath = lookup (entry, "path", "");
+	    if( type == "ftp" )
+	    {
+		type = "FTP";
+	    }
+	    if( type == "http" )
+	    {
+		type = "HTTP";
+	    }
 	    serversmap = add (serversmap, server, [ spath, type ]);
 	});
 
@@ -81,7 +89,10 @@
 
 	    // ftp and http need double-slash
 
-	    if ((type == "ftp") || (type == "http")) {
+	    if ( type == "ftp"
+		 || type == "http"
+		 || type == "HTTP"
+		 || type == "FTP" ) {
 		sep = "://";
 	    }
 
