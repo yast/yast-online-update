@@ -281,6 +281,7 @@ loaded patches or abort update completely." ), _("Warning"), _("&Install"), _("&
   define InstallPatches( list patch_list ) ``{
       list package_list = [];
       string pre_info = "";
+      string post_info = "";
       integer no = 1;
       integer package_count = 0;
       
@@ -305,6 +306,14 @@ loaded patches or abort update completely." ), _("Warning"), _("&Install"), _("&
 	      package_count = package_count + size ( package_list );
 	      no = no+1;
 	  }
+
+	  post_info = PKGINFO(`ftpGetPostInstallInformation(patch));
+
+	  if ( post_info != "" )
+	  {
+	      go_on = UI(`DisplayMsgFtpOk( post_info, _("Warning"), _("&Ok")));
+	  }
+	  
 	  // do not set error status - let patch status NEW
       
 	  if (ret == `abort )

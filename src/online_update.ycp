@@ -289,8 +289,28 @@ You will need to do the update again." );
           CloseDialog();
           return (ret == `yes);
       };
- 
 
+
+   define DisplayMsgFtpOk( string message, string header, string ok_button ) ``{
+          OpenDialog(
+                     `opt(`decorated),
+                     `HBox(
+                           `HSpacing(1),
+                           `VBox(
+				 `Left(`Heading( header)),
+				 `VSpacing(0.2),
+                                 `Label(message),
+				 `HBox(`PushButton(`id(`ok), `opt(`default), ok_button )),
+                                 `VSpacing(0.2)
+                                 ),
+                           `HSpacing(1)
+                           )
+                     );
+          any ret = UserInput();
+          CloseDialog();
+          return (ret == `ok);
+      };
+ 
 
   });
   
