@@ -97,7 +97,7 @@
 
     map usermap = Pkg::YouGetUserPassword();
 
-    string err = Pkg::YouGetDirectory( you_server );
+    string err = Pkg::YouGetDirectory( server );
 
     if ( err == "login" ) {
       string username = usermap[ "username" ]:"";
@@ -106,7 +106,8 @@
       string msg_string = _("Enter the registration data.");
 
       boolean regcode = false;
-      if ( substring( you_server, 0, 18 ) == "http://sdb.suse.de" ) {
+      string server_url = server[ "url" ]: "";
+      if ( substring( server_url, 0, 18 ) == "http://sdb.suse.de" ) {
         regcode = true;
       }
 
@@ -125,7 +126,7 @@
     }
 
     if ( err == "" ) {
-      err = Pkg::YouGetPatches( you_server, OnlineUpdate::reload,
+      err = Pkg::YouGetPatches( server, OnlineUpdate::reload,
                                 OnlineUpdate::signature_check );
     }
     
@@ -243,7 +244,7 @@ the update takes place.
 
   boolean cd_update = OnlineUpdate::cd_update;
 
-  list you_server_list = [];
+  list you_server_list = [ $[ "url": "", "name": "User-defined Location" ] ];
 
   string you_url = OnlineUpdate::you_url;
 
@@ -264,7 +265,8 @@ the update takes place.
   UI::OpenDialog(`opt(`decorated ),`Label( initMessage ));
 
   if ( size( you_url ) != 0 ) {
-    you_server_list = add( you_server_list, you_url );
+    map server = $[ "url": you_url ];
+    you_server_list = add( you_server_list, server );
   } else {
     string err = Pkg::YouGetServers( you_server_list );
     if ( size( err ) != 0 ) {
@@ -311,6 +313,19 @@ the update takes place.
                         status_lastupdate );
   }
 
+  list servers = [];
+  integer i = 0;
+  while ( i < size( you_server_list ) ) {
+    map server = you_server_list[ i ]:$[];
+    string name = server[ "name" ]:"";
+    string url = server[ "url" ]:"";
+    string text = "";
+    if ( size( name ) == 0 ) text = url;
+    else text = name;
+    servers = add( servers, `item( `id( i ), text ) );
+    i = i + 1;
+  }
+
   // layout main dialog
 
   term contents =
@@ -349,13 +364,19 @@ the update takes place.
               `Frame (_("Update Configuration"),
                   `VBox(
                       `VSpacing(0.3),
-					  `VSquash(
-                      `HBox(
-                          `HSpacing(1.2),
-                          `HWeight(1,`Left(`ComboBox(`id(`you), `opt(`editable), _("&Installation source"), you_server_list ))),
-                          `Bottom(`PushButton( `id(`expert), `opt(`notify), _("&Expert..."))),
-                          `HSpacing(1.2)
+                      `VSquash(
+                          `HBox(
+                              `HSpacing(0.8),
+                              `HWeight(1,`Left(`ComboBox(`id(`server), `opt(`notify), _("&Installation source"), servers ))),
+                              `HSpacing(1.2),
+                              `Bottom(`PushButton( `id(`expert), `opt(`notify), _("&Expert..."))),
+                              `HSpacing(1.2)
                       )),
+                      `HBox(
+                          `HSpacing(0.8),
+                          `TextEntry( `id(`url), `opt(`notify), _("URL"), "" ),
+                          `HSpacing(1.2)
+                      ),
                       `VSpacing(0.3),
                       `HBox(`HSpacing(0.8),
                           `Left(`CheckBox(`id(`manual),
@@ -416,23 +437,22 @@ without the need of user interaction.</p>
 
   if ( OnlineUpdate::you_auto )
   {
-      UI::ChangeWidget(`id(`automatic), `Value, true );
-      UI::ChangeWidget(`id(`manual), `Value, false );
+      UI::ChangeWidget( `id(`automatic), `Value, true );
+      UI::ChangeWidget( `id(`manual), `Value, false );
   }
   else
   {
-      UI::ChangeWidget(`id(`automatic), `Value, false );
-      UI::ChangeWidget(`id(`manual), `Value, true );
+      UI::ChangeWidget( `id(`automatic), `Value, false );
+      UI::ChangeWidget( `id(`manual), `Value, true );
   }
 
-/*
-  if ( you_server != "" )
-  {
-      UI::ChangeWidget(`id(`you), `Value, you_server );
-  }
-*/
+  UI::ChangeWidget( `id(`server), `Value, 1 );
 
-  string url = "";
+  map server = you_server_list[ 1 ]:$[];
+  UI::ChangeWidget( `id(`url), `Value, server[ "url" ]:"" );
+
+  boolean blockUrlEdit = true;
+
 
   //  Loop for User Input ....
 
@@ -446,10 +466,36 @@ without the need of user interaction.</p>
       OnlineUpdate::reload = UI::QueryWidget( `id( `reload ), `Value );
 
       // which server is selected from combo box installation source ?
-      string you_server =  UI::QueryWidget(`id(`you), `Value );
+      integer serverId = UI::QueryWidget(`id(`server), `Value );
 
-      if (ret == `next)
-      {
+      server = you_server_list[ serverId ]:$[];
+
+      if ( ret == `server ) {
+        UI::ChangeWidget( `id(`url), `Value, server[ "url" ]:"" );
+        blockUrlEdit = true;
+      } else if ( ret == `url ) {
+        if ( blockUrlEdit ) {
+          blockUrlEdit = false;
+        } else {
+          if ( serverId != 0 ) {
+            UI::ChangeWidget( `id(`server), `Value, 0 );
+          }
+        }
+      } else if ( ret == `expert ) {
+          string url = getUrl( "" );
+          if ( size( url ) > 0 ) {
+            UI::ChangeWidget( `id(`url), `Value, url );
+          }
+      } else if ( ret == `automatic ) {
+          SetupAutomatic();
+      } else if ( ret == `abort && UI::ConfirmAbortUpdate(`painless) ) {
+          return  `abort;
+      } else if (ret == `next) {
+          if ( serverId == 0 ) {
+            server[ "url" ] = UI::QueryWidget( `id( `url ), `Value );
+            you_server_list[ 0 ] = server;
+          }
+      
           string err = GetPatches();
 
           if ( size( err ) != 0 ) {
@@ -496,19 +542,9 @@ Cannot load patch information.
           } else {
             Pkg::YouSelectPatches();
           }
+      } else {
+        y2debug( "RET: %1", ret );
       }
-      else if ( ret == `expert )
-      {
-          string url = getUrl( "" );
-          if ( size( url ) > 0 ) {
-            UI::ChangeWidget( `id(`you), `Value, url );
-          }
-      }
-      else if ( ret == `automatic ) {
-          SetupAutomatic();
-      }
-      else if ( ret == `abort && UI::ConfirmAbortUpdate(`painless) )
-	  return  `abort;
 
   } until (ret == `back || ret == `next || ret == `again);
 
