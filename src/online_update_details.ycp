@@ -1,0 +1,143 @@
+/*
+ *************************************************************
+ *
+ *     YaST2      SuSE Labs                        -o)
+ *     --------------------                        /\\
+ *                                                _\_v
+ *           www.suse.de / www.suse.com
+ * ----------------------------------------------------------
+ *
+ * Author:        Gabriele Strattner <gs@suse.de>
+ *
+ * Purpose:
+ *
+ * Modify:
+ *
+ * external function:
+ *
+ *
+ *************************************************************
+
+ $Id$
+
+*/
+
+{
+    ////////////////////////////////////////////////////////////
+    // Testmode, for example fo screenshots
+    boolean test_mode    = lookup ( user_settings, "test_mode", false );
+
+    map last_status = $[];
+
+    // get last update status from PKGINFO
+    if ( !test_mode )
+    {
+	last_status = PKGINFO(`ftpLastUpdateStatus() );
+    }
+    else
+    {
+	 last_status = $["date":"12.10.2000", "days":"25", "status":"ok",
+			"patches":["patch-0-123", "recommended", "skdakdöak sdfsdfsdf", "05.10.2000",
+				  "sec-fix-988", "security", "salöda dsösld alsdäladä", "12.10.2000"]];
+    }
+
+
+    //////////////////////////////////////////////////////////////////////////////////////
+    //                                  P O P U P S                                     //
+    //////////////////////////////////////////////////////////////////////////////////////
+
+    // None at the moment
+    
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
+    // MAIN:
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    // create list for table
+    list table_patch = [];
+    integer index = 0;
+    list patch_list = lookup( last_status, "patches", [] );
+
+    while (index < size(patch_list) )
+    {
+	table_patch = add( table_patch,
+			   `item(`id(select(patch_list, index)), select(patch_list, index+3),
+				 select(patch_list, index), select(patch_list, index+2)) );
+	index = index+4;
+    };
+
+    list table_info = [];
+
+    table_info = add( table_info, `item(`id(1), UI(_("Date of last update:")), lookup(last_status, "date", "--.--.----")) );
+    table_info = add( table_info, `item(`id(2), UI(_("Days since update:")), lookup(last_status, "days", "--")) );
+    table_info = add( table_info, `item(`id(3), UI(_("Error messages:")), lookup(last_status, "status", "--" )) );
+    // TODO: count patches
+    table_info = add( table_info, `item(`id(3), UI(_("Number of security patches:  ")), 3 ));
+     
+    term contents =
+	// main dialog: 
+	`VBox(
+	      `VSpacing(0.2),
+	      `Table(`id(`table_info),`opt(`hvstretch), 
+		     `header( _("Description"), _("Data") ),
+		     table_info
+		     ),
+	      `VSpacing(0.5),
+	      `Table(`id(`table_patch),`opt(`hvstretch), 
+		     `header( _("Date"), _("Patch"), _("Description") ),
+		     table_patch
+		     ),
+	      `Left( `PushButton(`id(`info), `opt(`notify), _("&Show patch information")) ),
+	      `VSpacing( 0.2 )
+	      );
+    
+    string help_text = "";
+
+    // helptext  "main dialog online_update" 
+    string help_part1 =  UI(_("<p>
+This dialog shows detailed informations about the
+last package update and about all patches
+which are installed on your system.
+</p>"));
+    string help_part2 =  UI(_("<p>
+More detailed informations about a special patch can
+be obtained. Select first the patch in list and then
+click on button <b>Show Patch Info</b>.
+</p>"));
+
+    help_text = help_part1 + help_part2;
+    
+     // using SetWizardContents (define in online_update.ycp)
+     UI(`SetWizardContents("Detailed Informations ", contents, help_text, Args(0), Args(1) ));
+
+      
+   /////////////////////////////////////////////////////////////////////////////////////////
+   ////  Loop for User Input ....
+   /////////////////////////////////////////////////////////////////////////////////////////
+    symbol ret = `next;
+
+    repeat
+    {
+        ret= UI(`UserInput());
+
+        if (ret == `next)
+        {
+
+	}
+
+	if ( ret == `abort && ConfirmAbort(`painless) )
+	    return `abort;
+
+	if ( ret == `back)
+	{
+
+	}
+
+  } until (ret == `next || ret == `back || ret == `cancel);
+    
+   return ret;
+}
+
+
+
