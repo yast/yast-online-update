@@ -61,7 +61,7 @@ II. Verzeichnisstruktur auf den Servern:
                 Die Pakete sind unterhalb des Produktverzeichnisses in den 
 		zugehörigen Serienverzeichnissen abgelegt.
                 Beispiel:
-                        http://sdb.suse.de/download/i386/update/SuSE_SLES/7/n1/mod_php4.rpm
+                        http://sdb.suse.de/download/i386/update/SuSE-SLES/7/n1/mod_php4.rpm
 			
 		
         2.2.3 Patchbeschreibungen
