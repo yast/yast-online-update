@@ -60,14 +60,17 @@
 
   y2milestone( "you_url: %1", you_url );
 
-  string mirrorListServer = "www.suse.de";
+  map statusmap = Pkg::YouStatus();
+  y2debug("status map: %1", statusmap );
+
+  string mirrorListServer = lookup( statusmap, "mirrorurl", "www.suse.de" );
 
   string initMessage = "";
   if ( cd_update ) {
     initMessage = _("Initializing for CD update.");
     you_url = "cd:///";
   } else {
-    initMessage = sformat( _("Getting list of mirror servers from %1."), mirrorListServer );
+    initMessage = sformat( _("Getting list of mirror servers."), mirrorListServer );
   }
   UI::OpenDialog(`opt(`decorated ),`Label( initMessage ));
 
@@ -95,11 +98,7 @@
     return `abort;
   }
 
-  map statusmap = Pkg::YouStatus();
-
   UI::CloseDialog();
-
-  y2debug("status map: %1", statusmap );
 
   string status_product = lookup( statusmap, "product", "unknown" );
   string status_version = lookup( statusmap, "version", "unknown" );
