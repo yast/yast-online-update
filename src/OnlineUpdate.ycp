@@ -48,24 +48,9 @@ global boolean you_continue = false;
 global string you_auto_batchkind = "all";
 
 /**
- * flag: updating a business product?
- */
-global boolean business = false ;
-
-/**
- * already updated packages
- */
-global integer you_updated_packages = 0;
-
-/**
  * flag: YOU ok?
  */
 global boolean you_ok	= true;
-
-/**
- * map containing the new patches
- */
-global map you_patches = $[];
 
 /**
  * reloading serverlist form www.suse.de
@@ -81,7 +66,6 @@ global string you_url = "";
  * should signatures be checked?
  */
 global boolean signature_check = true;
-
 
 /**
   Force reload of all patches?

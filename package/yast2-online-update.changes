@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri May 16 15:04:31 CEST 2003 - cschum@suse.de
+
+- Rewrote YOU authentification code.
+
+-------------------------------------------------------------------
 Tue Mar 11 15:30:48 CET 2003 - arvin@suse.de
 
 - avoid empty screen before starting you during installation
