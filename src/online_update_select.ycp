@@ -293,7 +293,7 @@ double-click the line (or select it and use Alt + A).
 	    y2debug("ONLINE: get patches: %1", get_patches );
 
 	    // store map of patches
-	    Online::you_patches = get_patches;
+	    OnlineUpdate::you_patches = get_patches;
 	}
 
 	if ( ret == `back)
