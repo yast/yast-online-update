@@ -36,6 +36,7 @@ the update takes place.");
 	}
 	boolean enabled = AutoOnlineUpdate::enabled;
 	boolean autoget = AutoOnlineUpdate::autoget;
+        boolean skipPre = AutoOnlineUpdate::skipPre;
 	integer minute = AutoOnlineUpdate::minute;
 	integer hour = AutoOnlineUpdate::hour;
     integer day = AutoOnlineUpdate::day;
@@ -122,12 +123,12 @@ the update takes place.");
 								    )
 							      ),
 					    `VSpacing( 0.2 ),
-					    `HBox(
-						  `HSpacing( 0.8 ),
-						  `Left(
-							`CheckBox( `id( `autoget ), _("Only Download Patches"), autoget )
-							),
-						  `HSpacing( 0.8 )
+                                            `VBox(`HBox(`HSpacing( 0.8 ),
+						        `Left(`CheckBox( `id( `autoget ), _("Only Download Patches"), autoget )),
+        						`HSpacing( 0.8 )),
+                                                  `HBox(`HSpacing( 0.8 ),
+                                                        `Left(`CheckBox( `id( `skipPre), _("Skip patches with pre-install information"), skipPre)),
+						        `HSpacing( 0.8 ))
 						  ),
 					    `VSpacing( 0.5 )
 					    )
@@ -161,6 +162,7 @@ the update takes place.");
 	}
 
 	UI::ChangeWidget( `id( `autoget ), `Enabled, enabled );
+        UI::ChangeWidget( `id( `skipPre ), `Enabled, enabled );
 	UI::ChangeWidget( `id( `timing ), `Enabled, enabled );
 	UI::ChangeWidget( `id( `day ), `Enabled, enabled );
 	UI::ChangeWidget( `id( `crontime ), `Enabled, enabled );
@@ -180,6 +182,7 @@ the update takes place.");
 	    if ( ret == `enable )
 	    {
 		UI::ChangeWidget( `id( `autoget ), `Enabled, enabled );
+		UI::ChangeWidget( `id( `skipPre ), `Enabled, enabled );
 		UI::ChangeWidget( `id( `crontime ), `Enabled, enabled );
 		UI::ChangeWidget( `id( `timing ), `Enabled, enabled );
 		UI::ChangeWidget( `id( `hour ), `Enabled, enabled &&
@@ -218,6 +221,7 @@ the update takes place.");
 		    AutoOnlineUpdate::minute = (integer)UI::QueryWidget( `id( `minute ), `Value );
 		    AutoOnlineUpdate::hour = (integer)UI::QueryWidget( `id( `hour ), `Value );
 		    AutoOnlineUpdate::autoget = (boolean)UI::QueryWidget( `id( `autoget ), `Value );
+		    AutoOnlineUpdate::skipPre = (boolean)UI::QueryWidget( `id( `skipPre ), `Value );
 		    AutoOnlineUpdate::day = (integer)UI::QueryWidget( `id(`day ), `Value );
 		    AutoOnlineUpdate::timing =	(symbol)UI::QueryWidget(`id(`timing), `CurrentButton );
 

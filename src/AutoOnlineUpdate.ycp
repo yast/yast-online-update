@@ -60,6 +60,11 @@ global string options = "";
 global boolean autoget = false;
 
 /**
+ * Skip patches with pre-install information
+ */
+global boolean skipPre = false;
+
+/**
  * Auto update enabled
  */
 global boolean enabled = false;
@@ -132,6 +137,7 @@ global define boolean Read()
         else
             day = -1;
         if ( regexpmatch( cronjob, "-g" ) ) autoget = true;
+        if ( regexpmatch( cronjob, "-P" ) ) skipPre = true;
     }
     else
     {
@@ -160,6 +166,7 @@ global define boolean Write()
                 options );
     }
     if ( autoget ) cronjob = cronjob + " -g";
+    if ( skipPre ) cronjob = cronjob + " -P";
     cronjob = cronjob + "\n";
     SCR::Write( .target.string, cronfile, cronjob );
     return true;
@@ -177,6 +184,7 @@ global define boolean Import (map settings)
     day = settings["update_time", "day"]:-1;
     minute = settings["update_time", "minute"]:-1;
     autoget = settings["autoget"]:false;
+    skipPre = settings["skipPre"]:false;
     enabled = settings["enable_autoupdate"]:false;
     random_time = settings["update_time", "random_time"]:false;
 
@@ -203,6 +211,7 @@ global define map Export ()
     update_time["random_time"] = random_time;
     settings["update_time"] = update_time;
     settings["autoget"] = autoget;
+    settings["skipPre"] = skipPre;
     settings["enable_autoupdate"] = enabled;
 
     return settings;
@@ -247,6 +256,8 @@ global define string Summary()
 
     summary = Summary::AddHeader(summary, _("Only Download Patches"));
     summary = Summary::AddLine(summary, autoget ? _("Yes") : _("No") );
+    summary = Summary::AddHeader(summary, _("Skip packages with pre-install information?"));
+    summary = Summary::AddLine(summary, skipPre ? _("Yes") : _("No") );
 
     return summary;
 }

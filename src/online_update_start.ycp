@@ -132,11 +132,11 @@
 	usermap = Pkg::YouGetUserPassword();
     }
 
-y2error ("Server: %1", server);
+    y2error ("Server: %1", server);
 
     string err = Pkg::YouGetDirectory();
 
-y2error ("err: %1", err);
+    y2error ("err: %1", err);
 
     if ( err == "login" ) {
       string username = usermap[ "username" ]:"";

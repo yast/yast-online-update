@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Jan 27 20:26:35 CET 2005 - mir@suse.de
+
+- Automatic Online Update has new option -P (skip patches with pre
+  information), (#49887) (feature 120379)
+- 2.11.7
+
+-------------------------------------------------------------------
 Mon Jan 24 21:44:33 CET 2005 - nashif@suse.de
 
 - Adapted to new argument map when going back during installation
