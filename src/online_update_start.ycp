@@ -30,7 +30,6 @@
   import "Mode";
   import "OnlineUpdate";
   
-  boolean test_mode    	= Mode::test;
   boolean business 	= false;  
 
   // constant settings

@@ -58,17 +58,16 @@ packages were created by SuSE.
   
   
   //
-  // test_mode will be set, if menu is called with arg .test ( y2base menu '(.test)' qt )
+  // Mode::test will be set, if menu is called with arg .test ( y2base menu '(.test)' qt )
   // or online_update is called directly ( /sbin/yast2 online_update '(.test)' ) 
-  // test_mode means: get the patches, but do not install (inst_rpmcopy runs with test_mode)
+  // test mode means: get the patches, but do not install (inst_rpmcopy runs with test mode)
   
   integer arg_n = size(Args()) - 1;
-  boolean test_mode = false;
   
   while (arg_n >= 0) {
       if (Args(arg_n) == .test)
       {
-	  test_mode = true;
+	  Mode::test = true;
       }
       else if (Args(arg_n) == .cd_default)
       {
@@ -94,7 +93,6 @@ packages were created by SuSE.
 	  
       arg_n = arg_n - 1;
   }
-  Mode::test = true;
   
   y2debug("ONLINE: Testmode %1", Mode::test );
 
