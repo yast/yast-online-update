@@ -22,6 +22,27 @@
 
   boolean business	= false;
 
+  global define string GetPatches() ``{
+
+    UI::OpenDialog( `opt( `decorated ),
+      `VBox(
+        `VSpacing( 0.2 ),
+        `ProgressBar( `id( `progress ), _("Getting patch information.") ),
+        `VSpacing( 0.2 ),
+        `PushButton( `id( `abort ), AbortButtonLabel() ),
+        `VSpacing( 0.2 )
+      )
+    );
+
+    string err = Pkg::YouGetPatches( you_server,
+                                     OnlineUpdate::signature_check );
+
+    UI::CloseDialog();
+
+    return err;
+
+  };
+
 
   /////////////////////////////////////////////////////////////////////////////////////
   // MAIN:
@@ -45,7 +66,7 @@
     initMessage = _("Initializing for CD update.");
     you_url = "cd:///";
   } else {
-    initMessage = sformat( _("Getting list of YOU servers from %1."), mirrorListServer );
+    initMessage = sformat( _("Getting list of mirror servers from %1."), mirrorListServer );
   }
   UI::OpenDialog(`opt(`decorated ),`Label( initMessage ));
 
@@ -144,7 +165,7 @@
                 `VSpacing(0.3),
                 `HBox(`HSpacing(1.2),
                   `HWeight(1,`Left(`ComboBox(`id(`you), `opt(`editable), _("&Installation source"), you_server_list ))),
-                  `PushButton( `id(`expert), `opt(`notify), _("&Expert"))
+                  `PushButton( `id(`expert), `opt(`notify), _("&Expert..."))
                 ),
                 `VSpacing(0.3)
               )
@@ -238,44 +259,35 @@ another FTP or HTTP server.</p>
 	      }
 	  }
 
-          if ( cd_update ) {
-              UI::OpenDialog(`opt(`decorated ),`Label(_("Initializing for CD update. One moment please...")));
-          } else {
-              UI::OpenDialog(`opt(`decorated ),`Label(_("Initializing for FTP/HTTP update. One moment please...")));
-          }
-          string err = Pkg::YouGetPatches( you_server,
-                                           OnlineUpdate::signature_check );
-          UI::CloseDialog();
-          
+          string err = GetPatches();
+
           if ( size( err ) != 0 ) {
+            if ( err == "abort" ) ret = `this;
+            string msg = "";
             if ( err == "media" ) {
               if ( cd_update ) {
-                UI::ErrorPopup(_("Initialization failed. Please check that
-you have inserted the correct CD.\n"));
+                msg = _("Initialization failed. Please check that
+you have inserted the correct CD.\n");
               } else {
-	        UI::ErrorPopup(_("Initialization failed. Try again.
+	        msg = _("Initialization failed. Try again.
 If failure continues, choose
-another SuSE FTP/HTTP server.\n"));
+another SuSE FTP/HTTP server.\n");
               }
-	      ret = `this;
             } else if ( err == "sig" ) {
                 UI::ErrorPopup(_("Signature check for patch info files failed.
 Can't load patch information.\n"));
-              ret = `this;
+                ret = `this;
             } else if ( err == "url" ) {
-                UI::ErrorPopup(_("URL is invalid."));
+                msg = _("URL is invalid.");
             } else {
-              y2error( "YouGetPatches Error: %1", err );
-              // Message popup: yast2 component responsible for the you update cannot be initialised.
-              // This does not mean, connection failed to you server, but any other error occured.
-              UI::MessagePopup(_("Initialization of FTP/HTTP server failed:
-internal error.
-"));
-              return `abort;
+                msg =  _("Getting patch information failed.");
             }
+            
+            UI::YouErrorPopup( msg, Pkg::ErrorDetails() );
+            ret = `this;
+          } else {
+            Pkg::YouSelectPatches();
           }
-
-          Pkg::YouSelectPatches();
       }
       else if ( ret == `expert )
       {

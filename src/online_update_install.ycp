@@ -48,9 +48,13 @@
 	    `VSpacing( 0.2 ),
             `LogView(`id(`log), _("Package Update information"), 5, 0 ),
 	    `VSpacing( 0.5 ),
+            `ProgressBar( `id( `patchprogress ), _("Patch Progress") ),
+            `VSpacing( 0.2 ),
+            `ProgressBar( `id( `progress ), _("Total Progress") ),
+	    `VSpacing( 0.5 ),
 	    `Left(`CheckBox(`id(`remove_packages),_("&Remove source packages after update."), false)),
-	    `VSpacing( 0.2 )
-	    );
+            `VSpacing( 0.2 )
+            );
     
   string help_text = "";
 
@@ -72,8 +76,7 @@ option 'Remove source packages after update.'</p>");
   // using SetContents (define in online_update.ycp)
   Wizard::SetContents(_("Online Update Confirmation"), contents, help_text, WFM::Args(0), WFM::Args(1) );
 
-  // changing Label to Finish for the last step
-  UI::ChangeWidget(`id(`abort), `Enabled,  false );
+  UI::ChangeWidget(`id(`next), `Enabled,  false );
 
   Pkg::YouAttachSource();
 
@@ -86,6 +89,15 @@ option 'Remove source packages after update.'</p>");
                       _("No new patches available." ) );
   } else {
     while( size( patch ) != 0 ) {
+      y2debug("Patch: %1", patch);
+    
+      string errorMsg = patch[ "error" ]: "";
+      y2debug("ErrorMsg: %1", errorMsg);
+
+      if ( errorMsg == "abort" ) {
+        if ( UI::ConfirmAbortUpdate( `painless ) ) return `abort;
+      }
+    
       UI::ChangeWidget( `id(`log), `LastLine,
                         sformat ( _( "Retrieving %1: \"%2\" " ),
                             lookup( patch, "name", "unknown" ),
@@ -101,6 +113,8 @@ option 'Remove source packages after update.'</p>");
           UI::ChangeWidget( `id(`log), `LastLine, _(": Can't get files.") );
         } else if ( err == "sig" ) {
           UI::ChangeWidget( `id(`log), `LastLine, _(": Signature check failed.") );
+        } else if ( err == "abort" ) {
+          if ( UI::ConfirmAbortUpdate( `painless ) ) return `abort;
         } else {
           y2error( "YouGetCurrentPatch Error: %1", err );
         }
@@ -116,7 +130,7 @@ option 'Remove source packages after update.'</p>");
       UI::ErrorPopup( _("Download failed.") );
     } else {
     
-      patch =  Pkg::YouFirstPatch();
+      patch =  Pkg::YouFirstPatch( false );
 
       error = false;
 

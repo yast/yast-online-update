@@ -16,7 +16,8 @@ client_DATA =				\
 	online_update.ycp
 
 module_DATA =			\
-	OnlineUpdate.ycp
+	OnlineUpdate.ycp        \
+        OnlineUpdateCallbacks.ycp
 
 config_DATA =			\
 	online_update.y2cc	\

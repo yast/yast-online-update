@@ -9,12 +9,13 @@
  * Call the PackageSelector in YOU mode.
  */
 {
-
   textdomain "online-update";
 
   UI::OpenDialog(`opt(`defaultsize), `PackageSelector(`id(`selector), `opt(`youMode)) );
   symbol ret = UI::RunPkgSelection(`id(`selector) );
   UI::CloseDialog();
+
+  Wizard::ClearContents();  
 
   y2debug( "RunPkgSelection returned '%1'", ret );
 
