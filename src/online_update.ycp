@@ -55,12 +55,12 @@ packages were created by SuSE.
 
       if ( arg == .test || arg == ".test" )
       {
-	  Mode::SetTest (true);
+	  Mode::SetTest ("test");
       }
       else if ( arg == .cd_default || arg == ".cd_default" )
       {
-	  Mode::youInstallMap["you_server"]	= "CD";		// text for output field
-	  Mode::youInstallMap["you_serverkind"] = "cd";
+//	  Mode::youInstallMap["you_server"]	= "CD";		// text for output field
+//	  Mode::youInstallMap["you_serverkind"] = "cd";
 	  OnlineUpdate::cd_update	=  true;
       }
       else if ( arg == .auto.get || arg == ".auto.get" )

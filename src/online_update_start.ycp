@@ -136,7 +136,7 @@ y2error ("Server: %1", server);
 
     string err = Pkg::YouGetDirectory();
 
-y2error ("err: %1");
+y2error ("err: %1", err);
 
     if ( err == "login" ) {
       string username = usermap[ "username" ]:"";
@@ -192,7 +192,7 @@ y2error ("err: %1");
     initMessage = _("Initializing for CD update...");
     you_url = "cd:///";
   } else {
-    initMessage = sformat( _("Getting a list of mirror servers..."), mirrorListServer );
+    initMessage = sformat( _("Getting a list of mirror servers...")/*, mirrorListServer*/ );
   }
   UI::OpenDialog(`opt(`decorated ),`Label( initMessage ));
 
