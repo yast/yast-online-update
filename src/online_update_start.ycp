@@ -34,6 +34,9 @@
   string yastpath = "/var/lib/YaST";
   string patchpath = "/var/lib/YaST/patches";
   string logpath = "/var/log/y2ftp";
+  string ftp_server = lookup(user_settings, "ftp_server", "" );
+
+  
 
 
     //////////////////////////////////////////////////////////////////////////////////////
@@ -61,6 +64,13 @@
     foreach(`server, `info, ftp_server_map, ``{
 	ftp_server_list = add(ftp_server_list, server);
     });
+
+    // insert local server like CD, NFS ....
+    if ( ftp_server != "" )
+    {
+	ftp_server_list = add(ftp_server_list, ftp_server );
+	ftp_server_list = toset(ftp_server_list);
+    }
 	    
 	// initialize PKGINFO
 	UI(`OpenDialog(`opt(`decorated ),`Label(_("Initializing for ftp update; One moment please..."))));
@@ -95,8 +105,8 @@ for further information ."))) )
 	      `HBox(`HWeight(1, `Empty()),
 		    `HWeight(8, `Frame (_("Last update information"),
 					`VBox(`VSpacing(0.8),
-					      `HBox(`Label( sformat(UI(_("Last update was executed\n %1 days ago.")),
-								    lookup( last_status, "days", "--" ))),
+					      `HBox(`HSpacing(0.8),`Left(`Label( sformat(UI(_("Last update was executed\n %1 days ago.")),
+								    lookup( last_status, "days", "--" )))),
 						    `HSpacing(2.0),
 						    `PushButton( `id(`details), `opt(`notify), _("&Details"))
 						    ),
@@ -105,9 +115,9 @@ for further information ."))) )
 					)),
 		    `HWeight(1, `Empty())
 		    ),
-	      `VSpacing(2.0),
+	      `VSpacing(1.0),
 	      `HBox(`HWeight(1, `Empty()),
-		    `HWeight(8, `Frame (_("Choice of update mode and server"),
+		    `HWeight(8, `Frame (_("Choice of update mode"),
 					`RadioButtonGroup(`id(`choice),
 							  `VBox(
 								`VSpacing(0.3),
@@ -120,9 +130,21 @@ for further information ."))) )
 								      `Left(`RadioButton(`id(`manual),`opt(`notify),
 											 _("&Manual Update") ,  false))
 								      ),
+								`VSpacing(0.3) 
+								)
+							  )
+					)),
+		    `HWeight(1, `Empty())
+		    ),
+	      `VSpacing(1.0),	      
+	      `HBox(`HWeight(1, `Empty()),
+		    `HWeight(8, `Frame (_("Choice of installation-source"),
+					`RadioButtonGroup(`id(`choice),
+							  `VBox(
 								`VSpacing(0.3),
 								`HBox(`HSpacing(1.2),
-								      `Left(`ComboBox(`id(`ftp), "SuSE ftpserver", ftp_server_list ))
+								      `Left(`ComboBox(`id(`ftp), _("Installation-source"), ftp_server_list )),
+								      `PushButton( `id(`local), `opt(`notify), _("&Local"))
 								      ),
 								`VSpacing(0.3) 
 								)
@@ -167,6 +189,11 @@ if you click on button <b>Details</b>.
 	UI(`ChangeWidget(`id(`manual), `Value, true ));
     }
 
+    if ( ftp_server != "" )
+    {
+	UI(`ChangeWidget(`id(`ftp), `Value, ftp_server ));
+    }
+
     //  Loop for User Input ....
 
     symbol ret = `next;
@@ -175,19 +202,20 @@ if you click on button <b>Details</b>.
     {
         ret= UI(`UserInput());
 
+	if ( UI(`QueryWidget(`id(`automatic), `Value ) ) )
+	{
+	    user_settings = add (user_settings, "ftp_auto", true);
+	}
+	else
+	{
+	    user_settings = add (user_settings, "ftp_auto", false);
+	}
+	    
+	string ftp_server =  UI(`QueryWidget(`id(`ftp), `Value ));
+	user_settings = add(user_settings, "ftp_server", ftp_server);
+	
         if (ret == `next)
         {
-	    if ( UI(`QueryWidget(`id(`automatic), `Value ) ) )
-	    {
-		user_settings = add (user_settings, "ftp_auto", true);
-	    }
-	    else
-	    {
-		user_settings = add (user_settings, "ftp_auto", false);
-	    }
-	    
-	    string ftp_server =  UI(`QueryWidget(`id(`ftp), `Value ));
-	    user_settings = add(user_settings, "ftp_server", ftp_server);
 
 	    string update_path = select( lookup(ftp_server_map, ftp_server, ""), 0 );
 	      
@@ -209,6 +237,26 @@ another SuSE ftp server.")));
 	    if ( retval == `abort )
 		return `abort;
 	    
+	    ret = `again;
+	}
+	else if ( ret == `local )
+	{
+	    any retval = CallFunction(`inst_source( true, false ) );
+	    if ( retval == `abort )
+		return `abort;
+
+	    ftp_server = lookup ( user_settings, "ftp_server", "" );
+	    any retval = PKGINFO(`ftpSetServer( ftp_server,
+						"" ) );
+	    y2debug("ONLINE: PKGINFO(`setFtpServer( %1, ) ): %3", ftp_server,
+		    retval );
+		
+	    if (retval == nil || retval == false)
+	    {
+		UI(`DisplayMsgFtp(_("Initialization failed - please try again.
+If failure continues, please choose
+another SuSE ftp server.")));
+	    }
 	    ret = `again;
 	}
 	else if ( ret == `back)
