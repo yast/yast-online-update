@@ -130,6 +130,48 @@ packages were created by SuSE.
 
 UI(``{
 
+    global define YouErrorPopup( string message, string details ) ``{
+
+        if ( size( details ) == 0 ) return ErrorPopup( message );
+
+        string detailsStringOn = _("&Details <<");
+        string detailsStringOff = _("&Details >>");
+
+        OpenDialog( `opt( `decorated ),
+            `VBox(
+                `HBox( `HSpacing( 0.5 ), `Left( `Heading( _("Error") ) ) ),
+                `VSpacing( 0.2 ),
+                `Label( message ),
+                `ReplacePoint( `id( `rp ), `Empty() ),
+                `HBox(
+                    `PushButton( `id( `details ), detailsStringOff ),
+                    `PushButton( `id( `ok ), OKButtonLabel() )
+                )
+            )
+        );
+        
+        symbol ret = nil;
+        boolean showDetails = false;
+             
+        while( ret != `ok ) {
+            ret = UserInput();
+            
+            if ( ret == `details ) {
+                if ( showDetails ) {
+                    UI::ReplaceWidget( `id( `rp ), `Empty() );
+                    UI::ChangeWidget( `id( `details ), `Label, detailsStringOff );
+                } else {
+                    UI::ReplaceWidget( `id( `rp ), `HBox( `HSpacing( 0.5 ),
+                                                          `HWeight( 1, `RichText( details ) ),
+                                                          `HSpacing( 0.5 ) )
+                                                         );
+                    UI::ChangeWidget( `id( `details ), `Label, detailsStringOn );
+                }
+                showDetails = !showDetails;
+            }
+        }
+    }
+
     //  ConfirmAbortUpdate has same layout as/but different text than ConfirmAbort
    global define ConfirmAbortUpdate( symbol how_to ) ``{
 	  string what_will_happen = "";
@@ -197,7 +239,6 @@ You will need to do the update again.");
 
 	  return (ret == `really_abort);
       };
-
 
    global define DisplayMsgYou( string message, string header, string yes_button, string no_button ) ``{
           OpenDialog(
@@ -392,6 +433,11 @@ Check the registration data.
 
       return success;
   };
+
+  if ( Mode::test ) {
+    UI::YouErrorPopup( "Message", "This is a long message, whcih has almost no end." );
+    return `test;
+  }
 
   /*
    * Main dialog cycle
