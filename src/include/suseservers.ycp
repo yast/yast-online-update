@@ -39,14 +39,7 @@
 	    string server = lookup (entry, "server", "");
 	    string type = lookup (entry, "type", "");
 	    string spath = lookup (entry, "path", "");
-	    if( type == "ftp" )
-	    {
-		type = "FTP";
-	    }
-	    if( type == "http" )
-	    {
-		type = "HTTP";
-	    }
+
 	    serversmap = add (serversmap, server, [ spath, type ]);
 	});
 
