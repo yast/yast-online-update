@@ -19,6 +19,9 @@
 
 /*
  * $Log$
+ * Revision 1.2  2001/11/26 13:42:25  schubi
+ * new Flag in Patchfile: Installtrigger
+ *
  * Revision 1.1  2001/11/12 16:57:25  schubi
  * agent for handling you
  *
@@ -68,6 +71,7 @@
 #define LONGDESCRIPTION		"Longdescription."
 #define PREINFORMATION		"Preinformation."
 #define POSTINFORMATION		"Postinformation."
+#define INSTALLTRIGGER		"Installtrigger"
 #define LANGUAGE		"Language"
 #define DISTRIBUTION		"Distribution"
 #define SIZE			"Size"
@@ -174,12 +178,17 @@ PatchInfo::PatchInfo( const string path, const string desc_language )
 	   Element postInformationElement;
 	   postInformationElement.values = postInformationValues;
 	   postInformationElement.multiLine = true;
-
+	   
 	   Values defaultPostInformationValues;
 	   Element defaultPostInformationElement;
 	   defaultPostInformationElement.values =
 	      defaultPostInformationValues;
 	   defaultPostInformationElement.multiLine = true;
+
+	   Values installTriggerValues;
+	   Element installTriggerElement;
+	   installTriggerElement.values = installTriggerValues;
+	   installTriggerElement.multiLine = true;
 
 	   Values languageValues;
 	   Element languageElement;
@@ -258,6 +267,8 @@ PatchInfo::PatchInfo( const string path, const string desc_language )
 
 	   entries.insert(pair<const string, const Element>
 			  ( LANGUAGE, languageElement ) );
+	   entries.insert(pair<const string, const Element>
+			  ( INSTALLTRIGGER, installTriggerElement ) );	   
 	   entries.insert(pair<const string, const Element>
 			  ( DISTRIBUTION, distributionElement ) );
 	   entries.insert(pair<const string, const Element>
@@ -401,6 +412,18 @@ PatchInfo::PatchInfo( const string path, const string desc_language )
 		    patchElement.postInformation += *posValues + "\n";
 		 }
 	      }
+	   }
+
+	   posEntries = entries.find ( INSTALLTRIGGER );
+	   if ( posEntries != entries.end() );
+	   {
+	       Values values = (posEntries->second).values;
+	       Values::iterator posValues;
+	       for ( posValues = values.begin(); posValues != values.end() ;
+		     ++posValues )
+	       {
+		   patchElement.installTrigger += *posValues + "\n";
+	       }
 	   }
 
 	   posEntries = entries.find ( LANGUAGE );
@@ -547,6 +570,7 @@ PatchElement::PatchElement ( const string patchPath,
    longDescription = "";
    preInformation = "";
    postInformation = "";
+   installTrigger = "";
    language = "";
    distribution = "";
    size = "";

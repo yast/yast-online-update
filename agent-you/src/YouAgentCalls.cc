@@ -1559,32 +1559,61 @@ YCPValue YouAgent::newPatchList ( void )
 	 if ( patchElement.rawPackageInfo != NULL &&
 	      patchElement.kind != OPTIONAL )
 	 {
-	    // Evaluate, if a package is of the patch is already installed
-	    // on the current system. --> It will be selected to install.
-	    // But not patches with kind "optional"
+	     if ( patchElement.installTrigger != ""
+		  && mainscragent )
+	     {
+		 // Running trigger script in order to check if the
+		 // packages have to be installed
+		 YCPPath path = ".target.bash";
+		 YCPString value ( patchElement.installTrigger );
+		 YCPValue ret = mainscragent->Execute( path, value );
+
+		 if ( ret->isInteger() )	// success ???
+		 {
+		     if (  ret->asInteger()->value() >= 0 )
+		     {
+			 y2debug( "%s ok", patchElement.installTrigger.c_str() );
+			 packageInstalled = true;
+		     }
+		     else
+		     {
+			 y2debug( "%s returned ERROR",
+				  patchElement.installTrigger.c_str() );
+		     }
+		 }
+		 else
+		 {
+		     y2error("<.target.bash> System agent returned nil.");
+		 }		 
+	     }
+	     else
+	     {
+		 // Evaluate, if a package is of the patch is already installed
+		 // on the current system. --> It will be selected to install.
+		 // But not patches with kind "optional"
 	    
-	    PackVersList packageList =
-	       patchElement.rawPackageInfo->getRawPackageList( false );
-	    PackVersList::iterator pos;
+		 PackVersList packageList =
+		     patchElement.rawPackageInfo->getRawPackageList( false );
+		 PackVersList::iterator pos;
 
-	    for ( pos = packageList.begin();
-		  pos != packageList.end();
-		  pos++ )
-	    {
-	       PackageKey packageKey = *pos;
-	       string rpmVersion = rpmDb->queryPackageVersion ( packageKey.name() );
-	       if (  rpmVersion != "" )
-	       {
-		  string packageName = packageKey.name();
-		  bool basePackage;
-		  int installationPosition;
-		  int cdNr;
-		  string instPath;
-		  string version;
-		  long buildTime;
-		  int rpmSize;
+		 for ( pos = packageList.begin();
+		       pos != packageList.end();
+		       pos++ )
+		 {
+		     PackageKey packageKey = *pos;
+		     string rpmVersion = rpmDb->queryPackageVersion ( packageKey.name() );
+		     if (  rpmVersion != "" )
+		     {
+			 string packageName = packageKey.name();
+			 bool basePackage;
+			 int installationPosition;
+			 int cdNr;
+			 string instPath;
+			 string version;
+			 long buildTime;
+			 int rpmSize;
 
-		  patchElement.rawPackageInfo->getRawPackageInstallationInfo(
+			 patchElement.rawPackageInfo->getRawPackageInstallationInfo(
 					        packageName,
 						basePackage,
 						installationPosition,
@@ -1592,29 +1621,30 @@ YCPValue YouAgent::newPatchList ( void )
 						instPath,
 						version,
 						buildTime, rpmSize );
-		  if ( CompVersion ( version, rpmVersion ) == V_NEWER )
-		  {
-		     packageInstalled = true;
-		  }
-	       }
-	       else
-	       {
-		  // Checking if a provides is installed
-		  PackList packageList = patchElement.rawPackageInfo->getProvides(
+			 if ( CompVersion ( version, rpmVersion ) == V_NEWER )
+			 {
+			     packageInstalled = true;
+			 }
+		     }
+		     else
+		     {
+			 // Checking if a provides is installed
+			 PackList packageList = patchElement.rawPackageInfo->getProvides(
 									  packageKey.name()
 									  );
-		  PackList::iterator posList;
-		  for ( posList = packageList.begin();
-			posList != packageList.end();
-			++posList )
-		  {
-		     if (  rpmDb->queryPackageVersion ( *posList ) != "" )
-		     {
-			packageInstalled = true;
+			 PackList::iterator posList;
+			 for ( posList = packageList.begin();
+			       posList != packageList.end();
+			       ++posList )
+			 {
+			     if (  rpmDb->queryPackageVersion ( *posList ) != "" )
+			     {
+				 packageInstalled = true;
+			     }
+			 }
 		     }
-		  }
-	       }
-	    }
+		 }
+	     }
 	 }
 
 	 if ( packageInstalled )

@@ -44,6 +44,7 @@ struct PatchElement {
    string longDescription;
    string preInformation;
    string postInformation;
+   string installTrigger;
    string language;
    string distribution;
    string size;
