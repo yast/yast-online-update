@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Dec 11 13:05:44 CET 2001 - schubi@suse.de
+
+- New flag "UpdateOnlyInstalled" in order to install only
+  packages of patch which are installed. 
+
+-------------------------------------------------------------------
 Fri Dec  7 12:52:50 CET 2001 - schubi@suse.de
 
 - proxy support added
