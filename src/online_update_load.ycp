@@ -180,7 +180,7 @@ The ftp connection will be closed.
 	  return ret_list;
       }
 
-      string connect_string = "Starting download of selected patches from "  + ftp_server + ".\n";
+      string connect_string = sformat ( UI(_("Starting download of selected patches from %1.\n")), ftp_server );
       UI(`ChangeWidget(`id(`log), `LastLine, connect_string ));
 
       map  result_map = PKGINFO(`ftpConnect());
@@ -204,9 +204,7 @@ The ftp connection will be closed.
 	  
 	  y2debug("Status of patch %1: %2", patch, select( lookup(new_patches, patch, []), 3 ));
 
-	  UI(`ChangeWidget(`id(`log), `LastLine, "Get packages for patch " +
-			   patch +
-			   "\n" ));
+	  UI(`ChangeWidget(`id(`log), `LastLine, sformat( UI(_("Get packages for patch %1\n")), patch) ) );
 	  
 	  patch_result = PKGINFO( `ftpGetPatch( select(patch_list, index) ) );
 	  y2debug("ONLINE: PKGINFO(ftpGetPatch( %1 )): %2", select(patch_list, index), patch_result );
@@ -257,7 +255,7 @@ The ftp connection will be closed.
 		
 		  if (retval == nil || retval == false)
 		  {
-		      last_logging = sformat ( "Connection failed to %1\n", otherFtpServer );
+		      last_logging = sformat ( UI(_("Connection failed to %1\n")), otherFtpServer );
 		      UI(`ChangeWidget(`id(`log), `LastLine, last_logging ));		      
 		  }
 		  else
@@ -309,7 +307,7 @@ The ftp connection will be closed.
 		
 		  if (retval == nil || retval == false)
 		  {
-		      last_logging = sformat ( "Connection failed to %1\n", ftp_server );
+		      last_logging = sformat ( UI(_("Connection failed to %1\n")), ftp_server );
 		      UI(`ChangeWidget(`id(`log), `LastLine, last_logging ));		      
 		  }
 
@@ -609,8 +607,7 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
       // The patch-list only have to get from ftp-server in the
       // first call.
       
-      string connect_string = "Starting download of patch descriptions from "
-	  + ftp_server + ".\n";
+      string connect_string = sformat( UI(_("Starting download of patch descriptions from %1.\n")), ftp_server );
       UI(`ChangeWidget(`id(`log), `LastLine, connect_string ));
 
       if ( success )
@@ -652,9 +649,16 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
       {
 	  UI(`ChangeWidget(`id(`log), `LastLine,
 			   lookup (result_map, "message", "" ) )); 
-	  
-	  UI(`MessagePopup(_("Connection to ftp server failed.
+	  if ( lookup( user_settings, "ftp_server", "" ) == "CD" )
+	  {
+	      UI(`MessagePopup(_("Can't get patch descriptions.
+Please insert SuSE patch CD.")));  
+	  }
+	  else
+	  {
+	      UI(`MessagePopup(_("Connection to ftp server failed.
 Please try to get connection to another SuSE ftp server.")));
+	  }
 	  return `back;  
       }
 
@@ -724,8 +728,8 @@ Please try to get patches from another SuSE ftp server.")));
 	  new_patches = yast2map;
 	  y2milestone( " YaST2 patches found; only install %1",
 		       new_patches );
-	  UI(`MessagePopup(_("There have been found YaST2 patches.
-These patches should be installed at first.
+	  UI(`MessagePopup(_("There are YaST2 patches available.
+These patches should be installed first.
 Please install these patches and call YaST2 online update once
 again to install the rest of the packages.")));
       }
@@ -807,7 +811,7 @@ again to install the rest of the packages.")));
 	      {
 		  // set CloseUpdate status to false (installation NOT complete)
 		  PKGINFO(`ftpCloseUpdate(false) );
-		  PKGINFO(`ftpDisconnect());
+		  any ret = PKGINFO(`ftpDisconnect());
 		  y2debug("ONLINE:  PKGINFO(`ftpDisconnect()): %1", ret );
 		  return `abort;	// abort update
 	      }

@@ -242,7 +242,8 @@ installation-source instead of a ftp-server or select another ftp-server.
 	{
 	    user_settings = add (user_settings, "ftp_auto", false);
 	}
-	    
+
+	// add ftp_server to user_settings
 	string ftp_server =  UI(`QueryWidget(`id(`ftp), `Value ));
 	user_settings = add(user_settings, "ftp_server", ftp_server);
 	

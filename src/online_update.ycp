@@ -65,7 +65,11 @@
   while (arg_n >= 0) {
       if (Args(arg_n) == .test) {
 	  test_mode = true;
-      }            
+      }
+      else if (Args(arg_n) == .cd_default) {
+	  user_settings = add( user_settings, "ftp_server", "CD" );
+      }
+	  
       arg_n = arg_n - 1;
   }
   user_settings = add( user_settings, "test_mode", test_mode );
