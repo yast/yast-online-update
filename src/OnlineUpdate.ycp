@@ -1,0 +1,70 @@
+/**
+ * Module:              OnlineUpdate.ycp
+ *
+ * Authors:             Gabriele Strattner (gs@suse.de)
+ *                      Stefan Schubert (schubi@suse.de)
+ *
+ * Purpose:             Provides data used for Online Update
+ *
+ *
+ * $Id$
+ */
+
+{
+    module "OnlineUpdate";
+
+    import "Arch";
+    import "Installation";
+    import "Mode";
+
+    // ftp server for the online update
+    global string you_server	=   "ftp.suse.com";
+
+    // which kind of 'server'; possible values are: hd, nfs, cd, ftp, http
+    global string you_serverkind = "ftp";
+
+    // directory on the server
+    global string you_dir 	= "/pub/suse";
+
+    // flag: do we do an update from CD?
+    global boolean cd_update 	= false;
+
+    // flag: YOU automatic get mode?
+    global boolean you_auto_get = false;
+
+    // flag: YOU automatic install mode?
+    global boolean you_auto_install = false;
+
+    // flag: Automatic Update
+    global boolean you_auto	= false;
+
+    // flag: Continue mode?
+    global boolean you_continue = false;
+    
+    // batch kind like security,.....
+    global string you_auto_batchkind = "all";
+
+    // flag: updating a business product?
+    global boolean business = false ;
+    
+    // already updated packages
+    global integer you_updated_packages = 0;
+
+    // flag: YOU ok?
+    global boolean you_ok	= true;
+
+    // map containing the new patches
+    global map you_patches = $[];
+    
+
+    //
+    // Constructor
+    //
+    global define OnlineUpdate() ``{
+	return;
+    }
+
+    
+}
+
+
