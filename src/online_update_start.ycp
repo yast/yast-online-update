@@ -368,7 +368,10 @@ another FTP or HTTP server.</p>
             if ( err != "abort" ) {
               string msg = "";
               string details = Pkg::ErrorDetails();
-              if ( err == "media" ) {
+              if ( err == "login" ) {
+                msg = _("Login failed. Please check that you have provided
+the correct username and password.\n");
+              } else if ( err == "media" ) {
                 if ( cd_update ) {
                   msg = _("Initialization failed. Please check that
 you have inserted the correct CD.\n");
