@@ -221,6 +221,40 @@ will now be installed.");
     UI::RecalcLayout();
   }
 
+  global define LoadSettings() ``{
+    products = [];
+    string settings = SCR::Read( .target.string,
+                                 "/var/lib/YaST2/you/you_server_settings" );
+    list lines = splitstring( settings, "\n" );
+    integer i = 0;
+    while( i < size( lines ) ) {
+      list e = splitstring( lines[ i ]:"", ";" );
+      string pname = e[ 0 ]:"";
+      if( size( pname ) != 0 ) {
+        map p = $[ "name":e[ 0 ]:"", "version":e[ 1 ]:"", "arch":e[ 2 ]:"",
+                   "url":e[ 3 ]:"" ];
+        products = add( products, p );
+      }
+      i = i + 1;
+    }
+  }
+
+  global define SaveSettings() ``{
+    string settings = "";
+    integer i = 0;
+    while( i < size( products ) ) {
+      map p = products[ i ]:$[];
+      string line = p[ "name" ]:"" + ";" + p[ "version" ]:"" + ";" +
+                    p[ "arch" ]:"" + ";" + p[ "url" ]:"" + "\n";
+      y2internal( "%1", line );
+      settings = settings + line;
+      i = i + 1;
+    }
+    
+    SCR::Write( .target.string, "/var/lib/YaST2/you/you_server_settings",
+                settings );
+  }
+
   term widget_server_unused =
   `HBox(
     `Label( _("Server Status: unused") ),
@@ -278,10 +312,14 @@ server.</p>");
 
   list products = [];
   
-  products = add( products, $[ "name": "SuSE-Linux",
-                               "version": "9.0",
-                               "arch": "i386",
-                               "url": "ftp://ftp.suse.com/pub/suse" ] );
+  LoadSettings();
+  
+  if ( size( products ) == 0 ) {
+    products = add( products, $[ "name": "SuSE-Linux",
+                                 "version": "9.0",
+                                 "arch": "i386",
+                                 "url": "ftp://ftp.suse.com/pub/suse" ] );
+  }
 
   UpdateProductList();
   UpdateLastSync();
@@ -314,15 +352,17 @@ server.</p>");
       UI::ChangeWidget( `id(`products), `CurrentItem, current );
     } else if ( ret == `remove ) {
       integer current = UI::QueryWidget( `id(`products), `CurrentItem );
-      remove( products, current );
+      products = remove( products, current );
       UpdateProductList();
+      if ( current >= size( products ) ) current = size( products ) - 1;
+      UI::ChangeWidget( `id(`products), `CurrentItem, current );
     }
 
   } until ( ret == `next || ret == `cancel  || ret == `abort );
 
-  UI::CloseDialog();
-
   SaveSettings();
+
+  UI::CloseDialog();
 
   return ret;
 }
