@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Mar 25 10:28:22 CET 2004 - cschum@suse.de
+
+- Add yast2-packager to neededforbuilds.
+- 2.9.8
+
+-------------------------------------------------------------------
 Tue Mar 23 14:19:43 CET 2004 - lnussel@suse.de
 
 - set sort key in desktop file to move module icon to front (#36466)
