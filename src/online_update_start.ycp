@@ -111,13 +111,17 @@
 
   y2debug( "ONLINE: Return  PKGINFO(`ftpsetEnvironment() %1", retval );
   UI(`CloseDialog());
+
   // Popup is shown if the yast2 component responsible for the ftp update cannot be initialised.
   // This does not mean, connection failed to ftp server, but any other error occured.
-  if (!retval && UI(`MessagePopup(_("Initialisation of ftp server failed.\n
-Please check www.suse.de
-for further information ."))) )
+  if (!retval)
+  {
+      UI(`MessagePopup(_("Initialisation of ftp server failed.\n
+You may try to install the package
+\"yast2-online-update\" once again.\n")));
       return `abort;
-     
+  }
+  
   // get last update status from PKGINFO
   last_status = PKGINFO(`ftpLastUpdateStatus() );
 
