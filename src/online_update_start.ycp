@@ -421,22 +421,25 @@ another FTP or HTTP server.</p>
 	      boolean success = CheckAuthorization( you_server );
 	      if ( !success )
               {
-		  return `again;
+		  ret = `this;
 	      }
 	  }
 
+          UI::OpenDialog(`opt(`decorated ),`Label(_("Initializing for FTP/HTTP update. One moment please...")));
           string err = Pkg::YouGetPatches( you_server,
                                            OnlineUpdate::signature_check );
+          UI::CloseDialog();
+          
           if ( size( err ) != 0 ) {
             if ( err == "media" ) {
 	      UI::ErrorPopup(_("Initialization failed. Try again.
 If failure continues, choose
 another SuSE FTP/HTTP server.\n"));
-	      ret = `again;
+	      ret = `this;
             } else if ( err == "sig" ) {
                 UI::ErrorPopup(_("Signature check for patch info files failed.
 Can't load patch information.\n"));
-              ret = `again;
+              ret = `this;
             } else if ( err == "url" ) {
                 UI::ErrorPopup(_("URL is invalid."));
             } else {

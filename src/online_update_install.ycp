@@ -7,7 +7,7 @@
  *           www.suse.de / www.suse.com
  * ----------------------------------------------------------
  *
- * Author:        Gabriele Strattner <gs@suse.de>
+ * Author:        Cornelius Schumacher <cschum@suse.de>
  *
  * Purpose:
  *
@@ -54,23 +54,18 @@
     
   string help_text = "";
 
-  // helptext  update is finished 
-  string help_part1 =  _("<p>
-Online Update is finished.
-Your installation is up-to-date now.
-It is recommended to check regularly
-for new patches.<br></p>
-");
-  string help_part2 =  _("<p>
-If any errors occur during download or installation,
-check the <b>Details</b> for more information.
-</p>
-");
-  string help_part3 =  _("<p>
-Try to update again if important
-patches could not be installed.
-</p>
-");
+  string help_part1 =  _("<p>After connecting to SuSE server,
+YaST2 will download all selected patches.
+This could take some time. Several details are shown.</p>");
+
+  string help_part2 =  _("<p>When the download succesfully was finished, the
+patches will be installed. The progress is shown in the log window. If there
+are sepcial messages associated with patches they will be shown in an
+extra dialog, when the patch is being installed.</p>");
+
+  string help_part3 = _("<p>After patches are installed the downloaded
+data isn't needed anymore. If you want to delete this data, activate the
+option 'Remove source packages after update.'</p>");
  
   help_text = help_part1 + help_part2 + help_part3;
     
