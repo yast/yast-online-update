@@ -95,8 +95,6 @@
     return `abort;
   }
 
-  string str3 = _("Last update was executed\n %1 day ago.", "Last update was executed\n %1 days ago.", 0);
-
   map statusmap = Pkg::YouStatus();
 
   UI::CloseDialog();
@@ -107,84 +105,87 @@
   string status_version = lookup( statusmap, "version", "unknown" );
   string status_basearch = lookup( statusmap, "basearch", "unknown" );
   boolean status_business = lookup( statusmap, "business", false );
+  integer status_lastupdate = lookup( statusmap, "lastupdate", -1 );
+
+  string lastupdateLabel = "";
+  
+  if ( status_lastupdate == -1 ) {
+    lastupdateLabel = _( "There was no update executed up to now." );
+  } else if ( status_lastupdate == 0 ) {
+    lastupdateLabel = _( "Last successfull update was performed less than one day ago." );
+  } else {
+    lastupdateLabel = _( "Last successfull update was performed %1 day ago.",
+                         "Last successfull update was performed %1 days ago.",
+                         status_lastupdate );
+  }
 
   // layout main dialog
 
   term contents =
-    `VBox(
+  `VBox(
       `VSpacing( 0.3 ),
       `HBox(
-        `HWeight(1, `Empty()),
-        `HWeight(10,
-          `Frame ( _("System &information"),
-            `VBox(
-              `VSpacing(0.3),
-              `HBox(`HSpacing(0.8),
-                `Left( `Label( sformat( _("Product: %1"), status_product ) ) )
-              ),
-              `HBox(`HSpacing(0.8),
-                `Left( `Label( sformat( _("Version: %1"), status_version ) ) )
-              ),
-              `HBox(`HSpacing(0.8),
-                `Left( `Label( sformat( _("Base architecture: %1"), status_basearch ) ) )
-              ),
-              `VSpacing(0.3)
-            )
-          )
-        ),
-        `HWeight(1, `Empty())
-      ),
-      `VSpacing(1.0),
-      `HBox(
-        `HWeight(1, `Empty()),
-        `HWeight(10,
-          `Frame (_("&Choice of update mode"),
-            `VBox(
-                `RadioButtonGroup(`id(`choice),
+          `HWeight(1, `Empty()),
+          `HWeight(10,
+              `Frame ( _("System &information"),
                   `VBox(
                       `VSpacing(0.3),
                       `HBox(`HSpacing(0.8),
-                        `Left(`RadioButton(`id(`automatic),`opt(`notify),
-                              _("Automatic &Update"), false) )
+                            `Left( `Label( sformat( _("Product: %1"), status_product ) ) ),
+                            `HSpacing(0.8)
                       ),
-                      `VSpacing(0.3),
                       `HBox(`HSpacing(0.8),
-                        `Left(`RadioButton(`id(`manual),`opt(`notify),
-                             _("&Manual Update") ,  false))
+                          `Left( `Label( sformat( _("Version: %1"), status_version ) ) )
+                      ),
+                      `HBox(`HSpacing(0.8),
+                          `Left( `Label( sformat( _("Base architecture: %1"), status_basearch ) ) )
+                      ),
+                      `VSpacing(0.5),
+                      `HBox(`HSpacing(0.8),
+                          `Left( `Label( sformat( lastupdateLabel , status_lastupdate ) ) )
                       ),
                       `VSpacing(0.3)
                   )
-                ),
-                `HBox(`HSpacing(0.8),
-                  `Left(`CheckBox(`id(`reload),
-                        _("&Reload all patches from server"), true ) )
-                )
-            )
-          )
-        ),
-        `HWeight(1, `Empty())
+              )
+          ),
+          `HWeight(1, `Empty())
       ),
       `VSpacing(1.0),
       `HBox(
-        `HWeight(1, `Empty()),
-        `HWeight(10,
-          `Frame ( _("Choice of installation &source"),
-            `RadioButtonGroup(`id(`choice),
-              `VBox(
-                `VSpacing(0.3),
-                `HBox(`HSpacing(1.2),
-                  `HWeight(1,`Left(`ComboBox(`id(`you), `opt(`editable), _("&Installation source"), you_server_list ))),
-                  `PushButton( `id(`expert), `opt(`notify), _("&Expert..."))
-                ),
-                `VSpacing(0.3)
+          `HWeight(1, `Empty()),
+          `HWeight(10,
+              `Frame (_("Update Configuration"),
+                  `VBox(
+                      `VSpacing(0.3),
+                      `HBox(
+                          `HSpacing(1.2),
+                          `HWeight(1,`Left(`ComboBox(`id(`you), `opt(`editable), _("&Installation source"), you_server_list ))),
+                          `PushButton( `id(`expert), `opt(`notify), _("&Expert...")),
+                          `HSpacing(1.2)
+                      ),
+                      `VSpacing(0.3),
+                      `HBox(`HSpacing(0.8),
+                          `Left(`CheckBox(`id(`manual),
+                                _("&Manually select patches"), true ) )
+                      ),
+                      `HBox(`HSpacing(0.8),
+                          `Left(`CheckBox(`id(`reload),
+                                _("&Reload all patches from server"), true ) )
+                      ),
+                      `VSpacing( 0.5 ),
+                      `HBox(
+                          `HSpacing( 0.8 ),
+                          `Left( `PushButton( `id( `automatic ),
+                                 _("&Configure fully automatic update..." ) ) )
+                      ),
+                      `VSpacing( 0.3 )
+                  )
               )
-            )
-          )
-        ),
-        `HWeight(1, `Empty())
+          ),
+          `HWeight(1, `Empty())
       ),
       `VSpacing( 0.5 )
-    );
+  );
 
   string help_text = "";
 
@@ -240,7 +241,7 @@ another FTP or HTTP server.</p>
 
       ret= UI::UserInput();
 
-      OnlineUpdate::you_auto = UI::QueryWidget( `id( `automatic ), `Value );
+      OnlineUpdate::you_auto = !UI::QueryWidget( `id( `manual ), `Value );
       OnlineUpdate::reload = UI::QueryWidget( `id( `reload ), `Value );
 
       // which server is selected from combo box installation source ?
@@ -275,15 +276,15 @@ another FTP or HTTP server.</p>
               if ( err == "media" ) {
                 if ( cd_update ) {
                   msg = _("Initialization failed. Please check that
-  you have inserted the correct CD.\n");
+you have inserted the correct CD.\n");
                 } else {
 	          msg = _("Initialization failed. Try again.
-  If failure continues, choose
-  another SuSE FTP/HTTP server.\n");
+If failure continues, choose
+another SuSE FTP/HTTP server.\n");
                 }
               } else if ( err == "sig" ) {
                   msg = _("Signature check for patch info files failed.
-  Can't load patch information.\n");
+Can't load patch information.\n");
                   ret = `this;
               } else if ( err == "url" ) {
                   msg = _("URL is invalid.");

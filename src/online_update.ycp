@@ -204,6 +204,14 @@ Repeat the update, including the download, if desired.
 at least one patch is not installed correctly.
 You will need to do the update again.");
 	  }
+          else if ( how_to == `suseconfig )
+          {
+              // Warning text for aborting an installation without running SuSEconfig
+              what_will_happen = _("If you abort the installation now, SuSEconfig will
+not be run. The patches have been installed
+correctly, but without running SuSEconfig
+some of them might not work as expected.");
+          }
 	  else
 	  {
 	      y2warning("Unknown symbol for what will happen when aborting - please correct in calling module" );
@@ -381,7 +389,7 @@ You will need to do the update again.");
 	      reg_password = lookup( registration_map, "reg_password", "");
 	      reg_code = lookup( registration_map, "reg_code", "");
 
-	      login_status = Pkg::YouCheckAuthorization( you_server, reg_password, reg_code );
+	      login_status = Pkg::YouCheckAuthorization( you_server, reg_code, reg_password );
 
 	      if ( login_status == "" ) 	// registration was successful
 	      {

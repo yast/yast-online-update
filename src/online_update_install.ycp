@@ -76,17 +76,21 @@ option 'Remove source packages after update.'</p>");
   // using SetContents (define in online_update.ycp)
   Wizard::SetContents(_("Online Update Confirmation"), contents, help_text, WFM::Args(0), WFM::Args(1) );
 
-  UI::ChangeWidget(`id(`next), `Enabled,  false );
+  UI::ChangeWidget(`id(`back), `Enabled, false );
+  UI::ChangeWidget(`id(`next), `Enabled, false );
 
   Pkg::YouAttachSource();
 
   map patch = Pkg::YouFirstPatch();
 
   boolean error = false;
+
+  string msgNoPatches = _( "No patches have been selected for installation." );
+
+  integer installedPatches = 0;
   
   if ( size( patch ) == 0 ) {
-    UI::ChangeWidget( `id(`log), `LastLine,
-                      _("No new patches available." ) );
+    UI::ChangeWidget( `id(`log), `LastLine, msgNoPatches );
   } else {
     while( size( patch ) != 0 ) {
       y2debug("Patch: %1", patch);
@@ -136,8 +140,7 @@ option 'Remove source packages after update.'</p>");
       error = false;
 
       if ( size( patch ) == 0 ) {
-        UI::ChangeWidget( `id(`log), `LastLine,
-                          _("No patches selected to be installed." ) );
+        UI::ChangeWidget( `id(`log), `LastLine, msgNoPatches );
       } else {
         while( size( patch ) != 0 ) {
           UI::ChangeWidget( `id(`log), `LastLine,
@@ -153,6 +156,7 @@ option 'Remove source packages after update.'</p>");
           boolean ok = Pkg::YouInstallCurrentPatch();
           if ( ok ) {
             UI::ChangeWidget( `id(`log), `LastLine, _("Ok\n") );
+            installedPatches = installedPatches + 1;
           } else {
             UI::ChangeWidget( `id(`log), `LastLine, _("Error\n") );
             error = true;
@@ -171,32 +175,44 @@ option 'Remove source packages after update.'</p>");
         if ( error ) {
           UI::ErrorPopup( _("Installation failed.") );
         } else {
+          Pkg::YouFinish();
           UI::MessagePopup( _("Installation successful.") );
         }
       }
     }
   }
 
-     
+  UI::ChangeWidget(`id(`back), `Enabled, true );
+  UI::ChangeWidget(`id(`next), `Enabled, true );
+
+  if ( installedPatches == 0 ) {
+    Wizard::ReplaceNextButton( `PushButton( `id( `next ), FinishButtonLabel() ) );
+    Wizard::DisableAbortButton();
+    UI::ChangeWidget( `id( `patchprogress ), `Value, 100 );
+    UI::ChangeWidget( `id( `progress ), `Value, 100 );
+  }
+
   /////////////////////////////////////////////////////////////////////////////////////////
   ////  Loop for User Input ....
   /////////////////////////////////////////////////////////////////////////////////////////
   symbol ret = `next;
 
-  repeat
-      {
-	  ret= UI::UserInput();
+  repeat {
+    ret= UI::UserInput();
 
-	  if ( ret == `next && UI::QueryWidget(`id(`remove_packages),`Value ) )
-	  {
-	      y2debug( "Removing old rpm-packages" );	    
-              Pkg::YouRemovePackages();
-	  }
+    if ( ret == `next && UI::QueryWidget(`id(`remove_packages),`Value ) )
+    {
+        y2debug( "Removing old rpm-packages" );
+        Pkg::YouRemovePackages();
+    }
 
-      } until (ret == `next || ret == `back || ret == `abort || ret == `again );
+    if ( ret == `abort ) {
+        if ( !UI::ConfirmAbortUpdate( `suseconfig ) ) ret = `this;
+    }
+
+    if ( ret == `next && installedPatches == 0 ) ret = `abort;
+
+  } until (ret == `next || ret == `back || ret == `abort || ret == `again );
     
   return ret;
 }
-
-
-
