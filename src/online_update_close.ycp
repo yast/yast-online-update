@@ -51,10 +51,10 @@
 				  `HWeight( 2,`Left(`Label(`id(`error), "        " )))
 				  ),
 			    `HBox(`HWeight( 5,`Left(`Label(_("ALL installed security patches: ")))),
-				  `HWeight( 2,`Left(`Label(`id(`rec), "         " )))
+				  `HWeight( 2,`Left(`Label(`id(`sec), "         " )))
 				  ),
 			    `HBox(`HWeight( 5,`Left(`Label(_("ALL installed recommended patches: ")))),
-				  `HWeight( 2,`Left(`Label(`id(`sec), "          " )))
+				  `HWeight( 2,`Left(`Label(`id(`rec), "          " )))
 				  ),
 			    `VSpacing(0.5),
 			    `PushButton(`id(`details), `opt(`notify),
