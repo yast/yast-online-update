@@ -1,0 +1,361 @@
+/*
+ *
+ * Module:              online_update.ycp
+ *
+ * Author:      	Gabriele Strattner (gs@suse.de)
+ *
+ * Submodules:		online_update_start	
+ *			online_update_load
+ *			online_update_select
+ *			online_update_load
+ *			online_update_close 
+ *
+ * Purpose:		contains dialog loop for online update
+ *			initialisation of PKGINFO
+ *
+ * Modify:
+ *
+ *
+ * $Id$
+ */
+
+{
+  // definition of map user_settings  
+  map user_settings = $[];    
+
+  // constant settings 
+  string ftpserver = "ftp.suse.de";
+  string rootpath = "/";
+  string yastpath = "/var/lib/YaST";
+  string patchpath = "var/lib/YaST/patches";
+
+
+   
+  // Menuentry for the YaST2 menu
+  if (Args() == [ "get_menuentry" ]) 
+    return [ "online_update", $[
+			`menuentry    : UI(_("Online Update")),
+			`arguments    : [ ],
+			`widget       : `RichText(
+				// 
+				UI(_("Launch this module to get patches (online update).
+A patch is a set of packages which correct or
+improve your existing installation."))
+				+
+				UI(_("<p>You need to be logged in as <i>root</i> in order to do this.</p>"))), 
+			`codefragment : nil ]
+    ];
+
+
+  UI(``{
+
+       /**
+       * Create a typical installation wizard dialog.
+       */
+      OpenDialog(
+		 `opt(`defaultsize),
+		 `VBox(
+		       `ReplacePoint( `id(`image ), `Image( `suseheader, "SuSE") ),
+		       `HBox(
+			     `HWeight( 30, `ReplacePoint( `id(`helpSpace), `RichText(`id(`help), ""))),
+			     `HSpacing(1),
+			     `HWeight( 70, `VBox(
+						 `VSpacing(0.2),
+						 `Left(`Heading(`id(`title), _("YaST2\nInitializing ..."))),
+						 `HVCenter(`ReplacePoint(`id(`contents), `Empty())),
+						 `HBox(
+						       // "back" button: Return to the previous dialog
+						       `PushButton(`id(`back), _("&Back")),
+
+						       `HCenter(
+								// "abort" button: The installation will be aborted
+								`ReplacePoint( `id(`rep_abort), `PushButton(`id(`abort), _("&Abort Installation")))
+								),
+
+						       // "next" button: Proceed to the next dialog
+						       `ReplacePoint( `id(`rep_next), `PushButton(`id(`next), _("&Next")) )
+						       ),
+						 `VSpacing(0.2)
+						 )
+				       ),
+			     `HSpacing(1)
+			     )
+		       )
+		 );
+
+      /*
+       * Define how the general framework for the installation wizard should
+       * look like. This Macro creates and show a dialog.
+       */
+
+      define SetWizardContents(string title, term contents, string helptext,
+			      boolean has_back, boolean has_next) ``{
+	ChangeWidget(`id(`back), `Enabled, has_back);
+	ChangeWidget(`id(`next), `Enabled, has_next);
+	ChangeWidget(`id(`help), `Value, helptext);
+	ChangeWidget(`id(`title), `Value, title);
+	ReplaceWidget(`id(`contents), contents);
+	SetFocus( `id(`next) );
+      };
+
+	// This is a popup dialog for displaying (usually) error messages      
+    define DisplayMessage(string message) ``{
+	    // ok pushbutton: confirm the dialog
+	OpenDialog(
+	    `opt(`decorated),
+	    `HBox(
+		`HSpacing(1),
+		`VBox(
+		    `VSpacing(0.2),
+		    `Label(message),
+			// "OK" button: User confirmation
+		    `PushButton(`opt(`default), _("&OK")),
+		    `VSpacing(0.2)
+		    ),
+		`HSpacing(1)
+		)
+	    );
+	UserInput();
+	CloseDialog();
+    };
+
+    
+    define DisplayMessage2(string message, integer code, string stack) ``{
+      // ok pushbutton: confirm the dialog
+      term t = `VBox();
+      t = add(t, `Left(`Label(message)));
+      if (code != 0)
+	// optional warning dialog text
+	t = add(t, `Left(`Label(sformat(_("Error code %1"), code))));
+      if (stack != "") 
+	t = add(t, `Left(`Label(stack)));
+	  // "OK" button: User confirmation
+      OpenDialog(`opt(`decorated), add(t, `PushButton(_("&OK"))));
+      UserInput();
+      CloseDialog();
+    }; 
+
+	// This is a popup dialog with Yes/No question
+    define DisplayYesNo(string message, boolean d) ``{
+	
+	term t = `VBox();
+	t = add(t, `Left(`Label(message)));
+	term b = `HBox();
+	if (d) {
+		// "Yes" button: Answer to the dialog question
+	    b = add (b, `PushButton(`id(`yes), `opt (`default), _("&Yes")));
+		// "No" button: Answer to the dialog question
+	    b = add (b, `PushButton(`id(`no), _("&No")));
+	}
+	else {
+		// "No" button: Answer to the dialog question
+	    b = add (b, `PushButton(`id(`no), `opt (`default), _("&No")));
+		// "Yes" button: Answer to the dialog question
+	    b = add (b, `PushButton(`id(`yes), _("&Yes")));
+	}
+	
+	OpenDialog(`opt(`decorated), add(t, b));
+	any ui = UserInput();
+	CloseDialog();
+	
+	return (ui == `yes);
+	
+    };
+
+   define ConfirmAbort( symbol how_to ) ``{
+	  string what_will_happen = "";
+
+
+	  if ( how_to == `painless )
+	  {
+	      // Warning text for aborting the update before a patch is installed
+	      what_will_happen = _( "If you abort the installation now,
+no patch will be installed.
+An existing connection to ftp server will be closed.
+Your installation will remain untouched." );
+	  }
+	  else if ( how_to == `incomplete )
+	  {
+	      // Warning text for aborting if some patches are installed, some not
+	      what_will_happen = _( "If you abort the installation now,
+there could be some patches which are not yet installed.
+You may need to do the update again." );
+	  }
+	  else if ( how_to == `unusable )
+	  {
+	      // Warning text for aborting an installation during the install process
+	      what_will_happen = _( "If you abort the installation now,
+at least one patch is not installed correctly.
+You will need to do the update again." );
+	  }
+	  else
+	  {
+	      y2warning("Unknown symbol for what will happen when aborting - please correct in calling module" );
+	  }
+
+
+	  OpenDialog(
+		     `opt(`decorated),
+		     `HBox(
+			   `HSpacing(1),
+			   `VBox(
+				 `VSpacing(0.2),
+				 `HCenter(
+					  `HSquash(
+						   `VBox(
+							 // Confirm user request to abort installation
+							 `Left( `Label( _("Really abort Package Update?") ) ),
+							 `Left( `Label( what_will_happen ) )
+							 )
+						   )
+					  ),
+				 `HBox(
+				       // Button that will really abort the installation
+				       `PushButton(`id(`really_abort), _("&Abort Update") ),
+				       `HStretch(),
+
+				       // Button that will continue with the installation
+				       `PushButton(`id(`continue), `opt(`default), _("&Continue Update" ) )
+				       ),
+				 `VSpacing(0.2)
+				 ),
+			   `HSpacing(1)
+			   )
+		     );
+
+	  any ret = UserInput();
+	  CloseDialog();
+
+	  return (ret == `really_abort);
+      };
+    
+        define YesOrNo(any message, string yes_button_message, string no_button_message) ``{
+      OpenDialog(`opt(`decorated),
+	`HBox(`HSpacing(1),
+	      `VBox(`VSpacing(0.2),
+		    `Label(message),
+		    `HBox(`PushButton(`id(`yes), `opt(`default), yes_button_message),
+			  `HSpacing(2),
+			  `PushButton( no_button_message )),
+		    `VSpacing(0.2)),
+	      `HSpacing(1)
+	));
+      any ret = UserInput();
+      CloseDialog();
+      return (ret == `yes);
+    };
+  });
+
+  // check test_mode
+  integer arg_n = size(Args()) - 1;
+  boolean test_mode = false;
+  
+  while (arg_n >= 0) {
+      if (Args(arg_n) == .test) {
+	  test_mode = true;
+      }            
+      arg_n = arg_n - 1;
+  }
+  user_settings = add( user_settings, "test_mode", test_mode );
+  y2debug("ONLINE: Testmode %1", test_mode );
+
+  // check architecture
+  string architecture = SCR(`Read(.probe.architecture));
+  user_settings = add (user_settings, "architecture", architecture );
+
+  // check language
+  string language = UI( `GetLanguage() );
+  string default_language = "en";
+
+  map lang2yast1 = ReadY2("lang2yast1.ycp");
+
+  string  long_language	= lookup(lang2yast1, language, "english");
+  user_settings = add( user_settings, "language", language );
+
+  if ( !test_mode )
+  {
+      // initialize PKGINFO
+      UI(`OpenDialog(`opt(`decorated ),`Label(_("Initializing for ftp update; One moment please..."))));
+  
+      any retval = PKGINFO(`ftpSetEnvironment( $["ftpserver":ftpserver,
+						"language":long_language,
+						"architecture":architecture,
+						"rootpath":rootpath,
+						"yastpath":yastpath,
+						"patchpath":patchpath ] ) );
+
+      y2debug( "ONLINE: Return  PKGINFO(`ftpsetEnvironment() %1", retval );
+      UI(`CloseDialog());
+  }
+ 
+ 
+
+  
+/*
+   * Main dialog cycle
+   *
+   */
+
+  list dialog = [
+		 [`online_update_start(false, true), `auto ],
+		 [`online_update_load(true, true), `auto ],
+		 [`online_update_select(true, true), `manual ],
+		 [`online_update_load(true, true), `manual ],
+		 [`online_update_close(false, true), `auto ]
+		 
+  ];
+
+  /* 
+   *  Additional used modules
+   *  
+   * "online_update_info" is called in module:
+   * - online_update_start
+   * - online_update_close
+   * "inst_rpmcopy" is called in module:
+   * - online_update_load  if auto_mode
+   * - online_update_select if !auto_mode
+   */
+  
+  integer id = 0;
+  any result = `next;
+  boolean auto_mode = true;	
+  
+  while ((id >= 0) && (id < size (dialog))) {
+
+      symbol module_mode =  select( select(dialog, id), 1);
+      y2debug( "ONLINE: Module: %1 Mode: %2", select( select(dialog, id), 0), select( select(dialog, id), 1) );
+ 
+      if ( !auto_mode )
+      {
+	  result = CallFunction(select(select(dialog, id), 0 ));
+      }
+      else if (  select( select(dialog, id), 1) == `auto )
+      {
+	  result = CallFunction(select(select(dialog, id), 0 ));
+      }
+
+      if ( result == `automatic )
+      {
+	  auto_mode = true;
+	  id = id + 1;
+      }
+      if ( result == `manual )
+      {
+	  auto_mode = false;
+	  id = id + 1;
+      }
+
+      if (result == `cancel)
+	  break;
+      else if (result == `next)
+	  id = id + 1;
+      else if (result == `back)
+	  id = id - 1;
+      else if ( result == `finish )
+	  break;
+
+  }
+  
+  return UI(`CloseDialog());
+
+}

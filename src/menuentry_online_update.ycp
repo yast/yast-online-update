@@ -1,0 +1,1 @@
+CallModule("online_update", [ "get_menuentry"])

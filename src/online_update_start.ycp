@@ -1,0 +1,158 @@
+/*
+ *************************************************************
+ *
+ *     YaST2      SuSE Labs                        -o)
+ *     --------------------                        /\\
+ *                                                _\_v
+ *           www.suse.de / www.suse.com
+ * ----------------------------------------------------------
+ *
+ * Author:        Gabriele Strattner <gs@suse.de>
+ *
+ * Purpose:	start module for ftp update
+ *		display last update info
+ *		possibility to choose automatic or manual mode
+ * Modify:
+ *
+ * external function:
+ *
+ *
+ *************************************************************
+
+ $Id$
+
+*/
+
+{
+    boolean test_mode    = lookup ( user_settings, "test_mode", false );
+
+
+
+    //////////////////////////////////////////////////////////////////////////////////////
+    //                                  P O P U P S                                     //
+    //////////////////////////////////////////////////////////////////////////////////////
+
+
+
+    /////////////////////////////////////////////////////////////////////////////////////
+    // MAIN:
+    /////////////////////////////////////////////////////////////////////////////////////
+    
+    map last_status = $[];
+
+    // get last update status from PKGINFO
+    if ( !test_mode )
+    {
+	last_status = PKGINFO(`ftpLastUpdateStatus() );
+    }
+    else
+    {
+	 last_status = $["date":"12.10.2000", "days":"25", "status":"ok",
+			"patches":["patch-0-123", "recommended", "skdakdöak sdfsdfsdf", "05.10.2000",
+				  "sec-fix-988", "security", "salöda dsösld alsdäladä", "12.10.2000"]];
+    }
+
+    y2debug("ONLINE: last update status: %1", last_status );
+          
+    // layout main dialog 
+
+    term contents =
+	`VBox(
+	      `VSpacing( 0.3 ),
+	      `HBox(`HWeight(1, `Empty()),
+		    `HWeight(8, `Frame (_("Last update information"),
+					`VBox(`VSpacing(0.8),
+					      `HBox(`Label( sformat(UI(_("Last update was executed\n %1 days ago.")),
+								    lookup( last_status, "days", "--" ))),
+						    `HSpacing(2.0),
+						    `PushButton( `id(`details), `opt(`notify), _("&Details"))
+						    ),
+					      `VSpacing(0.8)
+					      )
+					)),
+		    `HWeight(1, `Empty())
+		    ),
+	      `VSpacing(2.0),
+	      `HBox(`HWeight(1, `Empty()),
+		    `HWeight(8, `Frame (_("Select update mode"),
+					`RadioButtonGroup(`id(`choice),
+							  `VBox(
+								`VSpacing(0.8),
+								`HBox(`HSpacing(0.8),
+								      `Left(`RadioButton(`id(`automatic),`opt(`notify),
+											 _("&Automatic Update"), true)
+									    )),
+								`VSpacing(0.8),
+								`HBox(`HSpacing(0.8),
+								      `Left(`RadioButton(`id(`manual),`opt(`notify),
+											 _("&Manual Update") ,  false)
+									    )),
+								`VSpacing(0.8) 
+								)
+							  )
+					)),
+		    `HWeight(1, `Empty())
+		    ),
+	      `VSpacing( 0.5 )
+	      );
+    
+    string help_text = "";
+
+    // helptext dialog online update start screen 
+    string help_part1 =  UI(_("<p>
+SuSE online update is the easy way to get all recommended
+patches and security fixes from SuSE ftp server.<br>
+<b>Automatic Update</b> will connect to <i>ftp.suse.com</i>,
+fetch the files and install the patches.</p>"));
+    
+    string help_part2 =  UI(_("<p>
+<b>Manual Update</b> will display all available patches
+and you can choose which patches should be installed.<br>
+Informations about the last update will be shown
+if you click on button <b>Details</b>.
+</p>"));
+
+    help_text = help_part1 + help_part2;
+			    
+    UI(`SetWizardContents("Welcome to SuSE Package Update", contents, help_text, true, true ));
+
+    UI(`ChangeWidget(`id(`abort), `Label, _("&Cancel")) );
+    
+   
+
+    //  Loop for User Input ....
+
+    symbol ret = `next;
+
+    repeat
+    {
+        ret= UI(`UserInput());
+
+        if (ret == `next)
+        {
+	    if ( UI(`QueryWidget(`id(`automatic), `Value ) ) )
+		return `automatic;
+	    else
+		return `manual;
+	}
+
+	if ( ret == `details )
+	{
+	    
+	}
+
+	if ( ret == `abort )
+	    return `abort;
+	
+	if ( ret == `back)
+	{
+
+	}
+
+  } until (ret == `next || ret == `back || ret == `abort);
+    
+   return ret;
+}
+
+
+
