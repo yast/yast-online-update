@@ -1,0 +1,73 @@
+//
+// suseservers.ycp
+//
+// convert .etc.suseservers format from any agent to and from
+// map-based format used in online_update
+//
+// any agent keeps data in list of maps:
+//  $[
+//    "path" : "/pub/Linux/mirrors/suse/ftp.suse.com/suse",
+//    "server" : "ftp.funet.fi",
+//    "type" : "ftp"
+//   ],
+//
+// online update keeps data in map:
+//   "ftp.funet.fi":["/pub/Linux/mirrors/suse/ftp.suse.com/suse", "ftp"],
+//
+// map read_suseservers ()
+//	read /etc/suseservers and return map in "online update" format
+// boolean write_suseservers (map serversmap)
+//	write /etc/suseservers from "online update" formatted map
+//
+// $Id$
+//
+
+{
+    textdomain "suseservers";
+
+    // read .etc.suseservers, return map
+
+    define read_suseservers () ``{
+	map serversmap = $[];
+	list serverslist = SCR(`Read(.etc.suseservers));
+	if (size (list) <= 0) {
+	    return serversmap;
+	}
+
+	foreach (`entry, serverslist, ``{
+	    string server = lookup (entry, "server", "");
+	    string type = lookup (entry, "type", "");
+	    string path = lookup (entry, "path", "");
+	    serversmap = add (serversmap, server, [ path, type ]);
+	});
+
+	return serversmap;
+    };
+
+
+    // write map to .etc.suseservers
+    define write_suseservers (map serversmap) ``{
+	boolean retval = false;
+
+	if (size (serversmap) <= 0) {
+	    return retval;
+	}
+
+	list serverslist = [];
+
+	foreach (`server, `value, serversmap, ``{
+	    string path = select (value, 0);
+	    string type = select (value, 1);
+
+	    // ftp and http need double-slash
+
+	    if ((type == "ftp") || (type == "http"))
+		path = "/" + path;
+
+	    serverslist = add (serverslist,
+			   $[ "path" : path, "server" : server, "type" : type ]);
+	});
+
+	return SCR(`Write(.etc.suseservers, serverslist));
+    };
+}
