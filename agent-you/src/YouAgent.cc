@@ -50,7 +50,8 @@ YouAgent::YouAgent()
 {
     currentPatchInfo = NULL;
     httpProxyUser = "";
-    httpProxyPassword = "";     
+    httpProxyPassword = "";
+    patchDirectory = "";     
 }
 
 

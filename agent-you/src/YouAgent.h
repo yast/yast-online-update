@@ -228,7 +228,8 @@ protected:
    string yastPath; // Path of YaST-directory
    string language; // Selected language
    string httpProxyUser;
-   string httpProxyPassword; 
+   string httpProxyPassword;
+   string patchDirectory; 
    PatchInfo *currentPatchInfo; //Patch-info about all patches on the client   
 };
 

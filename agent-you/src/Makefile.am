@@ -10,7 +10,7 @@ lib_LTLIBRARIES = liby2ag_you.la
 
 liby2ag_you_la_SOURCES = 			\
 	PatchInfo.cc PatchInfo.h		\
-	YouAgentCalls.cc \
+	YouAgentCalls.cc YouAgentCalls2.cc YouAgentCalls.h \
 	YouAgent.cc YouAgent.h
 liby2ag_you_la_LDFLAGS = -version-info 2:0
 
