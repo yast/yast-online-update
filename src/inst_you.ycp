@@ -26,15 +26,16 @@
     {
 	Internet::Start ();
 
-	// ping anything (www.suse.com) to trigger dod connections
-	SCR::Execute (.target.bash_background,
-		      "/bin/ping -c 1 -w 1 213.95.15.200");
-
 	integer i = 150;
 	while (i > 0)
 	{
 	    if (Internet::Connected ())
 		break;
+
+	    // ping anything (www.suse.com) to trigger dod connections
+	    SCR::Execute (.target.bash_background,
+			  "/bin/ping -c 1 -w 1 213.95.15.200");
+
 	    sleep (1000);
 	}
     }
