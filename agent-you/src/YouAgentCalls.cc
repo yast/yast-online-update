@@ -2888,7 +2888,9 @@ bool YouAgent::isBusiness ( void )
 {
     bool ret = true;
    
-    y2debug( "CALLING isBusiness" );
+    y2debug( "CALLING isBusiness; productname: %s",
+	     productName.c_str() );
+   
    
    if ( productName != "" &&
 	productName != "SuSE-Linux" )
