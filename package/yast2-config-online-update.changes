@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Dec  4 13:51:59 CET 2001 - schubi@suse.de
+
+- DisplayRegistrationPopup added 
+
+-------------------------------------------------------------------
 Mon Sep 24 18:11:49 CEST 2001 - gs@suse.de
 
 - first server entry in /etc/suseservers is default ftp server 
