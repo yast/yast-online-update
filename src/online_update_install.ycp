@@ -20,102 +20,6 @@
   //                                  P O P U P S                                     //
   //////////////////////////////////////////////////////////////////////////////////////
 
-  global define boolean YouMessagePopup( map patch, boolean pre )
-  ``{
-      string message = "";
-      
-      if ( pre ) message = patch[ "preinformation" ]:"";
-      else message = patch[ "postinformation" ]:"";
-
-      message = "<pre>" + message + "</pre>";
-
-      string detailsStringOn = _("Patch &Details <<");
-      string detailsStringOff = _("Patch &Details >>");
-
-      term detailsButton = `PushButton( `id( `details ), detailsStringOff );
-
-      string details = sformat( _("<b>Patch:</b> %1<br>"), patch[ "name" ]:"" );
-      
-      details = details + sformat( _("<b>Summary:</b> %1<br>"), patch[ "summary" ]:"" );
-      
-      list packages = patch[ "packages" ]:[];
-
-      details = details + _("<b>Packages:</b>");
-        
-      details = details + "<ul>";
-
-      foreach( string p, packages, ``{ details = details + "<li>" + p + "</li>"; } );
-
-      details = details + "</ul>";
-
-      term detailsTerm = 
-        `HBox( `HSpacing( 0.5 ),
-          `HWeight( 1, `RichText( `opt(`plainText), details ) ),
-          `HSpacing( 0.5 )
-        );
-       
-      term buttons = nil;
-      if ( pre ) {
-        buttons = `HBox(
-                      detailsButton,
-                      `PushButton( `id( `ok ), _("Install Patch") ),
-                      `PushButton( `id( `skip ), _("Skip Patch") )
-                  );
-      } else {
-        buttons = `HBox(
-                      detailsButton,
-                      `PushButton( `id( `ok ), Label::OKButton() )
-                  );
-      }
-
-      integer w = 20;
-      integer h = 5;
-      
-      if ( size( message ) > 100 ) {
-        w = 60;
-        h = 15;
-      }
-
-      UI::OpenDialog( `opt( `decorated ),
-          `VBox(
-              `HSpacing( w ),
-              `VSpacing( 0.2 ),
-              `HBox(
-                `VSpacing( h ),
-                `RichText( message )
-              ),
-              `ReplacePoint( `id( `rp ), `Empty() ),
-              buttons
-          )
-      );
-
-      symbol ret = nil;
-      boolean showDetails = false;
-
-      while( ret != `ok && ret != `skip ) {
-          ret = (symbol)UI::UserInput();
-
-          if ( ret == `details ) {
-              if ( showDetails ) {
-                  UI::ReplaceWidget( `id( `rp ), `Empty() );
-                  UI::ChangeWidget( `id( `details ), `Label, detailsStringOff );
-              } else {
-                  UI::ReplaceWidget( `id( `rp ), `HBox( `HSpacing( 0.5 ),
-                                                        `HWeight( 1, `RichText( details ) ),
-                                                        `HSpacing( 0.5 ) )
-                                                       );
-                  UI::ChangeWidget( `id( `details ), `Label, detailsStringOn );
-              }
-              showDetails = !showDetails;
-          }
-      }
-
-      UI::CloseDialog();
-
-      if ( ret ==  `ok ) return true;
-      else return false;
-  }    
-
   //////////////////////////////////////////////////////////////////////////////////////
   // MAIN:
   ///////////////////////////////////////////////////////////////////////////////////////
@@ -168,6 +72,17 @@ data is no longer needed. To delete this data, activate
   UI::ChangeWidget(`id(`back), `Enabled, false );
   UI::ChangeWidget(`id(`next), `Enabled, false );
 
+  boolean success = Pkg::YouGetPackages();
+  
+  boolean installedPackages = false;
+  
+  if ( !success ) {
+    Popup::Error( _("Download failed.") );
+  } else {
+    installedPackages = Pkg::YouInstallPatches();
+  }
+
+if ( false ) {
   Pkg::YouAttachSource();
 
   map patch = Pkg::YouFirstPatch( true );
@@ -362,12 +277,13 @@ the update?
       }
     }
   }
+}
 
   UI::ChangeWidget(`id(`back), `Enabled, true );
   UI::ChangeWidget(`id(`next), `Enabled, true );
   UI::SetFocus(`id(`next));
 
-  if ( installedPatches == 0 ) {
+  if ( !installedPackages ) {
     Wizard::DisableAbortButton();
     Wizard::ReplaceNextButton( `PushButton( `id( `next ), Label::CloseButton() ) );
     UI::ChangeWidget( `id( `patchprogress ), `Value, 100 );
@@ -388,13 +304,13 @@ the update?
         Pkg::YouRemovePackages();
     }
 
-    if ( ret == `cancel && installedPatches != 0 ) ret = `abort;
+    if ( ret == `cancel && !installedPackages ) ret = `abort;
 
     if ( ret == `abort ) {
         if ( !ConfirmAbortUpdate( `suseconfig ) ) ret = `this;
     }
 
-    if ( installedPatches == 0 &&
+    if ( !installedPackages &&
          ( ret == `next || ret == `cancel ) ) ret = `abort;
 
   } until ( ret == `next || ret == `back || ret == `abort || ret == `again ||

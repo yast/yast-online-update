@@ -10,6 +10,8 @@
 
     textdomain "online-update";
 
+    include "online_update_dialogs.ycp";
+
     /**
       Callback for YOU progress widget.
     */
@@ -53,7 +55,47 @@
     global define string ErrorCallback( string type, string text,
                                         string details )
     ``{
-        y2milestone( "ErrorCallback %1", text );
+        y2internal( "ErrorCallback %1", text );
+
+        if ( type == "skip" ) {
+          symbol proceed = YouSkipPopup( text, details );
+          
+          if ( proceed == `abort ) return "abort";
+          else if ( proceed == `tryagain ) return "retry";
+          else if ( proceed == `skip ) return "skip";
+          else if ( proceed == `all ) return "skipall";
+          else if ( proceed == `ok ) return "";
+          else return "error";
+        } else if ( type == "abort" ) {
+          if ( ConfirmAbortUpdate( `painless ) ) return "abort";
+          else return ""; 
+        } else {
+          string msg = text;
+          if ( size( details ) > 0 ) msg = msg + "\n" + details;
+          Popup::Error( msg );
+          return "error";
+        }
+
+	return "";
+    }
+
+    global define string MessageCallback( string type, list patches )
+    ``{
+        y2internal( "MessageCallback %1", type );
+
+        map patch = patches[ 0 ]:$[];
+
+        if ( type == "preinfo" ) {
+          boolean install = YouMessagePopup( patch, true );
+          if ( install ) return "";
+          else return "skip";
+        } else if ( type == "postinfo" ) {
+          YouMessagePopup( patch, false );
+          return "";
+        } else {
+          y2error( "Wrong message type: %1", type );
+          return "error";
+        }
 
 	return "";
     }
@@ -102,6 +144,8 @@
 
 	Pkg::CallbackYouProgress ("OnlineUpdateCallbacks::ProgressCallback");
 	Pkg::CallbackYouPatchProgress ("OnlineUpdateCallbacks::PatchProgressCallback");
+	Pkg::CallbackYouError ("OnlineUpdateCallbacks::ErrorCallback");
+	Pkg::CallbackYouMessage ("OnlineUpdateCallbacks::MessageCallback");
 	Pkg::CallbackYouLog ("OnlineUpdateCallbacks::LogCallback");
 	Pkg::CallbackYouExecuteYcpScript ("OnlineUpdateCallbacks::ExecuteYcpScriptCallback");
         Pkg::CallbackYouScriptProgress ("OnlineUpdateCallbacks::ScriptProgressCallback");
