@@ -10,7 +10,7 @@
 {
     module "OnlineUpdateCallbacks";
 
-    textdomain "online_update";
+    textdomain "online-update";
 
     /**
       Callback for YOU progress widget.
@@ -22,13 +22,13 @@
         UI::ChangeWidget( `id( `progress ), `Value, num );
 
         symbol ret = UI::PollInput();
-        
+
         y2error( "PollInput: %1", ret );
-        
+
         if ( ret == `abort ) {
             return false;
         }
-        
+
 	return true;
     }
 
@@ -42,13 +42,13 @@
         UI::ChangeWidget( `id( `patchprogress ), `Value, num );
 
         symbol ret = UI::PollInput();
-        
+
         y2error( "PollInput: %1", ret );
-        
+
         if ( ret == `abort ) {
             return false;
         }
-        
+
 	return true;
     }
 
