@@ -1,6 +1,6 @@
 #
 # spec file for package @RPMNAME@
-# 
+#
 # Copyright  (c)  2000  SuSE GmbH  Nuernberg, Germany.
 #
 # This file and all modifications and additions to the pristine
@@ -47,6 +47,7 @@ make install
 %{?suse_check}
 
 %files
+%defattr (-, root, root)
 %dir @YAST2DIR@/plugin
 @YAST2DIR@/plugin/libpy2ag_you.so.*
 %dir @YAST2DIR@/lib
@@ -55,12 +56,12 @@ make install
 @YAST2DIR@/scrconf/you.scr
 
 %files devel
+%defattr (-, root, root)
 %dir @YAST2DIR@/plugin
 @YAST2DIR@/plugin/libpy2ag_you.so
 @YAST2DIR@/plugin/libpy2ag_you.la
 %dir @YAST2DIR@/lib
 @YAST2DIR@/lib/liby2ag_you.so
 @YAST2DIR@/lib/liby2ag_you.la
-%dir @DOCDIR@
-@DOCDIR@/*
+%doc @DOCDIR@
 
