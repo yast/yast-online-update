@@ -51,10 +51,12 @@
 						    `HSpacing (0.5)
 						    ))),
 			      `VSpacing(0.2),
-			      `CheckBox(`id(`keep), _("&Keep authentification data"), true ),
+			      `CheckBox(`id(`keep), _("&Keep authentification data"), false ),
 			      `VSpacing(0.2),
+                              `PushButton(`id(`clear), _("&Clear inputs")),
+                              `VSpacing(0.2),
 			      `HBox(`PushButton(`id(`login), `opt(`default), _("&Login") ),
-				    `PushButton(`id(`abort), AbortButtonLabel() )
+				    `PushButton(`id(`abort), CancelButtonLabel() )
 				    ),
 			      `VSpacing(0.2)
 
@@ -63,19 +65,26 @@
 			)
 		  );
 
-       any ret = UI::UserInput();
+       do {
+           any ret = UI::UserInput();
 
-       if ( ret == `login )
-       {
-	   ret_map = add(ret_map, "username", UI::QueryWidget(`id(`username), `Value));
-	   ret_map = add(ret_map, "password", UI::QueryWidget(`id(`password), `Value));
-	   ret_map = add(ret_map, "persistent", UI::QueryWidget(`id(`keep), `Value));
-	   ret_map = add(ret_map, "login", true );
-       }
-       else
-       {
-	   ret_map =  add(ret_map, "login", false);
-       }
+           if ( ret == `login )
+           {
+	       ret_map = add(ret_map, "username", UI::QueryWidget(`id(`username), `Value));
+	       ret_map = add(ret_map, "password", UI::QueryWidget(`id(`password), `Value));
+	       ret_map = add(ret_map, "persistent", UI::QueryWidget(`id(`keep), `Value));
+	       ret_map = add(ret_map, "login", true );
+           }
+           else if ( ret == `clear )
+           {
+               UI::ChangeWidget( `id(`username), `Value, "" );
+               UI::ChangeWidget( `id(`password), `Value, "" );
+           }
+           else
+           {
+	       ret_map =  add(ret_map, "login", false);
+           }
+       } while ( ret == `clear );
 
        UI::CloseDialog();
 
@@ -94,10 +103,12 @@
         `VSpacing( 0.2 )
       )
     );
+    
+    Pkg::YouSetServer( server );
 
     map usermap = Pkg::YouGetUserPassword();
 
-    string err = Pkg::YouGetDirectory( server );
+    string err = Pkg::YouGetDirectory();
 
     if ( err == "login" ) {
       string username = usermap[ "username" ]:"";
@@ -126,7 +137,7 @@
     }
 
     if ( err == "" ) {
-      err = Pkg::YouGetPatches( server, OnlineUpdate::reload,
+      err = Pkg::YouGetPatches( OnlineUpdate::reload,
                                 OnlineUpdate::signature_check );
     }
     
