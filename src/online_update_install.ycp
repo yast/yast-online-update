@@ -72,19 +72,21 @@ data is no longer needed. To delete this data, activate
   UI::ChangeWidget(`id(`back), `Enabled, false );
   UI::ChangeWidget(`id(`next), `Enabled, false );
 
-  boolean success = Pkg::YouRetrievePatches();
-  
-  boolean installedPackages = false;
+  boolean success = Pkg::YouProcessPatches();
   
   if ( !success ) {
-    Popup::Error( _("Download failed.") );
-  } else {
-    installedPackages = Pkg::YouInstallPatches();
+    string details = Pkg::LastError() + "\n" + Pkg::LastErrorDetails();
+    YouErrorPopup( _("Patch processing failed."), details );
   }
 
   UI::ChangeWidget(`id(`back), `Enabled, true );
   UI::ChangeWidget(`id(`next), `Enabled, true );
   UI::SetFocus(`id(`next));
+
+  map status = Pkg::YouStatus();
+  integer installedPatches = status[ "installedpatches" ]:0;
+  
+  boolean installedPackages = installedPatches != 0;
 
   if ( !installedPackages ) {
     Wizard::DisableAbortButton();
