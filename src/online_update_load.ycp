@@ -284,6 +284,10 @@ loaded patches or abort update completely." ), _("Warning"), _("&Install"), _("&
       string post_info = "";
       integer no = 1;
       integer package_count = 0;
+
+      // remove old rpm logging
+      SCR(`Execute(.target.bash, "/bin/rm /var/log/y2logRPMShort" ));
+      SCR(`Execute(.target.bash, "/bin/rm /var/log/y2logRPM" ));      
       
       foreach ( `patch, patch_list, ``{
 	  any|symbol ret = nil;
@@ -311,7 +315,7 @@ loaded patches or abort update completely." ), _("Warning"), _("&Install"), _("&
 
 	  if ( post_info != "" )
 	  {
-	      go_on = UI(`DisplayMsgFtpOk( post_info, _("Warning"), _("&Ok")));
+	      go_on = UI(`DisplayMsgFtpOk( post_info, _("Information"), _("&Ok")));
 	  }
 	  
 	  // do not set error status - let patch status NEW
