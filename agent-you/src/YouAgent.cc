@@ -36,6 +36,7 @@
 #define CHECKYAST2VERSION "checkYaST2Version"	//Execute
 #define DELETEPACKAGES "deletePackages"	//Execute
 #define ISBUSINESS "isBusiness" //READ
+#define CHECKAUTHORIZATION "checkAuthorization" //Execute
 
 /*==========================================================================
  * Public member functions
@@ -149,7 +150,18 @@ YCPValue YouAgent::Execute (const YCPPath& path,
        {
 	   ret = deletePackages ( value->asString() );
        }
-   }   
+   }
+   else if ( path_name == CHECKAUTHORIZATION )
+   {
+       if ( !value.isNull()
+	    && value->isString()
+	    && !arg.isNull()
+	    && arg->isString() )
+       {
+	   ret = checkAuthorization( value->asString(),
+				     arg->asString() );
+       }
+   }      
    else
    {
       y2error ( "Path %s not found", path_name.c_str() );

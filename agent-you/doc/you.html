@@ -90,6 +90,15 @@ Returns: $[ "ok": false, "minYaST2Version","1.0.0" ] <BR>
 <Br>
 Usage: <TT>Execute (.you.checkYaST2Version, "4.2.3", "you-1" )</TT><BR>
 <P>
+<H3>.you.checkAuthorization</H3>
+Checking authorization of the user.<BR>
+<BR>
+Argument:  string password, string registrationCode<BR>
+<BR>
+Returns: string "ok"/"error_login"/"error_path"<BR>
+<Br>
+Usage: <TT>Execute (.you.checkAuthorization, "sadfasdf", "12345" )</TT><BR>
+<P>
 <H3>.you.deletePackages</H3>
 Deletes all packages of a patch.<BR>
 <BR>
