@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Aug 27 20:00:00 CEST 2002 - jsuchome@suse.cz
+
+- provide/obsolete old translation packages
+
+-------------------------------------------------------------------
 Tue Aug 20 11:11:14 CEST 2002 - gs@suse.de
 
 - PreRequ: %fillup_prereq  added to spec-file
