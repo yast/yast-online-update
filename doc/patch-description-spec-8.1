@@ -15,36 +15,36 @@ Spezifikation YOU Patches 8.1
   2. nach der fortlaufenden angehängten Nummer.
  
  
-- Ausführung von Scripten, C-Programmen, usw.
+- Ausführung von Skripten, C-Programmen, usw.
  -------------------------------------------
 
   Festlegungen:
   1. Der Name wird ebenfalls mit
      patch-<fortlaufende Nummer> angegeben
   
-  2. Ein Script ist in der Patch-Beschreibung dadurch gekennzeichnet, dass 
+  2. Ein Skript ist in der Patch-Beschreibung dadurch gekennzeichnet, dass 
      'InstPath: scripts' oder 'InstPath: ycp' angegeben ist
 
-  3. Die Scripten/Programme sollen sowohl von YOU als auch von der Kdo.zeile
+  3. Die Skripten/Programme sollen sowohl von YOU als auch von der Kdo.zeile
      aus aufgerufen werden können (dies muss vom Autor gwährleistet werden).
      Ausführung mit YOU:
      ------------------
      Falls Benutzereingaben erforderlich sind, wird ein YCP Modul (Popup)
      mit den entsprechenden Eingabefeldern aufgerufen.
-     Das Script wird in einer bash-Shell ausgeführt.
+     Das Skript wird in einer bash-Shell ausgeführt.
      Logausgaben+Fehlermeldungen werden in ein Logfile geleitet.
 
      Für die Erstellung des YCP-Moduls werden Beispiele (und evtl. eine
      Bibilothek mit den wichtigsten Funktionen) zur Verfügung gestellt.
 
-  4. Logausgaben müssen vom Script/Programm auf stdout ausgegeben werden.
+  4. Logausgaben müssen vom Skript/Programm auf stdout ausgegeben werden.
      YOU leitet stdout und stderr in ein Logfile mit Namen:
      /var/log/patches/<patchname.log> um.
 
-  5. Es wird ein "uninstall" Aufruf für die Scripten vorgesehen, d.h. Scripten
+  5. Es wird ein "uninstall" Aufruf für die Skripten vorgesehen, d.h. Skripten
      können entweder mit Parameter "install" oder "uninstall" aufgerufen werden.
 
-  6. Scripten können in der Patchbeschreibung bei 'Prescript:' (wird vor der 
+  6. Skripten können in der Patchbeschreibung bei 'Prescript:' (wird vor der 
      Installation der Pakete ausgeführt) und/oder 'Postscript:' (Ausführung 
      nach der Paketinstallation) angegeben werden.
 
