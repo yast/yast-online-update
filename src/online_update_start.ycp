@@ -48,14 +48,10 @@
   
   map last_status = $[];
   string default_language = "en";
-     
-  map lang2yast1 = ReadY2("lang2yast1.ycp");
 
   string language 	= lookup( user_settings, "language", default_language );
   boolean cd_update 	= lookup( user_settings, "cd_update", false );
   
-  string long_language 	= lookup(lang2yast1, language, "english");
-
   string architecture 	= lookup( user_settings, "architecture", "i386" );
 
   list ftp_server_list = [];
@@ -63,7 +59,7 @@
   string reloadServer =  SCR(`Read(.rc.system.YAST2_LOADFTPSERVER));
 
   y2milestone ( "YAST2_LOADFTPSERVER = %1", reloadServer );
-    
+
   if ( reloadServer != "no" )
   {
       // getting ftp-server-description from www.suse.de
@@ -71,7 +67,7 @@
       string command = "/usr/bin/wget -q --output-document="+
 	  SCR(`Read(.target.root))+
 	  "/etc/suseservers --tries=2 --timeout=5 http://www.suse.de/de/support/download/suseservers.txt";
-      if ( Shell( command ) != 0  )      
+      if ( SCR( `Execute(.target.bash, command) ) != 0  )      
       {
 	  y2error("command: %1", command);
 	  SCR (`Execute(.target.bash,
@@ -100,9 +96,9 @@
 
   // initialize PKGINFO
   UI(`OpenDialog(`opt(`decorated ),`Label(_("Initializing for ftp update; One moment please..."))));
-  
+
   any retval = PKGINFO(`ftpSetEnvironment( $["ftpserver":"",
-					    "language":long_language,
+					    "language":language,
 					    "rootpath":rootpath,
 					    "architecture":architecture,
 					    "yastpath":yastpath,
@@ -112,10 +108,10 @@
   y2debug( "ONLINE: Return  PKGINFO(`ftpsetEnvironment() %1", retval );
   UI(`CloseDialog());
 
-  // Popup is shown if the yast2 component responsible for the ftp update cannot be initialised.
-  // This does not mean, connection failed to ftp server, but any other error occured.
   if (!retval)
   {
+      // Message popup: yast2 component responsible for the ftp update cannot be initialised.
+      // This does not mean, connection failed to ftp server, but any other error occured.
       UI(`MessagePopup(_("Initialisation of ftp server failed
 (internal error).")));
       return `abort;
