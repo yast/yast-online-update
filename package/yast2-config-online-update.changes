@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Feb  4 15:01:00 CET 2002 - gs@suse.de
+
+- rename rc.config.y2c_online_update to sysconfig.you
+- internal changes 
+
+-------------------------------------------------------------------
 Tue Dec  4 13:51:59 CET 2001 - schubi@suse.de
 
 - DisplayRegistrationPopup added 
