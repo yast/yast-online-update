@@ -230,7 +230,7 @@ installation-source instead of a ftp-server or select another ftp-server.
     
     help_text = help_part1 + help_part2 + help_part3;
 			    
-    UI(`SetWizardContents("Welcome to SuSE Package Update", contents, help_text, Args(0), Args(1) ));
+    UI(`SetWizardContents(_("Welcome to SuSE Package Update"), contents, help_text, Args(0), Args(1) ));
 
     UI(`ChangeWidget(`id(`abort), `Label, _("&Abort Update")) );
     

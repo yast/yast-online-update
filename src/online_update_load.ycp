@@ -90,7 +90,7 @@
 	    download,
 	    `Left(`ProgressBar(`id(`progress), _("Total progress"), 100)),
 	    `LogView(`id(`log),
-		     "Information about the activities",
+		     _("Information about the activities"),
 		     5,		// visible lines
 		     500),	// lines to store,
 	    `VSpacing( 0.2 )
@@ -535,7 +535,7 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
 		patch,
 		lookup ( check_version, "minYaST2Version", "-" ),
 		version );
-	      UI(`DisplayMsgFtpOk( message, "Error", "not install" ));
+	      UI(`DisplayMsgFtpOk( message, _("Error"), _("not install") ));
 	  }
       });
 

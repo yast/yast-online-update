@@ -331,7 +331,7 @@ You will need to do the update again.");
 
       info_map = PKGINFO( `ftpGetPatchInformation( patch_name ));
 
-      string infotext = sformat("<p>%1</p><p>%2</p>", patch_name, lookup(info_map, "description", "") );
+      string infotext = lookup(info_map, "description", "");
 
       list table_input = [];
       foreach (`pac, `info_list, lookup(info_map, "packages", $[] ), ``{
@@ -344,7 +344,12 @@ You will need to do the update again.");
 			       `VBox(
 				     `HSpacing(50),
 				     `Left(`Heading( _("Patch information") )),
-				     `VWeight( 4, `RichText(`id(`infotext), infotext )),
+				     `VWeight( 4,
+					       `LogView(`id(`infotext),
+							"",
+							5,	// visible lines
+							30)	// lines to store,
+					       ),
 				     `VSpacing(0.5),
 				     `VWeight( 4, `Table(`id(`table_pac),`opt(`hvstretch), 
 							 `header( _("Name"), _("Installed"), _("New Version"), _("Description") ),
@@ -355,6 +360,7 @@ You will need to do the update again.");
 			       )
 			 );
       });
+      UI(`ChangeWidget(`id(`infotext), `Value, infotext ));      
       UI(`SetFocus(`id(`ok_info)));
 	  
       any r = UI(`UserInput());

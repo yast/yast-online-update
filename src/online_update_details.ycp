@@ -108,7 +108,7 @@ click on the <b>Show Patch Info</b> button.
     help_text = help_part1 + help_part2;
     
      // using SetWizardContents (define in online_update.ycp)
-     UI(`SetWizardContents("Detailed Information ", contents, help_text, Args(0), Args(1) ));
+     UI(`SetWizardContents(_("Detailed Information "), contents, help_text, Args(0), Args(1) ));
 
       
    /////////////////////////////////////////////////////////////////////////////////////////

@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Jan 15 19:03:17 MET 2001 - schubi@suse.de
+
+- Translations added.
+- Changed Richtext-widget to logview
+
+-------------------------------------------------------------------
 Fri Jan 12 17:42:31 MET 2001 - schubi@suse.de
 
 - Getting ftp server list from suse.de 
