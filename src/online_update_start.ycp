@@ -224,6 +224,8 @@ internal error.
 
 */
 
+  Pkg::TargetInit("/",false);
+
   map statusmap = Pkg::YouStatus();
 
   y2debug("status map: %1", statusmap );
@@ -438,8 +440,6 @@ another FTP or HTTP server.</p>
 
       if (ret == `next)
       {
-          Pkg::TargetInit("/",true);
-
           boolean ok = Pkg::YouGetPatches( you_server );
           if ( !ok ) {
 	      UI::ErrorPopup(_("Initialization failed. Try again.
