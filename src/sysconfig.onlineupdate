@@ -15,5 +15,14 @@ REG_CODE=""
 #
 # Registration password for business products
 #
-
 REG_PASSWORD=""
+
+#
+# User for used proxy
+#
+PROXY_USER=""
+
+#
+# Password for used proxy
+#
+PROXY_PASSWORD=""
