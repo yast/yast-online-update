@@ -1,4 +1,13 @@
 -------------------------------------------------------------------
+Tue Jul 22 14:26:00 CEST 2003 - cschum@suse.de
+
+- Added support for YCP scripts as part of patches.
+- Long running scripts can now be canceled.
+- Added "Try again" option to download and install error dialogs.
+- Added option to edit server URL in a dialog.
+- Renamed "Expert" button to "New Server...".
+
+-------------------------------------------------------------------
 Fri May 16 15:04:31 CEST 2003 - cschum@suse.de
 
 - Rewrote YOU authentification code.
