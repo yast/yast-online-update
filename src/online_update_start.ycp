@@ -381,14 +381,18 @@ the update takes place.
                           `HBox(
                               `HSpacing(0.8),
                               `HWeight(1,`Left(`ComboBox(`id(`server), `opt(`notify), _("&Installation source"), servers ))),
-                              `HSpacing(1.2),
-                              `Bottom(`PushButton( `id(`expert), `opt(`notify), _("&Expert..."))),
                               `HSpacing(1.2)
                       )),
                       `HBox(
                           `HSpacing(0.8),
                           `TextEntry( `id(`url), `opt(`notify), _("URL"), "" ),
                           `HSpacing(1.2)
+                      ),
+                      `HBox(
+                          `HSpacing(0.8),
+                          `PushButton( `id(`newserver), _("New Server...") ),
+                          `PushButton( `id(`editserver), _("Edit Server...") ),
+                          `HStretch()
                       ),
                       `VSpacing(0.3),
                       `HBox(`HSpacing(0.8),
@@ -496,8 +500,12 @@ without the need of user interaction.</p>
             UI::ChangeWidget( `id(`server), `Value, 0 );
           }
         }
-      } else if ( ret == `expert ) {
-          string url = getUrl( "" );
+      } else if ( ret == `newserver || ret == `editserver ) {
+          string url = "";
+          if ( ret == `editserver ) {
+            url = UI::QueryWidget( `id(`url), `Value );
+          }
+          url = editUrl( url );
           if ( size( url ) > 0 ) {
             UI::ChangeWidget( `id(`url), `Value, url );
           }
