@@ -8,7 +8,7 @@
 #
 # please send bugfixes or comments to @MAINTAINER@
 
-# neededforbuild  autoconf automake gpp libgpp ydoc libycp libycp-devel liby2 liby2-devel libscr libscr-devel
+# neededforbuild  autoconf automake gpp libgpp ydoc libycp libycp-devel liby2 liby2-devel libscr libscr-devel libpkg libpkg-devel
 
 Vendor:       SuSE GmbH, Nuernberg, Germany
 Distribution: SuSE Linux 8.0 (i386)
@@ -22,7 +22,7 @@ Packager:     @MAINTAINER@
 Summary:      YaST2 SCR YOU agent
 Version:      @VERSION@
 Source0:      @RPMNAME@-@VERSION@.tar.bz2
-
+Requires:     libpkg y2a_ftp y2a_http
 %description
 -
 
