@@ -130,12 +130,22 @@ patches could not be installed.
                                 lookup( patch, "name", "unknown" ),
                                 lookup( patch, "summary", "no summary" ) ) );
 
+          string info = lookup( patch, "preinformation", "" );
+          if ( size( info ) != 0 ) {
+            UI::MessagePopup( info );
+          }
+
           boolean ok = Pkg::YouInstallCurrentPatch();
           if ( ok ) {
             UI::ChangeWidget( `id(`log), `LastLine, _("Ok\n") );
           } else {
             UI::ChangeWidget( `id(`log), `LastLine, _("Error\n") );
             error = true;
+          }
+
+          string info = lookup( patch, "postinformation", "" );
+          if ( size( info ) != 0 ) {
+            UI::MessagePopup( info );
           }
 
           patch = Pkg::YouNextPatch();
