@@ -144,8 +144,8 @@
     }
 
     if ( err == "" ) {
-      err = Pkg::YouGetPatches( OnlineUpdate::reload,
-                                OnlineUpdate::signature_check );
+      err = Pkg::YouRetrievePatchInfo( OnlineUpdate::reload,
+                                       OnlineUpdate::signature_check );
     }
 
     UI::CloseDialog();
