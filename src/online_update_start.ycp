@@ -99,7 +99,7 @@
     UI::OpenDialog( `opt( `decorated ),
       `VBox(
         `VSpacing( 0.2 ),
-        `ProgressBar( `id( `progress ), _("Getting patch information...") ),
+        `ProgressBar( `id( `progress ), _("Retrieving information about new updates...") ),
         `VSpacing( 0.2 ),
         `PushButton( `id( `abort ), AbortButtonLabel() ),
         `VSpacing( 0.2 )
