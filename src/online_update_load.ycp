@@ -204,6 +204,8 @@ The ftp connection will be closed.
 	  UI(`ChangeWidget(`id(`status), `Value, _("active")) );
       }
 
+      ShowProgress( 5 );
+      
       while ( (index < patch_no) && go_on )
       {
 	  map result_map = $[];
@@ -279,8 +281,17 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
 	  }
 	  
 	  index = index+1;
-	  ShowProgress( (index*100)/patch_no );
+	  if (((index*100)/patch_no) > 95 )
+	  {
+	      ShowProgress( 95 );	      
+	  }
+	  else
+	  {
+	      ShowProgress( (index*100)/patch_no );
+	  }
       }
+      
+      ShowProgress( 100 );  
 
       // disconnect
       result_map = PKGINFO(`ftpDisconnect());
@@ -317,7 +328,7 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
 				"/bin/rpm --checksig " + package + " >" + tmpfile + " 2>>" + tmpfile ));
 	  if ( ret_shell != 0 )
 	  {
-	      if ( SCR (`Execute (.target.bash, "/bin/grep \"GPG NOT OK\" " + tmpfile )) == 0 )
+	      if ( SCR (`Execute (.target.bash, "/bin/grep -i \"GPG NOT OK\" " + tmpfile )) == 0 )
 	      {
 		  boolean ret = true;
 
@@ -350,7 +361,7 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
 	  else
 	  {
 	      // Checking, if gpg was available
-	      if ( SCR (`Execute (.target.bash, "/bin/grep \"GPG\" " + tmpfile )) != 0 )
+	      if ( SCR (`Execute (.target.bash, "/bin/grep -i \"GPG\" " + tmpfile )) != 0 )
 	      {
 		  y2warning ( "package %1 no pgp-key found",
 				package );
