@@ -164,29 +164,38 @@ abort the update?"), patchName );
                                 lookup( patch, "summary", "no summary" ) ) );
 
           string info = lookup( patch, "preinformation", "" );
+
+          boolean install = true;
+          
           if ( size( info ) != 0 ) {
-            UI::MessagePopup( info );
+            install = UI::AnyQuestionPopup( patchName, info,
+                                            _("Install patch"),
+                                            _("Skip patch"), `focus_yes );
           }
 
-          boolean ok = Pkg::YouInstallCurrentPatch();
-          if ( ok ) {
-            UI::ChangeWidget( `id(`log), `LastLine, _("Ok\n") );
-            installedPatches = installedPatches + 1;
+          if ( !install ) {
+            UI::ChangeWidget( `id(`log), `LastLine, _("Skipped\n") );
           } else {
-            UI::ChangeWidget( `id(`log), `LastLine, _("Error\n") );
-            error = true;
-            
-            string msg = sformat( _("Error installing patch '%1'.\n
+            boolean ok = Pkg::YouInstallCurrentPatch();
+            if ( ok ) {
+              UI::ChangeWidget( `id(`log), `LastLine, _("Ok\n") );
+              installedPatches = installedPatches + 1;
+            } else {
+              UI::ChangeWidget( `id(`log), `LastLine, _("Error\n") );
+              error = true;
+
+              string msg = sformat( _("Error installing patch '%1'.\n
 Do you want to skip this patch or abort
 the update?"), patchName );
-            
-            boolean proceed = UI::YouSkipPopup( msg, Pkg::Error() );
-            if ( !proceed ) return `abort;
-          }
 
-          info = lookup( patch, "postinformation", "" );
-          if ( size( info ) != 0 ) {
-            UI::MessagePopup( info );
+              boolean proceed = UI::YouSkipPopup( msg, Pkg::Error() );
+              if ( !proceed ) return `abort;
+            }
+
+            info = lookup( patch, "postinformation", "" );
+            if ( size( info ) != 0 ) {
+              UI::MessagePopup( info );
+            }
           }
 
           patch = Pkg::YouNextPatch();
