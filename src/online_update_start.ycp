@@ -36,7 +36,11 @@
 
   y2milestone( "you_url: %1", you_url );
 
-  UI::OpenDialog(`opt(`decorated ),`Label(_("Initializing for FTP/HTTP update. One moment please...")));
+  if ( cd_update ) {
+    UI::OpenDialog(`opt(`decorated ),`Label(_("Initializing for CD update. One moment please...")));
+  } else {
+    UI::OpenDialog(`opt(`decorated ),`Label(_("Initializing for FTP/HTTP update. One moment please...")));
+  }
 
   if ( cd_update ) you_url = "cd:///";
 
@@ -237,16 +241,25 @@ another FTP or HTTP server.</p>
 	      }
 	  }
 
-          UI::OpenDialog(`opt(`decorated ),`Label(_("Initializing for FTP/HTTP update. One moment please...")));
+          if ( cd_update ) {
+              UI::OpenDialog(`opt(`decorated ),`Label(_("Initializing for CD update. One moment please...")));
+          } else {
+              UI::OpenDialog(`opt(`decorated ),`Label(_("Initializing for FTP/HTTP update. One moment please...")));
+          }
           string err = Pkg::YouGetPatches( you_server,
                                            OnlineUpdate::signature_check );
           UI::CloseDialog();
           
           if ( size( err ) != 0 ) {
             if ( err == "media" ) {
-	      UI::ErrorPopup(_("Initialization failed. Try again.
+              if ( cd_update ) {
+                UI::ErrorPopup(_("Initialization failed. Please check that
+you have inserted the correct CD.\n"));
+              } else {
+	        UI::ErrorPopup(_("Initialization failed. Try again.
 If failure continues, choose
 another SuSE FTP/HTTP server.\n"));
+              }
 	      ret = `this;
             } else if ( err == "sig" ) {
                 UI::ErrorPopup(_("Signature check for patch info files failed.
