@@ -189,7 +189,7 @@ data is no longer needed. To delete this data, activate
 
   Pkg::YouAttachSource();
 
-  map patch = Pkg::YouFirstPatch( false );
+  map patch = Pkg::YouFirstPatch( true );
 
   boolean error = false;
 
