@@ -19,7 +19,9 @@
     ``{
 //        y2milestone("ProgressCallback %1", num);
 
-        UI::ChangeWidget( `id( `progress ), `Value, num );
+        if ( UI::WidgetExists( `id( `progress ) ) ) {
+          UI::ChangeWidget( `id( `progress ), `Value, num );
+        }
 
         symbol ret = UI::PollInput();
 
@@ -37,7 +39,9 @@
     ``{
 //        y2milestone("PatchProgressCallback %1", num);
 
-        UI::ChangeWidget( `id( `patchprogress ), `Value, num );
+        if ( UI::WidgetExists( `id( `progress ) ) ) {
+          UI::ChangeWidget( `id( `patchprogress ), `Value, num );
+        }
 
         symbol ret = UI::PollInput();
 
