@@ -73,7 +73,6 @@ option 'Remove source packages after update.'</p>");
   Wizard::SetContents(_("Online Update Confirmation"), contents, help_text, WFM::Args(0), WFM::Args(1) );
 
   // changing Label to Finish for the last step
-  UI::ChangeWidget(`id(`next), `Label,  FinishButtonLabel() );
   UI::ChangeWidget(`id(`abort), `Enabled,  false );
 
   Pkg::YouAttachSource();

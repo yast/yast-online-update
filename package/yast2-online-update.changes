@@ -1,4 +1,15 @@
 -------------------------------------------------------------------
+Wed Oct 23 13:30:25 CEST 2002 - cschum@suse.de
+
+- Run SuSEconfig after installation of patches.
+- Fixed "Browse" button in dialog for adding directory source. 
+
+-------------------------------------------------------------------
+Wed Oct  2 14:04:22 CEST 2002 - cschum@suse.de
+
+- Use themed image as header.
+
+-------------------------------------------------------------------
 Wed Sep 11 17:06:23 CEST 2002 - cschum@suse.de
 
 - Fixed problem of vanishing Expert button when there are long

@@ -125,7 +125,7 @@ packages were created by SuSE.
   Wizard::CreateDialog();
 
   // show the special YOU image
-  Wizard::SetImage( Read (.local.byte, Directory::imagedir + "/online_update_long.png") );
+  Wizard::SetImage( Read (.local.byte, Directory::themedir + "/current/online_update_long.png") );
 
 UI(``{
 
@@ -464,6 +464,7 @@ Check the registration data.
     [`online_update_start(false, true), `always ],
     [`online_update_select(false, true), `manual ],
     [`online_update_install(false, true), `always ],
+    [`inst_suseconfig(false, false), `always ]
   ];
 
   /*
@@ -487,18 +488,17 @@ Check the registration data.
 
       y2debug( "ONLINE: Module: %1 Mode: %2", module_name, module_mode );
 
-      if ( OnlineUpdate::you_updated_packages > 0
-	   || symbolof(module_name) != `inst_suseconfig )
+      if ( id == size( dialog ) - 1 ) {
+          UI::ChangeWidget(`id(`next), `Label,  FinishButtonLabel() );
+      }
+
+      if ( !OnlineUpdate::you_auto )
       {
-	  // call all modules in manual mode
-	  if ( !OnlineUpdate::you_auto )
-	  {
-	      result = WFM::CallFunction( module_name );
-	  }
-	  else if ( select( select(dialog, id, []), 1, `none ) == `always )
-	  {
-	      result = WFM::CallFunction( module_name );
-	  }
+	  result = WFM::CallFunction( module_name );
+      }
+      else if ( select( select(dialog, id, []), 1, `none ) == `always )
+      {
+	  result = WFM::CallFunction( module_name );
       }
 
       if (result == `again )

@@ -16,6 +16,7 @@
   import "Mode";
   import "OnlineUpdate";
 
+  include "ui/file_popups.ycp";
   include "inst_source_dialogs.ycp";
 
   boolean business	= false;
@@ -48,8 +49,8 @@
     you_server_list = add( you_server_list, you_url );
   } else {
     string err = Pkg::YouGetServers( you_server_list );
-    y2error( "Get Servers: %1", err );
     if ( size( err ) != 0 ) {
+      y2error( "Get Servers: %1", err );
       if ( err == "get" ) {
         UI::ErrorPopup(_("Cannot connect to www.suse.de. Check your connection."));
       } else {
@@ -64,7 +65,7 @@
   }
 
   string str1 = _("Getting available serverlist from www.suse.de ...");
-  string str3 = _("Last update was executed\n %1 day ago.", "Last update was executed\n %1 days ago.", num);
+  string str3 = _("Last update was executed\n %1 day ago.", "Last update was executed\n %1 days ago.", 0);
 
 //  Pkg::TargetInit("/",false);
 

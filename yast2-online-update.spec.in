@@ -33,7 +33,6 @@ PreReq:    	%fillup_prereq
 @scrconfdir@/*.scr
 @clientdir@/online*.ycp
 @moduledir@/OnlineUpdate.ycp
-@imagedir@/online_update_long.png
 %doc @docdir@
 
 %post

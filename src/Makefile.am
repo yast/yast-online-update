@@ -26,11 +26,8 @@ config_DATA =			\
 	online_update.y2cc	\
 	cd_update.y2cc
 
-image_DATA =			\
-	online_update_long.png
-
 ynclude_DATA =			\
 	suseservers.ycp
 
 EXTRA_DIST = $(client_DATA) $(module_DATA) $(config_DATA) $(etc_DATA)	\
-	$(adm_DATA) $(image_DATA) $(ynclude_DATA)
+	$(adm_DATA) $(ynclude_DATA)
