@@ -1,0 +1,76 @@
+Spezifikation YOU Patches 8.1
+=============================
+
+- Abarbeitung der Patches:
+--------------------------
+
+  Die Patches müssen in der korrekten Reihenfolge abgearbeitet werden,
+  d.h. die laufende Nummer, die angehängt wird, muss berücksichtigt werden.
+
+  Die Sortierung erfolgt:
+  1. nach dem Namen
+     Dies ist nur für das ftp-Online-Update wichtig, die Patches für die
+     Business-Produkte beginnen immer mit "patch-".
+
+  2. nach der fortlaufenden angehängten Nummer.
+ 
+ 
+- Ausführung von Scripten, C-Programmen, usw.
+ -------------------------------------------
+
+  Festlegungen:
+  1. Der Name wird ebenfalls mit
+     patch-<fortlaufende Nummer> angegeben
+  
+  2. Ein Script ist in der Patch-Beschreibung dadurch gekennzeichnet, dass 
+     'InstPath: scripts' oder 'InstPath: ycp' angegeben ist
+
+  3. Die Scripten/Programme sollen sowohl von YOU als auch von der Kdo.zeile
+     aus aufgerufen werden können (dies muss vom Autor gwährleistet werden).
+     Ausführung mit YOU:
+     ------------------
+     Falls Benutzereingaben erforderlich sind, wird ein YCP Modul (Popup)
+     mit den entsprechenden Eingabefeldern zur Verfügung gestellt.
+     Das Script wird in einer bash-Shell ausgeführt.
+     Logausgaben+Fehlermeldungen werden in ein Logfile geleitet.
+
+     Für die Erstellung des YCP-Moduls werden Beispiele und eine
+     Bibilothek mit den wichtigsten Funktionen zur Verfügung gestellt.
+
+  4. Logausgaben müssen vom Script/Programm auf stdout ausgegeben werden.
+     YOU leitet stdout und stderr in ein Logfile mit Namen:
+     /var/log/patches/<patchname.log> um.
+
+  5. Es wird ein "uninstall" Aufruf für die Scripten vorgesehen, d.h. Scripten können 
+     entweder mit Parameter "install" oder "uninstall" aufgerufen werden.  
+
+  6. Scripten können in der Patchbeschreibung bei 'Prescript:' (wird vor der Installation
+     der Pakete ausgeführt) und/oder 'Postscript:' (Ausführung nach der Paketinstallation)
+     angegeben werden.
+
+     
+- Abhängigkeiten für Patches können angegeben werden:
+-----------------------------------------------------
+  
+  Requires:  patch-<no_X1> patch-<no_X2> ...
+             Die Installation des Patches setzt die Installation von
+ 	     patch-<no_X1>, patch-<no_X2> ... voraus.
+
+  Obsoletes: patch-<no_Y1> patch-<no_Y2> ...
+             Die patches patch-<no_Y1>, patch-<no_Y2> ... müssen nicht installiert werden, 
+             d.h. werden nicht zur Installation vorgeschlagen.
+
+  Conflict:  patch-<no_Z1> patch-<no_Z2> ...
+             Die Installtion des Patches würde einen Konflikt mit den
+             (bereits installierten) patch-<no_Z1>, patch-<no_Z2> ... auslösen.
+
+- Paketabhängigkeiten:
+----------------------
+
+  Die Abhängigkeiten der Pakete werden ebenfalls berücksichtigt.
+
+  Die Reihenfolge der Paketinstallation ist nicht festgelegt, insbesondere ist nicht
+  festgelegt, wann die Abhängigkeiten der Pakete untereinander aufgelöst werden.
+
+
+ 
