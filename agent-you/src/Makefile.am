@@ -9,7 +9,6 @@ plugin_LTLIBRARIES = libpy2ag_you.la
 lib_LTLIBRARIES = liby2ag_you.la
 
 liby2ag_you_la_SOURCES = 			\
-	RpmDb.cc RpmDb.h			\
 	PatchInfo.cc PatchInfo.h		\
 	YouAgentCalls.cc \
 	YouAgent.cc YouAgent.h

@@ -156,12 +156,35 @@ YCPValue YouAgent::setEnvironment ( YCPMap setMap )
    {
       rootPath = dummyValue->asString()->value();
       y2debug( "setEnvironment: rootpath = %s",rootPath.c_str() );
-   }
-   else
-   {
-      rootPath = "";
-      y2error("ROOTPATH not found" );
-      ok = false;
+
+      if ( rootPath != "/"
+	   && mainscragent )
+      {
+	  // targetpkg is already initialized wirth targetroot /
+	   YCPPath path = ".targetpkg.dbTargetPath";
+	   
+	   YCPValue ret = mainscragent->Write( path,
+					YCPString( rootPath ) );
+
+	   if ( ret->isBoolean() )	// success
+	   {
+	       if (  ret->asBoolean()->value() )
+	       {
+		   y2milestone( "Set agent to %s",
+				rootPath.c_str() );
+	       }
+	       else
+	       {
+		   y2error( "Cannot set rootpatch" );
+		   ok = false;
+	       }
+	   }
+	   else
+	   {
+	       y2error("<.targetpkg.dbTargetPath> System agent returned nil.");
+	       ok = false;
+	   }
+      }
    }
 
    dummyValue = setMap->value(YCPString(YASTPATH));
@@ -201,24 +224,6 @@ YCPValue YouAgent::setEnvironment ( YCPMap setMap )
       architecture = "";
       y2error("ARCHITECTURE not found" );
       ok = false;
-   }
-
-   //	initialize rpm-db
-
-   if ( ok->value() && rpmDb == NULL )
-   {
-      DbStatus dbStatus = DB_OK;
-      rpmDb = new RpmDb ( rootPath );
-      dbStatus = rpmDb->initDatabase ( false ); // not create new db
-      if ( dbStatus != DB_OK )
-      {
-	 y2error( "SetEnvironment: init rpm-database" );
-	 ok = false;
-      }
-      else
-      {
-	 y2debug( "SetEnvironment: init rpm-database OK" );
-      }
    }
 
    if ( ok->value() )
@@ -1540,6 +1545,11 @@ YCPValue YouAgent::newPatchList ( void )
       return YCPError( "missing call setServer()", YCPVoid());       
    }
 
+   if ( !mainscragent )
+   {
+      return YCPError( "mainsrcagent not initialized", YCPVoid());        
+   }
+
    if ( currentPatchInfo != NULL )
    {
       delete currentPatchInfo;
@@ -1611,7 +1621,21 @@ YCPValue YouAgent::newPatchList ( void )
 		       pos++ )
 		 {
 		     PackageKey packageKey = *pos;
-		     string rpmVersion = rpmDb->queryPackageVersion ( packageKey.name() );
+		     string rpmVersion = "";
+		     YCPPath path = ".targetpkg.info.version";
+	   
+		     YCPValue ret = mainscragent->Read( path,
+					YCPString( packageKey.name() ) );
+
+		     if ( ret->isString() )	// success
+		     {
+			 rpmVersion = ret->asString()->value();
+		     }
+		     else
+		     {
+			 y2error("<.targetpkg.info.version> System agent returned nil.");
+		     }
+		     
 		     if (  rpmVersion != "" )
 		     {
 			 string packageName = packageKey.name();
@@ -1647,7 +1671,13 @@ YCPValue YouAgent::newPatchList ( void )
 			       posList != packageList.end();
 			       ++posList )
 			 {
-			     if (  rpmDb->queryPackageVersion ( *posList ) != "" )
+			     YCPPath path = ".targetpkg.installed";
+	   
+			     YCPValue ret = mainscragent->Read( path,
+					YCPString( *posList) );
+
+			     if ( ret->isBoolean() 	// success
+				  && ret->asBoolean()->value() )
 			     {
 				 packageInstalled = true;
 			     }
@@ -1696,6 +1726,11 @@ YCPValue YouAgent::getPatchInformation ( const YCPString patchName )
       return YCPError( "missing call setServer()", YCPVoid());              
    }
 
+   if ( !mainscragent )
+   {
+      return YCPError( "No system agent installed", YCPVoid());       
+   }
+   
    if ( currentPatchInfo == NULL )
    {
        currentPatchInfo = new  PatchInfo ( destPatchPath + PATCH, language );       
@@ -1740,14 +1775,9 @@ YCPValue YouAgent::getPatchInformation ( const YCPString patchName )
 	       string instPath;
 	       string version;
 	       long buildTime;
-	       string shortDescription;
-	       string longDescription;
-	       string notify;
-	       string delDescription;
-	       string category;
-	       int size;
-	       int rpmSize;
-
+	       int rpmSize;	       
+	       string shortDescription =
+		   patchElement.rawPackageInfo->getLabel( packageName );
 
 	       patchElement.rawPackageInfo->getRawPackageInstallationInfo(
 						packageName,
@@ -1757,19 +1787,26 @@ YCPValue YouAgent::getPatchInformation ( const YCPString patchName )
 						instPath,
 						version,
 						buildTime, rpmSize );
-	       patchElement.rawPackageInfo->getRawPackageDescritption(
-						packageName,
-						shortDescription,
-						longDescription,
-						notify,
-						delDescription,
-						category,
-						size);
 
 	       YCPList packageList;
 	       packageList->add ( YCPString ( shortDescription ) );
-	       packageList->add ( YCPString (
-				rpmDb->queryPackageVersion ( packageName )));
+
+	       string rpmVersion = "";
+	       YCPPath path = ".targetpkg.info.version";
+	   
+	       YCPValue retpkg = mainscragent->Read( path,
+					YCPString( packageName ) );
+
+	       if ( retpkg->isString() )	// success
+	       {
+		   rpmVersion = retpkg->asString()->value();
+	       }
+	       else
+	       {
+		   y2error("<.targetpkg.info.version> System agent returned nil.");
+	       }
+	       
+	       packageList->add ( YCPString ( rpmVersion ) );
 	       packageList->add ( YCPString ( version ) );
 
 	       packageMap->add ( YCPString ( packageName ),
@@ -2067,8 +2104,14 @@ YCPValue YouAgent::getPatch ( const YCPString patchName )
 	       else
 	       {
 		  // NO other ftp or http server
-		  if ( !rpmDb->checkSourcePackage( destPatchPath + "/" + instPath,
-						   version ) )
+		  YCPPath path = ".targetpkg.checkSourcePackage";
+	   
+		  YCPValue ret = mainscragent->Execute( path,
+				YCPString( destPatchPath + "/" + instPath ),
+				YCPString( version ));
+		   
+		  if ( ret->isBoolean()
+		       && !ret->asBoolean()->value() )
 		  {
 		      if ( serverKind == FTP )
 		      {
@@ -2331,13 +2374,6 @@ YCPValue YouAgent::getPatch ( const YCPString patchName )
 	 string version;
 	 long buildTime;
 	 int rpmSize;
-	 string shortDescription;
-	 string longDescription;
-	 string notify;
-	 string delDescription;
-	 string category;
-	 string serie;
-	 int size;
 
 	 patchElement.rawPackageInfo->getRawPackageInstallationInfo(
 				         packageName,
@@ -2348,16 +2384,8 @@ YCPValue YouAgent::getPatch ( const YCPString patchName )
 					 version,
 					 buildTime,
 					 rpmSize );
-	 patchElement.rawPackageInfo->getRawPackageDescritption(
-				         packageName,
-					 shortDescription,
-					 longDescription,
-					 notify,
-					 delDescription,
-					 category,
-					 size);
 
-	 serie = patchElement.rawPackageInfo->getSerieOfPackage(
+	 string serie = patchElement.rawPackageInfo->getSerieOfPackage(
 								packageName );
 
 	 if ( instPath.substr ( 0, strlen ( FTPADRESS ) ) == FTPADRESS   )
@@ -2544,22 +2572,8 @@ YCPValue YouAgent::getPackages ( const YCPString patchName )
 					 buildTime,
 					 rpmSize );
 	       
-	       string shortDescription;
-	       string longDescription;
-	       string notify;
-	       string delDescription;
-	       string category;
-	       int size;
-
-	       patchElement.rawPackageInfo->getRawPackageDescritption(
-						packageName,
-						shortDescription,
-						longDescription,
-						notify,
-						delDescription,
-						category,
-						size);
-	       
+	       string shortDescription =
+		   patchElement.rawPackageInfo->getLabel( packageName );
 	       
 	       serie = patchElement.rawPackageInfo->getSerieOfPackage(
 								 packageName );

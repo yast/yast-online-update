@@ -7,7 +7,6 @@
 #include <scr/SCRInterpreter.h>
 #include <Y2.h>
 #include "PatchInfo.h"
-#include "RpmDb.h"
 
 /**
  * @short SCR Agent for YOU transfer
@@ -228,7 +227,6 @@ protected:
    string rootPath; // Root-Path ( update )
    string yastPath; // Path of YaST-directory
    string language; // Selected language
-   RpmDb *rpmDb; // rpm-database    
    PatchInfo *currentPatchInfo; //Patch-info about all patches on the client   
 };
 

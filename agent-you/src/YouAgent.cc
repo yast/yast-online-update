@@ -48,7 +48,6 @@
  *--------------------------------------------------------------------------*/
 YouAgent::YouAgent()
 {
-    rpmDb = NULL;
     currentPatchInfo = NULL;
 }
 
