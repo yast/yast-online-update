@@ -27,12 +27,11 @@ PreReq:    	%fillup_prereq
 %files
 %defattr(-,root,root)
 /var/adm/fillup-templates/sysconfig.onlineupdate
-/etc/suseservers
 @configdir@/online_update.y2cc
 @configdir@/cd_update.y2cc
 @scrconfdir@/*.scr
 @clientdir@/online*.ycp
-@moduledir@/OnlineUpdate.ycp
+@moduledir@/OnlineUpdate*.ycp
 %doc @docdir@
 
 %post
