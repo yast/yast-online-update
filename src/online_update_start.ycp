@@ -112,7 +112,7 @@
   });
 
   // initialize PKGINFO
-  UI(`OpenDialog(`opt(`decorated ),`Label(_("Initializing for ftp update; One moment please..."))));
+  UI(`OpenDialog(`opt(`decorated ),`Label(_("Initializing for FTP update; One moment please..."))));
 
   any retval = PKGINFO(`ftpSetEnvironment( $["ftpserver":"",
 					    "language":language,
@@ -129,8 +129,9 @@
   {
       // Message popup: yast2 component responsible for the ftp update cannot be initialised.
       // This does not mean, connection failed to ftp server, but any other error occured.
-      UI(`MessagePopup(_("Initialisation of ftp server failed
-(internal error).")));
+      UI(`MessagePopup(_("Initialization of FTP server failed
+(internal error).
+")));
       return `abort;
   }
   
@@ -140,7 +141,7 @@
   y2debug("ONLINE: last update status: %1", last_status );
 
  integer num = tointeger( lookup( last_status, "days", "0" ));
- string last_update = sformat( _( "Last update was executed\n %1 day ago.", "Last update was executed\n %1 days ago.", num), num );
+ string last_update = sformat( _("Last update was executed\n %1 day ago.", "Last update was executed\n %1 days ago.", num), num );
   
   // layout main dialog 
 
@@ -182,12 +183,12 @@
 		  ),
 	    `VSpacing(1.0),	      
 	    `HBox(`HWeight(1, `Empty()),
-		  `HWeight(8, `Frame (_("Choice of installation-source"),
+		  `HWeight(8, `Frame (_("Choice of installation source"),
 				      `RadioButtonGroup(`id(`choice),
 							`VBox(
 							      `VSpacing(0.3),
 							      `HBox(`HSpacing(1.2),
-								    `Left(`ComboBox(`id(`ftp), _("&Installation-source"), ftp_server_list )),
+								    `Left(`ComboBox(`id(`ftp), _("&Installation source"), ftp_server_list )),
 								    `PushButton( `id(`expert), `opt(`notify), _("&Expert"))
 								    ),
 							      `VSpacing(0.3) 
@@ -203,10 +204,11 @@
 
   // helptext dialog online update start screen 
   string help_part1 =  UI(_("<p>
-SuSE online update is the easy way to get all recommended
+SuSE Online Update is the easy way to get all recommended
 patches and security fixes from SuSE ftp server.<br>
 <b>Automatic Update</b> will connect to the server,
-fetch the files and install the patches.</p>"));
+fetch the files, and install the patches.</p>
+"));
     
   string help_part2 =  UI(_("<p>
 <b>Manual Update</b> will display all available patches
@@ -216,9 +218,10 @@ if you click on the <b>Details</b> button.
 </p>"));
 
   string help_part3 =  UI(_("<p>
-If you click on button <b>Expert</b> you can select an local
-installation-source instead of a ftp-server or select another ftp-server.
-</p>"));
+If you click on button <b>Expert</b>, you can select an local
+installation source instead of an FTP server or select another FTP server.
+</p>
+"));
     
     
   help_text = help_part1 + help_part2 + help_part3;
@@ -329,10 +332,10 @@ installation-source instead of a ftp-server or select another ftp-server.
 		
 	      if (retval == nil || retval == false)
 	      {
-		  UI(`DisplayMsgFtp(_(
-				      "Initialization failed - please try again.
+		  UI(`DisplayMsgFtp(_("Initialization failed -- please try again.
 If failure continues, please choose
-another SuSE ftp server.")));
+another SuSE FTP server.
+")));
 		  ret = `again;
 	      }
 		
@@ -367,9 +370,10 @@ another SuSE ftp server.")));
 		
 	      if (retval == nil || retval == false)
 	      {
-		  UI(`DisplayMsgFtp(_("Initialization failed - please try again.
+		  UI(`DisplayMsgFtp(_("Initialization failed -- please try again.
 If failure continues, please choose
-another SuSE ftp server.")));
+another SuSE FTP server.
+")));
 	      }
 	      ret = `again;
 	  }

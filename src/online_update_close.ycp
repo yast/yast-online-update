@@ -70,7 +70,7 @@
 			  )
 		    ),
 	    `VSpacing( 0.5 ),
-	    `Left(`CheckBox(`id(`remove_packages),_("&Remove source-packages after update."), false))
+	    `Left(`CheckBox(`id(`remove_packages),_("&Remove source packages after update."), false))
 	    );
     
   string help_text = "";
@@ -78,19 +78,20 @@
   // helptext  update is finished 
   string help_part1 =  UI(_("<p>
 Online Update is finished.
-Your installation is up to date now.
-It is recommended to check if there are
-new patches available in regular periods.<br></p>"));
+Your installation is up-to-date now.
+It is recommended to check regularly
+for new patches.<br></p>
+"));
   string help_part2 =  UI(_("<p>
-If any error occurs during download or installation
-of the patches, you can check the <b>Details</b>
-for further information.
+If any errors occur during download or installation,
+check the <b>Details</b> for more information.
 </p>
 "));
   string help_part3 =  UI(_("<p>
-Please try to do the update again, if important
+Please try to do the update again if important
 patches could not be installed.
-</p>"));
+</p>
+"));
  
   help_text = help_part1 + help_part2 + help_part3;
     

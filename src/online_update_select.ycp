@@ -123,10 +123,12 @@
     // Helptext  "List of available patches"
     // This text is shown if patches will be installed from CD.
     string help_part01 = UI(_("<p>This dialog shows the patches from
-SuSE patch CD which are not yet installed on your system.</p>"));
+SuSE patch CD that are not yet installed on your system.</p>
+"));
     // This is the text for ftp installation.
-    string help_part02 =  UI(_("<p>This dialog shows all new patches which are
-available for download on SuSE ftp server.</p>"));
+    string help_part02 =  UI(_("<p>This dialog shows all new patches available
+for download from the SuSE FTP server.</p>
+"));
     // Don't translate "recommended" and "security". The patch mode is shown in a list
     // and will always be english text.
     string help_part1 = UI(_("<p>Mode \"recommended\" means you should install the patch.
@@ -139,9 +141,10 @@ downloaded and must be installed on a second run.
 <p>
 <b>X</b>: Patches concerning your installation are preselected.
 They will be downloaded and installed on your system.
-If you don't want a certain patch, double
-click on line to deselect it (or select line and use Alt A).
-</p>"));
+If you do not want a certain patch, double-click
+the line to deselect it (or select the line and use Alt + A).
+</p>
+"));
 
     string help_part3 =  UI(_("<p>
 <b>G</b>: patch is available but not relevant for your installation
@@ -150,10 +153,11 @@ You can download the patch but it will not be installed.
 </p>"));
     
     string help_part4 = UI(_("<p>
-<b>_</b>: this patch is not selected, it will neither
-be downloaded nor installed. To select the patch, double
-click on line (or select line and use Alt A).
-</p>"));
+<b>_</b>: This patch is not selected. It will not
+be downloaded or installed. To select the patch,
+double-click the line (or select it and use Alt + A).
+</p>
+"));
 
     if ( cd_update )
     {

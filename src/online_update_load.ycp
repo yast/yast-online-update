@@ -111,20 +111,23 @@ This could take some time. Several details are shown.</p>"));
 
   string help_part12 = UI(_("<p>YaST2 first gets the patch descriptions
 from the patch CD.<br>
-After that all selected patches will be copied to the
-harddisk.</p>"));
+After that, all selected patches will be copied to the
+hard disk.</p>
+"));
 
   string help_part13 = UI(_("<p>YaST2 first gets the descriptions of
-the available patches from the ftp server.
-After that you will be able to to select the patches you want to
-be downloaded and installed.</p>"));
+the available patches from the FTP server.
+After that, select the patches to
+download and install.</p>
+"));
   
   string help_part2 =  UI(_("<p>
 The fields above show information about the connection and
 time of data transfer.
-The box below displays data from ftp logfile. If something
-goes wrong, please check this source of information. 
-</p>"));
+The box below displays data from the FTP log file. If something
+goes wrong, check this file for information. 
+</p>
+"));
   string help_part3 =  UI(_("<p>
 If you decide to <b>Abort Update</b>, the download of
 patches will be interrupted. No patch will be installed.
@@ -393,7 +396,8 @@ The ftp connection will be closed.
 		  string msg_str = sformat(UI(_("Can't get patch \"%1\" from
 server \"%2\".
 You may try to download remaining patches or
-go on with installing of already got ones.")),
+go on with installation of downloaded ones.
+")),
 					   select(patch_list, index), lastErrorServer );
 	      
 		  any ret = UI(`DisplayMsgFtp( msg_str, _("Notify"), _("&Download"), _("&Install") ));
@@ -479,7 +483,9 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
       string tmpfile = SCR(`Read(.run.mktemp));
 
       string pgp_warning = sformat(
-				   UI(_("Cannot check the patch %1 cause the GPG key is not installed or is corrupted.\nSo SuSE cannot guarantee that the packages has been created by SuSE")),
+				   UI(_("Cannot check patch %1 because the GPG key is not installed or is corrupted.
+SuSE cannot guarantee that the packages has been created by SuSE.
+")),
 			       patch);
       
       list packageVersion = PKGINFO (`getPackageVersion("gpg"));
@@ -488,7 +494,9 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
       {
 	  // package pgp not found
 	  pgp_warning = sformat(
-		   UI(_("Cannot check the patch %1 cause the GPG package is not installed or is corrupted.\nSo SuSE cannot guarantee that the packages has been created by SuSE")),
+		   UI(_("Cannot check patch %1 because the GPG package is not installed or is corrupted.
+SuSE cannot guarantee that the packages has been created by SuSE.
+")),
 		   patch);
       }
       
@@ -519,7 +527,9 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
 	      else
 	      {
 		  string message = sformat(
-					   UI(_("The patch %1 will not be installed \ncause package %2 is corrupted")),
+					   UI(_("Patch %1 will not be installed 
+because package %2 is corrupted
+")),
 					   patch, package );
 	      
 		  y2error( "%1", message );
@@ -666,7 +676,9 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
 	  {
 	      // not the correct YaST2 Verison
 	      string message = sformat(
-		UI(_("The patch %1 needs the version %2 of YaST2.\nYou have installed version %3")),
+		UI(_("Patch %1 needs version %2 of YaST2.
+You have installed version %3.
+")),
 		patch,
 		lookup ( check_version, "minYaST2Version", "-" ),
 		version );
@@ -767,13 +779,15 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
 	      {
 		  UI(`MessagePopup(_("Can't get the patch descriptions.
 Please insert SuSE patch CD and
-restart the \"Patch CD-Update\".")));
+restart the \"Patch CD Update\".
+")));
 		  return `abort;
 	      }
 	      else
 	      {
-		  UI(`MessagePopup(_("Connection to ftp server failed.
-Please try to get connection to another SuSE ftp server.")));
+		  UI(`MessagePopup(_("Connection to FTP server failed.
+Try to connect to another SuSE FTP server.
+")));
 		  return `back;  
 	      }
 	  }
@@ -821,15 +835,17 @@ Please try to get connection to another SuSE ftp server.")));
 	  {
 	      UI(`MessagePopup(_("Can't get the patches from CD.
 Please insert the SuSE patch CD
-(mind the correct version!) -
+(check the version)
 or update your system with YaST2
-\"Online-Update\"."))); 
+\"Online Update\".
+"))); 
 	      return `abort;
 	  }
 	  else
 	  {
 	      UI(`MessagePopup(_("Can't get the patches from server.
-Please try to get patches from another SuSE ftp server.")));   
+Please try to get patches from another SuSE FTP server.
+")));   
 	      return `back;
 	  }
       }
@@ -875,8 +891,9 @@ Please try to get patches from another SuSE ftp server.")));
 	  // Message popup text: YaST2 patches found which should be installed first
 	  UI(`MessagePopup(_("There are YaST2 patches available.
 These patches should be installed first.
-Please install these patches and call YaST2 online update once
-again to install the rest of the packages.")));
+Please install these patches then run the YaST2 Online Update
+again to install the rest of the packages.
+")));
       }
   }
   
@@ -896,7 +913,9 @@ again to install the rest of the packages.")));
 	  {
 	      // only greater than 1 MB
 	      string message = sformat (
-		UI(_("There are %1 patches on ftp. Downloading may take a while.\n Do you really want to download the patches now?")),
+		UI(_("There are %1 patches on FTP. Downloading may take a while.
+ Do you really want to download the patches now?
+")),
 		size_text( disk_size ) );
 
 	      if ( !UI(`AnyQuestionPopup( "", message ,YesButtonLabel(), NoButtonLabel(), `yes_default)) )
@@ -947,7 +966,7 @@ again to install the rest of the packages.")));
 	      {
 		  any ret = PKGINFO(`ftpDisconnect());
 		  y2debug("ONLINE:  PKGINFO(`ftpDisconnect()): %1", ret );
-		  UI(`MessagePopup(_("There is no patch which will have to be installed.")));
+		  UI(`MessagePopup(_("There is no patch to install.")));
 	      }
 	      return `abort;		// abort update
 	  }

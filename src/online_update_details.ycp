@@ -103,9 +103,10 @@ installed on your system.
 </p>"));
     string help_part2 =  UI(_("<p>
 More detailed information about a special patch can
-be obtained. First select the patch from the list and then
-click on the <b>Show Patch Info</b> button.
-</p>"));
+be obtained. First, select the patch from the list
+then click on the <b>Show Patch Info</b> button.
+</p>
+"));
 
     help_text = help_part1 + help_part2;
     
