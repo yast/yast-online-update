@@ -108,35 +108,35 @@
   string help_text = "";
 
   // helptext  "Connection and Data transfer" 
-  string help_part11 =  UI(_("<p>After connecting to SuSE server,
+  string help_part11 =  _("<p>After connecting to SuSE server,
 YaST2 will download all selected patches.
-This could take some time. Several details are shown.</p>"));
+This could take some time. Several details are shown.</p>");
 
-  string help_part12 = UI(_("<p>YaST2 first gets the patch descriptions
+  string help_part12 = _("<p>YaST2 first gets the patch descriptions
 from the patch CD.<br>
 After that, all selected patches will be copied to the
 hard disk.</p>
-"));
+");
 
-  string help_part13 = UI(_("<p>After YaST2 retrieves the descriptions of
+  string help_part13 = _("<p>After YaST2 retrieves the descriptions of
 the available patches from the FTP or HTTP server, 
 select the patches to
 download and install.</p>
-"));
+");
   
-  string help_part2 =  UI(_("<p>
+  string help_part2 =  _("<p>
 The fields above show information about the connection and
 the time for data transfer.
 The box below displays data from the FTP or HTTP log file. If something
 goes wrong, check this file for information. 
 </p>
-"));
-  string help_part3 =  UI(_("<p>
+");
+  string help_part3 =  _("<p>
 If you decide to <b>Abort Update</b>, the download of
 patches will be interrupted. No patch will be installed.
 The FTP or HTTP connection will be closed. 
 </p>
-"));
+");
 
   if ( cd_update )
   {
@@ -157,7 +157,7 @@ The FTP or HTTP connection will be closed.
   // and there could be a popup "YaST2 patches available". 
   //
   
-  UI::SetWizardContents(_("Connection and Data transfer"), contents, help_text, Args(0), Args(1) );
+  Wizard::SetContents(_("Connection and Data transfer"), contents, help_text, Args(0), Args(1) );
 
   UI::ChangeWidget(`id(`id1), `Value, you_server);  
   UI::ChangeWidget(`id(`status), `Value, _("closed") );
@@ -209,10 +209,10 @@ The FTP or HTTP connection will be closed.
 
       foreach( `patch, `patch_info, new_patches, ``{
 	  // only get the patch if marked with "X" or "G" 
-	  if ( select ( lookup(new_patches, patch, []), 3 ) == "X" || select ( lookup(new_patches, patch, []), 3 ) == "G")
+	  if ( select ( lookup(new_patches, patch, []), 3, "" ) == "X" || select ( lookup(new_patches, patch, []), 3, "" ) == "G")
 	   {
 	       if ( batchkind == "all" ||
-		    batchkind == select ( lookup(new_patches, patch, []), 0 ) )
+		    batchkind == select ( lookup(new_patches, patch, []), 0, "" ) )
 	       {
 		   patch_list = add(patch_list, patch);
 	       }
@@ -226,7 +226,7 @@ The FTP or HTTP connection will be closed.
 	  return ret_list;
       }
 
-      string connect_string = sformat ( UI(_("Starting download of selected patches from %1.\n")), you_server );
+      string connect_string = sformat ( _("Starting download of selected patches from %1.\n"), you_server );
       UI::ChangeWidget(`id(`log), `LastLine, connect_string );
 
       map  result_map = SCR::Execute(.you.connect,"");
@@ -248,25 +248,26 @@ The FTP or HTTP connection will be closed.
       while ( (index < patch_no) && go_on )
       {
 	  map patch_result = $[];
-	  string patch = select(patch_list, index);
+	  string patch = select( patch_list, index, "" );
 	  
-	  y2debug("Status of patch %1: %2", patch, select( lookup(new_patches, patch, []), 3 ));
+	  y2debug("Status of patch %1: %2", patch, select( lookup(new_patches, patch, []), 3, "" ));
 
-	  UI::ChangeWidget(`id(`log), `LastLine, sformat( UI(_("Get packages for patch %1\n")), patch) );
+	  UI::ChangeWidget(`id(`log), `LastLine, sformat( _("Get packages for patch %1\n"), patch) );
 	  
-	  patch_result = SCR::Execute( .you.getPatch, select(patch_list, index) );
-	  y2debug("ONLINE: SCR::Execute(.you.getPatch, %1 )): %2", select(patch_list, index), patch_result );
+	  patch_result = SCR::Execute( .you.getPatch, patch );
+	  y2milestone("ONLINE: SCR::Execute(.you.getPatch, %1 )): %2", patch, patch_result );
+	  
 	  while ( lookup(patch_result, "ok", false) == true &&
 		  lookup(patch_result, "nextPackage","") != "" )
 	  {
 	      boolean otherServerConnect = false;
-	      y2debug("ONLINE: SCR::Execute(.you.getPatch, %1 )): %2",
-		      select(patch_list, index), patch_result );  
+	      y2milestone("ONLINE: SCR::Execute(.you.getPatch, %1 )): %2", patch, patch_result );  
+
 	      UI::ChangeWidget(`id(`log), `LastLine, "Package " +
 			    lookup(patch_result, "nextPackage","") +
 			   "\n" );
-	      UI::ChangeWidget(`id(`fileProgress), `ExpectedSize, lookup(patch_result, "nextPackageSize",0));
-	      UI::ChangeWidget(`id(`fileProgress), `Filename, lookup(patch_result, "nextPackage",""));
+	      UI::ChangeWidget(`id(`fileProgress), `ExpectedSize, lookup(patch_result, "nextPackageSize", 0));
+	      UI::ChangeWidget(`id(`fileProgress), `Filename, lookup(patch_result, "nextPackage", ""));
 
 	      string otherYouServer = lookup ( patch_result, "nextServer", "" );
 	      string otherYouServerKind = lookup ( patch_result, "nextServerKind", "" );
@@ -313,7 +314,7 @@ The FTP or HTTP connection will be closed.
 		
 		  if (retval == nil || retval == false)
 		  {
-		      last_logging = sformat ( UI(_("Connection failed to %1\n")), otherYouServer );
+		      last_logging = sformat ( _("Connection failed to %1\n"), otherYouServer );
 		      UI::ChangeWidget(`id(`log), `LastLine, last_logging );   
 		  }
 		  else
@@ -336,8 +337,8 @@ The FTP or HTTP connection will be closed.
 	      }
 
 	      // Getting rpm
-	      patch_result = SCR::Execute( .you.getPatch, select(patch_list, index) );
-	      y2debug("ONLINE: SCR::Execute(.you.getPatch, %1 )): %2", select(patch_list, index), patch_result );
+	      patch_result = SCR::Execute( .you.getPatch, patch );
+	      y2debug("ONLINE: SCR::Execute(.you.getPatch, %1 )): %2", patch, patch_result );
 	      
 	      if ( !lookup(patch_result, "ok", false)  )
 	      {
@@ -377,7 +378,7 @@ The FTP or HTTP connection will be closed.
 					 $["kind":you_serverkind, "name":you_server, "path":you_dir]);		  
 		  if (retval == nil || retval == false)
 		  {
-		      last_logging = sformat ( UI(_("Connection failed to %1\n")), you_server );
+		      last_logging = sformat ( _("Connection failed to %1\n"), you_server );
 		      UI::ChangeWidget(`id(`log), `LastLine, last_logging );    
 		  }
 
@@ -392,7 +393,7 @@ The FTP or HTTP connection will be closed.
 	      }
 
 	      if ( scriptName != ""
-		   && select( lookup(new_patches, patch, []), 3 ) == "X" )
+		   && select( lookup(new_patches, patch, []), 3, "" ) == "X" )
 	      {
 		  string command = "source " + scriptName;
 		  
@@ -414,8 +415,8 @@ The FTP or HTTP connection will be closed.
 	  if ( !lookup(patch_result, "ok", false) )
 	  {
 	      // set status to error
-	      SCR::Write(.you.patchUpdateStatus, select(patch_list, index), ERROR );
-	      y2debug("ONLINE:  SCR::Write(.you.patchUpdateStatus,%1, %2)", select(patch_list, index), ERROR );
+	      SCR::Write(.you.patchUpdateStatus, patch, ERROR );
+	      y2debug("ONLINE:  SCR::Write(.you.patchUpdateStatus,%1, %2)", patch, ERROR );
 	      user_settings = add(user_settings, "you_ok", false );
 	       
 	      // put logging into LogView Widget before showing popup
@@ -427,12 +428,12 @@ The FTP or HTTP connection will be closed.
 
 	      if (  !auto_mode_get )
 	      {
-		  string msg_str = sformat(UI(_("Cannot get patch \"%1\" from
+		  string msg_str = sformat(_("Cannot get patch \"%1\" from
 server \"%2\".
 Try to download remaining patches or
 continue with installation of downloaded ones.
-")),
-					   select(patch_list, index), lastErrorServer );
+"),
+					   select(patch_list, index, ""), lastErrorServer );
 	      
 		  any ret = UI::DisplayMsgFtp( msg_str, _("Notify"), _("&Download"), _("&Install") );
 
@@ -442,13 +443,13 @@ continue with installation of downloaded ones.
 		  }
 	      }
 	  }
-	  else if ( select ( lookup(new_patches, patch, []), 3 ) == "X" )
+	  else if ( select ( lookup(new_patches, patch, []), 3, "" ) == "X" )
 	  {
 	      // patches marked with "X" will be installed
 	      if ( batchkind == "all" ||
-		   batchkind == select ( lookup(new_patches, patch, []), 0 ) )
+		   batchkind == select ( lookup(new_patches, patch, []), 0, "" ) )
 	      {
-		  ret_list = add( ret_list, select(patch_list, index) );
+		  ret_list = add( ret_list, patch );
 	      }
 	  }
 	  
@@ -518,19 +519,19 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
       string tmpfile = SCR::Read(.run.mktemp);
 
       string gpg_warning = sformat(
-				   UI(_("Cannot check patch %1 because the GPG key is not installed or is corrupted.
+				   _("Cannot check patch %1 because the GPG key is not installed or is corrupted.
 SuSE cannot guarantee that the packages were created by SuSE.
-")),
+"),
 			       patch);
       
       if ( !(SCR::Read (.targetpkg.installed, "gpg")) )
       {
 	  // package gpg not found
 	  gpg_warning = sformat(
-		   UI(_("Cannot check patch %1 because the GPG package is not installed or is
+		   _("Cannot check patch %1 because the GPG package is not installed or is
 corrupted.
 SuSE cannot guarantee that the packages were created by SuSE.
-")),
+"),
 		   patch);
       }
       
@@ -561,9 +562,9 @@ SuSE cannot guarantee that the packages were created by SuSE.
 	      else
 	      {
 		  string message = sformat(
-					   UI(_("Patch %1 will not be installed 
+					   _("Patch %1 will not be installed 
 because package %2 is corrupted.
-")),
+"),
 					   patch, package );
 	      
 		  y2error( "%1", message );
@@ -631,8 +632,8 @@ because package %2 is corrupted.
 	      info_list = SCR::Read(.you.packages, patch );
 
 	      foreach (`pac, info_list , ``{
-		  package_list = add ( package_list, select ( pac, 0 ) );
-		  desc_list = add ( desc_list, select( pac, 1) );
+		  package_list = add ( package_list, select ( pac, 0, "" ) );
+		  desc_list = add ( desc_list, select( pac, 1, "" ) );
 	      });
 	      
 	      y2debug("ONLINE: SCR::Read(.you.packages %1 ): %2 %3",
@@ -648,7 +649,7 @@ because package %2 is corrupted.
 		  if ( pre_info != "" &&
 		       !auto_mode_install )
 		  {
-		      string header = sformat(UI(_("Warning for patch %1")),
+		      string header = sformat(_("Warning for patch %1"),
 						    patch );
 		      
 		      go_on = UI::DisplayMsgYou( pre_info,
@@ -672,7 +673,7 @@ because package %2 is corrupted.
 		      if ( post_info != "" &&
 			   !auto_mode_install )
 		      {
-			  string header = sformat(UI(_("Information for patch %1")),
+			  string header = sformat(_("Information for patch %1"),
 						  patch );
 
 			  go_on = UI::DisplayMsgYouOk( post_info,
@@ -707,9 +708,9 @@ because package %2 is corrupted.
 	  {
 	      // not the correct YaST2 Verison
 	      string message = sformat(
-		UI(_("Patch %1 requires YaST2 version %2.
+		_("Patch %1 requires YaST2 version %2.
 You have installed version %3.
-")),
+"),
 		patch,
 		lookup ( check_version, "minYaST2Version", "-" ),
 		version );
@@ -739,7 +740,7 @@ You have installed version %3.
       // The patch-list only has to loaded from you-server when module is called first time
       // and not only install local available patches.
 
-      string connect_string = sformat( UI(_("Starting download of patch descriptions from %1.\n")), you_server );
+      string connect_string = sformat( _("Starting download of patch descriptions from %1.\n"), you_server );
       UI::ChangeWidget(`id(`log), `LastLine, connect_string );
 
       if ( success )
@@ -820,10 +821,10 @@ You have installed version %3.
 		  else
 		  {
 		      string gpg_warning = sformat(
-					    UI(_("Cannot check patch %1 because the GPG package is not installed
+					    _("Cannot check patch %1 because the GPG package is not installed
 or the patchdescription is corrupted.
 SuSE cannot guarantee that the patch has been created by SuSE.
-")),
+"),
 					    message);		      
 		      // not ok
 		      boolean ret = UI::DisplayMsgYou( gpg_warning, _("Warning"),
@@ -955,22 +956,22 @@ Try another SuSE FTP/HTTP server.
       boolean notyast2found = false;
       map yast2map = $[];
       foreach( `patch, `patch_info, new_patches, ``{
-	  if (  select ( patch_info, 3 ) == "X" &&
-		select ( patch_info, 0 ) == "YaST2" )
+	  if (  select ( patch_info, 3, "" ) == "X" &&
+		select ( patch_info, 0, "" ) == "YaST2" )
 	  {
 	      yast2found = true;
 	      yast2map = add ( yast2map, patch, patch_info );
 	  }
 	  else
 	  {
-	      if ( select ( patch_info, 3 ) == "X" )
+	      if ( select ( patch_info, 3, "" ) == "X" )
 	      {
 		  notyast2found = true;
 	      }
 	      list dummy = [];
-	      dummy = add ( dummy, select ( patch_info, 0 ) );
-	      dummy = add ( dummy, select ( patch_info, 1 ) );
-	      dummy = add ( dummy, select ( patch_info, 2 ) );
+	      dummy = add ( dummy, select ( patch_info, 0, "" ) );
+	      dummy = add ( dummy, select ( patch_info, 1, "" ) );
+	      dummy = add ( dummy, select ( patch_info, 2, "" ) );
 	      dummy = add ( dummy, " " );
 	      yast2map = add ( yast2map, patch, dummy );
 	  }
@@ -999,16 +1000,16 @@ again to install the rest of the packages.
 	  integer disk_size = 0;
 	  foreach( `patch, `patch_info, new_patches, ``{
 	      disk_size = disk_size + tointeger(
-						select ( lookup(new_patches, patch, []), 2 ) )*1024;
+						select ( lookup(new_patches, patch, []), 2, "" ) )*1024;
 	  });
 
 	  if ( disk_size > 1000000 )
 	  {
 	      // only greater than 1 MB
 	      string message = sformat (
-		UI(_("There are %1 patches on FTP/HTTP. Downloading may take a while.
+		_("There are %1 patches on FTP/HTTP. Downloading may take a while.
 Download the patches now?
-")),
+"),
 		size_text( disk_size ) );
 
 	      if ( !UI::AnyQuestionPopup( "", message ,YesButtonLabel(), NoButtonLabel(), `yes_default) )
@@ -1026,11 +1027,11 @@ Download the patches now?
 	  // only use patches which already have been loaded from server
 	  foreach( `patch, `patch_info, new_patches, ``{
 	      // only get the patch if marked with "X" or "G" 
-	      if ( select ( lookup(new_patches, patch, []), 3 ) == "X" ||
-		   select ( lookup(new_patches, patch, []), 3 ) == "G")
+	      if ( select ( lookup(new_patches, patch, []), 3, "" ) == "X" ||
+		   select ( lookup(new_patches, patch, []), 3, "" ) == "G")
 	      {
 		  if ( batchkind == "all" ||
-		       batchkind == select ( lookup(new_patches, patch, []), 0 ) )
+		       batchkind == select ( lookup(new_patches, patch, []), 0, "" ) )
 		  {
 		      install_patches = add(install_patches, patch);
 		  }

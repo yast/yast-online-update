@@ -59,7 +59,7 @@
 
 	if (size (serverslist) > 0)
 	{
-	    map entry = select ( serverslist, 0 );
+	    map entry = select ( serverslist, 0, "" );
 	    server = lookup (entry, "server", "");	    
 	}
 	
@@ -72,7 +72,7 @@
 
 	if (size (serverslist) > 0)
 	{
-	    map entry = select ( serverslist, 0 );
+	    map entry = select ( serverslist, 0, "" );
 	    kind = lookup (entry, "kind", "");	    
 	}
 	
@@ -96,8 +96,8 @@
 
 	foreach (`key, `value, serversmap, ``{
 	    string server = key;
-	    string spath = select (value, 0);
-	    string type = select (value, 1);
+	    string spath = select (value, 0, "");
+	    string type = select (value, 1, "");
 	    string sep = ":/";
 
 	    // ftp and http need double-slash

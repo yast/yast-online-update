@@ -58,20 +58,20 @@
     while (index < size(patch_list) )
     {
 	patch_input = add( patch_input,
-			   `item(`id(select(patch_list, index)), select(patch_list, index+3),
-				 select(patch_list, index), select(patch_list, index+4), select(patch_list, index+2)) );
-	if ( select(patch_list, index+1) == "recommended" )    		rec_no = rec_no+1;
-	else if ( select(patch_list, index+1) == "security" )    	sec_no = sec_no+1;
+			   `item(`id(select(patch_list, index, "")), select(patch_list, index+3, ""),
+				 select(patch_list, index, ""), select(patch_list, index+4, ""), select(patch_list, index+2, "")) );
+	if ( select(patch_list, index+1, "") == "recommended" )    		rec_no = rec_no+1;
+	else if ( select(patch_list, index+1, "") == "security" )    	sec_no = sec_no+1;
 	
 	index = index+5;
     };
 
     list info_input = [];
 
-    info_input = add( info_input, `item(`id(2), UI(_("Days since update:")), lookup(last_status, "days", "--")) );
-    info_input = add( info_input, `item(`id(3), UI(_("Status of last update:")), lookup(last_status, "status", "--" )) );
-    info_input = add( info_input, `item(`id(3), UI(_("Number of recommended patches:  ")), rec_no ));
-    info_input = add( info_input, `item(`id(3), UI(_("Number of security patches:  ")), sec_no ));
+    info_input = add( info_input, `item(`id(2), _("Days since update:"), lookup(last_status, "days", "--")) );
+    info_input = add( info_input, `item(`id(3), _("Status of last update:"), lookup(last_status, "status", "--" )) );
+    info_input = add( info_input, `item(`id(3), _("Number of recommended patches:  "), rec_no ));
+    info_input = add( info_input, `item(`id(3), _("Number of security patches:  "), sec_no ));
      
     term contents =
 	// main dialog: 
@@ -96,22 +96,22 @@
     string help_text = "";
 
     // helptext  "main dialog online_update" 
-    string help_part1 =  UI(_("<p>
+    string help_part1 =  _("<p>
 This dialog shows detailed information about the
 last package update and about all patches
 installed on your system.
-</p>"));
-    string help_part2 =  UI(_("<p>
+</p>");
+    string help_part2 =  _("<p>
 For more detailed information about a patch, 
 select the patch from the list
 then click <b>Show Patch Info</b>.
 </p>
-"));
+");
 
     help_text = help_part1 + help_part2;
     
-     // using SetWizardContents (define in online_update.ycp)
-     UI(`SetWizardContents(_("Detailed Information "), contents, help_text, Args(0), Args(1) ));
+     // using Wizard::SetContents (define in online_update.ycp)
+     Wizard::SetContents(_("Detailed Information "), contents, help_text, Args(0), Args(1) );
 
       
    /////////////////////////////////////////////////////////////////////////////////////////
@@ -121,18 +121,18 @@ then click <b>Show Patch Info</b>.
 
     repeat
     {
-        ret= UI(`UserInput());
+        ret= UI::UserInput();
 
 	if ( ret == `info )
 	{
-	    string patch = UI(`QueryWidget(`id(`patch_table), `CurrentItem ) );
+	    string patch = UI::QueryWidget(`id(`patch_table), `CurrentItem );
 	    ShowPatchInfo( patch );
 	}
         else if (ret == `next)
         {
 
 	}
-	else if ( ret == `abort  && UI(`ConfirmAbortUpdate(`painless)) )
+	else if ( ret == `abort  && UI::ConfirmAbortUpdate(`painless) )
 	{
 	    return `abort;
 	}

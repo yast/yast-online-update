@@ -70,7 +70,7 @@
   y2debug( "ONLINE: Return  .you.setEnvironment() %1", retval );
   UI::CloseDialog();
 
-  string reloadServer =  SCR::Read(.rc.system.YAST2_LOADFTPSERVER);
+  string reloadServer =  SCR::Read(.sysconfig.onlineupdate.YAST2_LOADFTPSERVER);
   y2milestone ( "YAST2_LOADFTPSERVER = %1", reloadServer );
 
   // Check wether YOU runs on a business product
@@ -122,11 +122,11 @@
   // look for default directory in server map (instead of "/pub/suse")
   if ( you_dir == "" )
   {
-      you_dir = select( lookup(you_server_map, you_server, ["",""]), 0 );
+      you_dir = select( lookup(you_server_map, you_server, ["",""]), 0, "" );
   }
   if ( you_serverkind == "" )
   {
-      you_serverkind = select( lookup(you_server_map, you_server, ["",""]), 1 );
+      you_serverkind = select( lookup(you_server_map, you_server, ["",""]), 1, "" );
   }  
   y2milestone("YOU server: %1, directory: %2", you_server, you_dir );
   
@@ -222,23 +222,23 @@ internal error.
   string help_text = "";
 
   // helptext dialog online update start screen 
-  string help_part1 =  UI(_("<p>SuSE Online Update is the easy way to get all recommended
+  string help_part1 =  _("<p>SuSE Online Update is the easy way to get all recommended
 patches and security fixes from a SuSE ftp/http server.<br>
 <b>Automatic Update</b> will connect to the server,
 fetch the files, and install the patches.</p>
-"));
+");
     
-  string help_part2 =  UI(_("<p>
+  string help_part2 =  _("<p>
 <b>Manual Update</b> will display all available patches
 and you can choose which patches should be installed.<br>
 Information about the last update will be shown
 if you click on the <b>Details</b> button.
-</p>"));
+</p>");
 
-  string help_part3 =  UI(_("<p>After clicking <b>Expert</b>, select a local
+  string help_part3 =  _("<p>After clicking <b>Expert</b>, select a local
 installation source instead of an FTP/HTTP server or select 
 another FTP/HTTP server.</p>
-"));
+");
     
     
   help_text = help_part1 + help_part2 + help_part3;
@@ -262,7 +262,7 @@ another FTP/HTTP server.</p>
       string you_server = read_first_suseserver(); 
       user_settings = add(user_settings, "you_server", you_server);
 
-      string you_dir = select( lookup(you_server_map, you_server, []), 0 );
+      string you_dir = select( lookup(you_server_map, you_server, []), 0, "" );
       user_settings = add(user_settings, "you_dir", you_dir);
 
       string you_serverkind = read_first_suseserverkind(); 
@@ -284,9 +284,9 @@ another FTP/HTTP server.</p>
   
   if ( !cd_update )
   {
-      UI::SetWizardContents(_("Welcome to SuSE Package Update"), contents, help_text, Args(0), Args(1) );
+      Wizard::SetContents(_("Welcome to SuSE Package Update"), contents, help_text, Args(0), Args(1) );
 
-      UI::ReplaceWizardAbortButton( `PushButton(`id(`abort), _("&Abort Update")));
+      Wizard::ReplaceAbortButton( `PushButton(`id(`abort), _("&Abort Update")));
   }
   else
   {
@@ -344,9 +344,9 @@ another FTP/HTTP server.</p>
 	  if (ret == `next)
 	  {
 
-	      you_dir = select( lookup(you_server_map, you_server, []), 0 );
+	      you_dir = select( lookup(you_server_map, you_server, []), 0, "" );
 	      user_settings = add(user_settings, "you_dir", you_dir);
-	      you_serverkind = select( lookup(you_server_map, you_server, []), 1 );
+	      you_serverkind = select( lookup(you_server_map, you_server, []), 1, "" );
 	      user_settings = add(user_settings, "you_serverkind", you_serverkind);
 
 	      any retval = SCR::Execute( .you.setServer, $["kind":you_serverkind, "name":you_server, "path":you_dir]);
@@ -390,10 +390,8 @@ another SuSE FTP/HTTP server.\n"));
 	  }
 	  else if ( ret == `expert )
 	  {
-	      you_dir = select( lookup(you_server_map,
-				       you_server, []), 0 );
-	      you_serverkind = select( lookup(you_server_map,
-					      you_server, []), 1 );
+	      you_dir = select( lookup(you_server_map, you_server, []), 0, "" );
+	      you_serverkind = select( lookup(you_server_map, you_server, []), 1, "" );
 	    
 	      user_settings = add ( user_settings, "you_dir", you_dir );
 	      user_settings = add ( user_settings, "you_serverkind", you_serverkind );	      
