@@ -188,8 +188,8 @@ Your installation will remain untouched." );
 	  {
 	      // Warning text for aborting if some patches are installed, some not
 	      what_will_happen = _( "If you abort the installation now,
-there could be patches which are not yet downloaded.
-You may need to do the update again." );
+the patches are not yet downloaded and installed.
+You will need to do the update again." );
 	  }
 	  else if ( how_to == `unusable )
 	  {
@@ -338,7 +338,7 @@ You will need to do the update again." );
   list dialog = [
 		 [`online_update_start(false, true), 		`always ],
 		 [`online_update_load(true, true),	 	`always ],
-		 [`online_update_select(true, true), 		`manual ],
+		 [`online_update_select(false, true), 		`manual ],
 		 [`online_update_load(false, true), 		`manual ],
 		 //[`inst_suseconfig(false, true), 		`always ],
 		 [`online_update_close(false, true), 		`always ]

@@ -107,7 +107,7 @@ closed.
   UI(`ChangeWidget(`id(`id4), `Value, _("56:34:45") ));
 
 
-  // Fake the getting of patches for test_mode
+  // Fake getting of patches for test_mode
   integer test_id = 0;
   define FakeGetPatch( string patch) ``{
       integer counter = 0;
@@ -339,10 +339,15 @@ Please try to get patches from another SuSE ftp server.")));
       {
 	  y2debug( "ONLINE: manual mode, installing: %1", got_patches );
 
-	  UI(`UserInput());
-          // install selected patches
-	  any ret = InstallPatches( got_patches );
-	  return `next;
+	  any r = UI(`UserInput());
+	  if ( r == `next )
+	  {
+	      // install selected patches
+	      any ret = InstallPatches( got_patches );
+	      return `next;
+	  }
+	  else if ( r == `abort  && UI(`ConfirmAbortUpdate(`incomplete)) )
+	      return `abort;
       }
       else
       {
