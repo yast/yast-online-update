@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Dec  7 12:52:50 CET 2001 - schubi@suse.de
+
+- proxy support added
+- YouAgentCalls splitted 
+
+-------------------------------------------------------------------
 Tue Dec  4 13:45:23 CET 2001 - schubi@suse.de
 
 - PKGINFO calls removed 
