@@ -287,14 +287,16 @@ the update takes place.");
 
   // helptext dialog online update start screen
   string help_part1 =  _("<p>SuSE Online Update is the easy way to get all recommended
-patches and security fixes from a SuSE ftp/http server.<br>
-<b>Automatic Update</b> will connect to the server,
-fetch the files, and install the patches.</p>
+patches and security fixes from a SuSE ftp/http server.
+</p>
 ");
 
   string help_part2 =  _("<p>
-<b>Manual Update</b> will display all available patches
-and you can choose which patches should be installed.
+If <b>Manually select patches</b> is checked, all available patches will be shown
+and you can choose which patches should be installed.<br>
+If <b>Reload all patches from server</b> is checked, all patches will be fetched
+from the server even when they already are locally available from a previous
+download.
 </p>");
 
   string help_part3 =  _("<p>After clicking <b>Expert</b>, select a local
@@ -302,8 +304,12 @@ installation source instead of an FTP or HTTP server or select
 another FTP or HTTP server.</p>
 ");
 
+  string help_part4 = _("<p>Clicking on <b>Configure fully automatic update</b>
+will open a dialog where you can configure YOU to check for updates once a day
+and automatically download and install updates when new ones are available
+without the need of user interaction.</p>");
 
-  help_text = help_part1 + help_part2 + help_part3;
+  help_text = help_part1 + help_part2 + help_part3 + help_part4;
 
   Wizard::SetContents(_("Welcome to SuSE Package Update"), contents, help_text, WFM::Args(0), WFM::Args(1) );
 
