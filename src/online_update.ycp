@@ -270,6 +270,9 @@ You will need to do the update again.");
   user_settings = add (user_settings, "architecture", architecture );
 
   // check language
+
+  // TODO: use long_language (lang2yast1.ycp)  ?????
+  
   string language = UI( `GetLanguage(true) );
   user_settings = add( user_settings, "language", language );
 
