@@ -423,13 +423,20 @@ go on with installing of already got ones.")),
 
 	  // Polling input to give the user a chance to stop the download  
 	  any r = UI(`PollInput());
-	  if ( r == `abort && UI(`DisplayMsgFtp( _("Download of patches will be stopped.
-You may continue with installation of already
-loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&Abort") )) )
+	  if ( r == `abort )
 	  {
+	      any ret = UI(`DisplayMsgFtp( _("Download of patches will be stopped.
+You may continue with installation of already
+loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&Abort")) );
 	      go_on = false;
+
+	      if ( !ret )
+	      {
+		  // don't install any patches - finish the workflow
+		  ret_list = [];
+	      }
+	      // else   stop loading and continue with installation of the patches
 	  }
-	  
 	  index = index+1;
 	  if (((index*100)/patch_no) > 95 )
 	  {
