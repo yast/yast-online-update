@@ -25,7 +25,6 @@
 
   import "Mode";
   import "OnlineUpdate";
-  import "InstMedia";
   import "Arch";
   import "Packages";
 
@@ -43,7 +42,6 @@
 
   // prepare for inst_rpmcopy
   Mode::normal = true;
-  InstMedia::installmode = "hd";
 
 
   // possible status information
