@@ -58,7 +58,17 @@
 
   list you_server_list = [];
 
-  
+  // initialize You Agent
+  UI::OpenDialog(`opt(`decorated ),`Label(_("Initializing for FTP/HTTP update; One moment please...")));
+
+  any retval = SCR::Execute(.you.setEnvironment, $[ "language":long_language,
+						  "rootpath":rootpath,
+						  "architecture":architecture,
+						  "yastpath":yastpath,
+						  "patchpath":patchpath] );
+
+  y2debug( "ONLINE: Return  .you.setEnvironment() %1", retval );
+  UI::CloseDialog();
 
   string reloadServer =  SCR::Read(.rc.system.YAST2_LOADFTPSERVER);
   y2milestone ( "YAST2_LOADFTPSERVER = %1", reloadServer );
@@ -133,17 +143,6 @@
       you_server_list = add(you_server_list, server);
   });
 
-  // initialize You Agent
-  UI::OpenDialog(`opt(`decorated ),`Label(_("Initializing for FTP/HTTP update; One moment please...")));
-
-  any retval = SCR::Execute(.you.setEnvironment, $[ "language":language,
-						  "rootpath":rootpath,
-						  "architecture":architecture,
-						  "yastpath":yastpath,
-						  "patchpath":patchpath] );
-
-  y2debug( "ONLINE: Return  .you.setEnvironment() %1", retval );
-  UI::CloseDialog();
 
   if (!retval)
   {
