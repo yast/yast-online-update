@@ -23,12 +23,12 @@
         already_up = Internet::Status ();
 
     if (!already_up)
-	Internet::start ();
+	Internet::Start ();
 
     symbol ret = WFM::CallFunction ("online_update");
 
     if (!already_up)
-	Internet::stop ();
+	Internet::Stop ();
 
     return ret;
 }

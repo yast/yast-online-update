@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Feb 26 15:57:41 CET 2003 - arvin@suse.de
+
+- fixed starting and stopping of internet connection for
+  online update run during installation
+
+-------------------------------------------------------------------
 Wed Feb 26 15:19:33 CET 2003 - cschum@suse.de
 
 - Fixed setup of automatic update (Missing linefeed at end of cron
