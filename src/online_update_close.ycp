@@ -48,14 +48,14 @@
 	      `Frame( _("Package Update information"),
 		      `VBox(`VSpacing(0.5),
 			    `Left(`Label(_("Update is finished."))),
-			    `HBox(`HWeight( 3,`Left(`Label(_("Status of update: ") ))),
-				  `HWeight( 1,`Left(`Label(`id(`error), " " )))
+			    `HBox(`HWeight( 5,`Left(`Label(_("Status of update: ") ))),
+				  `HWeight( 2,`Left(`Label(`id(`error), "        " )))
 				  ),
-			    `HBox(`HWeight( 3,`Left(`Label(_("Installed security patches: ")))),
-				  `HWeight( 1,`Left(`Label(`id(`rec), " " )))
+			    `HBox(`HWeight( 5,`Left(`Label(_("Installed security patches: ")))),
+				  `HWeight( 2,`Left(`Label(`id(`rec), "         " )))
 				  ),
-			    `HBox(`HWeight( 3,`Left(`Label(_("Installed recommended patches: ")))),
-				  `HWeight( 1,`Left(`Label(`id(`sec), " " )))
+			    `HBox(`HWeight( 5,`Left(`Label(_("Installed recommended patches: ")))),
+				  `HWeight( 2,`Left(`Label(`id(`sec), "          " )))
 				  ),
 			    `VSpacing(0.5),
 			    `PushButton(`id(`details), `opt(`notify),
@@ -69,32 +69,36 @@
     string help_text = "";
 
     // helptext  update is finished 
-    string help_part1 =  UI("<p>
+    string help_part1 =  UI(_("<p>
 Online Update is finished.
 Your installation is update to date now.
 It is recommended to check if there are
-new patches available in regular periods.<br></p>");
-    string help_part2 =  UI("<p>
+new patches available in regular periods.<br></p>"));
+    string help_part2 =  UI(_("<p>
 If any error occurs during downlod or installation
 of the patches, you can check the <b>Details</b>
 for further information.
-</p>");
- string help_part3 =  UI("<p>
+</p>"));
+ string help_part3 =  UI(_("<p>
 Please try to do the update again, if important
 patches could not be installed.
-</p>");
+</p>"));
+ 
     help_text = help_part1 + help_part2 + help_part3;
     
      // using SetContents (define in online_update.ycp)
-     UI(`SetWizardContents("Online Update Confirmation", contents, help_text, Args(0), Args(1) ));
+     UI(`SetWizardContents(_("Online Update Confirmation"), contents, help_text, Args(0), Args(1) ));
 
      // changing Label to Finish for the last step
      UI(`ChangeWidget(`id(`next), `Label,  _("&Finish") ) );
 
+     // set status and close update
+     any ret = PKGINFO(`ftpCloseUpdate( lookup(user_settings, "ftp_ok", false)) );
 
      // Show results
      map last_status = PKGINFO(`ftpLastUpdateStatus() );
-
+     y2debug( "ONLINE:  PKGINFO(`ftpLastUpdateStatus(): %1", last_status );
+     
      list patch_list = lookup( last_status, "patches", [] );
      integer rec_no = 0;
      integer sec_no = 0;
@@ -125,16 +129,20 @@ patches could not be installed.
         {
 	    any retval = CallFunction(`online_update_details( true, false ) );
 	    if ( retval == `abort )
+	    {
+		PKGINFO(`ftpDisconnect());
 		return `abort;
+	    }
 	    
 	    ret = `again;
 	}
 
 	
+
     } until (ret == `next || ret == `back || ret == `abort || ret == `again );
 
     // Close connection
-    PKGINFO(`ftpCloseUpdate());
+    PKGINFO(`ftpDisconnect());
     
    return ret;
 }

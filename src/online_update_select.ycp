@@ -100,19 +100,19 @@
     // helptext  "main dialog online_update"
     string help_text = "";
     
-    string help_part1 =  UI("<p>This dialog shows all patches which are
+    string help_part1 =  UI(_("<p>This dialog shows all patches which are
 available for download on SuSE ftp server.<br>
 Mode \"recommended\" means you should install the patch.
 \"security\" is a security patch and it is highly recommended to install it.
-</p>");
-    string help_part2 =  UI("<p>Meaning of the status flags:</p>
+</p>"));
+    string help_part2 =  UI(_("<p>Meaning of the status flags:</p>
 <p>
 <b>X</b>: Patches concerning your installation are preselected.
 They will be downloaded and installed on your system.
 If you don't want a certain patch, double
 click on line to deselect it (or selcect line and use Crtl A).
-</p>");
-    string help_part3 =  UI("<p>
+</p>"));
+    string help_part3 =  UI(_("<p>
 <b>G</b>: patch is available but not relevant for your installation
 (concerns packages which are not installed).
 You can download the patch but it will not be installed.
@@ -120,7 +120,7 @@ You can download the patch but it will not be installed.
 <p>
 <b>_</b>: you have deselected this patch, it will neither
 downloaded nor installed.
-</p>");
+</p>"));
 
     help_text = help_part1 + help_part2 + help_part3;
     

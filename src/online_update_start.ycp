@@ -25,7 +25,6 @@
 
 {
   boolean test_mode    = lookup ( user_settings, "test_mode", false );
-  boolean fake_mode    = lookup ( user_settings, "fake_mode", false );
   
    // constant settings
   map ftp_server_map = $["mack"		: ["/update-test/suse"],
@@ -63,8 +62,6 @@
 	ftp_server_list = add(ftp_server_list, server);
     });
 	    
-    if ( !fake_mode )
-    {
 	// initialize PKGINFO
 	UI(`OpenDialog(`opt(`decorated ),`Label(_("Initializing for ftp update; One moment please..."))));
   
@@ -84,20 +81,9 @@
 Please check www.suse.de
 for further information ."))) )
 	    return `abort;
-    }
      
     // get last update status from PKGINFO
-    if ( !fake_mode )
-    {
 	last_status = PKGINFO(`ftpLastUpdateStatus() );
-    }
-    else
-    {
-	last_status = $["date":"12.10.2000", "days":"25", "status":"ok",
-		       "patches":["patch-0-123", "rec", "skdakdöak sdfsdfsdf", "05.10.2000",
-				 "sec-fix-988", "sec", "salöda dsösld alsdäladä", "12.10.2000",
-				 "sec-fix-123", "sec", "bbbbbb asdfg Gsdfksdf", "12.10.2000" ]];
-    }
 
     y2debug("ONLINE: last update status: %1", last_status );
           
@@ -205,19 +191,16 @@ if you click on button <b>Details</b>.
 
 	    string update_path = select( lookup(ftp_server_map, ftp_server, ""), 0 );
 	      
-	    if ( !fake_mode )
-	    {
-		any retval = PKGINFO(`ftpSetServer( ftp_server,
-						   update_path) );
-		y2debug("ONLINE: PKGINFO(`setFtpServer( %1, %2 ) ): %3", ftp_server, update_path, retval );
+	    any retval = PKGINFO(`ftpSetServer( ftp_server,
+						update_path) );
+	    y2debug("ONLINE: PKGINFO(`setFtpServer( %1, %2 ) ): %3", ftp_server, update_path, retval );
 		
-		if (retval == nil || retval == false)
-		{
-		    UI(`DisplayMsgFtp(_("Initialization failed - please try again.
+	    if (retval == nil || retval == false)
+	    {
+		UI(`DisplayMsgFtp(_("Initialization failed - please try again.
 If failure continues, please choose
 another SuSE ftp server.")));
-		    ret = `again;
-		}
+		ret = `again;
 	    }
 	}
 	else if ( ret == `details )
