@@ -1,0 +1,28 @@
+/**
+ * File:	network/online-update/inst_you.ycp
+ * Package:	online-update
+ * Summary:	Call YOU during installation
+ * Authors:	Arvin Schnell <arvin@suse.de>
+ *
+ * $Id$
+ */
+
+{
+    textdomain "online-update";
+
+    import "Internet";
+
+
+    // FIXME
+
+    if (!Internet::do_test)	// nothing to do
+	return `auto;
+
+    if (!Internet::do_you)	// nothing to do
+	return `auto;
+
+
+    symbol ret = WFM::CallFunction ("online_update");
+
+    return ret;
+}
