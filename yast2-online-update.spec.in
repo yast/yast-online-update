@@ -8,8 +8,6 @@ Provides:	y2c_online_update yast2-config-online-update
 Obsoletes:	y2c_online_update yast2-config-online-update
 Provides:	yast2-trans-online-update
 Obsoletes:	yast2-trans-online-update
-Provides:	yast2-agent-you yast2-agent-you-devel
-Obsoletes:	yast2-agent-you yast2-agent-you-devel
 
 Summary:    	YaST2 online update
 
