@@ -114,8 +114,8 @@ harddisk.</p>"));
 
   string help_part13 = UI(_("<p>YaST2 first gets the descriptions of
 the available patches from the ftp server.
-After that you will have the possibitlity to select which patches
-should be downloaded and installed.</p>"));
+After that you will be able to to select the patches you want to
+be downloaded and installed.</p>"));
   
   string help_part2 =  UI(_("<p>
 The fields above show information about the connection and
