@@ -132,12 +132,39 @@ packages were created by SuSE.
 
 UI(``{
 
-    global define YouErrorPopup( string message, string details ) ``{
+    global define YouSkipPopup( string message, string details )
+    ``{
+        return YouErrorPopupGeneric( message, details, true );
+    }
+
+    global define YouErrorPopup( string message, string details )
+    ``{
+        return YouErrorPopupGeneric( message, details, false );
+    }
+
+    global define YouErrorPopupGeneric( string message, string details,
+                                        boolean skip ) ``{
 
         if ( size( details ) == 0 ) return ErrorPopup( message );
 
         string detailsStringOn = _("&Details <<");
         string detailsStringOff = _("&Details >>");
+
+        term detailsButton = `PushButton( `id( `details ), detailsStringOff );
+
+        term buttons = nil;
+        if ( skip ) {
+          buttons = `HBox(
+                        detailsButton,
+                        `PushButton( `id( `ok ), _("Skip patch") ),
+                        `PushButton( `id( `abort ), _("Abort update") )
+                    );
+        } else {
+          buttons = `HBox(
+                        detailsButton,
+                        `PushButton( `id( `ok ), OKButtonLabel() )
+                    );
+        }
 
         OpenDialog( `opt( `decorated ),
             `VBox(
@@ -145,17 +172,14 @@ UI(``{
                 `VSpacing( 0.2 ),
                 `Label( message ),
                 `ReplacePoint( `id( `rp ), `Empty() ),
-                `HBox(
-                    `PushButton( `id( `details ), detailsStringOff ),
-                    `PushButton( `id( `ok ), OKButtonLabel() )
-                )
+                buttons
             )
         );
         
         symbol ret = nil;
         boolean showDetails = false;
              
-        while( ret != `ok ) {
+        while( ret != `ok && ret != `abort ) {
             ret = UserInput();
             
             if ( ret == `details ) {
@@ -174,6 +198,9 @@ UI(``{
         }
         
         CloseDialog();
+
+        if ( ret ==  `ok ) return true;
+        else return false;
     }
 
     //  ConfirmAbortUpdate has same layout as/but different text than ConfirmAbort
@@ -447,7 +474,7 @@ Check the registration data.
   };
 
   if ( Mode::test ) {
-    UI::YouErrorPopup( "Message", "This is a long message, whcih has almost no end." );
+    UI::YouErrorPopup( "Message", "This is a message." );
     return `test;
   }
 

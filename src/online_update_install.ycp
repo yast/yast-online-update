@@ -85,6 +85,9 @@ option 'Remove source packages after update.'</p>");
 
   boolean error = false;
 
+  // If stop is set to true the update stops, if there are download errors
+  boolean stop = false;
+
   string msgNoPatches = _( "No patches have been selected for installation." );
 
   integer installedPatches = 0;
@@ -101,10 +104,12 @@ option 'Remove source packages after update.'</p>");
       if ( errorMsg == "abort" ) {
         if ( UI::ConfirmAbortUpdate( `painless ) ) return `abort;
       }
+
+      string patchName = lookup( patch, "name", "unknown" );
     
       UI::ChangeWidget( `id(`log), `LastLine,
                         sformat ( _( "Retrieving %1: \"%2\" " ),
-                            lookup( patch, "name", "unknown" ),
+                            patchName,
                             lookup( patch, "summary", "no summary" ) ) );
 
       string err = Pkg::YouGetCurrentPatch( OnlineUpdate::reload,
@@ -114,16 +119,24 @@ option 'Remove source packages after update.'</p>");
       } else {
         UI::ChangeWidget( `id(`log), `LastLine, _("Error") );
         error = true;
+        if ( err == "abort" ) {
+          if ( UI::ConfirmAbortUpdate( `painless ) ) return `abort;
+        }
         if ( err == "media" ) {
           UI::ChangeWidget( `id(`log), `LastLine, _(": Can't get files.") );
         } else if ( err == "sig" ) {
           UI::ChangeWidget( `id(`log), `LastLine, _(": Signature check failed.") );
-        } else if ( err == "abort" ) {
-          if ( UI::ConfirmAbortUpdate( `painless ) ) return `abort;
         } else {
           y2error( "YouGetCurrentPatch Error: %1", err );
         }
         UI::ChangeWidget( `id(`log), `LastLine, _("\n") );
+      
+        string msg = sformat( _("Error downloading patch '%1'.
+Do you want to skip this patch or
+abort the update?"), patchName );
+      
+        boolean proceed = UI::YouSkipPopup( msg, Pkg::Error() );
+        if ( !proceed ) return `abort;
       }
 
       patch = Pkg::YouNextPatch();
@@ -131,7 +144,7 @@ option 'Remove source packages after update.'</p>");
     
     UI::ChangeWidget( `id(`log), `LastLine, _("Download finished.\n\n") );
 
-    if ( error ) {
+    if ( stop ) {
       UI::ErrorPopup( _("Download failed.") );
     } else {
     
@@ -143,9 +156,11 @@ option 'Remove source packages after update.'</p>");
         UI::ChangeWidget( `id(`log), `LastLine, msgNoPatches );
       } else {
         while( size( patch ) != 0 ) {
+          string patchName = lookup( patch, "name", "unknown" );
+        
           UI::ChangeWidget( `id(`log), `LastLine,
                             sformat ( _( "Installing %1: \"%2\" " ),
-                                lookup( patch, "name", "unknown" ),
+                                patchName,
                                 lookup( patch, "summary", "no summary" ) ) );
 
           string info = lookup( patch, "preinformation", "" );
@@ -160,6 +175,13 @@ option 'Remove source packages after update.'</p>");
           } else {
             UI::ChangeWidget( `id(`log), `LastLine, _("Error\n") );
             error = true;
+            
+            string msg = sformat( _("Error installing patch '%1'.\n
+Do you want to skip this patch or abort
+the update?"), patchName );
+            
+            boolean proceed = UI::YouSkipPopup( msg, Pkg::Error() );
+            if ( !proceed ) return `abort;
           }
 
           info = lookup( patch, "postinformation", "" );
@@ -172,11 +194,10 @@ option 'Remove source packages after update.'</p>");
 
         UI::ChangeWidget( `id(`log), `LastLine, _("Installation finished.\n") );
 
-        if ( error ) {
+        if ( stop ) {
           UI::ErrorPopup( _("Installation failed.") );
         } else {
           Pkg::YouFinish();
-          UI::MessagePopup( _("Installation successful.") );
         }
       }
     }

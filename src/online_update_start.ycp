@@ -260,6 +260,7 @@ another FTP or HTTP server.</p>
 	      if ( !success )
               {
 		  ret = `this;
+                  continue;
 	      }
 	  }
 
