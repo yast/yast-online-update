@@ -309,6 +309,7 @@ You will need to do the update again." );
 		 [`online_update_load(true, true), `auto ],
 		 [`online_update_select(true, true), `manual ],
 		 [`online_update_load(false, true), `manual ],
+		 //[`inst_suseconfig(false, true), `auto ],
 		 [`online_update_close(false, true), `auto ]
 		 
   ];

@@ -115,9 +115,9 @@ if you click on button <b>Details</b>.
 
     help_text = help_part1 + help_part2;
 			    
-    UI(`SetWizardContents("Welcome to SuSE Package Update", contents, help_text, true, true ));
+    UI(`SetWizardContents("Welcome to SuSE Package Update", contents, help_text, Args(0), Args(1) ));
 
-    UI(`ChangeWidget(`id(`abort), `Label, _("&Cancel")) );
+    UI(`ChangeWidget(`id(`abort), `Label, _("&Abort Update")) );
     
    
 
@@ -143,7 +143,7 @@ if you click on button <b>Details</b>.
 	    return `again;
 	}
 
-	if ( ret == `abort && UI(`ConfirmAbort(`painless)) )
+	if ( ret == `abort && UI(`ConfirmAbortUpdate(`painless)) )
 	    return `abort;
 
 	if ( ret == `back)

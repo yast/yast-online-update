@@ -137,7 +137,7 @@ click on button <b>Show Patch Info</b>.
         {
 
 	}
-	else if ( ret == `abort )
+	else if ( ret == `abort  && UI(`ConfirmAbortUpdate(`painless)) )
 	{
 	    return `cancel;
 	}
