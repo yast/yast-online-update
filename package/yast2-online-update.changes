@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Sep 10 17:38:42 CEST 2002 - cschum@suse.de
+
+- Added correct status and error messages for Patch CD update.
+- Removed a double declaration error.
+
+-------------------------------------------------------------------
 Fri Sep  6 17:00:41 CEST 2002 - cschum@suse.de
 
 - Added Provides/Obsoletes for y2t_online_update.
