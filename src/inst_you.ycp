@@ -12,8 +12,8 @@
 
     import "Internet";
 
-
-    // FIXME
+    if (!Internet::Fastest())	// nothing to do
+	return `auto;
 
     if (!Internet::do_test)	// nothing to do
 	return `auto;
@@ -21,8 +21,13 @@
     if (!Internet::do_you)	// nothing to do
 	return `auto;
 
+    // FIXME ???
+    Internet::start ();
 
     symbol ret = WFM::CallFunction ("online_update");
+
+    // FIXME ???
+    Internet::stop ();
 
     return ret;
 }
