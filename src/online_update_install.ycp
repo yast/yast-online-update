@@ -221,6 +221,7 @@ data is no longer needed. To delete this data, activate
       
       if ( size( err ) == 0 ) {
         UI::ChangeWidget( `id(`log), `LastLine, _("Ok\n") );
+        proceed = `ok;
       } else if ( err == "skipped" ) {
         UI::ChangeWidget( `id(`log), `LastLine, _("Skipped\n") );
       } else {
