@@ -25,6 +25,7 @@
   
   string version = yast_version ();
 
+  include "package_utils.ycp";
   include "ui/wizard_dialog.ycp";
   include "ui/common_popups.ycp";
   include "ui/common_functions.ycp";
@@ -63,10 +64,22 @@
   boolean test_mode = false;
   
   while (arg_n >= 0) {
-      if (Args(arg_n) == .test) {
+      if (Args(arg_n) == .test)
+      {
 	  test_mode = true;
       }
-      else if (Args(arg_n) == .cd_default) {
+      else if (Args(arg_n) == .cd_default)
+      {
+	  // write server, dir, partition  to user_settings:
+	  map install_info = $[];
+	  install_info = add( install_info, "bootmode", "CD" );
+
+	  if ( !test_mode )
+	  {
+	      y2milestone("installMap :%1", install_info );
+	      PKGINFO ( `writeInstallInf( "/var/lib/YaST",
+					  install_info  ));
+	  }
 	  user_settings = add( user_settings, "ftp_server", "CD" );
 	  user_settings = add( user_settings, "cd_update", true );
       }
@@ -248,7 +261,7 @@ You will need to do the update again.");
   // setting targetroot
   string targetroot            = SCR(`Read(.target.root));
   user_settings = add( user_settings, "targetroot", targetroot );  
-  
+
   /*
    * Main dialog cycle
    *
