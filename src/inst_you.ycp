@@ -21,13 +21,17 @@
     if (!Internet::do_you)	// nothing to do
 	return `auto;
 
-    // FIXME ???
-    Internet::start ();
+    boolean already_up = false;
+    if (!Mode::test)
+        already_up = Internet::Status ();
+
+    if (!already_up)
+	Internet::start ();
 
     symbol ret = WFM::CallFunction ("online_update");
 
-    // FIXME ???
-    Internet::stop ();
+    if (!already_up)
+	Internet::stop ();
 
     return ret;
 }
