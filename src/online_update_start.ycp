@@ -42,6 +42,8 @@
 
   UI::OpenDialog(`opt(`decorated ),`Label(_("Initializing for FTP/HTTP update. One moment please...")));
 
+  if ( cd_update ) you_url = "cd:///";
+
   if ( size( you_url ) != 0 ) {
     you_server_list = add( you_server_list, you_url );
   } else {
@@ -340,34 +342,9 @@ another FTP or HTTP server.</p>
   }
 */
 
-  if ( !cd_update )
-  {
-      Wizard::SetContents(_("Welcome to SuSE Package Update"), contents, help_text, WFM::Args(0), WFM::Args(1) );
+  Wizard::SetContents(_("Welcome to SuSE Package Update"), contents, help_text, WFM::Args(0), WFM::Args(1) );
 
-      Wizard::ReplaceAbortButton( `PushButton(`id(`abort), _("&Abort Update")));
-  }
-  else
-  {
-/*
-      // write settings for CD update and return `next
-      OnlineUpdate::you_auto 	= false;
-
-      any retval = SCR::Execute( .you.setServer,
-				 $["kind":you_serverkind,
-				  "name":you_server,
-				  "path":you_dir]);
-
-      if (retval == nil || retval == false)
-      {
-	  y2error("ONLINE: .you.setServer( %1, %2 %3) ): %4", you_server, you_dir, you_serverkind, retval );
-	  return `abort;
-      }
-      y2debug("ONLINE: .you.setServer( %1, %2 %3) ): %4", you_server, you_dir, you_serverkind, retval );
-
-      return `next;
-*/
-  }
-
+  Wizard::ReplaceAbortButton( `PushButton(`id(`abort), _("&Abort Update")));
 
   if ( OnlineUpdate::you_auto )
   {
