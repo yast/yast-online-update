@@ -441,9 +441,10 @@ download.
 </p>
 ");
 
-  string help_part3 =  _("<p>After clicking <b>Expert</b>, select a local
+  string help_part3 =  _("<p>After clicking <b>New Server</b>, select a local
 installation source instead of an FTP or HTTP server or select
-another FTP or HTTP server.</p>
+another FTP or HTTP server. Click <b>Edit Server</b> to edit the location of the
+selected server.</p>
 ");
 
   string help_part4 = _("<p>Clicking <b>Configure Fully Automatic Update</b>
