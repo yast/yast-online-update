@@ -34,8 +34,87 @@
   //                                  P O P U P S                                     //
   //////////////////////////////////////////////////////////////////////////////////////
 
-  // None at the moment
-    
+  global define YouMessagePopup( map patch, boolean pre )
+  ``{
+      string message = "";
+      
+      if ( pre ) message = patch[ "preinformation" ]:"";
+      else message = patch[ "postinformation" ]:"";
+
+      string detailsStringOn = _("Patch &Details <<");
+      string detailsStringOff = _("Patch &Details >>");
+
+      term detailsButton = `PushButton( `id( `details ), detailsStringOff );
+
+      string details = sformat( _("<b>Patch:</b> %1<br>"), patch[ "name" ]:"" );
+      
+      details = details + sformat( _("<b>Summary:</b> %1<br>"), patch[ "summary" ]:"" );
+      
+      list packages = patch[ "packages" ]:[];
+
+      details = details + _("<b>Packages:</b>");
+        
+      details = details + "<ul>";
+
+      foreach( `p, packages, ``{ details = details + "<li>" + p + "</li>"; } );
+
+      details = details + "</ul>";
+
+      term detailsTerm = 
+        `HBox( `HSpacing( 0.5 ),
+          `HWeight( 1, `RichText( details ) ),
+          `HSpacing( 0.5 )
+        );
+       
+      term buttons = nil;
+      if ( pre ) {
+        buttons = `HBox(
+                      detailsButton,
+                      `PushButton( `id( `ok ), _("Install patch") ),
+                      `PushButton( `id( `skip ), _("Skip patch") )
+                  );
+      } else {
+        buttons = `HBox(
+                      detailsButton,
+                      `PushButton( `id( `ok ), OKButtonLabel() )
+                  );
+      }
+
+      UI::OpenDialog( `opt( `decorated ),
+          `VBox(
+              `VSpacing( 0.2 ),
+              `Label( message ),
+              `ReplacePoint( `id( `rp ), `Empty() ),
+              buttons
+          )
+      );
+
+      symbol ret = nil;
+      boolean showDetails = false;
+
+      while( ret != `ok && ret != `skip ) {
+          ret = UI::UserInput();
+
+          if ( ret == `details ) {
+              if ( showDetails ) {
+                  UI::ReplaceWidget( `id( `rp ), `Empty() );
+                  UI::ChangeWidget( `id( `details ), `Label, detailsStringOff );
+              } else {
+                  UI::ReplaceWidget( `id( `rp ), `HBox( `HSpacing( 0.5 ),
+                                                        `HWeight( 1, `RichText( details ) ),
+                                                        `HSpacing( 0.5 ) )
+                                                       );
+                  UI::ChangeWidget( `id( `details ), `Label, detailsStringOn );
+              }
+              showDetails = !showDetails;
+          }
+      }
+
+      UI::CloseDialog();
+
+      if ( ret ==  `ok ) return true;
+      else return false;
+  }    
 
   //////////////////////////////////////////////////////////////////////////////////////
   // MAIN:
@@ -170,9 +249,7 @@ abort the update?"), patchName );
           boolean install = true;
           
           if ( size( info ) != 0 ) {
-            install = UI::AnyQuestionPopup( patchName, info,
-                                            _("Install patch"),
-                                            _("Skip patch"), `focus_yes );
+            install = YouMessagePopup( patch, true );
           }
 
           if ( !install ) {
@@ -184,8 +261,9 @@ abort the update?"), patchName );
               installedPatches = installedPatches + 1;
 
               info = lookup( patch, "postinformation", "" );
+              
               if ( size( info ) != 0 ) {
-                UI::MessagePopup( info );
+                YouMessagePopup( patch, false );
               }
             } else if ( result == "skipped" ) {
               UI::ChangeWidget( `id(`log), `LastLine, _("Skipped\n") );
