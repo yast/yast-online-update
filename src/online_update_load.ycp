@@ -61,24 +61,34 @@
   // MAIN:
   ///////////////////////////////////////////////////////////////////////////////
 
+  any|term download = nil;
+  
+  if ( UI(`HasSpecialWidget(`DownloadProgress ) ))
+  {
+      download = `Left(`DownloadProgress(`id(`fileProgress),_("Current patch"), "", 0 ));
+  }
+  else
+  {
+      download = `Empty();
+  }
 
   term contents =
       // main dialog: 
       `VBox(
 	    `VSpacing( 0.2 ),
 	    `HBox(
-		  `HWeight( 60,`VBox(`Left(`Label(_("Connected to"))),
-				     `Left(`Label(`id(`id1),`opt(`outputField), "                              ")) )
+		  `HWeight( 50,`VBox(`Left(`Label(_("Connected to"))),
+				     `Left(`Label(`id(`id1),`opt(`outputField), "                                          "))
+				      )
 			    ),
-		  `HWeight( 40,`VBox(`Left(`Label(_("Status of connection"))),
-				     `Left(`Label(`id(`status),`opt(`outputField), "                              ")) )
+		  `HWeight( 50,`VBox(`Left(`Label(_("Status of connection"))),
+				     `Left(`Label(`id(`status),`opt(`outputField), "                                          "))
+				      )
 			    )
 		  ),
-	    `HBox(
-		  `ProgressBar(`id(`progress), _("Progress"), 100),
-		  `HSpacing(1.0)
-		  ),
 	    `VSpacing(0.5),
+	    download,
+	    `Left(`ProgressBar(`id(`progress), _("Total progress"), 100)),
 	    `LogView(`id(`log),
 		     "Information about the activities",
 		     5,		// visible lines
@@ -205,7 +215,18 @@ The ftp connection will be closed.
 			   "\n" ));
 
 	  result_map = PKGINFO( `ftpGetPatch( select(patch_list, index) ) );
-	  y2debug("ONLINE: PKGINFO(ftpGetPatch( %1 )): %2", select(patch_list, index), lookup(result_map, "ok", false));
+	  y2debug("ONLINE: PKGINFO(ftpGetPatch( %1 )): %2", select(patch_list, index), result_map );
+	  while ( lookup(result_map, "ok", false) == true &&
+		  lookup(result_map, "nextPackage","") != "" )
+	  {
+	      y2debug("ONLINE: PKGINFO(ftpGetPatch( %1 )): %2", select(patch_list, index), result_map );
+	      UI(`ChangeWidget(`id(`log), `LastLine, "Package " +
+			    lookup(result_map, "nextPackage","") +
+			   "\n" ));
+	      UI(`ChangeWidget(`id(`fileProgress), `ExpectedSize, lookup(result_map, "nextPackageSize",0)) );
+	      UI(`ChangeWidget(`id(`fileProgress), `Filename, lookup(result_map, "nextPackage","")) );
+	      result_map = PKGINFO( `ftpGetPatch( select(patch_list, index) ) );
+	  }
 
 	  if ( !lookup(result_map, "ok", false) )
 	  {
@@ -281,25 +302,77 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
   // Checking packages for consistents and original SuSE-packages
   //
   define checkPackages( list package_list, string patch ) ``{
-      boolean ok = true;
+      boolean install = true;
+      boolean dontAsk = false;
 
+      string tmpfile = SCR(`Read(.run.mktemp));
+
+      string pgp_warning = sformat(
+				   UI(_("Cannot check the patch %1 cause the PGP key is not installed or is corrupted.\nSo SuSE cannot guarantee that the packages has been created by SuSE")),
+			       patch);
+      
+      y2milestone ( "tmpfile : %1", tmpfile );
       foreach ( `package, package_list, ``{
 	  integer ret_shell = SCR(`Execute(.target.bash,
-				"/bin/rpm --checksig " + package ));
+				"/bin/rpm --checksig " + package + " >" + tmpfile + " 2>>" + tmpfile ));
 	  if ( ret_shell != 0 )
 	  {
-	      string message = sformat(
-		UI(_("The patch %1 will not be installed \ncause package %2 is corrupted")),
-		patch, package );
+	      if ( SCR (`Execute (.target.bash, "/bin/grep \"GPG NOT OK\" " + tmpfile )) == 0 )
+	      {
+		  boolean ret = true;
+
+		  y2warning ( "package %1 returned pgp-error",
+				package );
+		  if ( !dontAsk )
+		  {
+		      ret = UI(`DisplayMsgFtp( pgp_warning, _("Warning"),
+					       _("&Install"), _("&Not install") ));
+		      if ( !ret )
+		      {
+			  install = false;
+			  y2warning ( "installing anyway" );
+		      }
+		      dontAsk = true;
+		  }
+	      }
+	      else
+	      {
+		  string message = sformat(
+					   UI(_("The patch %1 will not be installed \ncause package %2 is corrupted")),
+					   patch, package );
 	      
-	      y2error( "%1", message );
+		  y2error( "%1", message );
 	      
-	      UI(`DisplayMsgFtpOk( message, _("Error"), _("&ok") ));
-	      ok = false;
+		  UI(`DisplayMsgFtpOk( message, _("Error"), _("&ok") ));
+		  install = false;
+	      }
 	  }
+	  else
+	  {
+	      // Checking, if gpg was available
+	      if ( SCR (`Execute (.target.bash, "/bin/grep \"GPG\" " + tmpfile )) != 0 )
+	      {
+		  y2warning ( "package %1 no pgp-key found",
+				package );
+		  
+		  if ( !dontAsk )
+		  {
+		      ret = UI(`DisplayMsgFtp( pgp_warning, _("Warning"),
+					       _("&Install"), _("&Not install") ));
+		      if ( !ret )
+		      {
+			  install = false;
+			  y2warning ( "installing anyway" );
+		      }
+		      dontAsk = true;
+		  }
+	      }
+	  }
+	  
+	  SCR (`Execute (.target.bash, "/bin/rm " + tmpfile ));	  
       });
       
-      return ok;
+      return install;
   };
 
   //

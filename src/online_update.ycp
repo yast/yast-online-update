@@ -33,13 +33,15 @@
   string d3 = UI(_("Could not dial to internet. Please check your settings."));
   string d4 = UI(_("Could not dial to internet. Please connect manually."));
   string d5 = UI(_("Error occured while closing connection to internet."));
-  string d6 = UI(_("Cannot check the packages cause there has not be found\nany PGP configuration or key. So SuSE cannot guarantee that \nthe packages are created by SuSE"));
+
   string d8 = UI(_("Do not show this message again."));
   string d7 = UI(_("Skip"));
   string d11 = UI(_("Continue"));
   string d9 = UI(_("Install"));
   string d10 = sformat(UI(_("The package \"%1\" is not a SuSE package.\nShould  I install nevertheless ?")), d9 );
   string d12 = UI(_("There is no connection to internet. Trying to connect."));
+
+  string gpg_warning = UI(_("Cannot check the packages cause there has not be found\nany PGP configuration or key. So SuSE cannot guarantee that \nthe packages are created by SuSE"));
   
   
   // includes for wizard dialog

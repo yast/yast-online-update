@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Dec 21 17:21:21 MET 2000 - schubi@suse.de
+
+- progress bar for file-loading added
+- pgp-key check for every package  added
+
+-------------------------------------------------------------------
 Mon Dec 18 17:51:24 CET 2000 - kkaempf@suse.de
 
 - provide list of SuSE servers in /etc/suseservers (standard-URL format)
