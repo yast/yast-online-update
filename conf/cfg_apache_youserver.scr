@@ -17,5 +17,5 @@
 .sysconfig.apache_youserver
 
 `ag_ini(
-  SysConfigFile("/etc/sysconfig/apache")
+  `SysConfigFile("/etc/sysconfig/apache")
 )
