@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Feb 12 14:07:42 CET 2002 - gs@suse.de
+
+- check for string arguments; correct settings for YOU server 
+
+-------------------------------------------------------------------
 Mon Feb 11 17:31:59 CET 2002 - schubi@suse.de
 
 - checking version of the package which has been uploaded 
