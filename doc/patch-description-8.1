@@ -89,6 +89,10 @@ Packages:
 ##
 
 Filename: 	<package>-<version>-<arch>.rpm  or  <package>-<date>.rpm for business products 
+Patchname:	<package>-<version>-<arch>.patch.rpm
+Patchversions:	<package versions; If the installed package has one of these versions only the patch
+                 defined in "Patchname" will be installed. If not the RPM defined in "Filename" will
+                 be installed>
 RpmName: 	<package>
 Label: 		<short description of the package - english text>		* YOU special field
 InstPath: 	<subdirectory of the installation path, e.g. "a1", "n1", ... or "rpm" for business products>
