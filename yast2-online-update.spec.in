@@ -2,7 +2,7 @@
 # neededforbuild yast2-devel-packages gpp libgpp libxcrypt libxcrypt-devel yast2-packager
 
 @HEADER@
-Requires:	yast2 yast2-agent-ftp yast2-agent-http
+Requires:	yast2
 
 Provides:	y2c_online_update yast2-config-online-update
 Obsoletes:	y2c_online_update yast2-config-online-update
