@@ -262,7 +262,9 @@ abort the update?
     
     UI::ChangeWidget( `id(`log), `LastLine, _("Download finished.\n\n") );
 
-    y2milestone( "Skip map: %1", skipMap );
+    Pkg::YouDisconnect();
+
+    y2milestone("Download finished.");
 
     if ( stop ) {
       UI::ErrorPopup( _("Download failed.") );
