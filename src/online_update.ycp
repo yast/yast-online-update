@@ -68,7 +68,7 @@ packages were created by SuSE.
   integer arg_n = size(Args()) - 1;
   
   while (arg_n >= 0) {
-      if (Args(arg_n) == .test)
+      if (Args(arg_n) == .test || Args(arg_n) == ".test")
       {
 	  Mode::test = true;
       }
@@ -77,12 +77,12 @@ packages were created by SuSE.
 	  Mode::youInstallMap["you_serverkind"] = "cd";
 	  OnlineUpdate::cd_update	=  true;
       }
-      else if (Args(arg_n) == .auto.get)
+      else if (Args(arg_n) == .auto.get || Args(arg_n) == ".auto.get")
       {
 	  OnlineUpdate::you_auto_get	= true;
 	  OnlineUpdate::you_auto	= true;
       }
-      else if (Args(arg_n) == .auto.install)
+      else if (Args(arg_n) == .auto.install || Args(arg_n) == ".auto.install")
       {
 	  OnlineUpdate::you_auto_install = true;
 	  OnlineUpdate::you_auto	 = true;	  

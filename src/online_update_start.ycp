@@ -372,9 +372,9 @@ another SuSE FTP/HTTP server.\n"));
 	      // Show popup to get the registration and password in case of business product
 	      // and no local installation
 	      if ( business
-		   && you_serverkind != "CD"
-		   && you_serverkind != "Harddisk"
-		   && you_serverkind != "Net" )
+		   && you_serverkind != "cd"
+		   && you_serverkind != "harddisk"
+		   && you_serverkind != "nfs" )
 	      {
 		  // get, check and possibly save the registration and password
 		  boolean success = CheckAuthorization( );
@@ -399,8 +399,8 @@ another SuSE FTP/HTTP server.\n"));
 	  you_dir 	 = select( lookup(you_server_map, you_server, ["",""]), 0, "" );
 	  you_serverkind = select( lookup(you_server_map, you_server, ["",""]), 1, "" );
 
-	  // possible values for yast2-agent-you:
-	  // "ftp", "FTP", "http", "HTTP", "cd", "CD", "harddisk", "Harddisk", "local", "nfs", "Net", ""
+	  // Possible values for you_serverkind (see also inst_source.ycp):
+	  // "ftp", "http", "cd", "harddisk", "local", "nfs"
 	  
           // set install information for inst_source  
 	  if ( you_serverkind == "cd" || you_serverkind == "harddisk" )
@@ -413,7 +413,8 @@ another SuSE FTP/HTTP server.\n"));
 	  }
 	  Mode::youInstallMap["you_dir"] 	= you_dir;
 	  Mode::youInstallMap["you_serverkind"] = you_serverkind;
-	  
+
+	  // call dialog Change source of installation
 	  any retval = CallFunction(`inst_source( true, true ) );
 	  if ( retval == `abort )
 	      return `abort;

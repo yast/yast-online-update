@@ -279,9 +279,9 @@ The FTP or HTTP connection will be closed.
 	      // Checking, if the package is on another server; not when the
 	      // source is CD, Harddisk....
 	      if ( you_serverkind != "local" &&
-		   you_serverkind != "Net" &&
-		   you_serverkind != "CD" &&
-		   you_serverkind != "Harddisk" &&
+		   you_serverkind != "nfs" &&
+		   you_serverkind != "cd" &&
+		   you_serverkind != "harddisk" &&
 		   size ( otherYouServer ) > 0 )
 	      {
 		  map result = $[];
