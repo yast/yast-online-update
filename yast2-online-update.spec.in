@@ -1,11 +1,11 @@
 @HEADER-COMMENT@
-# neededforbuild yast2-devtools autoconf automake ydoc
+# neededforbuild yast2-devel-packages gpp libgpp libxcrypt libxcrypt-devel yast2-packager
 
 @HEADER@
-Requires:	yast2-trans-online-update  yast2  yast2-agent-you  yast2-agent-ftp  yast2-agent-http
+Requires:	yast2 yast2-agent-ftp yast2-agent-http
 
-Provides:	y2c_online_update
-Obsoletes:	y2c_online_update
+Provides:	y2c_online_update yast2-config-online-update
+Obsoletes:	y2c_online_update yast2-config-online-update
 
 BuildArchitectures: noarch
 
@@ -16,9 +16,9 @@ Summary:	YaST2 online update
 
 @PREP@
 
-@BUILD-YCP@
+@BUILD@
 
-@INSTALL-YCP@
+@INSTALL@
 
 @CLEAN@
 
@@ -32,7 +32,7 @@ Summary:	YaST2 online update
 @scrconfdir@/*.scr
 @clientdir@/online*.ycp
 @moduledir@/OnlineUpdate.ycp
-/usr/lib/YaST2/images/online_update_long.png
+@imagedir@/online_update_long.png
 %doc @docdir@
 
 %post

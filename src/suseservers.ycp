@@ -29,7 +29,7 @@
 
 {
 
-textdomain "suseservers";
+textdomain "online-update";
 
 /**
  * Read .etc.suseservers, return map

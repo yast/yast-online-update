@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Jul  3 14:50:07 CEST 2002 - msvec@suse.cz
+
+- renamed to yast2-online-update
+- merged with yast2-agent-you
+- 2.6.0
+
+-------------------------------------------------------------------
 Fri Mar 22 12:15:54 CET 2002 - schubi@suse.de
 
 - taking long language names for patch descriptions #15365

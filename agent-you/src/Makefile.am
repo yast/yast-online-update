@@ -2,6 +2,8 @@
 # Makefile.am for y2a_you/src
 #
 
+AM_CXXFLAGS = -DY2LOG=\"agent-you\"
+
 plugin_LTLIBRARIES = libpy2ag_you.la
 lib_LTLIBRARIES = liby2ag_you.la
 

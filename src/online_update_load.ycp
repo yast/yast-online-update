@@ -21,7 +21,7 @@
 */
 
 {
-  textdomain "online_update";
+  textdomain "online-update";
 
   import "Mode";
   import "OnlineUpdate";

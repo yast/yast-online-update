@@ -2,8 +2,6 @@
 # Makefile.am for y2c_online_update/src
 #
 
-SUBDIRS = include
-
 etcdir = /etc
 admdir = /var/adm/fillup-templates
 

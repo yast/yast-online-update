@@ -3,3 +3,6 @@ Makefile.in
 .libs
 .deps
 runyou
+*.log
+*.sum
+site.exp

@@ -10,7 +10,7 @@
 
 {
 
-  textdomain "online_update";
+  textdomain "online-update";
 
   import "Language";
   import "Arch";

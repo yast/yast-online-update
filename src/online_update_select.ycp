@@ -16,7 +16,7 @@
 
 {
 
-  textdomain "online_update";
+  textdomain "online-update";
 
   import "OnlineUpdate";
 
