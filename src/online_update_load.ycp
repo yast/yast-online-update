@@ -25,16 +25,19 @@
   
   // Testmode
   boolean test_mode    = lookup ( user_settings, "test_mode", false );
+
+  boolean business    = lookup( user_settings, "business", false );  
   
-  // selected ftp server
-  string ftp_server = lookup( user_settings, "ftp_server", "" );
-  string ftp_dir = lookup( user_settings, "ftp_dir", "" );
+  // selected you server
+  string you_server = lookup( user_settings, "you_server", "" );
+  string you_serverkind = lookup( user_settings, "you_serverkind", "" );  
+  string you_dir = lookup( user_settings, "you_dir", "" );
   
   // check installation mode
-  boolean auto_mode 	= lookup( user_settings, "ftp_auto", false );
-  boolean continue_mode = lookup( user_settings, "ftp_continue", false );
-  boolean auto_mode_get = lookup( user_settings, "ftp_auto_get", false );
-  boolean auto_mode_install = lookup( user_settings, "ftp_auto_install",
+  boolean auto_mode 	= lookup( user_settings, "you_auto", false );
+  boolean continue_mode = lookup( user_settings, "you_continue", false );
+  boolean auto_mode_get = lookup( user_settings, "you_auto_get", false );
+  boolean auto_mode_install = lookup( user_settings, "you_auto_install",
 				      false );
   boolean cd_update 	= lookup( user_settings, "cd_update", false );
   
@@ -49,7 +52,7 @@
   string INSTALLED = "installed";
   string LOAD = "load";
   
-  user_settings = add(user_settings, "ftp_ok", true );
+  user_settings = add(user_settings, "you_ok", true );
   
   //////////////////////////////////////////////////////////////////////////////
   //                                  P O P U P S                             //
@@ -58,7 +61,7 @@
   global define ShowProgress( integer percent )``{
       
       y2debug("PROGRESS: %1", percent );
-      UI(`ChangeWidget(`id(`progress), `Value, percent ));
+      UI::ChangeWidget(`id(`progress), `Value, percent );
   };
 
   
@@ -68,7 +71,7 @@
 
   term download = nil;
   
-  if ( UI(`HasSpecialWidget(`DownloadProgress ) ))
+  if ( UI::HasSpecialWidget(`DownloadProgress ) )
   {
       download = `Left(`DownloadProgress(`id(`fileProgress),_("Current patch"), "", 0 ));
   }
@@ -116,7 +119,7 @@ hard disk.</p>
 "));
 
   string help_part13 = UI(_("<p>YaST2 first gets the descriptions of
-the available patches from the FTP server.
+the available patches from the FTP/HTTP server.
 After that, select the patches to
 download and install.</p>
 "));
@@ -124,14 +127,14 @@ download and install.</p>
   string help_part2 =  UI(_("<p>
 The fields above show information about the connection and
 time of data transfer.
-The box below displays data from the FTP log file. If something
+The box below displays data from the FTP/HTTP log file. If something
 goes wrong, check this file for information. 
 </p>
 "));
   string help_part3 =  UI(_("<p>
 If you decide to <b>Abort Update</b>, the download of
 patches will be interrupted. No patch will be installed.
-The ftp connection will be closed. 
+The ftp/http connection will be closed. 
 </p>"));
 
   if ( cd_update )
@@ -153,10 +156,10 @@ The ftp connection will be closed.
   // and there could be a popup "YaST2 patches available". 
   //
   
-  UI(`SetWizardContents(_("Connection and Data transfer"), contents, help_text, Args(0), Args(1) ));
+  UI::SetWizardContents(_("Connection and Data transfer"), contents, help_text, Args(0), Args(1) );
 
-  UI(`ChangeWidget(`id(`id1), `Value, ftp_server) );  
-  UI(`ChangeWidget(`id(`status), `Value, _("closed") ));
+  UI::ChangeWidget(`id(`id1), `Value, you_server);  
+  UI::ChangeWidget(`id(`status), `Value, _("closed") );
 
   // Fake getting of patches for fake_mode (NOT USED)
   integer test_id = 0;
@@ -168,7 +171,7 @@ The ftp connection will be closed.
       while (counter < 100)
       {
 	  counter = counter + 1;
-	  UI(`ChangeWidget(`id(`log), `LastLine, "Neue Zeile ........\n" ));
+	  UI::ChangeWidget(`id(`log), `LastLine, "Neue Zeile ........\n" );
       }
       test_id = test_id + 1;
 	 
@@ -192,7 +195,7 @@ The ftp connection will be closed.
       return result;
   };
 
-  // get patches from ftp server
+  // get patches from you server
   global define GetAllPatches( map new_patches ) ``{
       list ret_list = [];
       list patch_list = [];
@@ -201,7 +204,7 @@ The ftp connection will be closed.
       integer patch_no = 0;
       string batchkind = "";
 
-      batchkind = lookup ( user_settings, "ftp_auto_batchkind", "all" );
+      batchkind = lookup ( user_settings, "you_auto_batchkind", "all" );
 
       foreach( `patch, `patch_info, new_patches, ``{
 	  // only get the patch if marked with "X" or "G" 
@@ -222,24 +225,24 @@ The ftp connection will be closed.
 	  return ret_list;
       }
 
-      string connect_string = sformat ( UI(_("Starting download of selected patches from %1.\n")), ftp_server );
-      UI(`ChangeWidget(`id(`log), `LastLine, connect_string ));
+      string connect_string = sformat ( UI(_("Starting download of selected patches from %1.\n")), you_server );
+      UI::ChangeWidget(`id(`log), `LastLine, connect_string );
 
-      map  result_map = PKGINFO(`ftpConnect());
-      y2debug("ONLINE:  PKGINFO(`ftpConnect()): %1", result_map );
+      map  result_map = SCR::Execute(.you.connect,"");
+      y2debug("ONLINE:  SCR::Execute(.you.connect): %1", result_map );
       connect_string = lookup (result_map, "message", "" );
       if ( size ( connect_string ) > 0 )
       {
-	  UI(`ChangeWidget(`id(`log), `LastLine, connect_string+"\n" ));
+	  UI::ChangeWidget(`id(`log), `LastLine, connect_string+"\n" );
       }
       if (lookup( result_map, "ok", false )  )
       {
-	  UI(`ChangeWidget(`id(`status), `Value, _("active")) );
+	  UI::ChangeWidget(`id(`status), `Value, _("active"));
       }
 
       ShowProgress( 5 );
 
-      string lastErrorServer = ftp_server; // only for error popup      
+      string lastErrorServer = you_server; // only for error popup      
       
       while ( (index < patch_no) && go_on )
       {
@@ -248,89 +251,96 @@ The ftp connection will be closed.
 	  
 	  y2debug("Status of patch %1: %2", patch, select( lookup(new_patches, patch, []), 3 ));
 
-	  UI(`ChangeWidget(`id(`log), `LastLine, sformat( UI(_("Get packages for patch %1\n")), patch) ) );
+	  UI::ChangeWidget(`id(`log), `LastLine, sformat( UI(_("Get packages for patch %1\n")), patch) );
 	  
-	  patch_result = PKGINFO( `ftpGetPatch( select(patch_list, index) ) );
-	  y2debug("ONLINE: PKGINFO(ftpGetPatch( %1 )): %2", select(patch_list, index), patch_result );
+	  patch_result = SCR::Execute( .you.getPatch, select(patch_list, index) );
+	  y2debug("ONLINE: SCR::Execute(.you.getPatch, %1 )): %2", select(patch_list, index), patch_result );
 	  while ( lookup(patch_result, "ok", false) == true &&
 		  lookup(patch_result, "nextPackage","") != "" )
 	  {
 	      boolean otherServerConnect = false;
-	      
-	      y2debug("ONLINE: PKGINFO(ftpGetPatch( %1 )): %2", select(patch_list, index), patch_result );
-	      UI(`ChangeWidget(`id(`log), `LastLine, "Package " +
+	      y2debug("ONLINE: SCR::Execute(.you.getPatch, %1 )): %2",
+		      select(patch_list, index), patch_result );  
+	      UI::ChangeWidget(`id(`log), `LastLine, "Package " +
 			    lookup(patch_result, "nextPackage","") +
-			   "\n" ));
-	      UI(`ChangeWidget(`id(`fileProgress), `ExpectedSize, lookup(patch_result, "nextPackageSize",0)) );
-	      UI(`ChangeWidget(`id(`fileProgress), `Filename, lookup(patch_result, "nextPackage","")) );
+			   "\n" );
+	      UI::ChangeWidget(`id(`fileProgress), `ExpectedSize, lookup(patch_result, "nextPackageSize",0));
+	      UI::ChangeWidget(`id(`fileProgress), `Filename, lookup(patch_result, "nextPackage",""));
 
-	      string otherFtpServer = lookup ( patch_result, "nextFtpServer", "" );
+	      string otherYouServer = lookup ( patch_result, "nextServer", "" );
+	      string otherYouServerKind = lookup ( patch_result, "nextServerKind", "" );	      
 	      
 	      // Checking, if the package is on another server; not when the
 	      // source is CD, Harddisk....
-	      if ( ftp_server != "local" &&
-		   ftp_server != "Net" &&
-		   ftp_server != "CD" &&
-		   ftp_server != "Harddisk" &&
-		   size ( otherFtpServer ) > 0 )
+	      if ( you_serverkind != "local" &&
+		   you_serverkind != "Net" &&
+		   you_serverkind != "CD" &&
+		   you_serverkind != "Harddisk" &&
+		   size ( otherYouServer ) > 0 )
 	      {
 		  map result = $[];
 
 		  otherServerConnect = true;
 		  
 		  // disconnect from the old server
-		  result = PKGINFO(`ftpDisconnect());
-		  y2debug("ONLINE:  PKGINFO(`ftpDisonnect()): %1", result );
+		  result = SCR::Execute( .you.disconnect,"");
+		  y2debug("ONLINE:  SCR::Execute(.you.disconnect): %1", result );
 		  string last_logging = lookup(result, "message", "" );
 		  if ( size ( last_logging ) > 0 )
 		  {
-		      UI(`ChangeWidget(`id(`log), `LastLine, last_logging+"\n" ));
+		      UI::ChangeWidget(`id(`log), `LastLine, last_logging+"\n" );
 		  }
 		  if ( lookup( result, "ok", false )  )
 		  {
-		      UI(`ChangeWidget(`id(`status), `Value, _("closed")) );
+		      UI::ChangeWidget(`id(`status), `Value, _("closed"));
 		  }
 		  
-		  // connecting to other ftp-server
+		  // connecting to other you-server
 
-		  any retval = PKGINFO(`ftpSetServer( otherFtpServer,"." ) );
-		  y2debug("ONLINE: PKGINFO(`setFtpServer( %1, %2 ) ): %3",
-			  otherFtpServer, ".", retval );
+		  any retval = SCR::Execute( .you.setServer,
+					     $["kind":otherYouServerKind,
+					      "name":otherYouServerr,
+					      "path":"."]);
+		  y2debug("ONLINE: SCR::Execute(.you.setServer,( %1, %2 %3 ) ): %4",
+			  otherYouServer, ".", otherYouServerKind, retval );
 		
 		  if (retval == nil || retval == false)
 		  {
-		      last_logging = sformat ( UI(_("Connection failed to %1\n")), otherFtpServer );
-		      UI(`ChangeWidget(`id(`log), `LastLine, last_logging ));		      
+		      last_logging = sformat ( UI(_("Connection failed to %1\n")), otherYouServer );
+		      UI::ChangeWidget(`id(`log), `LastLine, last_logging );   
 		  }
 		  else
 		  {
 		      // connect to new server
-		      result = PKGINFO(`ftpConnect());
-		      y2debug("ONLINE:  PKGINFO(`ftpConnect()): %1", result );
+		      result = SCR::Execute(.you.connect,"");
+		      y2debug("ONLINE:  SCR::Execute(.you.connect): %1", result );		      
+
 		      string connect_string = lookup (result, "message", "" );
 		      if ( size ( connect_string ) > 0 )
 		      {
-			  UI(`ChangeWidget(`id(`log), `LastLine, connect_string+"\n" ));
+			  UI::ChangeWidget(`id(`log), `LastLine, connect_string+"\n" );
 		      }
 		      if (lookup( result, "ok", false )  )
 		      {
-			  UI(`ChangeWidget(`id(`status), `Value, _("active")) );
-			  UI(`ChangeWidget(`id(`id1), `Value, otherFtpServer) );  			  
+			  UI::ChangeWidget(`id(`status), `Value, _("active"));
+			  UI::ChangeWidget(`id(`id1), `Value, otherYouServer);  			  
 		      }
 		  }
 	      }
 
 	      // Getting rpm
-	      patch_result = PKGINFO( `ftpGetPatch( select(patch_list, index) ) );
+	      patch_result = SCR::Execute( .you.getPatch, select(patch_list, index) );
+	      y2debug("ONLINE: SCR::Execute(.you.getPatch, %1 )): %2", select(patch_list, index), patch_result );
+	      
 	      if ( !lookup(patch_result, "ok", false)  )
 	      {
 		  if ( otherServerConnect )
 		  {
-		      lastErrorServer = otherFtpServer;
+		      lastErrorServer = otherYouServer;
 		  }
 		  else
 		  {
-		      lastErrorServer = ftp_server;
+		      lastErrorServer = you_server;
 		  }
 	      }
 	      
@@ -342,37 +352,35 @@ The ftp connection will be closed.
 		  otherServerConnect = false;
 		  
 		  // disconnect from  server
-		  result = PKGINFO(`ftpDisconnect());
-		  y2debug("ONLINE:  PKGINFO(`ftpDisonnect()): %1", result );
+		  result = SCR::Execute( .you.disconnect, "");
+		  y2debug("ONLINE:  SCR::Execute(.you.disconnect): %1", result );
+		  
 		  string last_logging = lookup(result, "message", "" );
 		  if ( size ( last_logging ) > 0 )
 		  {
-		      UI(`ChangeWidget(`id(`log), `LastLine, last_logging+"\n" ));
+		      UI::ChangeWidget(`id(`log), `LastLine, last_logging+"\n" );
 		  }
 		  if ( lookup( result, "ok", false )  )
 		  {
-		      UI(`ChangeWidget(`id(`status), `Value, _("closed")) );
+		      UI::ChangeWidget(`id(`status), `Value, _("closed"));
 		  }
 		  
-		  // setting to old ftp-server
-		  any retval = PKGINFO(`ftpSetServer( ftp_server,
-					 ftp_dir ) );
-		  y2debug("ONLINE: PKGINFO(`setFtpServer( %1, %2 ) ): %3",
-			  ftp_server, ftp_dir, retval );
-		
+		  // setting to old you-server
+		  any retval = SCR::Execute( .you.setServer,
+					 $["kind":you_serverkind, "name":you_server, "path":you_dir]);		  
 		  if (retval == nil || retval == false)
 		  {
-		      last_logging = sformat ( UI(_("Connection failed to %1\n")), ftp_server );
-		      UI(`ChangeWidget(`id(`log), `LastLine, last_logging ));		      
+		      last_logging = sformat ( UI(_("Connection failed to %1\n")), you_server );
+		      UI::ChangeWidget(`id(`log), `LastLine, last_logging );    
 		  }
 
 		  // connect to old server
-		  result = PKGINFO(`ftpConnect());
-		  y2debug("ONLINE:  PKGINFO(`ftpConnect()): %1", result );
+		  result = SCR::Execute(.you.connect, "");
+		  y2debug("ONLINE:  SCR::Execute(.you.connect): %1", result );		      		  
 		  if (lookup( result, "ok", false )  )
 		  {
-		      UI(`ChangeWidget(`id(`status), `Value, _("active")) );
-		      UI(`ChangeWidget(`id(`id1), `Value, ftp_server) );  		      
+		      UI::ChangeWidget(`id(`status), `Value, _("active"));
+		      UI::ChangeWidget(`id(`id1), `Value, you_server);   
 		  }
 	      }
 	  }
@@ -380,15 +388,15 @@ The ftp connection will be closed.
 	  if ( !lookup(patch_result, "ok", false) )
 	  {
 	      // set status to error
-	      PKGINFO( `ftpChangePatchUpdateStatus( select(patch_list, index), ERROR ) );
-	      y2debug("ONLINE:  PKGINFO( `ftpChangePatchUpdateStatus(%1, %2)", select(patch_list, index), ERROR );
-	      user_settings = add(user_settings, "ftp_ok", false );
+	      SCR::Write(.you.patchUpdateStatus, select(patch_list, index), ERROR );
+	      y2debug("ONLINE:  SCR::Write(.you.patchUpdateStatus,%1, %2)", select(patch_list, index), ERROR );
+	      user_settings = add(user_settings, "you_ok", false );
 	       
 	      // put logging into LogView Widget before showing popup
 	      string last_logging = lookup(patch_result, "message", "" );
 	      if ( size ( last_logging ) > 0 )
 	      {
-		  UI(`ChangeWidget(`id(`log), `LastLine, last_logging+"\n" ));
+		  UI::ChangeWidget(`id(`log), `LastLine, last_logging+"\n" );
 	      }
 
 	      if (  !auto_mode_get )
@@ -400,7 +408,7 @@ go on with installation of downloaded ones.
 ")),
 					   select(patch_list, index), lastErrorServer );
 	      
-		  any ret = UI(`DisplayMsgFtp( msg_str, _("Notify"), _("&Download"), _("&Install") ));
+		  any ret = UI::DisplayMsgFtp( msg_str, _("Notify"), _("&Download"), _("&Install") );
 
 		  if (!ret)
 		  {
@@ -422,16 +430,16 @@ go on with installation of downloaded ones.
 	  string log_string = lookup(patch_result, "message", "" );
 	  if ( log_string != "" )
 	  {
-	      UI(`ChangeWidget(`id(`log), `LastLine, log_string+"\n" ));
+	      UI::ChangeWidget(`id(`log), `LastLine, log_string+"\n" );
 	  }
 
 	  // Polling input to give the user a chance to stop the download  
-	  any r = UI(`PollInput());
+	  any r = UI::PollInput();
 	  if ( r == `abort )
 	  {
-	      any ret = UI(`DisplayMsgFtp( _("Download of patches will be stopped.
+	      any ret = UI::DisplayMsgFtp( _("Download of patches will be stopped.
 You may continue with installation of already
-loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&Abort")) );
+loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&Abort"));
 	      go_on = false;
 
 	      if ( !ret )
@@ -454,20 +462,21 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
       
       ShowProgress( 0 );
 
-      UI(`ChangeWidget(`id(`fileProgress), `Filename, "") );      
-      UI(`ChangeWidget(`id(`fileProgress), `ExpectedSize, 1024) );
+      UI::ChangeWidget(`id(`fileProgress), `Filename, "");      
+      UI::ChangeWidget(`id(`fileProgress), `ExpectedSize, 1024);
       
       // disconnect
-      map result = PKGINFO(`ftpDisconnect());
-      y2debug("ONLINE:  PKGINFO(`ftpDisonnect()): %1", result );
+      map result = SCR::Execute( .you.disconnect, "");
+      y2debug("ONLINE:  SCR::Execute(.you.disconnect): %1", result );      
+
       string last_logging = lookup(result, "message", "" );
       if ( size ( last_logging ) > 0 )
       {
-	  UI(`ChangeWidget(`id(`log), `LastLine, last_logging+"\n" ));
+	  UI::ChangeWidget(`id(`log), `LastLine, last_logging+"\n" );
       }
       if (lookup( result, "ok", false )  )
       {
-	  UI(`ChangeWidget(`id(`status), `Value, _("closed")) );
+	  UI::ChangeWidget(`id(`status), `Value, _("closed"));
       }
       
       return ret_list;
@@ -480,7 +489,7 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
       boolean install = true;
       boolean dontAsk = false;
 
-      string tmpfile = SCR(`Read(.run.mktemp));
+      string tmpfile = SCR::Read(.run.mktemp);
 
       string pgp_warning = sformat(
 				   UI(_("Cannot check patch %1 because the GPG key is not installed or is corrupted.
@@ -502,11 +511,11 @@ SuSE cannot guarantee that the packages has been created by SuSE.
       
       y2milestone ( "tmpfile : %1", tmpfile );
       foreach ( `package, package_list, ``{
-	  integer ret_shell = SCR(`Execute(.target.bash,
-				"/bin/rpm --checksig " + package + " >" + tmpfile + " 2>>" + tmpfile ));
+	  integer ret_shell = SCR::Execute(.target.bash,
+				"/bin/rpm --checksig " + package + " >" + tmpfile + " 2>>" + tmpfile );
 	  if ( ret_shell != 0 )
 	  {
-	      if ( SCR (`Execute (.target.bash, "/bin/grep -i \"GPG NOT OK\" " + tmpfile )) == 0 )
+	      if ( SCR ::Execute (.target.bash, "/bin/grep -i \"GPG NOT OK\" " + tmpfile ) == 0 )
 	      {
 		  boolean ret = true;
 
@@ -514,8 +523,8 @@ SuSE cannot guarantee that the packages has been created by SuSE.
 				package );
 		  if ( !dontAsk )
 		  {
-		      ret = UI(`DisplayMsgFtp( pgp_warning, _("Warning"),
-					       _("&Install"), _("&Don't install") ));
+		      ret = UI::DisplayMsgYou( pgp_warning, _("Warning"),
+					       _("&Install"), _("&Don't install") );
 		      if ( !ret )
 		      {
 			  install = false;
@@ -534,14 +543,14 @@ because package %2 is corrupted
 	      
 		  y2error( "%1", message );
 	      
-		  UI(`DisplayMsgFtpOk( message, _("Error"), _("&ok") ));
+		  UI::DisplayMsgYouOk( message, _("Error"), _("&ok") );
 		  install = false;
 	      }
 	  }
 	  else
 	  {
 	      // Checking, if gpg was available
-	      if ( SCR (`Execute (.target.bash, "/bin/grep -i \"GPG\" " + tmpfile )) != 0 )
+	      if ( SCR::Execute (.target.bash, "/bin/grep -i \"GPG\" " + tmpfile ) != 0 )
 	      {
 		  y2warning ( "package %1 no pgp-key found",
 				package );
@@ -550,8 +559,8 @@ because package %2 is corrupted
 		  {
 		      boolean ret = true;
 		      
-		      ret = UI(`DisplayMsgFtp( pgp_warning, _("Warning"),
-					       _("&Install"), _("&Don't install") ));
+		      ret = UI::DisplayMsgYou( pgp_warning, _("Warning"),
+					       _("&Install"), _("&Don't install") );
 		      if ( !ret )
 		      {
 			  install = false;
@@ -562,7 +571,7 @@ because package %2 is corrupted
 	      }
 	  }
 	  
-	  SCR (`Execute (.target.bash, "/bin/rm " + tmpfile ));	  
+	  SCR::Execute (.target.bash, "/bin/rm " + tmpfile );	  
       });
       
       return install;
@@ -580,28 +589,28 @@ because package %2 is corrupted
       integer package_count = 0;
 
       // remove old rpm logging
-      SCR(`Execute(.target.bash, "/bin/rm /var/log/y2logRPMShort" ));
-      SCR(`Execute(.target.bash, "/bin/rm /var/log/y2logRPM" ));      
+      SCR::Execute(.target.bash, "/bin/rm /var/log/y2logRPMShort" );
+      SCR::Execute(.target.bash, "/bin/rm /var/log/y2logRPM" );      
       
       foreach ( `patch, patch_list, ``{
 	  symbol ret = nil;
 	  boolean go_on  = true;
-
-	  map check_version = PKGINFO(`ftpCheckYaST2Version(version,patch));
-	  if ( lookup ( check_version, "ok", true ) )
+	  
+	  map check_version = SCR::Execute (.you.checkYaST2Version, version,patch );
+ 	  if ( lookup ( check_version, "ok", true ) )
 	  {
 	      // correct YaST2 version
 	      list package_list = [];
 	      list info_list = [];
 	      list desc_list = [];
-	      info_list = PKGINFO( `ftpGetPackages( patch ));
+	      info_list = SCR::Read(.you.packages, patch );
 
 	      foreach (`pac, info_list , ``{
 		  package_list = add ( package_list, select ( pac, 0 ) );
 		  desc_list = add ( desc_list, select( pac, 1) );
 	      });
 	      
-	      y2debug("ONLINE: PKGINFO(`ftpGetPackages( %1 )): %2 %3",
+	      y2debug("ONLINE: SCR::Read(.you.packages %1 ): %2 %3",
 		      patch,
 		      package_list,
 		      desc_list);
@@ -609,7 +618,7 @@ because package %2 is corrupted
 	      {
 		  // packages are ok
 		  
-		  pre_info = PKGINFO(`ftpGetPreInstallInformation(patch));
+		  pre_info = SCR::Read(.you.preInstallInformation,  patch);
 
 		  if ( pre_info != "" &&
 		       !auto_mode_install )
@@ -617,10 +626,10 @@ because package %2 is corrupted
 		      string header = sformat(UI(_("Warning for patch %1")),
 						    patch );
 		      
-		      go_on = UI(`DisplayMsgFtp( pre_info,
+		      go_on = UI::DisplayMsgYou( pre_info,
 						 header,
 						 _("&Install"),
-						 _("&Skip patch")));
+						 _("&Skip patch"));
 
 		      y2debug( "RREETTURRN: %1", go_on);
 		  }
@@ -633,8 +642,7 @@ because package %2 is corrupted
 			      no, ret );
 		      package_count = package_count + size ( package_list );
 		      no = no+1;
-		      post_info = PKGINFO(`ftpGetPostInstallInformation(
-								patch));
+		      post_info = SCR::Read(.you.postInstallInformation,  patch);
 
 		      if ( post_info != "" &&
 			   !auto_mode_install )
@@ -642,9 +650,9 @@ because package %2 is corrupted
 			  string header = sformat(UI(_("Information for patch %1")),
 						  patch );
 
-			  go_on = UI(`DisplayMsgFtpOk( post_info,
+			  go_on = UI::DisplayMsgYouOk( post_info,
 				header,
-				_("&Ok")));
+				_("&Ok"));
 		      }
 		  }
 
@@ -653,22 +661,20 @@ because package %2 is corrupted
 		  if (ret == `abort )
 		  {
 		      // set status to error
-		      PKGINFO( `ftpChangePatchUpdateStatus( patch, ERROR ) );
-		      y2debug(
-		      "ONLINE:  PKGINFO( `ftpChangePatchUpdateStatus(%1, %2)",
-		      patch, ERROR );
-		      user_settings = add(user_settings, "ftp_ok", false );
+		      SCR::Write(.you.patchUpdateStatus, patch, ERROR );
+		      y2debug("ONLINE:  SCR::Write(.you.patchUpdateStatus,%1, %2)",
+			      patch, ERROR );		      
+
+		      user_settings = add(user_settings, "you_ok", false );
 		      // ********************* foreach abbrechen **************
 		      return `cancel;
 		  }
 		  else if ( ret == `next )
 		  {
 		      // set status to INSTALLED
-		      PKGINFO( `ftpChangePatchUpdateStatus( patch,
-							    INSTALLED ) );
-		      y2debug(
-  		      "ONLINE:  PKGINFO( `ftpChangePatchUpdateStatus(%1, %2)",
-		      patch, INSTALLED );
+		      SCR::Write(.you.patchUpdateStatus, patch, INSTALLED );
+		      y2debug("ONLINE:  SCR::Write(.you.patchUpdateStatus,%1, %2)",
+			      patch, INSTALLED );		      
 		  }
 	      }
 	  }
@@ -682,18 +688,18 @@ You have installed version %3.
 		patch,
 		lookup ( check_version, "minYaST2Version", "-" ),
 		version );
-	      UI(`DisplayMsgFtpOk( message, _("Warning"), _("Don't install") ));
+	      UI::DisplayMsgYouOk( message, _("Warning"), _("Don't install") );
 	  }
       });
 
-      user_settings = add ( user_settings, "ftp_updated_packages",
+      user_settings = add ( user_settings, "you_updated_packages",
 			    package_count );
       
       return `ok;
   };
 
   //  
-  // Several functions of PKGINFO return a map of result information, e.g. 
+  // Several functions of SCR(.you....) return a map of result information, e.g. 
   // $[ "ok": "true", "continue": false, "progress":"20", "message":"Download successful" ]
   // (not all information is used on every call)
   //  
@@ -705,22 +711,23 @@ You have installed version %3.
   if ( !continue_mode &&
        !auto_mode_install )
   {
-      // The patch-list only has to loaded from ftp-server when module is called first time
+      // The patch-list only has to loaded from you-server when module is called first time
       // and not only install local available patches.
 
-      string connect_string = sformat( UI(_("Starting download of patch descriptions from %1.\n")), ftp_server );
-      UI(`ChangeWidget(`id(`log), `LastLine, connect_string ));
+      string connect_string = sformat( UI(_("Starting download of patch descriptions from %1.\n")), you_server );
+      UI::ChangeWidget(`id(`log), `LastLine, connect_string );
 
       if ( success )
       {
-	  result_map = PKGINFO(`ftpConnect());
+	  result_map = SCR::Execute(.you.connect, "");
+	  y2debug("ONLINE:  SCR::Execute(.you.connect): %1", result_map );	  
+
 	  success = lookup( result_map, "ok", false );
-	  y2debug("ONLINE:  PKGINFO(`ftpConnect()): %1", result_map );
 	  string last_logging = lookup(result_map, "message", "" );
 	  if ( size ( last_logging ) > 0 )
 	  {
-	      UI(`ChangeWidget(`id(`log),
-			       `LastLine, last_logging+"\n" ));
+	      UI::ChangeWidget(`id(`log),
+			       `LastLine, last_logging+"\n" );
 	  }
       }
 
@@ -728,33 +735,45 @@ You have installed version %3.
       {
 	  // Remove all patches with status .new or .error, because we want to download
 	  // the actual (possibly improved) descriptions from server
+	  //  [ "Distribution_Version":"7.2","Product_Version":"3.0", "Product_Name":"Email Server" ] 
 	 
-	  // $[ "installedVersion":"SuSE 6.3", "updateVersion":"SuSE 6.4" ]
-	  map versions = PKGINFO(`readVersions());
-	  string version = lookup( versions, "installedVersion", "" );
-	  string patch_path = sformat("/var/lib/YaST/patches/%1/update/%2/patches/",
-				      lookup(user_settings, "architecture", "i386"),
-      				      substring( version, size(version)-7, 3 ) );
+	  map productInfo = SCR::Read (.you.productInfo);
+	  y2debug("ONLINE: productInfo: %1", productInfo);	  
+	  string patch_path = "";
+
+	  if ( SCR::Read (.you.isBusiness) )
+	  {
+	      patch_path = sformat("/var/lib/YaST/patches/%1/update/%2/%3/patches/",
+				   lookup(user_settings, "architecture", "i386"),
+				   lookup( productInfo, "Product_Name", "" ),
+				   lookup( productInfo, "Product_Version", "" ));
+	  }
+	  else
+	  {
+	      patch_path = sformat("/var/lib/YaST/patches/%1/update/%2/patches/",
+				   lookup(user_settings, "architecture", "i386"),
+				   lookup( productInfo, "Distribution_Version", "" ));
+	  }
 	  
 	  string rm_files = patch_path + "*.new";
 	  y2debug("ONLINE: patch file path %1", patch_path);
-	  integer ret = SCR(`Execute(.target.bash, sformat("rm -rf %1", rm_files )));
+	  integer ret = SCR::Execute(.target.bash, sformat("rm -rf %1", rm_files ));
 	  rm_files = patch_path + "*.error";
-	  SCR(`Execute(.target.bash, sformat("rm -rf %1", rm_files )));
+	  SCR::Execute(.target.bash, sformat("rm -rf %1", rm_files ));
 	  
-	  UI(`ChangeWidget(`id(`status), `Value, _("active")) );
+	  UI::ChangeWidget(`id(`status), `Value, _("active"));
 	  while (go_on)
 	  {
 	      //get list of patches step by step
-	      result_map = PKGINFO(`ftpGetPatchList( ));
-	      y2debug("ONLINE:  PKGINFO(`ftpGetPatchList()): %1", result_map );
+	      result_map = SCR::Execute(.you.getPatchList, ""); 
+	      y2debug("ONLINE: SCR::Execute(.you.getPatchList) : %1", result_map );
 
 	      go_on = lookup (result_map, "continue", false );
 
 	      string message = lookup (result_map, "message", "" );
 	      if ( message != "" )
 	      {
-		  UI(`ChangeWidget(`id(`log), `LastLine, message +"\n" ));
+		  UI::ChangeWidget(`id(`log), `LastLine, message +"\n" );
 	      }
 
 	      ShowProgress( lookup (result_map, "progress", 0 ) );
@@ -765,53 +784,52 @@ You have installed version %3.
       else
       {
 	  
-	  UI(`ChangeWidget(`id(`log), `LastLine,
-			   lookup (result_map, "message", "" ) )); 
+	  UI::ChangeWidget(`id(`log), `LastLine,
+			   lookup (result_map, "message", "" ) ); 
 
 	  if ( !auto_mode_get )
 	  {
-	      // Error popup if ftpConnect failed -
+	      // Error popup if youConnect failed -
 	      // Patch CD udpate: no CD in drive, mount failed
-	      // Online Update: connecting to ftp server failed
+	      // Online Update: connecting to you server failed
 	  
-	      //if ( lookup( user_settings, "ftp_server", "" ) == "CD" )
+	      //if ( lookup( user_settings, "you_server", "" ) == "CD" )
 	      if ( cd_update )
 	      {
-		  UI(`MessagePopup(_("Can't get the patch descriptions.
+		  UI::MessagePopup(_("Can't get the patch descriptions.
 Please insert SuSE patch CD and
 restart the \"Patch CD Update\".
-")));
+"));
 		  return `abort;
 	      }
 	      else
 	      {
-		  UI(`MessagePopup(_("Connection to FTP server failed.
-Try to connect to another SuSE FTP server.
-")));
+		  UI::MessagePopup(_("Connection to YOU server failed.
+Try to connect to another SuSE FTP/HTTP server.
+"));
 		  return `back;  
 	      }
 	  }
 	  else
 	  {
-	      PKGINFO(`ftpCloseUpdate( false));  
+	      SCR::Execute(.you.closeUpdate, false); 
 	      return `abort;	      
 	  }
       }
 
-      // disconnect 
-      map disconnect_map = PKGINFO(`ftpDisconnect());
-
-      y2debug( "ONLINE:  PKGINFO(`ftpDisconnect(): %1",  disconnect_map );
+      // disconnect
+      map disconnect_map = SCR::Execute( .you.disconnect, "");
+      y2debug("ONLINE:  SCR::Execute(.you.disconnect): %1", disconnect_map );
   
       if ( lookup(disconnect_map, "ok", false ) )
       {
-	  UI(`ChangeWidget(`id(`status), `Value, _("closed")) );
+	  UI::ChangeWidget(`id(`status), `Value, _("closed"));
       }
 
       string disconnect_message = lookup (disconnect_map, "message", "" );
       if ( size ( disconnect_message ) > 0 )
       {
-	  UI(`ChangeWidget(`id(`log), `LastLine, disconnect_message +"\n" ));
+	  UI::ChangeWidget(`id(`log), `LastLine, disconnect_message +"\n" );
       }
 
       ShowProgress( 0 );      
@@ -819,33 +837,33 @@ Try to connect to another SuSE FTP server.
   
   if (success)
   {
-      new_patches = PKGINFO(`ftpNewPatchList( ));
+      new_patches = SCR::Read(.you.newPatchList);
       y2debug( "ONLINE: Reading patch data: %1", new_patches );
   }
   else
   {
-      // Error popup if ftpGetPatchList failed -
+      // Error popup if youGetPatchList failed -
       // Patch CD update: wrong CD in drive (path must be: <architecture>/update/<version>
-      // Online Update: path on ftp server not found
+      // Online Update: path on you server not found
 
       if ( !auto_mode_get &&
 	   !auto_mode_install )
       {
 	  if ( cd_update )
 	  {
-	      UI(`MessagePopup(_("Can't get the patches from CD.
+	      UI::MessagePopup(_("Can't get the patches from CD.
 Please insert the SuSE patch CD
 (check the version)
 or update your system with YaST2
 \"Online Update\".
-"))); 
+")); 
 	      return `abort;
 	  }
 	  else
 	  {
-	      UI(`MessagePopup(_("Can't get the patches from server.
-Please try to get patches from another SuSE FTP server.
-")));   
+	      UI::MessagePopup(_("Can't get the patches from server.
+Please try to get patches from another SuSE FTP/HTTP server.
+"));   
 	      return `back;
 	  }
       }
@@ -889,11 +907,11 @@ Please try to get patches from another SuSE FTP server.
 	  y2milestone( " YaST2 patches found; only install %1",
 		       new_patches );
 	  // Message popup text: YaST2 patches found which should be installed first
-	  UI(`MessagePopup(_("There are YaST2 patches available.
+	  UI::MessagePopup(_("There are YaST2 patches available.
 These patches should be installed first.
 Please install these patches then run the YaST2 Online Update
 again to install the rest of the packages.
-")));
+"));
       }
   }
   
@@ -913,12 +931,12 @@ again to install the rest of the packages.
 	  {
 	      // only greater than 1 MB
 	      string message = sformat (
-		UI(_("There are %1 patches on FTP. Downloading may take a while.
+		UI(_("There are %1 patches on FTP/HTTP. Downloading may take a while.
  Do you really want to download the patches now?
 ")),
 		size_text( disk_size ) );
 
-	      if ( !UI(`AnyQuestionPopup( "", message ,YesButtonLabel(), NoButtonLabel(), `yes_default)) )
+	      if ( !UI::AnyQuestionPopup( "", message ,YesButtonLabel(), NoButtonLabel(), `yes_default) )
 	      {
 		  return `abort;		// abort update	      
 	      }
@@ -929,7 +947,7 @@ again to install the rest of the packages.
       
       if ( auto_mode_install )
       {
-	  string batchkind = lookup ( user_settings, "ftp_auto_batchkind", "all" );
+	  string batchkind = lookup ( user_settings, "you_auto_batchkind", "all" );
 	  // only use patches which already have been loaded from server
 	  foreach( `patch, `patch_info, new_patches, ``{
 	      // only get the patch if marked with "X" or "G" 
@@ -964,29 +982,30 @@ again to install the rest of the packages.
 	  {
 	      if ( !auto_mode_install )
 	      {
-		  any ret = PKGINFO(`ftpDisconnect());
-		  y2debug("ONLINE:  PKGINFO(`ftpDisconnect()): %1", ret );
-		  UI(`MessagePopup(_("There is no patch to install.")));
+		  any ret = SCR::Execute( .you.disconnect, "");
+		  y2debug("ONLINE:  SCR::Execute(.you.disconnect): %1", ret );
+
+		  UI::MessagePopup(_("There is no patch to install."));
 	      }
 	      return `abort;		// abort update
 	  }
       }
       else
       {
-	  // Patches has been get only; Finish ftp update
-	  y2debug("ONLINE: close update with status: %1", lookup(user_settings, "ftp_ok", false) );
-	  any result = PKGINFO(`ftpCloseUpdate( lookup(user_settings, "ftp_ok", false)) );	  
+	  // Patches has been get only; Finish you update
+	  y2debug("ONLINE: close update with status: %1", lookup(user_settings, "you_ok", false) );
+	  SCR::Execute(.you.closeUpdate, lookup(user_settings, "you_ok", false)); 	  
 	  return `abort;
       }
   }
   else if ( !continue_mode )
   {
       // write new_patches to user_settings -> table input online_update_select
-      user_settings = add(user_settings, "ftp_patches", new_patches );
+      user_settings = add(user_settings, "you_patches", new_patches );
       y2debug( "Wrote list of new patches to user_settings: %1", new_patches );
 
       // prepare for second call in manual mode 
-      user_settings = add(user_settings, "ftp_continue", true );
+      user_settings = add(user_settings, "you_continue", true );
 
       // got patches and write new_patches to user_settings -> go `next if CD update
       if ( cd_update )
@@ -995,7 +1014,7 @@ again to install the rest of the packages.
   else if ( continue_mode )
   {
       // get selected patches (written to user_settings from online_update_select)
-      map get_patches = lookup( user_settings, "ftp_patches", $[] );
+      map get_patches = lookup( user_settings, "you_patches", $[] );
 
       list install_patches = GetAllPatches( get_patches );
 
@@ -1005,19 +1024,19 @@ again to install the rest of the packages.
 
 	  while (true)
 	  {
-	      any r = UI(`UserInput());
+	      any r = UI::UserInput();
 	      if ( r == `next )
 	      {
 		  // install selected patches
 		  any ret = InstallPatches( install_patches );
 		  return `next;
 	      }
-	      else if ( r == `abort  && UI(`ConfirmAbortUpdate(`incomplete)) )
+	      else if ( r == `abort  && UI::ConfirmAbortUpdate(`incomplete) )
 	      {
 		  // set CloseUpdate status to false (installation NOT complete)
-		  PKGINFO(`ftpCloseUpdate(false) );
-		  any ret = PKGINFO(`ftpDisconnect());
-		  y2debug("ONLINE:  PKGINFO(`ftpDisconnect()): %1", ret );
+		  SCR::Execute(.you.closeUpdate, false);
+		  map disconnect_map = SCR::Execute(.you.disconnect, "");
+		  y2debug("ONLINE:  SCR::Execute(.you.disconnect): %1", disconnect_map );		  
 		  return `abort;	// abort update
 	      }
 	  }
@@ -1025,9 +1044,9 @@ again to install the rest of the packages.
       else
       {
 	  // do not set the CloseUpdate status -> no patch is installed
-	  PKGINFO(`ftpDisconnect());
-	  y2debug("ONLINE:  PKGINFO(`ftpDisconnect())" );
-	  UI(`MessagePopup(_("No patch will be installed.")));
+	  map disconnect_map = SCR::Execute(.you.disconnect, "");
+	  y2debug("ONLINE:  SCR::Execute(.you.disconnect): %1", disconnect_map );		  	  
+	  UI::MessagePopup(_("No patch will be installed."));
 
 	  return `finish;
 	  //return `abort;
@@ -1035,8 +1054,9 @@ again to install the rest of the packages.
   }
   else
   {
-      PKGINFO(`ftpDisconnect());
-      y2debug("ONLINE:  PKGINFO(`ftpDisconnect()): %1", ret );
+      map disconnect_map = SCR::Execute(.you.disconnect, "");
+      y2debug("ONLINE:  SCR::Execute(.you.disconnect): %1", disconnect_map );		  	  
+      
       y2error("online_update_load - mode not set");
       return `abort;
   }
@@ -1049,20 +1069,17 @@ again to install the rest of the packages.
 
   repeat
       {
-	  ret= UI(`UserInput());
+	  ret= UI::UserInput();
 
 	  ////////////////////////////////////////////////////////////////////////////////////////////////////////
 	  ////  FINISH
 	  ////////////////////////////////////////////////////////////////////////////////////////////////////////
-	  if ( ret == `abort && UI(`ConfirmAbortUpdate(`incomplete)) )
+	  if ( ret == `abort && UI::ConfirmAbortUpdate(`incomplete) )
 	  {
-	      PKGINFO(`ftpDisconnect());
-	      y2debug("ONLINE:  PKGINFO(`ftpDisconnect()): %1", ret );
-	      return `abort;
-	  }
-	  if (ret == `next)
-	  {
+	      map disconnect_map = SCR::Execute(.you.disconnect, "");
+	      y2debug("ONLINE:  SCR::Execute(.you.disconnect): %1", disconnect_map );		  	  
 
+	      return `abort;
 	  }
 
 	  ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1072,7 +1089,7 @@ again to install the rest of the packages.
 	  if ( ret == `back)
 	  {
 	      // RESET continue mode
-	      user_settings = add(user_settings, "ftp_continue", false );
+	      user_settings = add(user_settings, "you_continue", false );
 	  }
 
       } until (ret == `next || ret == `back || ret == `cancel);

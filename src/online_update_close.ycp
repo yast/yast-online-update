@@ -30,7 +30,7 @@
   // Testmode, for example fo screenshots
   boolean test_mode    = lookup ( user_settings, "test_mode", false );
 
-  boolean auto_mode_install = lookup( user_settings, "ftp_auto_install", false );
+  boolean auto_mode_install = lookup( user_settings, "you_auto_install", false );
 
   //////////////////////////////////////////////////////////////////////////////////////
   //                                  P O P U P S                                     //
@@ -103,8 +103,9 @@ patches could not be installed.
   UI(`ChangeWidget(`id(`abort), `Enabled,  false ) );
 
   // set status and close update
-  y2debug("ONLINE: close update with status: %1", lookup(user_settings, "ftp_ok", false) );
-  any result = PKGINFO(`ftpCloseUpdate( lookup(user_settings, "ftp_ok", false)) );
+  y2debug("ONLINE: close update with status: %1", lookup(user_settings, "you_ok", false) );
+  any result = SCR::Execute (.you.closeUpdate,
+			     lookup(user_settings, "you_ok", false));
 
   if ( auto_mode_install )
   {
@@ -113,8 +114,8 @@ patches could not be installed.
   }
   
   // Show results
-  map last_status = PKGINFO(`ftpLastUpdateStatus() );
-  y2debug( "ONLINE:  PKGINFO(`ftpLastUpdateStatus(): %1", last_status );
+  map last_status = SCR::Read (.you.lastUpdateStatus );
+  y2debug( "ONLINE: SCR::Read (.you.lastUpdateStatus ) : %1", last_status );
      
   list patch_list = lookup( last_status, "patches", [] );
   integer rec_no = 0;
@@ -152,7 +153,7 @@ patches could not be installed.
 	      any retval = CallFunction(`online_update_details( true, false ) );
 	      if ( retval == `abort )
 	      {
-		  PKGINFO(`ftpDisconnect());
+		  SCR::Execute( .you.disconnect );
 		  return `abort;
 	      }
 	    
@@ -167,7 +168,8 @@ patches could not be installed.
 	      {
 		  if ( select(patch_list, index+4) == "installed" )
 		  {
-		      PKGINFO(`ftpDeletePackages(select(patch_list, index)) );
+		      SCR::Execute(.you.deletePackages,
+				   select(patch_list, index));
 		  }
 		  index = index+5;
 	      };
@@ -176,7 +178,7 @@ patches could not be installed.
       } until (ret == `next || ret == `back || ret == `abort || ret == `again );
 
   // Close connection
-  PKGINFO(`ftpDisconnect());
+  SCR::Execute( .you.disconnect );
     
   return ret;
 }

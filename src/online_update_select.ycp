@@ -34,14 +34,14 @@
 
     boolean cd_update 	= lookup( user_settings, "cd_update", false );
       
-    // map ftp_patches contains information about all available patches, e.g.
+    // map you_patches contains information about all available patches, e.g.
     //
     // $["patch-001":["recommended", "Patch for NFS server", "234", "X"],
     //   "patch-002":["security", "Noch ein weiterer patch", "565", " "]];
     //
     // status information from all patches must be stored, because if the user
     // deselects a patch and selects it again we must know whether it was "X" or "G"
-    map all_patches = lookup( user_settings, "ftp_patches", $[] );
+    map all_patches = lookup( user_settings, "you_patches", $[] );
     y2debug("ONLINE: %1", all_patches );
     
     // if the user doesn't do any changes and the current YaST2 has the right versin, the user
@@ -50,7 +50,7 @@
     maplist ( `patch, `value,  all_patches, ``(
     {
 	// checking YaST2-version
-	map check_version = PKGINFO(`ftpCheckYaST2Version(version,patch));
+	map check_version = SCR::Execute( .you.checkYaST2Version, version, patch);
 	if ( lookup ( check_version, "ok", true ) )
 	{
 	    get_patches = add ( get_patches, patch, value );
@@ -72,12 +72,12 @@
 			  if ( mode == "document" &&
 			       ( pstatus == "X" || pstatus == "G" ))
 			  {
-      			      UI( `ChangeWidget(`id(`patch_table), `Item( patch, 0 ), " ok" ));
+      			      UI::ChangeWidget(`id(`patch_table), `Item( patch, 0 ), " ok" );
 			      get_patches = add( get_patches, patch, [select(value, 0), select(value,1), select(value,2 ), "X"] );			      
 			  }
 			  else
 			  {
-			      UI( `ChangeWidget(`id(`patch_table), `Item( patch, 0 ), sformat( " %1 ", pstatus )) );
+			      UI::ChangeWidget(`id(`patch_table), `Item( patch, 0 ), sformat( " %1 ", pstatus ));
 			  get_patches = add( get_patches, patch, [select(value, 0), select(value,1), select(value,2 ), pstatus] );
 			  }
 		      }
@@ -125,9 +125,9 @@
     string help_part01 = UI(_("<p>This dialog shows the patches from
 SuSE patch CD that are not yet installed on your system.</p>
 "));
-    // This is the text for ftp installation.
+    // This is the text for you installation.
     string help_part02 =  UI(_("<p>This dialog shows all new patches available
-for download from the SuSE FTP server.</p>
+for download from the SuSE FTP/HTTP server.</p>
 "));
     // Don't translate "recommended" and "security". The patch mode is shown in a list
     // and will always be english text.
@@ -169,7 +169,7 @@ double-click the line (or select it and use Alt + A).
     }
     
     // using SetContents (define in online_update.ycp)
-    UI(`SetWizardContents(_("List of available patches"), contents, help_text, Args(0), Args(1) ));
+    UI::SetWizardContents(_("List of available patches"), contents, help_text, Args(0), Args(1) );
 
       
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -179,17 +179,17 @@ double-click the line (or select it and use Alt + A).
 
     repeat {
 
-	ret= UI(`UserInput());
+	ret= UI::UserInput();
 
-	if ( ret == `abort && UI(`ConfirmAbortUpdate(`unusable)) )
+	if ( ret == `abort && UI::ConfirmAbortUpdate(`unusable) )
 	{
-	    PKGINFO(`ftpDisconnect());
+	    SCR::Execute (.you.disconnect);
 	    return `abort;
 	}
 	if (ret == `patch_table || ret == `apply)
 	{
-	    any id = UI(`QueryWidget(`id(`patch_table), `CurrentItem ));
-	    term  patch_info = UI( `QueryWidget(`id(`patch_table), `Item(id)) );
+	    any id = UI::QueryWidget(`id(`patch_table), `CurrentItem );
+	    term  patch_info = UI::QueryWidget(`id(`patch_table), `Item(id));
 	    y2debug("PATCHINFO: %1", patch_info);
 
 	    string patch_name = select(patch_info, 3);
@@ -203,7 +203,7 @@ double-click the line (or select it and use Alt + A).
 	    }
 	    else if ( select( lookup( all_patches, patch_name, []), 3 ) == "X" )
 	    {
-		string pre_info = PKGINFO(`ftpGetPreInstallInformation(patch_name));
+		string pre_info = SCR::Read( .you.preInstallInformation, patch_name);
 		boolean go_on = true;
 
 		if ( pre_info != "" )
@@ -211,17 +211,17 @@ double-click the line (or select it and use Alt + A).
 		    string header = sformat(UI(_("Warning for patch %1")),
 					    patch_name );
 		      
-		    go_on = UI(`DisplayMsgFtp( pre_info,
+		    go_on = UI::DisplayMsgYou( pre_info,
 					       header,
 					       _("&Install"),
-					       _("&Skip patch")));
+					       _("&Skip patch"));
 
 		    y2debug( "RREETTURRN: %1", go_on);
 		}
 
 		if ( go_on )
 		{
-		    map check_version = PKGINFO(`ftpCheckYaST2Version(version,patch_name));
+		    map check_version = SCR::Execute( .you.checkYaST2Version, version,patch_name);
 		    if ( lookup ( check_version, "ok", true ) )
 		    {
 			// was "X" before -> mark with "X" again
@@ -232,13 +232,13 @@ double-click the line (or select it and use Alt + A).
 			string message = sformat(
 			 UI(_("This patch needs the version %1 of YaST2.\nYou have installed version %2")),
 			lookup ( check_version, "minYaST2Version", "-" ), version );
-			UI(`DisplayMsgFtpOk( message, ErrorMsg(), _("Don't install") ));
+			UI::DisplayMsgYouOk( message, ErrorMsg(), _("Don't install") );
 		    }
 		}
 	    }
 	    else if ( select( lookup( all_patches, patch_name, []), 3 ) == " " )
 	    {
-		map check_version = PKGINFO(`ftpCheckYaST2Version(version,patch_name));
+		map check_version = SCR::Execute( .you.checkYaST2Version, version,patch_name);
 		if ( lookup ( check_version, "ok", true ) )
 		{
 		    if ( select( patch_info, 1 ) == " G " )
@@ -249,7 +249,7 @@ double-click the line (or select it and use Alt + A).
 		    else
 		    {
 			// was not "X" and not "G" before -> mark with "G"
-			string pre_info = PKGINFO(`ftpGetPreInstallInformation(patch_name));
+			string pre_info = SCR::Read( .you.preInstallInformation, patch_name);
 			boolean go_on = true;
 
 			if ( pre_info != "" )
@@ -257,10 +257,10 @@ double-click the line (or select it and use Alt + A).
 			    string header = sformat(UI(_("Warning for patch %1")),
 						    patch_name );
 		      
-			    go_on = UI(`DisplayMsgFtp( pre_info,
+			    go_on = UI::DisplayMsgYou( pre_info,
 						       header,
 						       _("&Install"),
-						       _("&Skip patch")));
+						       _("&Skip patch"));
 
 			    y2debug( "RREETTURRN: %1", go_on);
 			}
@@ -276,13 +276,13 @@ double-click the line (or select it and use Alt + A).
 		    string message = sformat(
 			UI(_("This patch needs the version %1 of YaST2.\nYou have installed version %2")),
 			lookup ( check_version, "minYaST2Version", "-" ), version );
-		    UI(`DisplayMsgFtpOk( message, ErrorMsg(), _("Don't install") ));
+		    UI::DisplayMsgYouOk( message, ErrorMsg(), _("Don't install") );
 		}
 	    }
 	}
 	else if ( ret == `info )
 	{
-	    string patch = UI(`QueryWidget(`id(`patch_table), `CurrentItem ) );
+	    string patch = UI::QueryWidget(`id(`patch_table), `CurrentItem );
 	    ShowPatchInfo( patch );
 	}
 	else if (ret == `next)
@@ -290,7 +290,7 @@ double-click the line (or select it and use Alt + A).
 	    y2debug("ONLINE: get patches: %1", get_patches );
 
 	    // write patch info to user_settings
-	    user_settings = add(user_settings, "ftp_patches", get_patches);
+	    user_settings = add(user_settings, "you_patches", get_patches);
 	}
 
 	if ( ret == `back)

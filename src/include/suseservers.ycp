@@ -65,6 +65,19 @@
 	
 	return server;
     };
+
+    global define read_first_suseserverkind () ``{
+	string kind = "";
+	list serverslist = SCR(`Read(.etc.suseservers));
+
+	if (size (serverslist) > 0)
+	{
+	    map entry = select ( serverslist, 0 );
+	    kind = lookup (entry, "kind", "");	    
+	}
+	
+	return kind;
+    };
     
 
     // write map to .etc.suseservers

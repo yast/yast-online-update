@@ -31,8 +31,8 @@
   
     map last_status = $[];
 
-    // get last update status from PKGINFO
-    last_status = PKGINFO(`ftpLastUpdateStatus() );
+    // get last update status 
+    last_status = SCR::Read( .you.lastUpdateStatus); 
 
 
     //////////////////////////////////////////////////////////////////////////////////////

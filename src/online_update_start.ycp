@@ -9,7 +9,7 @@
  *
  * Author:        Gabriele Strattner <gs@suse.de>
  *
- * Purpose:	start module for ftp update
+ * Purpose:	start module for you update
  *		display last update info
  *		possibility to choose automatic or manual mode
  * Modify:
@@ -27,16 +27,17 @@
   textdomain "online_update";
    
   boolean test_mode    = lookup ( user_settings, "test_mode", false );
+  boolean business = false;  
   
   // constant settings
   include "suseservers.ycp";
 
-  // ftp_server_map = $[ "server" : [ "path", "type" ], ... ]
+  // you_server_map = $[ "server" : [ "path", "type" ], ... ]
 
   string rootpath = "/";
   string yastpath = "/var/lib/YaST";
   string patchpath = "/var/lib/YaST/patches";
-  string logpath = "/var/log/y2ftp";
+  string serverdescr_file = "suseservers.txt";  
 
 
   /////////////////////////////////////////////////////////////////////////////////////
@@ -47,96 +48,116 @@
   map last_status = $[];
   string default_language = "en";
 
+  map lang2yast1 = ReadY2("lang2yast1.ycp");  
+  
   string language 	= lookup( user_settings, "language", default_language );
   boolean cd_update 	= lookup( user_settings, "cd_update", false );
+  string long_language 	= lookup(lang2yast1, language, "english");  
   
   string architecture 	= lookup( user_settings, "architecture", "i386" );
 
-  list ftp_server_list = [];
+  list you_server_list = [];
 
-  string reloadServer =  SCR(`Read(.rc.system.YAST2_LOADFTPSERVER));
+  
 
+  string reloadServer =  SCR::Read(.rc.system.YAST2_LOADFTPSERVER);
   y2milestone ( "YAST2_LOADFTPSERVER = %1", reloadServer );
+
+  // Check wether YOU runs on a business product
+
+  if ( SCR::Read(.you.isBusiness) )
+  {
+      user_settings = add( user_settings, "business", true );
+      business = true;
+      serverdescr_file = "suseservers_http.txt"; 
+  }
   
   if ( reloadServer != "no" )
   {
 
-      // getting ftp-server-description from www.suse.de
-      SCR (`Execute(.target.bash,"/bin/cp /etc/suseservers /etc/suseservers.bak" ));
+      // getting you-server-description from www.suse.de
+      SCR::Execute(.target.bash,"/bin/cp /etc/suseservers /etc/suseservers.bak" );
       string command = "/usr/bin/wget -q --output-document="+
-	  "/etc/suseservers --tries=2 --timeout=5 http://www.suse.de/de/support/download/suseservers.txt";
-      if ( SCR( `Execute(.target.bash, command) ) != 0  )      
+	  "/etc/suseservers --tries=2 --timeout=5 http://www.suse.de/de/support/download/"
+	  + serverdescr_file;
+      if ( SCR::Execute(.target.bash, command) != 0  )      
       {
 	  y2error("command: %1", command);
-	  SCR (`Execute(.target.bash,
-			"/bin/cp /etc/suseservers.bak /etc/suseservers" ));
+	  SCR::Execute(.target.bash,
+			"/bin/cp /etc/suseservers.bak /etc/suseservers" );
       }
       else
       {
 	  y2milestone("command %1 ok", command);
       }
-      SCR (`Execute(.target.remove,"/etc/suseservers.bak" ));	
+      SCR::Execute(.target.remove,"/etc/suseservers.bak" );	
   }
 
-  map ftp_server_map = read_suseservers ();
+  map you_server_map = read_suseservers ();
 
-  string ftp_server =   lookup(user_settings, "ftp_server", "" );
+  string you_server =   lookup(user_settings, "you_server", "" );
+  string you_serverkind =   lookup(user_settings, "you_serverkind", "" );  
   string default_server = "";
+  string default_serverkind = "";
   
   // default server is first entry in file /etc/suseservers (instead of "ftp.suse.com")
-  if ( ftp_server == "" )
+  if ( you_server == "" )
   {
       default_server = read_first_suseserver();
-      ftp_server = read_first_suseserver();
+      default_serverkind = read_first_suseserverkind();
   }
 
-  string ftp_dir =  lookup(user_settings, "ftp_dir", "" );
+  string you_dir =  lookup(user_settings, "you_dir", "" );
 
   // look for default directory in server map (instead of "/pub/suse")
-  if ( ftp_dir == "" )
+  if ( you_dir == "" )
   {
-      ftp_dir = select( lookup(ftp_server_map, ftp_server, [""]), 0 );
+      you_dir = select( lookup(you_server_map, you_server, ["",""]), 0 );
   }
-  y2milestone("FTP server: %1, directory: %2", ftp_server, ftp_dir );
+  if ( you_serverkind == "" )
+  {
+      you_serverkind = select( lookup(you_server_map, you_server, ["",""]), 1 );
+  }  
+  y2milestone("YOU server: %1, directory: %2", you_server, you_dir );
   
   // insert local server like CD, NFS ....
-  if ( ftp_server != "" && ftp_server != default_server )
+  if ( you_server != "" && you_server != default_server )
   {
-      list ftp_dir_list = [];
-      ftp_dir_list = add ( ftp_dir_list, ftp_dir );
-      ftp_server_map = add(ftp_server_map, ftp_server, ftp_dir_list );
+      list you_dir_list = [];
+      you_dir_list = add ( you_dir_list, you_dir );
+      you_dir_list = add ( you_dir_list, you_serverkind );      
+      you_server_map = add(you_server_map, you_server, you_dir_list );
   }
     
-  foreach(`server, `info, ftp_server_map, ``{
-      ftp_server_list = add(ftp_server_list, server);
+  foreach(`server, `info, you_server_map, ``{
+      you_server_list = add(you_server_list, server);
   });
 
-  // initialize PKGINFO
-  UI(`OpenDialog(`opt(`decorated ),`Label(_("Initializing for FTP update; One moment please..."))));
+  // initialize You Agent
+  UI::OpenDialog(`opt(`decorated ),`Label(_("Initializing for FTP/HTTP update; One moment please...")));
 
-  any retval = PKGINFO(`ftpSetEnvironment( $["ftpserver":"",
-					    "language":language,
-					    "rootpath":rootpath,
-					    "architecture":architecture,
-					    "yastpath":yastpath,
-					    "logFilename":logpath,
-					    "patchpath":patchpath] ) );
+  any retval = SCR::Execute(.you.setEnvironment, $[ "language":language,
+						  "rootpath":rootpath,
+						  "architecture":architecture,
+						  "yastpath":yastpath,
+						  "logFilename":logpath,
+						  "patchpath":patchpath] );
 
-  y2debug( "ONLINE: Return  PKGINFO(`ftpsetEnvironment() %1", retval );
-  UI(`CloseDialog());
+  y2debug( "ONLINE: Return  .you.setEnvironment() %1", retval );
+  UI::CloseDialog();
 
   if (!retval)
   {
-      // Message popup: yast2 component responsible for the ftp update cannot be initialised.
-      // This does not mean, connection failed to ftp server, but any other error occured.
-      UI(`MessagePopup(_("Initialization of FTP server failed
+      // Message popup: yast2 component responsible for the you update cannot be initialised.
+      // This does not mean, connection failed to you server, but any other error occured.
+      UI::MessagePopup(_("Initialization of FTP/HTTP server failed
 (internal error).
-")));
+"));
       return `abort;
   }
   
-  // get last update status from PKGINFO
-  last_status = PKGINFO(`ftpLastUpdateStatus() );
+  // get last update status from YOU agent
+  last_status = SCR::Read(.you.lastUpdateStatus);
 
   y2debug("ONLINE: last update status: %1", last_status );
 
@@ -188,7 +209,7 @@
 							`VBox(
 							      `VSpacing(0.3),
 							      `HBox(`HSpacing(1.2),
-								    `Left(`ComboBox(`id(`ftp), _("&Installation source"), ftp_server_list )),
+								    `Left(`ComboBox(`id(`you), _("&Installation source"), you_server_list )),
 								    `PushButton( `id(`expert), `opt(`notify), _("&Expert"))
 								    ),
 							      `VSpacing(0.3) 
@@ -205,7 +226,7 @@
   // helptext dialog online update start screen 
   string help_part1 =  UI(_("<p>
 SuSE Online Update is the easy way to get all recommended
-patches and security fixes from SuSE ftp server.<br>
+patches and security fixes from SuSE ftp/http server.<br>
 <b>Automatic Update</b> will connect to the server,
 fetch the files, and install the patches.</p>
 "));
@@ -219,14 +240,14 @@ if you click on the <b>Details</b> button.
 
   string help_part3 =  UI(_("<p>
 If you click on button <b>Expert</b>, you can select an local
-installation source instead of an FTP server or select another FTP server.
+installation source instead of an FTP/HTTP server or select another FTP/HTTP server.
 </p>
 "));
     
     
   help_text = help_part1 + help_part2 + help_part3;
 
-  if ( lookup( user_settings, "ftp_auto_install", false ) )
+  if ( lookup( user_settings, "you_auto_install", false ) )
   {
       // auto mode; install patches which are currently on the server
       // Do not use internet
@@ -234,68 +255,73 @@ installation source instead of an FTP server or select another FTP server.
       return `next;      
   }  
 
-  if ( lookup( user_settings, "ftp_auto_get", false ) )
+  if ( lookup( user_settings, "you_auto_get", false ) )
   {
       // auto mode; get patch descriptions and packages, but do not install patches
-      if ( size ( ftp_server_list ) <= 0 )
+      if ( size ( you_server_list ) <= 0 )
       {
 	  y2error ( "No serverlist available" );
 	  return `abort;
       }
-      string ftp_server = read_first_suseserver(); 
-      user_settings = add(user_settings, "ftp_server", ftp_server);
+      string you_server = read_first_suseserver(); 
+      user_settings = add(user_settings, "you_server", you_server);
 
-      string ftp_dir = select( lookup(ftp_server_map, ftp_server, []), 0 );
-      user_settings = add(user_settings, "ftp_dir", ftp_dir);
+      string you_dir = select( lookup(you_server_map, you_server, []), 0 );
+      user_settings = add(user_settings, "you_dir", you_dir);
 
-      any retval = PKGINFO(`ftpSetServer( ftp_server,
-					  ftp_dir ) );
+      string you_serverkind = read_first_suseserverkind(); 
+      user_settings = add(user_settings, "you_serverkind", you_serverkind);
+
+      any retval = SCR::Execute( .you.setServer, $["kind":you_serverkind, "name":you_server, "path":you_dir]);
 		
       if (retval == nil || retval == false)
       {
 	  return `abort;
-	  y2error("ONLINE: PKGINFO(`setFtpServer( %1, %2 ) ): %3",
-		  ftp_server, ftp_dir, retval );
+	  y2error("ONLINE: .you.setServer( %1, %2 %3) ): %4",
+		  you_server, you_dir, you_serverkind, retval );
       }
-      y2debug("ONLINE: PKGINFO(`setFtpServer( %1, %2 ) ): %3",
-	      ftp_server, ftp_dir, retval );
+      y2debug("ONLINE: .you.setServer( %1, %2 %3) ): %4",
+	      you_server, you_dir, you_serverkind, retval );
       
       return `next;      
   }  
   
   if ( !cd_update )
   {
-      UI(`SetWizardContents(_("Welcome to SuSE Package Update"), contents, help_text, Args(0), Args(1) ));
+      UI::SetWizardContents(_("Welcome to SuSE Package Update"), contents, help_text, Args(0), Args(1) );
 
-      UI(`ReplaceWizardAbortButton( `PushButton(`id(`abort), _("&Abort Update"))) );
+      UI::ReplaceWizardAbortButton( `PushButton(`id(`abort), _("&Abort Update")));
   }
   else
   {
       // write settings for CD update and return `next
-      user_settings = add (user_settings, "ftp_auto", false);
-      user_settings = add(user_settings, "ftp_server", "CD" );
-	
-      any retval = PKGINFO(`ftpSetServer( "CD", "" ) );
-      y2debug("ONLINE: PKGINFO(`setFtpServer( \"CD\", \"\" ) ): %1", retval );
+      user_settings = add (user_settings, "you_auto", false);
+      user_settings = add(user_settings, "you_server", "CD" );
+      user_settings = add(user_settings, "you_serverkind", "CD" );
+      user_settings = add(user_settings, "you_dir", "" );            
 
+      any retval = SCR::Execute( .you.setServer, $["kind":you_serverkind, "name":you_server, "path":you_dir]);
+      y2debug("ONLINE: .you.setServer( %1, %2 %3) ): %4",
+	      you_server, you_dir, you_serverkind, retval );
+      
       return `next;
   }
   
 
-  if ( lookup(user_settings, "ftp_auto", false ) )
+  if ( lookup(user_settings, "you_auto", false ) )
   {
-      UI(`ChangeWidget(`id(`automatic), `Value, true ));
-      UI(`ChangeWidget(`id(`manual), `Value, false ));
+      UI::ChangeWidget(`id(`automatic), `Value, true );
+      UI::ChangeWidget(`id(`manual), `Value, false );
   }
   else
   {
-      UI(`ChangeWidget(`id(`automatic), `Value, false ));
-      UI(`ChangeWidget(`id(`manual), `Value, true ));
+      UI::ChangeWidget(`id(`automatic), `Value, false );
+      UI::ChangeWidget(`id(`manual), `Value, true );
   }
 
-  if ( ftp_server != "" )
+  if ( you_server != "" )
   {
-      UI(`ChangeWidget(`id(`ftp), `Value, ftp_server ));
+      UI::ChangeWidget(`id(`you), `Value, you_server );
   }
 
   //  Loop for User Input ....
@@ -304,42 +330,60 @@ installation source instead of an FTP server or select another FTP server.
 
   repeat
       {
-	  ret= UI(`UserInput());
+	  ret= UI::UserInput();
 
-	  if ( UI(`QueryWidget(`id(`automatic), `Value ) ) )
+	  if ( UI::QueryWidget(`id(`automatic), `Value ) ) 
 	  {
-	      user_settings = add (user_settings, "ftp_auto", true);
+	      user_settings = add (user_settings, "you_auto", true);
 	  }
 	  else
 	  {
-	      user_settings = add (user_settings, "ftp_auto", false);
+	      user_settings = add (user_settings, "you_auto", false);
 	  }
 
-	  // add ftp_server to user_settings
-	  string ftp_server =  UI(`QueryWidget(`id(`ftp), `Value ));
-	  user_settings = add(user_settings, "ftp_server", ftp_server);
+	  // add you_server to user_settings
+	  string you_server =  UI::QueryWidget(`id(`you), `Value );
+	  user_settings = add(user_settings, "you_server", you_server);
 	
 	  if (ret == `next)
 	  {
 
-	      ftp_dir = select( lookup(ftp_server_map, ftp_server, []), 0 );
-	      user_settings = add(user_settings, "ftp_dir", ftp_dir);
+	      you_dir = select( lookup(you_server_map, you_server, []), 0 );
+	      user_settings = add(user_settings, "you_dir", you_dir);
+	      you_serverkind = select( lookup(you_server_map, you_server, []), 1 );
+	      user_settings = add(user_settings, "you_serverkind", you_serverkind);
 
-	      any retval = PKGINFO(`ftpSetServer( ftp_server,
-						  ftp_dir ) );
-	      y2debug("ONLINE: PKGINFO(`setFtpServer( %1, %2 ) ): %3",
-		      ftp_server, ftp_dir, retval );
-		
+	      any retval = SCR::Execute( .you.setServer, $["kind":you_serverkind, "name":you_server, "path":you_dir]);
+	      
+	      y2debug("ONLINE: .you.setServer( %1, %2 %3) ): %4",
+	      you_server, you_dir, you_serverkind, retval );
+	      
 	      if (retval == nil || retval == false)
 	      {
-		  UI(`DisplayMsgFtp(_("Initialization failed -- please try again.
+		  UI::DisplayMsgYou(_("Initialization failed -- please try again.
 If failure continues, please choose
-another SuSE FTP server.
-")));
+another SuSE FTP/HTTP server.
+"));
 		  ret = `again;
 	      }
-		
+	      else
+	      {
+		  // Show popup to get the registration and password in case of business product
+		  // and no local installation
+		  if ( business
+		       && you_serverkind != "CD"
+		       && you_serverkind != "Harddisk"
+		       && you_serverkind != "Net" )
+		  {
+		      // get, check and possibly save the registration and password
+		      boolean success = CheckAuthorization( );
 
+		      if ( !success )
+		      {
+			  return `abort;
+		      }
+		  }
+	      }	      
 	  }
 	  else if ( ret == `details )
 	  {
@@ -351,29 +395,32 @@ another SuSE FTP server.
 	  }
 	  else if ( ret == `expert )
 	  {
-	      ftp_dir = select( lookup(ftp_server_map,
-				       ftp_server, []), 0 );
+	      you_dir = select( lookup(you_server_map,
+				       you_server, []), 0 );
+	      you_serverkind = select( lookup(you_server_map,
+					      you_server, []), 1 );
 	    
-	      user_settings = add ( user_settings, "ftp_dir", ftp_dir );
+	      user_settings = add ( user_settings, "you_dir", you_dir );
+	      user_settings = add ( user_settings, "you_serverkind", you_serverkind );	      
 	      user_settings = add ( user_settings,"post_install", false );
 	      any retval = CallFunction(`inst_source( true, true ) );
 	      if ( retval == `abort )
 		  return `abort;
 
-	      ftp_server = lookup ( user_settings, "ftp_server", "" );
-	      ftp_dir = lookup ( user_settings, "ftp_dir", "" );
-	      retval = PKGINFO(`ftpSetServer( ftp_server,
-						  ftp_dir ) );
-	      y2debug("ONLINE: PKGINFO(`setFtpServer( %1,%2 ) ): %3", ftp_server,
-		      ftp_dir,
-		      retval );
-		
+	      you_server = lookup ( user_settings, "you_server", "" );
+	      you_serverkind = lookup ( user_settings, "you_serverkind", "" );	      
+	      you_dir = lookup ( user_settings, "you_dir", "" );
+	      
+	      retval = SCR::Execute( .you.setServer, $["kind":you_serverkind, "name":you_server, "path":you_dir]);
+      
+	      y2error("ONLINE: .you.setServer( %1, %2 %3) ): %4",
+		      you_server, you_dir, you_serverkind, retval );		
 	      if (retval == nil || retval == false)
 	      {
-		  UI(`DisplayMsgFtp(_("Initialization failed -- please try again.
+		  UI::DisplayMsgYou(_("Initialization failed -- please try again.
 If failure continues, please choose
-another SuSE FTP server.
-")));
+another SuSE FTP/HTTP server.
+"));
 	      }
 	      ret = `again;
 	  }
@@ -381,7 +428,7 @@ another SuSE FTP server.
 	  {
 
 	  }
-	  else if ( ret == `abort && UI(`ConfirmAbortUpdate(`painless)) )
+	  else if ( ret == `abort && UI::ConfirmAbortUpdate(`painless) )
 	      return  `abort;
 	
       } until (ret == `back || ret == `next || ret == `again);

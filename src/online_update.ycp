@@ -30,7 +30,7 @@
   include "ui/common_functions.ycp";
   include "ui/common_messages.ycp";
 
-  UI(`CreateWizardDialog());
+  UI::CreateWizardDialog();
 
   // dummy message, which will be used in the future, but have to be
   // translated into other languages.
@@ -62,7 +62,7 @@ packages are created by SuSE.
   //
   // test_mode will be set, if menu is called with arg .test ( y2bignfat menu '(.test)' qt )
   // or online_update is called directly ( /sbin/yast2 online_update '(.test)' ) 
-  // test_mode means: get the ftp-patches, but do not install (inst_rpmcopy runs with test_mode)
+  // test_mode means: get the patches, but do not install (inst_rpmcopy runs with test_mode)
   
   integer arg_n = size(Args()) - 1;
   boolean test_mode = false;
@@ -75,32 +75,23 @@ packages are created by SuSE.
       else if (Args(arg_n) == .cd_default)
       {
 	  // write server, dir, partition  to user_settings:
-	  map install_info = $[];
-	  install_info = add( install_info, "bootmode", "CD" );
-
-	  if ( !test_mode )
-	  {
-	      y2milestone("installMap :%1", install_info );
-	      PKGINFO ( `writeInstallInf( "/var/lib/YaST",
-					  install_info  ));
-	  }
-	  user_settings = add( user_settings, "ftp_server", "CD" );
+	  user_settings = add( user_settings, "you_serverkind", "CD" );
 	  user_settings = add( user_settings, "cd_update", true );
       }
       else if (Args(arg_n) == .auto.get)
       {
-	  user_settings = add( user_settings, "ftp_auto_get", true );
-	  user_settings = add( user_settings, "ftp_auto", true );
+	  user_settings = add( user_settings, "you_auto_get", true );
+	  user_settings = add( user_settings, "you_auto", true );
       }
       else if (Args(arg_n) == .auto.install)
       {
-	  user_settings = add( user_settings, "ftp_auto_install", true );
-	  user_settings = add( user_settings, "ftp_auto", true );	  
+	  user_settings = add( user_settings, "you_auto_install", true );
+	  user_settings = add( user_settings, "you_auto", true );	  
       }
       else
       {
 	  // batch kind like security,.....
-	  user_settings = add( user_settings, "ftp_auto_batchkind", sformat("%1", Args(arg_n)) );
+	  user_settings = add( user_settings, "you_auto_batchkind", sformat("%1", Args(arg_n)) );
 	  y2milestone( "Getting patches for kind %1 only",  Args(arg_n) );
       }
 	  
@@ -121,7 +112,7 @@ UI(``{
 	      // Warning text for aborting the update before a patch is installed
 	      what_will_happen = _("If you abort the installation now,
 no patch will be installed.
-An existing connection to the FTP server will be closed.
+An existing connection to the FTP/HTTP server will be closed.
 Your installation will remain untouched.
 ");
 	  }
@@ -181,7 +172,7 @@ You will need to do the update again.");
       };
 
 
-   global define DisplayMsgFtp( string message, string header, string yes_button, string no_button ) ``{
+   global define DisplayMsgYou( string message, string header, string yes_button, string no_button ) ``{
           OpenDialog(
                      `opt(`decorated),
                      `HBox(
@@ -203,7 +194,7 @@ You will need to do the update again.");
       };
 
 
-   global define DisplayMsgFtpOk( string message, string header, string ok_button ) ``{
+   global define DisplayMsgYouOk( string message, string header, string ok_button ) ``{
           OpenDialog(
                      `opt(`decorated),
                      `HBox(
@@ -232,7 +223,7 @@ You will need to do the update again.");
 
       map info_map = $[];
 
-      info_map = PKGINFO( `ftpGetPatchInformation( patch_name ));
+      info_map = SCR::Read( .you.patchInformation, patch_name );
 
       string infotext = lookup(info_map, "description", "");
       
@@ -242,7 +233,7 @@ You will need to do the update again.");
 					       select(info_list, 2), select(info_list, 0)) );
       });
 
-      UI(`OpenDialog(`opt(`decorated ),
+      UI::OpenDialog(`opt(`decorated ),
 		     `HBox(`VSpacing(20),
 			   `VBox(
 				 `HSpacing(60),
@@ -261,26 +252,126 @@ You will need to do the update again.");
 				 `PushButton(`id(`ok_info), `opt(`default), OKButtonLabel() )
 				 )
 			   )
-		     )
-	 );
-      UI(`ChangeWidget(`id(`infotext), `Value, infotext ));      
-      UI(`SetFocus(`id(`ok_info)));
+		     );
+      UI::ChangeWidget(`id(`infotext), `Value, infotext );      
+      UI::SetFocus(`id(`ok_info));
 	  
-      any r = UI(`UserInput());
-      UI(`CloseDialog());
+      any r = UI::UserInput();
+      UI::CloseDialog();
        
       return (r); 
   };
 
+  //
+  // Check whether the given file_path exits
+  //
+  global define file_exist( string file_path ) ``{
+       string fileCommand = "/usr/bin/test -f " + file_path;
+       boolean file_found = (SCR (`Execute (.target.bash, fileCommand)) == 0);
+       return file_found;
+   };
+     
+  //
+  // Check/get the registration and password in case of a business product
+  //
+  global define CheckAuthorization ( ) ``{
+
+      boolean success = false;
+      boolean go_on = true;
+      map registration_map = $[];
+      string login_status = "";
+      string headline = UI(_("Authorization"));
+      string msg_string = UI(_("Please enter the registration data."));
+      string reg_password = "";
+      string reg_code = "";
+      
+      if ( file_exist( "/var/lib/support/rc.business_registration" ) )
+      {
+	  // try to get the data from /var/lib/support/business_registration
+	  reg_password = SCR::Read(.rc.business_registration.REG_PASSWORD);
+	  reg_code = SCR::Read(.rc.business_registration.REG_CODE);
+      }
+
+      while ( go_on )
+      {
+	  // show the registration data to allow changes
+	  registration_map = UI::DisplayRegistrationPopup( reg_password, reg_code,
+							   headline, msg_string );
+
+	  if ( lookup(registration_map, "login", false) )
+	  {
+	      // try to get connection to the server
+	      login_status = SCR::Execute( .you.checkAuthorization, reg_password, reg_code );
+	      
+	      if ( login_status == "ok" ) 	// registration was successful
+	      {
+		  success = true;
+		  go_on = false;
+		      
+		  if ( lookup( registration_map, "keep_reg_data", false ))
+		  {
+		      // write registration data
+		      SCR::Write(.rc.business_registration.REG_PASSWORD,
+				 lookup( registration_map, "reg_password", ""));
+		      SCR::Write(.rc.business_registration.REG_CODE,
+				 lookup( registration_map, "reg_code", ""));
+
+		      SCR::Write(.rc.business_registration, nil);
+		  }
+		  else if ( file_exist( "/var/lib/support/rc.business_registration" ) )
+		  {
+		      // reset entries in registration file
+		      SCR::Write(.rc.business_registration.REG_PASSWORD, "");
+		      SCR::Write(.rc.business_registration.REG_CODE, "");
+
+		      SCR::Write(.rc.business_registration, nil);
+		  }
+	      }
+	      else	// let the user try again to enter the correct registration/password
+	      {
+		  reg_password = lookup( registration_map, "reg_password", "");
+		  reg_code = lookup( registration_map, "reg_code", "");
+		  
+		  if ( login_status == "error_login" )
+		  {
+		      headline = ErrorMsg();
+		      msg_string =  UI(_("Authorization failed.
+Please check the registration data." )) ;
+		  }
+		  else if  ( login_status == "error_path" )
+		  {
+		      msg_string = UI(_("Login on http server failed.
+Please restart the Online Update and
+use the 'Expert' mode to check the
+server data.") );
+		      UI::ErrorPopup( msg_string );
+		      go_on = false;
+		      success = false;
+		  }
+	      }
+	  }
+	  else
+	  {
+	      // user has cancelled the registration dialog
+	      go_on = false;
+	      success = false;
+	  }
+      }
+      y2milestone( "Return  CheckAuthorization: %1", success );
+      
+      return success;
+  };
+
+  
   // check architecture
-  string architecture = SCR(`Read(.probe.architecture));
+  string architecture = SCR::Read(.probe.architecture);
   user_settings = add (user_settings, "architecture", architecture );
 
   // check language
 
   // TODO: use long_language (lang2yast1.ycp)  ?????
   
-  string language = UI( `GetLanguage(true) );
+  string language = UI::GetLanguage(true);
   user_settings = add( user_settings, "language", language );
 
   // setting targetroot - NOT USED anymore 
@@ -319,11 +410,11 @@ You will need to do the update again.");
       symbol module_mode =  select( select(dialog, id), 1);
       y2debug( "ONLINE: Module: %1 Mode: %2", select( select(dialog, id), 0), select( select(dialog, id), 1) );
 
-      if ( lookup ( user_settings, "ftp_updated_packages", 0 ) > 0 ||
+      if ( lookup ( user_settings, "you_updated_packages", 0 ) > 0 ||
 	   select(select(dialog, id), 0 ) != `inst_suseconfig(false, true) )
       {
 	  // call all modules in manual mode 
-	  if ( !lookup(user_settings, "ftp_auto", true ) )
+	  if ( !lookup(user_settings, "you_auto", true ) )
 	  {
 	      result = CallFunction(select(select(dialog, id), 0 ));
 	  }
@@ -346,6 +437,6 @@ You will need to do the update again.");
 
   }
   
-  return UI(`CloseDialog());
+  return UI::CloseDialog();
 
 }
