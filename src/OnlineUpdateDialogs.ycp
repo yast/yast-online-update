@@ -55,7 +55,7 @@ the update takes place.");
                     `HStretch(),
                     `CheckBox(`id(`random),
                         `opt(`notify),
-                        _("Set random time"),
+                        _("Set Random Time"),
                         random_time),
                     `HStretch()
                  );

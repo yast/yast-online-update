@@ -237,7 +237,7 @@ global define string Summary()
     }
     else
     {
-        timestr = sformat(_("%1 at a random time"), when);;
+        timestr = sformat(_("%1 at a Random Time"), when);
     }
 
     summary = Summary::AddHeader(summary, _("Time of Scheduled Online Update"));

@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Aug 27 15:13:39 CEST 2004 - arvin@suse.de
+
+- merged proof read messages
+
+-------------------------------------------------------------------
 Thu Jul  1 15:07:06 CEST 2004 - lnussel@suse.de
 
 - merge 9.1 branch
@@ -17,7 +22,7 @@ Fri Apr 16 13:43:59 CEST 2004 - cschum@suse.de
 Mon Apr  5 09:48:21 CEST 2004 - gs@suse.de
 
 - fixed cd_update.desktop for ncurses menu (bug #38088)
-- V 2.9.11 
+- V 2.9.11
 
 -------------------------------------------------------------------
 Fri Apr 02 15:59:59 CEST 2004 - arvin@suse.de
