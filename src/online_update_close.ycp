@@ -50,17 +50,17 @@
 	    `Frame( _("Package Update information"),
 		    `VBox(`VSpacing(0.5),
 			  `Left(`Label(_("Update is finished."))),
-			  `HBox(`HWeight( 5,`Left(`Label(_("Status of last update: ") ))),
-				`HWeight( 2,`Left(`Label(`id(`error), "        " )))
+			  `HBox(`HWeight( 80,`Left(`Label(_("Status of last update: ") ))),
+				`HWeight( 15,`Left(`Label(`id(`error), "       " )))
 				),
-			  `HBox(`HWeight( 5,`Left(`Label(_("ALL installed security patches: ")))),
-				`HWeight( 2,`Left(`Label(`id(`sec), "         " )))
+			  `HBox(`HWeight( 80,`Left(`Label(_("ALL installed security patches: ")))),
+				`HWeight( 15,`Left(`Label(`id(`sec), "       " )))
 				),
-			  `HBox(`HWeight( 5,`Left(`Label(_("ALL installed recommended patches: ")))),
-				`HWeight( 2,`Left(`Label(`id(`rec), "          " )))
+			  `HBox(`HWeight( 80,`Left(`Label(_("ALL installed recommended patches: ")))),
+				`HWeight( 15,`Left(`Label(`id(`rec), "       " )))
 				),
-			  `HBox(`HWeight( 5,`Left(`Label(_("ALL installed YaST2 patches: ")))),
-				`HWeight( 2,`Left(`Label(`id(`yast2), "          " )))
+			  `HBox(`HWeight( 80,`Left(`Label(_("ALL installed YaST2 patches: ")))),
+				`HWeight( 15,`Left(`Label(`id(`yast2), "       " )))
 				),
 			  `VSpacing(0.5),
 			  `PushButton(`id(`details), `opt(`notify),
