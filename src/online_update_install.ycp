@@ -131,7 +131,7 @@
             `VSpacing( 0.2 ),
             `ProgressBar( `id( `progress ), _("Total Progress") ),
 	    `VSpacing( 0.5 ),
-	    `Left(`CheckBox(`id(`remove_packages),_("&Remove source packages after update."), false)),
+	    `Left(`CheckBox(`id(`remove_packages),_("&Remove source packages after update"), false)),
             `VSpacing( 0.2 )
             );
     
@@ -154,6 +154,8 @@ option 'Remove source packages after update.'</p>");
     
   // using SetContents (define in online_update.ycp)
   Wizard::SetContents(_("Online Update Confirmation"), contents, help_text, WFM::Args(0), WFM::Args(1) );
+
+  Wizard::ReplaceNextButton( `PushButton( `id( `next ), FinishButtonLabel() ) );
 
   UI::ChangeWidget(`id(`back), `Enabled, false );
   UI::ChangeWidget(`id(`next), `Enabled, false );
@@ -322,10 +324,11 @@ the update?"), patchName );
 
   UI::ChangeWidget(`id(`back), `Enabled, true );
   UI::ChangeWidget(`id(`next), `Enabled, true );
+  UI::SetFocus(`id(`next));
 
   if ( installedPatches == 0 ) {
-    Wizard::ReplaceNextButton( `PushButton( `id( `next ), FinishButtonLabel() ) );
     Wizard::DisableAbortButton();
+    Wizard::ReplaceNextButton( `PushButton( `id( `next ), CloseButtonLabel() ) );
     UI::ChangeWidget( `id( `patchprogress ), `Value, 100 );
     UI::ChangeWidget( `id( `progress ), `Value, 100 );
   }
