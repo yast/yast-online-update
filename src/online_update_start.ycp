@@ -387,6 +387,10 @@ the update takes place.");
                   `VBox(
                       `VSpacing(0.3),
                       `HBox(`HSpacing(0.8),
+                          `Left( `Label( sformat( lastupdateLabel , status_lastupdate ) ) )
+                      ),
+                      `VSpacing(0.5),
+                      `HBox(`HSpacing(0.8),
                             `Left( `Label( sformat( _("Product: %1"), status_product ) ) ),
                             `HSpacing(0.8)
                       ),
@@ -395,10 +399,6 @@ the update takes place.");
                       ),
                       `HBox(`HSpacing(0.8),
                           `Left( `Label( sformat( _("Base Architecture: %1"), status_basearch ) ) )
-                      ),
-                      `VSpacing(0.5),
-                      `HBox(`HSpacing(0.8),
-                          `Left( `Label( sformat( lastupdateLabel , status_lastupdate ) ) )
                       ),
                       `VSpacing(0.3)
                   )
