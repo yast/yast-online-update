@@ -55,7 +55,7 @@
     global define string ErrorCallback( string type, string text,
                                         string details )
     ``{
-        y2internal( "ErrorCallback %1", text );
+//        y2internal( "ErrorCallback %1", text );
 
         if ( type == "skip" ) {
           symbol proceed = YouSkipPopup( text, details );
@@ -81,7 +81,7 @@
 
     global define string MessageCallback( string type, list<map> patches )
     ``{
-        y2internal( "MessageCallback %1", type );
+//        y2internal( "MessageCallback %1", type );
 
         if ( type == "preinfo" ) {
           boolean install = YouMessagePopup( patches, true );
@@ -100,7 +100,7 @@
 
     global define void LogCallback( string text )
     ``{
-        y2milestone( "LogCallback %1", text );
+//        y2milestone( "LogCallback %1", text );
 
         if ( UI::WidgetExists( `id( `log ) ) ) {
           UI::ChangeWidget( `id( `log ), `LastLine, text );
@@ -112,7 +112,7 @@
     */
     global define boolean ExecuteYcpScriptCallback( string script )
     ``{
-        y2milestone("ExecuteYcpScriptCallback");
+//        y2milestone("ExecuteYcpScriptCallback");
 
         return (boolean)WFM::call( script, [] );
     }
@@ -122,7 +122,7 @@
     */
     global define boolean ScriptProgressCallback( integer percent )
     ``{
-        y2milestone("ScriptProgressCallback");
+//        y2milestone("ScriptProgressCallback");
 
         symbol ret = (symbol)UI::PollInput();
 
@@ -138,7 +138,7 @@
     */
     global define void OnlineUpdateCallbacks()
     ``{
-	y2milestone ( "OnlineUpdateCallbacks constructor" );
+//	y2milestone ( "OnlineUpdateCallbacks constructor" );
 
 	Pkg::CallbackYouProgress ("OnlineUpdateCallbacks::ProgressCallback");
 	Pkg::CallbackYouPatchProgress ("OnlineUpdateCallbacks::PatchProgressCallback");
