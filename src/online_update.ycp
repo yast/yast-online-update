@@ -473,11 +473,6 @@ Check the registration data.
       return success;
   };
 
-  if ( Mode::test ) {
-    UI::YouErrorPopup( "Message", "This is a message." );
-    return `test;
-  }
-
   /*
    * Main dialog cycle
    *
@@ -522,9 +517,16 @@ Check the registration data.
       else if (result == `back)
 	  id = id - 1;
       else if ( result == `finish )
-	  id = size(dialog)-1;				// call last module
+          if ( !Mode::installation && !Mode::update ) { 
+	      id = size(dialog)-1;		// call last module
+          } else {
+              result = `next;
+              break;
+          }
 
   }
 
-  return UI::CloseDialog();
+  UI::CloseDialog();
+
+  return result;
 }
