@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Nov 21 15:32:08 CET 2003 - cschum@suse.de
+
+- Added module you_server for configuration of local YOU server.
+
+-------------------------------------------------------------------
 Sun Sep 14 20:57:13 CEST 2003 - adrian@suse.de
 
 - make it working in kcontrol

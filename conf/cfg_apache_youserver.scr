@@ -1,0 +1,21 @@
+/**
+ * File:
+ *   cfg_apache_youserver.scr
+ * Summary:
+ *   SCR Agent for reading/writing YOU specific variables from
+ *   /etc/sysconfig/apache.
+ * Access:
+ *   read/write
+ * Authors:
+ *   Cornelius Schumacher <cschum@suse.de>
+ *
+ * Example:
+ *
+ *   Read(.sysconfig.apache_youserver.YOU_SERVER)
+ *
+ */
+.sysconfig.apache_youserver
+
+`ag_ini(
+  SysConfigFile("/etc/sysconfig/apache")
+)

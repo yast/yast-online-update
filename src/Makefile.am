@@ -2,6 +2,8 @@
 # Makefile.am for online-update/src
 #
 
+SUBDIRS = httpd
+
 client_DATA =				\
 	online_update_start.ycp		\
 	online_update_select.ycp 	\
@@ -15,7 +17,8 @@ module_DATA =				\
 
 config_DATA =				\
 	online_update.y2cc		\
-	cd_update.y2cc
+	cd_update.y2cc                  \
+        you_server.y2cc
 
 desktop_DATA =				\
 	online_update.desktop		\

@@ -1,0 +1,14 @@
+
+## Path:           Network/WWW/Apache/YOU_Server
+## Description:    YOU server configuration
+## Type:           yesno
+## Default:        no
+## Config:         apache
+## ServiceRestart: apache
+## Command:
+#
+# This variable controls, if apache provides a YOU server. The server requires
+# a directory tree containing patches at /var/lib/YaST2/you/mnt. The YaST module
+# you_server can be used to conveniently configure the YOU server.
+#
+YOU_SERVER="no"
