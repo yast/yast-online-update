@@ -20,8 +20,8 @@ Icon = cdupdate.png
 ; *one* *short* descriptive line for y2cc
 Helptext = _("Install patches from CD to correct and improve your existing installation.")
 
-; arguments, seperated by space
-Arguments =  .cd_default
+; arguments, separated by space
+Arguments = .cd_default
 
 ; whether root privileges are required to run this module
 RequiresRoot = true
