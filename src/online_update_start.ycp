@@ -341,7 +341,11 @@ Check network connection.
           result = UI::YouIgnorePopup( _("Error getting servers."),
                                        Pkg::ErrorDetails() );        
         }
-        if ( result == `abort ) return result;
+        if ( result == `abort )
+	{
+	    UI::CloseDialog();
+	    return result;
+	}
       }
     } while ( result == `retry );
   }
