@@ -62,7 +62,7 @@ global boolean autoget = false;
 /**
  * Skip patches with pre-install information
  */
-global boolean skipPre = false;
+global boolean skipPre = true;
 
 /**
  * Auto update enabled

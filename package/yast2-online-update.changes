@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Feb 23 13:31:29 CET 2005 - mir@suse.de
+
+- automatic online update setup (cronjob): "skip patches with
+  pre-install messages" is default.
+- 2.11.9
+
+-------------------------------------------------------------------
 Mon Feb  7 15:38:35 CET 2005 - mir@suse.de
 
 - Merged in proofread textx
