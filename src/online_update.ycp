@@ -23,13 +23,6 @@
   // definition of map user_settings  
   map user_settings = $[];    
 
-  // constant settings 
-  string ftpserver = "ftp.suse.de";
-  string rootpath = "/";
-  string yastpath = "/var/lib/YaST";
-  string patchpath = "/var/lib/YaST/patches";
-  string logpath = "/var/log/y2ftplog";
-
    
   // Menuentry for the YaST2 menu
   if (Args() == [ "get_menuentry" ]) 
@@ -154,7 +147,7 @@ Your installation will remain untouched." );
 	  {
 	      // Warning text for aborting if some patches are installed, some not
 	      what_will_happen = _( "If you abort the installation now,
-there could be some patches which are not yet installed.
+there could be patches which are not yet downloaded.
 You may need to do the update again." );
 	  }
 	  else if ( how_to == `unusable )
@@ -205,6 +198,26 @@ You will need to do the update again." );
       };
 
 
+   define DisplayMsgFtp( string message ) ``{
+          OpenDialog(
+                     `opt(`decorated),
+                     `HBox(
+                           `HSpacing(1),
+                           `VBox(
+				 `Left(`Heading( _("Notify"))),
+				 `VSpacing(0.2),
+                                 `Label(message),
+                                   `PushButton(`id(`continue), `opt(`default), _("&OK")),
+                                 `VSpacing(0.2)
+                                 ),
+                           `HSpacing(1)
+                           )
+                     );
+          any ret = UserInput();
+          CloseDialog();
+          return (ret);
+      };
+ 
   // show detailed information about one patch
    define ShowPatchInfo ( string patch_name ) ``{
 
@@ -272,45 +285,22 @@ You will need to do the update again." );
 
   // check language
   string language = UI( `GetLanguage() );
-  string default_language = "en";
-
-  map lang2yast1 = ReadY2("lang2yast1.ycp");
-
-  string  long_language	= lookup(lang2yast1, language, "english");
   user_settings = add( user_settings, "language", language );
 
-  if ( !test_mode )
-  {
-      // initialize PKGINFO
-      UI(`OpenDialog(`opt(`decorated ),`Label(_("Initializing for ftp update; One moment please..."))));
-  
-      any retval = PKGINFO(`ftpSetEnvironment( $["ftpserver":ftpserver,
-						"language":long_language,
-						"architecture":architecture,
-						"rootpath":rootpath,
-						"yastpath":yastpath,
-						"patchpath":patchpath,
-						"logfilename":logpath ] ) );
-
-      y2debug( "ONLINE: Return  PKGINFO(`ftpsetEnvironment() %1", retval );
-      UI(`CloseDialog());
-  }
- 
- 
 
   
-/*
+  /*
    * Main dialog cycle
    *
    */
 
   list dialog = [
-		 [`online_update_start(false, true), `auto ],
-		 [`online_update_load(true, true), `auto ],
-		 [`online_update_select(true, true), `manual ],
-		 [`online_update_load(false, true), `manual ],
-		 //[`inst_suseconfig(false, true), `auto ],
-		 [`online_update_close(false, true), `auto ]
+		 [`online_update_start(false, true), 		`all ],
+		 [`online_update_load(true, true),	 	`all ],
+		 [`online_update_select(true, true), 		`manual ],
+		 [`online_update_load(false, true), 		`manual ],
+		 //[`inst_suseconfig(false, true), 		`all ],
+		 [`online_update_close(false, true), 		`all ]
 		 
   ];
 
@@ -321,39 +311,29 @@ You will need to do the update again." );
    * - online_update_start
    * - online_update_close
    * "inst_rpmcopy" is called in module:
-   * - online_update_load  if auto_mode
-   * - online_update_select if !auto_mode
+   * - online_update_load
+   *
    */
   
   integer id = 0;
   any result = `next;
-  boolean auto_mode = true;	
-  
+
   while ((id >= 0) && (id < size (dialog))) {
 
       symbol module_mode =  select( select(dialog, id), 1);
       y2debug( "ONLINE: Module: %1 Mode: %2", select( select(dialog, id), 0), select( select(dialog, id), 1) );
- 
-      if ( !auto_mode )
+
+      // call all modules if NOT automatic mode 
+      if ( !lookup(user_settings, "ftp_auto", true ) )
       {
 	  result = CallFunction(select(select(dialog, id), 0 ));
       }
-      else if (  select( select(dialog, id), 1) == `auto )
+      else if (  select( select(dialog, id), 1) == `all )
       {
 	  result = CallFunction(select(select(dialog, id), 0 ));
       }
 
-      if ( result == `automatic )
-      {
-	  auto_mode = true;
-	  id = id + 1;
-      }
-      else if ( result == `manual )
-      {
-	  auto_mode = false;
-	  id = id + 1;
-      }
-      else if (result == `again )
+      if (result == `again )
 	  continue;
       else if (result == `cancel || result == `abort)
 	  break;

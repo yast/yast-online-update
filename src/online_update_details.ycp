@@ -37,9 +37,9 @@
     else
     {
 	last_status = $["date":"12.10.2000", "days":"25", "status":"ok",
-		       "patches":["patch-0-123", "rec", "skdakdöak sdfsdfsdf", "05.10.2000",
-				 "sec-fix-988", "sec", "salöda dsösld alsdäladä", "12.10.2000",
-				 "sec-fix-123", "sec", "bbbbbbbb asdsfdf Cdsfdsf", "12.10.2000" ]];
+		       "patches":["patch-0-123", "rec", "skdakdöak sdfsdfsdf", "30", "05.10.2000",
+				 "sec-fix-988", "sec", "salöda dsösld alsdäladä", "25", "12.10.2000",
+				 "sec-fix-123", "sec", "bbbbbbbb asdsfdf Cdsfdsf", "25", "12.10.2000" ]];
     }
 
 
@@ -71,30 +71,32 @@
 	if ( select(patch_list, index+1) == "rec" )    		rec_no = rec_no+1;
 	else if ( select(patch_list, index+1) == "sec" )    	sec_no = sec_no+1;
 	
-	index = index+4;
+	index = index+5;
     };
 
     list info_input = [];
 
-    info_input = add( info_input, `item(`id(1), UI(_("Date of last update:")), lookup(last_status, "date", "--.--.----")) );
     info_input = add( info_input, `item(`id(2), UI(_("Days since update:")), lookup(last_status, "days", "--")) );
-    info_input = add( info_input, `item(`id(3), UI(_("Error messages:")), lookup(last_status, "status", "--" )) );
+    info_input = add( info_input, `item(`id(3), UI(_("Status of last update:")), lookup(last_status, "status", "--" )) );
     info_input = add( info_input, `item(`id(3), UI(_("Number of recommended patches:  ")), rec_no ));
     info_input = add( info_input, `item(`id(3), UI(_("Number of security patches:  ")), sec_no ));
      
     term contents =
 	// main dialog: 
 	`VBox(
+	      `Left(`Label(_("Last update informations"))),
+	      `VWeight( 3,`Table(`id(`info_table),`opt(`hvstretch), 
+				 `header( _("Description"), _("Data") ),
+				 info_input
+				 )
+			),
 	      `VSpacing(0.2),
-	      `Table(`id(`info_table),`opt(`hvstretch), 
-		     `header( _("Description"), _("Data") ),
-		     info_input
-		     ),
-	      `VSpacing(0.5),
-	      `Table(`id(`patch_table),`opt(`hvstretch), 
-		     `header( _("Date"), _("Patch"), _("Description") ),
-		     patch_input
-		     ),
+	      `Left(`Label(_("Informations about all installed patches"))),
+	      `VWeight( 4,`Table(`id(`patch_table),`opt(`hvstretch), 
+				 `header( _("Days"), _("Patch"), _("Description") ),
+				 patch_input
+				 )
+			),
 	      `Left( `PushButton(`id(`info), `opt(`notify), _("&Show patch information")) ),
 	      `VSpacing( 0.2 )
 	      );
@@ -139,14 +141,14 @@ click on button <b>Show Patch Info</b>.
 	}
 	else if ( ret == `abort  && UI(`ConfirmAbortUpdate(`painless)) )
 	{
-	    return `cancel;
+	    return `abort;
 	}
 	else if ( ret == `back)
 	{
 
 	}
 
-  } until (ret == `next || ret == `back || ret == `cancel || ret == `abort);
+  } until (ret == `next || ret == `back || ret == `cancel);
     
    return ret;
 }

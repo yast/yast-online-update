@@ -24,8 +24,15 @@
 */
 
 {
-    boolean test_mode    = lookup ( user_settings, "test_mode", false );
+  boolean test_mode    = lookup ( user_settings, "test_mode", false );
 
+   // constant settings
+  map ftpservermap = $["ftp.suse.com"	: ["/usr/patches"],
+		      "ftp.suse.de"	: ["/patchroot"] ];
+
+  string yastpath = "/var/lib/YaST";
+  string patchpath = "/var/lib/YaST/patches";
+  string logpath = "/var/log/y2ftplog";
 
 
     //////////////////////////////////////////////////////////////////////////////////////
@@ -39,7 +46,37 @@
     /////////////////////////////////////////////////////////////////////////////////////
     
     map last_status = $[];
+    string default_language = "en";
+     
+    map lang2yast1 = ReadY2("lang2yast1.ycp");
 
+    string language 	 = lookup( user_settings, "language", default_language );
+    string long_language = lookup(lang2yast1, language, "english");
+
+    string architecture = lookup( user_settings, "architecture", "i386" );
+
+    list ftpserver = [];
+
+    foreach(`server, `info, ftpservermap, ``{
+	ftpserver = add(ftpserver, server);
+    });
+	    
+    if ( !test_mode )
+    {
+	// initialize PKGINFO
+	UI(`OpenDialog(`opt(`decorated ),`Label(_("Initializing for ftp update; One moment please..."))));
+  
+	any retval = PKGINFO(`ftpSetEnvironment( $["language":long_language,
+						  "architecture":architecture,
+						  "yastpath":yastpath,
+						  "patchpath":patchpath,
+						  "logfilename":logpath ] ) );
+
+	y2debug( "ONLINE: Return  PKGINFO(`ftpsetEnvironment() %1", retval );
+	UI(`CloseDialog());
+
+    }
+     
     // get last update status from PKGINFO
     if ( !test_mode )
     {
@@ -75,20 +112,24 @@
 		    ),
 	      `VSpacing(2.0),
 	      `HBox(`HWeight(1, `Empty()),
-		    `HWeight(8, `Frame (_("Select update mode"),
+		    `HWeight(8, `Frame (_("Choice of update mode and server"),
 					`RadioButtonGroup(`id(`choice),
 							  `VBox(
-								`VSpacing(0.8),
+								`VSpacing(0.3),
 								`HBox(`HSpacing(0.8),
 								      `Left(`RadioButton(`id(`automatic),`opt(`notify),
-											 _("&Automatic Update"), true)
-									    )),
-								`VSpacing(0.8),
+											 _("&Automatic Update"), true) )
+								      ),
+								`VSpacing(0.3),
 								`HBox(`HSpacing(0.8),
 								      `Left(`RadioButton(`id(`manual),`opt(`notify),
-											 _("&Manual Update") ,  false)
-									    )),
-								`VSpacing(0.8) 
+											 _("&Manual Update") ,  false))
+								      ),
+								`VSpacing(0.3),
+								`HBox(`HSpacing(1.2),
+								      `Left(`ComboBox(`id(`ftp), "SuSE ftpserver", ftpserver ))
+								      ),
+								`VSpacing(0.3) 
 								)
 							  )
 					)),
@@ -132,26 +173,50 @@ if you click on button <b>Details</b>.
         if (ret == `next)
         {
 	    if ( UI(`QueryWidget(`id(`automatic), `Value ) ) )
-		return `automatic;
+	    {
+		user_settings = add (user_settings, "ftp_auto", true);
+	    }
 	    else
-		return `manual;
+	    {
+		user_settings = add (user_settings, "ftp_auto", false);
+	    }
+	    
+	    string ftp_server =  UI(`QueryWidget(`id(`ftp), `Value ));
+	    user_settings = add(user_settings, "ftp_server", ftp_server);
+	    
+	    if ( !test_mode )
+	    {
+		any retval = PKGINFO(`ftpSetServer( ftp_server,
+						    update_path) );
+		y2debug("ONLINE: PKGINFO(`setFtpServer( %1, %2 ) ): %3", ftp_server, update_path, retval );
+		
+		if (retval == nil || retval == false)
+		{
+		    UI(`DisplayFtpMsg(_("Initialization failed - please try again.
+If failure continues, please choose
+another SuSE ftp server.")));
+		    ret = `again;
+		}
+	    }
 	}
-
-	if ( ret == `details )
+	else if ( ret == `details )
 	{
-	    CallFunction(`online_update_details( true, false ) );
-	    return `again;
+	    any retval = CallFunction(`online_update_details( true, false ) );
+	    if ( retval == `abort )
+		return `abort;
+	    
+	    ret = `again;
 	}
-
-	if ( ret == `abort && UI(`ConfirmAbortUpdate(`painless)) )
-	    return `abort;
-
-	if ( ret == `back)
+	else if ( ret == `back)
 	{
 
 	}
+	else if ( ret == `abort && UI(`ConfirmAbortUpdate(`painless)) )
+	    return  `abort;
+	
+  } until (ret == `back || ret == `next || ret == `again);
 
-  } until (ret == `next || ret == `back || ret == `abort);
+    y2debug("Return START: %1", ret );
     
    return ret;
 }

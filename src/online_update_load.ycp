@@ -23,120 +23,289 @@
 */
 
 {
-    ////////////////////////////////////////////////////////////
-    // Testmode, for example fo screenshots
-    boolean test_mode    = lookup ( user_settings, "test_mode", false );
+  // constant settings
+  string log_path = "/var/log/y2ftplog";
 
-    ////////////////////////////////////////////////////////////
-    // Read the current architecture (no architecture depended modes yet
-    // string architecture = lookup( user_settings, "architecture", default_architecture);
+  // Testmode
+  boolean test_mode    = lookup ( user_settings, "test_mode", false );
 
+  // check installation mode
+  boolean auto_mode = lookup( user_settings, "ftp_auto", false );
+  boolean continue_mode = lookup( user_settings, "ftp_continue", false );
 
+    
+  //////////////////////////////////////////////////////////////////////////////////////
+  //                                  P O P U P S                                     //
+  //////////////////////////////////////////////////////////////////////////////////////
 
-    //////////////////////////////////////////////////////////////////////////////////////
-    //                                  P O P U P S                                     //
-    //////////////////////////////////////////////////////////////////////////////////////
-
-    // None at the moment
     
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////
-    // MAIN:
-    /////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    // Options to test this modules, but the other modules are in testmode:
-    // test_mode   = true;
-    // test_mode   = false;
-    // todo: comment all options above
+  //////////////////////////////////////////////////////////////////////////////////////
+  // MAIN:
+  //////////////////////////////////////////////////////////////////////////////////////
 
 
-    term contents =
-	    // main dialog: 
-	`VBox(
-	      `VSpacing( 0.2 ),
-	      `HBox(
-		    `HWeight( 50,`VBox (`Left(`Label(_("Connection"))),
-					`Left(`Label(`id(`id1),`opt(`outputField), "                          ")) )
-			      ),
-		    `HWeight( 50,`VBox(`Left(`Label(_("Data transfer"))),
-				       `Left(`Label(`id(`id2),`opt(`outputField),  "                          ")) )
-			      )
-		    ),
-	      `HBox(
-		    `HWeight( 50,`VBox (`Left(`Label(_("Connection time"))),
-					`Left(`Label(`id(`id3),`opt(`outputField), "                           ")) )
-			      ),
-		    `HWeight( 50,`VBox(`Left(`Label(_("Estimated time"))),
-				       `Left(`Label(`id(`id4),`opt(`outputField), "                            ")) )
-			      )
-		    ),
-	      `VSpacing(0.5),
-	       `LogView(`id(`log),
-			      "Information about the activities",
-			      5,	// visible lines
-			      10),	// lines to store,
-	      `VSpacing( 0.2 )
-	      );
+  term contents =
+      // main dialog: 
+      `VBox(
+	    `VSpacing( 0.2 ),
+	    `HBox(
+		  `HWeight( 50,`VBox (`Left(`Label(_("Connection to:"))),
+				      `Left(`Label(`id(`id1),`opt(`outputField), "                          ")) )
+			    ),
+		  `HWeight( 50,`VBox(`Left(`Label(_("Status of connection"))),
+				     `Left(`Label(`id(`id2),`opt(`outputField),  "                          ")) )
+			    )
+		  ),
+	    `HBox(
+		  `HWeight( 50,`VBox (`Left(`Label(_("Connection time"))),
+				      `Left(`Label(`id(`id3),`opt(`outputField), "                           ")) )
+			    ),
+		  `HWeight( 50,`VBox(`Left(`Label(_("Estimated time"))),
+				     `Left(`Label(`id(`id4),`opt(`outputField), "                            ")) )
+			    )
+		  ),
+	    `VSpacing(0.5),
+	    `LogView(`id(`log),
+		     "Information about the activities",
+		     5,	// visible lines
+		     10),	// lines to store,
+	    `VSpacing( 0.2 )
+	    );
 
-    string help_text = "";
+  string help_text = "";
 
-    // helptext  "main dialog online_update" 
-    string help_part1 =  UI("<p>After connecting to SuSE server
-<i>ftp.suse.com</i>, YaST2 will download all available patches.
+  // helptext  "main dialog online_update" 
+  string help_part1 =  UI("<p>After connecting to SuSE server,
+YaST2 will download all available patches.
 This could take some time. Several details are shown.</p>");
-    string help_part2 =  UI("<p>
+  string help_part2 =  UI("<p>
 Fields above show informations about the connection and
 time of data transfer.
-Box below displays data from ftp logfile.
+Box below displays data from ftp logfile. If something
+goes wrong, please check this source of information. 
 </p>");
-    string help_part3 =  UI("<p>
-If you decide to <b>Abort Update</b>, the ftp connection will
-be closed and already downloaded data deleted.
+  string help_part3 =  UI("<p>
+If you decide to <b>Abort Update</b>, the download of
+patches will be interrupted and the ftp connection 
+closed. 
 </p>");
 
-    help_text = help_part1 + help_part2 + help_part3;
+  help_text = help_part1 + help_part2 + help_part3;
     
-     // using SetContents (define in online_update.ycp)
-     UI(`SetWizardContents(_("Connection and Data transfer"), contents, help_text, Args(0), Args(1) ));
+  // using SetContents (define in online_update.ycp)
+  UI(`SetWizardContents(_("Connection and Data transfer"), contents, help_text, Args(0), Args(1) ));
 
-     UI(`ChangeWidget(`id(`id1), `Value, _("closed") ));  
-     UI(`ChangeWidget(`id(`id2), `Value, _("fkalöfklö") ));
-     UI(`ChangeWidget(`id(`id3), `Value, _("30:34:32") ));
-     UI(`ChangeWidget(`id(`id4), `Value, _("56:34:45") ));
+  // TODO: get values from 
+  UI(`ChangeWidget(`id(`id1), `Value, lookup( user_settings, "ftp_server", "ftp.suse.com")));  
+  UI(`ChangeWidget(`id(`id2), `Value, _("active") ));
+  UI(`ChangeWidget(`id(`id3), `Value, _("30:34:32") ));
+  UI(`ChangeWidget(`id(`id4), `Value, _("56:34:45") ));
+
+
+  integer test_id = 0;
+
+  define FakeGetPatch( string patch) ``{
+      integer counter = 0;
+      string log = "";
+
+      while (counter < 300)
+      {
+	  counter = counter + 1;
+	  log = sformat("Noch ein weitere Zeile im Logfile (no. %1)\n", counter ); 
+	  UI(`ChangeWidget(`id(`log), `LastLine, log ));
+      }
+      test_id = test_id + 1;
+	 
+      y2debug("ONLINE: Get patch %1 ( test_mode ): %2", patch, test_id != 1 );
+
+      if (test_id == 1)
+      {
+	  return false;
+      }
+      else
+      {
+	  return true;
+      }
+  };
+
+  define GetAllPatches( map new_patches ) ``{
+
+      map ret_map = $[];
+
+      // give the user a chance to abort the update between getting the certain patches 
+      any r = UI(`PollInput());
+	 
+      any retval = nil;
+      foreach( `patch, `patch_info, new_patches, ``{
+
+	  if ( !test_mode )
+	  {
+	      retval = PKGINFO(`ftpGetPatch( patch ));
+	      y2debug("ONLINE: Get patch %1: %2", patch, retval );
+	  }
+	  else
+	  {
+	      retval = FakeGetPatch( patch );
+	  }
+
+	  if ( !retval )
+	  {
+	      string msg_str = sformat(UI(_("Can't get patch \"%1\" from ftp server.
+Try to get remaining patches.")), patch );
+	      
+	      UI(`DisplayMsgFtp( msg_str ));
+	      // TODO: Popup mit 2 Buttons OK -> weiter, Cancel Abbruch
+	  }
+	  else
+	  {
+	      ret_map = add(ret_map, patch, patch_info );
+	  }
+	  
+	  if ( r == `abort && UI(`ConfirmAbortUpdate( `incomplete )) )
+	  {
+	      return `cancel;
+	  }
+      });
+
+      return ret_map;
+  };
+
+  define InstallPatches( map patch_map ) ``{
+      y2debug("Installing");
+  };
+
+  map new_patches = $[];
+  boolean success = true;
+
+  if ( !test_mode )
+  {
+      //get list of patches (internal issue of pkginfo)
+      success = PKGINFO(`ftpGetPatchList( log_path ));
+
+      // TODO: show logfile in LogView widget
+      // UI(`ChangeWidget(`id(`log), `LastLine, logpath ));
       
-   ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-   ////  Loop for User Input ....
-   ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    symbol ret = `next;
+      if (success)
+      {
+	  new_patches = PKGINFO(`ftpNewPatchList( ));
+      }
+      else
+      {
+	  UI(`DisplayMsgFtp(_("Can't get patches from server.
+Please try to get connection to another SuSE ftp server.")));
+	  return `back;
+      }
+  }
+  else
+  {
+      new_patches = $["patch-001":["rec", "Patch for NFS server", "03:56", "X"],
+		      "patch-002":["rec", "Noch einweiterer patch", "02:56", " "],
+		      "patch-003":["sec", "Security dfsdkfö", "02:12", "X"],
+		      "patch-004":["sec", "Nochmal security", "02:01", "X"] ];
+  }
+		     
+  if ( auto_mode )
+  {
+      // get the patches
+      map got_patches = GetAllPatches( new_patches );
 
-    repeat
-    {
-        ret= UI(`UserInput());
+      if ( got_patches != `cancel )
+      {
+	  // go on and install all available patches in auto_mode
+	  
+	  y2debug( "ONLINE: autoinstall GetAllPatches(): %1", got_patches );
+      }
+      else
+      {
+	  //PKGINFO(`ftpCloseConnection());
+	  return `abort;		// abort update
+      }
+  }
+  else if ( !continue_mode )
+  {
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////
-        ////  FINISH
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////
-	if ( ret == `abort && UI(`ConfirmAbortUpdate(`painless)) )
-	    return `abort;
+      // write new_patches to user_settings -> table input online_update_select
+      user_settings = add(user_settings, "ftp_patches", new_patches );
+
+      // prepare for second call in manual mode 
+      user_settings = add(user_settings, "ftp_continue", true );
+      
+
+      if (test_mode)
+
+      {
+	  UI(`ChangeWidget(`id(`log), `LastLine, "Got list of patches:\nPKGINFO(`ftpGetPatchList( log_path )) called\n
+PKGINFO(`ftpNewPatchList( ) called \n") );
+	   
+
+	  string log = sformat( "Wrote list of new patches to user_settings: %1", new_patches );
+
+	  UI(`ChangeWidget(`id(`log), `LastLine, log ) );
+      }
+  
+      // prepare for second call in manual mode 
+      user_settings = add(user_settings, "ftp_continue", true );
+  }
+  else if ( continue_mode )
+  {
+      // get selected patches (written to user_settings from online_update_select)
+      map install_patches = lookup( user_settings, "ftp_patches", $[] );
+
+      map got_patches = GetAllPatches( install_patches );
+
+      if ( got_patches != `cancel )
+      {
+	  // install selected patches
+	  UI(`InstallPatches( got_patches ));
+      }
+      else
+      {
+	//PKGINFO(`ftpCloseConnection());
+	  return `abort;		// abort update  
+      }
+  }
+  else
+  {
+      y2error("online_update_load - mode not set");
+      return `abort;
+  }
+	 
+	 
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+  ////  Loop for User Input ....
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+  symbol ret = `next;
+
+  repeat
+      {
+	  ret= UI(`UserInput());
+
+	  ////////////////////////////////////////////////////////////////////////////////////////////////////////
+	  ////  FINISH
+	  ////////////////////////////////////////////////////////////////////////////////////////////////////////
+	  if ( ret == `abort && UI(`ConfirmAbortUpdate(`incomplete)) )
+	      return `abort;
 	
-        if (ret == `next)
-        {
+	  if (ret == `next)
+	  {
 
-	}
+	  }
 
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////
-        ////  
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////
+	  ////////////////////////////////////////////////////////////////////////////////////////////////////////
+	  ////  
+	  ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	if ( ret == `back)
-	{
+	  if ( ret == `back)
+	  {
 
-	}
+	  }
 
-  } until (ret == `next || ret == `back || ret == `cancel);
-    
-   return ret;
+      } until (ret == `next || ret == `back || ret == `cancel);
+
+  y2debug("online_update_load Return: %1", ret );
+  return ret;
 }
 
 
