@@ -37,8 +37,6 @@
   string yastpath = "/var/lib/YaST";
   string patchpath = "/var/lib/YaST/patches";
   string logpath = "/var/log/y2ftp";
-  string ftp_server = lookup(user_settings, "ftp_server", "ftp.suse.com" );
-  string ftp_dir = lookup(user_settings, "ftp_dir", "/pub/suse" );  
 
 
   /////////////////////////////////////////////////////////////////////////////////////
@@ -59,7 +57,7 @@
   string reloadServer =  SCR(`Read(.rc.system.YAST2_LOADFTPSERVER));
 
   y2milestone ( "YAST2_LOADFTPSERVER = %1", reloadServer );
-
+  
   if ( reloadServer != "no" )
   {
 
@@ -82,8 +80,27 @@
 
   map ftp_server_map = read_suseservers ();
 
+  string ftp_server =   lookup(user_settings, "ftp_server", "" );
+  string default_server = "";
+  
+  // default server is first entry in file /etc/suseservers (instead of "ftp.suse.com")
+  if ( ftp_server == "" )
+  {
+      default_server = read_first_suseserver();
+      ftp_server = read_first_suseserver();
+  }
+
+  string ftp_dir =  lookup(user_settings, "ftp_dir", "" );
+
+  // look for default directory in server map (instead of "/pub/suse")
+  if ( ftp_dir == "" )
+  {
+      ftp_dir = select( lookup(ftp_server_map, ftp_server, []), 0 );
+  }
+  y2milestone("FTP server: %1, directory: %2", ftp_server, ftp_dir );
+  
   // insert local server like CD, NFS ....
-  if ( ftp_server != "" && ftp_server != "ftp.suse.com" )
+  if ( ftp_server != "" && ftp_server != default_server )
   {
       list ftp_dir_list = [];
       ftp_dir_list = add ( ftp_dir_list, ftp_dir );
@@ -340,7 +357,7 @@ another SuSE ftp server.")));
 
 	      ftp_server = lookup ( user_settings, "ftp_server", "" );
 	      ftp_dir = lookup ( user_settings, "ftp_dir", "" );
-	      any retval = PKGINFO(`ftpSetServer( ftp_server,
+	      retval = PKGINFO(`ftpSetServer( ftp_server,
 						  ftp_dir ) );
 	      y2debug("ONLINE: PKGINFO(`setFtpServer( %1,%2 ) ): %3", ftp_server,
 		      ftp_dir,
