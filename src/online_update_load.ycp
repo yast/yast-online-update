@@ -505,7 +505,6 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
   // call inst_rpmcopy for every patch with list of packages belonging to the patch
   //
   global define InstallPatches( list patch_list ) ``{
-      list package_list = [];
       string pre_info = "";
       string post_info = "";
       integer no = 1;
@@ -523,10 +522,20 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
 	  if ( lookup ( check_version, "ok", true ) )
 	  {
 	      // correct YaST2 version
-	      package_list = PKGINFO(`ftpGetPackages( patch ) );
+	      list package_list = [];
+	      list info_list = [];
+	      list desc_list = [];
+	      info_list = PKGINFO( `ftpGetPackages( patch ));
+
+	      foreach (`pac, info_list , ``{
+		  package_list = add ( package_list, select ( pac, 0 ) );
+		  desc_list = add ( desc_list, select( pac, 1) );
+	      });
 	      
-	      y2debug("ONLINE: PKGINFO(`ftpGetPackages( %1 )): %1",
-		      package_list );
+	      y2debug("ONLINE: PKGINFO(`ftpGetPackages( %1 )): %2 %3",
+		      patch,
+		      package_list,
+		      desc_list);
 	      if ( checkPackages ( package_list, patch ) )
 	      {
 		  // packages are ok
@@ -548,7 +557,8 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
 		  if ( go_on )
 		  {
 		      ret = CallFunction(`inst_rpmcopy(false, false,
-						       package_list ));
+						       package_list,
+						       desc_list ));
 		      y2debug("ONLINE: %1. call of inst_rpmcopy returns: %2",
 			      no, ret );
 		      package_count = package_count + size ( package_list );
