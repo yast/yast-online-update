@@ -80,7 +80,7 @@ YCPValue YouAgent::newPatchList ( void )
 
 		 if ( ret->isInteger() )	// success ???
 		 {
-		     if (  ret->asInteger()->value() >= 0 )
+		     if (  ret->asInteger()->value() == 0 )
 		     {
 			 y2debug( "%s ok", patchElement.installTrigger.c_str() );
 			 packageInstalled = true;
