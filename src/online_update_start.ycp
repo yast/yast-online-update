@@ -279,7 +279,7 @@ internal error.
 */
       else if ( ret == `expert )
       {
-          string url = getDirectory( "" );
+          string url = getUrl( "" );
 
           UI::ChangeWidget( `id(`you), `Value, url );
 /*
