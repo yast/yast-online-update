@@ -642,6 +642,9 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
 
       if (success)
       {
+	  // TODO: remove all patches with status .new or .error
+	  //       e.g. /var/lib/YaST/patches/i386/7.1/patches/mysql-1.20010404.new
+	  
 	  UI(`ChangeWidget(`id(`status), `Value, _("active")) );
 	  while (go_on)
 	  {
@@ -701,14 +704,31 @@ Please try to get connection to another SuSE ftp server.")));
   
   if (success)
   {
-	  new_patches = PKGINFO(`ftpNewPatchList( ));
-	  y2debug( "ONLINE: Reading patch data: %1", new_patches );
+      new_patches = PKGINFO(`ftpNewPatchList( ));
+      y2debug( "ONLINE: Reading patch data: %1", new_patches );
   }
   else
   {
+      if ( cd_update )
+      {
+	  // set cd_update false before going back - user must select CD installation first 
+	  user_settings = add (user_settings, "cd_update", false );
+	  user_settings = add (user_settings, "ftp_server", "" );
+	  
+	  UI(`MessagePopup(_("YaST2 can't get the patches
+because a different source media was
+used on previous installation.\n
+Please select button \"Expert\" on start
+page and select \"CD installation\" on
+appearing dialog. Insert the patch CD
+before proceeding.\n")));
+      }
+      else
+      {
 	  UI(`MessagePopup(_("Can't get patches from server.
-Please try to get patches from another SuSE ftp server.")));
-	  return `back;
+Please try to get patches from another SuSE ftp server.")));   
+      }
+      return `back;
   }
 
   if ( !continue_mode )
