@@ -194,7 +194,6 @@ click on line (or select line and use Crtl A).
 	    y2debug("Status of selected patch %1: %2",  patch_name, select( lookup( all_patches, patch_name, []), 3 ));
 
 	    if ( select( patch_info, 1 ) == " X " ||
-		 select( patch_info, 1 ) == " G " ||
 		 select( patch_info, 1 ) == " ok" )
 	    {
 		// mark patch deselected
@@ -221,8 +220,16 @@ click on line (or select line and use Crtl A).
 		map check_version = PKGINFO(`ftpCheckYaST2Version(version,patch_name));
 		if ( lookup ( check_version, "ok", true ) )
 		{
-		    // was not "X" before -> mark with "G" 
-		    UpdateGetPatches( patch_name, "G" ,select ( patch_info, 2 ) );
+		    if ( select( patch_info, 1 ) == " G " )
+		    {
+			// was "G" before -> mark with "X"
+			UpdateGetPatches( patch_name, "X" ,select ( patch_info, 2 ) );			
+		    }
+		    else
+		    {
+			// was not "X" and not "G" before -> mark with "G" 
+			UpdateGetPatches( patch_name, "G" ,select ( patch_info, 2 ) );
+		    }
 		}
 		else
 		{

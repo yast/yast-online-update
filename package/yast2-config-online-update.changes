@@ -2,6 +2,9 @@
 Mon May  7 17:03:54 CEST 2001 - sh@suse.de
 
 - Use new UI(`GetLanguate()) parameter 
+- accept next button in export mode.
+- error popup xxx server not found ( Bug 8872 )
+- Enable installing NEW packages
 
 -------------------------------------------------------------------
 Mon Apr 30 15:29:43 MEST 2001 - gs@suse.de

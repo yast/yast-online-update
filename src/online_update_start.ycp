@@ -301,7 +301,7 @@ another SuSE ftp server.")));
 	    
 	      user_settings = add ( user_settings, "ftp_dir", ftp_dir );
 	      user_settings = add ( user_settings,"post_install", false );
-	      any retval = CallFunction(`inst_source( true, false ) );
+	      any retval = CallFunction(`inst_source( true, true ) );
 	      if ( retval == `abort )
 		  return `abort;
 

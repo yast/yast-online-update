@@ -213,6 +213,8 @@ The ftp connection will be closed.
       }
 
       ShowProgress( 5 );
+
+      string lastErrorServer = ftp_server; // only for error popup      
       
       while ( (index < patch_no) && go_on )
       {
@@ -295,6 +297,18 @@ The ftp connection will be closed.
 
 	      // Getting rpm
 	      patch_result = PKGINFO( `ftpGetPatch( select(patch_list, index) ) );
+	      if ( !lookup(patch_result, "ok", false)  )
+	      {
+		  if ( otherServerConnect )
+		  {
+		      lastErrorServer = otherFtpServer;
+		  }
+		  else
+		  {
+		      lastErrorServer = ftp_server;
+		  }
+	      }
+
 	      
 	      if ( otherServerConnect )
 	      {
@@ -357,7 +371,7 @@ The ftp connection will be closed.
 server \"%2\".
 You may try to download remaining patches or
 go on with installing of already got ones.")),
-				       select(patch_list, index), ftp_server );
+				       select(patch_list, index), lastErrorServer );
 	      
 	      any ret = UI(`DisplayMsgFtp( msg_str, _("Notify"), _("&Download"), _("&Install") ));
 
