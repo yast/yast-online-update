@@ -57,9 +57,10 @@ packages were created by SuSE.
   // or online_update is called directly ( /sbin/yast2 online_update '(.test)' )
   // test mode means: get the patches, but do not install (inst_rpmcopy runs with test mode)
 
-  integer arg_n = size(WFM::Args()) - 1;
+  integer arg_n = 0;
+  integer arg_max = size( WFM::Args() );
 
-  while (arg_n >= 0) {
+  while (arg_n < arg_max ) {
       if (WFM::Args(arg_n) == .test || WFM::Args(arg_n) == ".test")
       {
 	  Mode::test = true;
@@ -80,6 +81,12 @@ packages were created by SuSE.
 	  OnlineUpdate::you_auto_install = true;
 	  OnlineUpdate::you_auto	 = true;
       }
+      else if ( WFM::Args(arg_n) == .url || WFM::Args(arg_n) == ".url" )
+      {
+          if ( arg_n + 1 < arg_max ) {
+              OnlineUpdate::you_url = WFM::Args( arg_n + 1 );
+          }
+      }
       else
       {
 	  // batch kind like security,.....
@@ -87,11 +94,10 @@ packages were created by SuSE.
 	  y2milestone( "Getting patches for kind %1 only",  WFM::Args(arg_n) );
       }
 
-      arg_n = arg_n - 1;
+      arg_n = arg_n + 1;
   }
 
   y2debug("ONLINE: Testmode %1", Mode::test );
-
 
 UI(``{
 
@@ -430,13 +436,9 @@ server data.
    */
 
   list dialog = [
-		 [`online_update_start(false, true), 		`always ],
-		 [`online_update_load(true, true),	 	`always ],
-		 [`online_update_select(false, true), 		`manual ],
-		 [`online_update_load(false, true), 		`manual ],
-		 [`inst_suseconfig(false, true), 		`always ],
-		 [`online_update_close(false, true), 		`always ]
-
+    [`online_update_start(false, true), `always ],
+    [`online_update_select(false, true), `manual ],
+    [`online_update_install(false, true), `always ],
   ];
 
   /*

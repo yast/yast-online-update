@@ -18,10 +18,15 @@
 
   textdomain "online-update";
 
+  UI::OpenDialog(`opt(`defaultsize), `PackageSelector(`id(`selector) ));
+  UI::RunPkgSelection(`id(`selector) );
+  UI::CloseDialog();
+}
+
+/*
   import "OnlineUpdate";
 
   boolean cd_update	= OnlineUpdate::cd_update;
-
 
   // map you_patches contains information about all available patches, e.g.
   //
@@ -302,6 +307,7 @@ double-click the line (or select it and use Alt + A).
     } until (ret == `next || ret == `back || ret == `cancel || ret == `abort);
 
    return ret;
-
-/* EOF */
 }
+
+*/
+

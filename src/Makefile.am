@@ -4,7 +4,7 @@
 
 etcdir = /etc
 admdir = /var/adm/fillup-templates
-yncludedir = @yncludedir@/onlineupdate
+yncludedir = @yncludedir@/online-update
 
 etc_DATA = suseservers
 
@@ -16,6 +16,7 @@ client_DATA =				\
 	online_update_details.ycp	\
 	online_update_select.ycp 	\
 	online_update_close.ycp		\
+        online_update_install.ycp       \
 	online_update.ycp
 
 module_DATA =			\

@@ -35,7 +35,7 @@ global boolean you_auto_install = false;
 /**
  * flag: Automatic Update
  */
-global boolean you_auto	= false;
+global boolean you_auto	= true;
 
 /**
  * flag: Continue mode?
@@ -71,6 +71,11 @@ global map you_patches = $[];
  * reloading serverlist form www.suse.de
  */
 global string reloadServer = "yes";
+
+/**
+ * Url where patches are looked for.
+ */
+global string you_url = "";
 
 /* EOF */
 }

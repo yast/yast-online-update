@@ -19,10 +19,6 @@
 
   boolean business	= false;
 
-  include "online-update/suseservers.ycp";
-
-  // you_server_map = $[ "server" : [ "path", "type" ], ... ]
-
   // constant settings
   string rootpath = "/";
   string yastpath = "/var/lib/YaST";
@@ -81,6 +77,21 @@
 
   list you_server_list = [];
 
+  string you_url = OnlineUpdate::you_url;
+
+  y2milestone( "you_url: %1", you_url );
+
+  if ( size( you_url ) != 0 ) {
+    you_server_list = add( you_server_list, you_url );
+  } else {
+    you_server_list = Pkg::YouGetServers();
+  }
+
+  if ( size( you_server_list ) == 0 ) {
+    // Error
+  }
+
+/*
   // initialize You Agent
   UI::OpenDialog(`opt(`decorated ),`Label(_("Initializing for FTP/HTTP update. One moment please...")));
 
@@ -211,62 +222,85 @@ internal error.
  integer num = tointeger( lookup( last_status, "days", "0" ));
  string last_update = sformat( _("Last update was executed\n %1 day ago.", "Last update was executed\n %1 days ago.", num), num );
 
+*/
+
+  map statusmap = Pkg::YouStatus();
+
+  y2debug("status map: %1", statusmap );
+
+  string status_product = lookup( statusmap, "product", "unknown" );
+  string status_version = lookup( statusmap, "version", "unknown" );
+  string status_basearch = lookup( statusmap, "basearch", "unknown" );
+
   // layout main dialog
 
   term contents =
-      `VBox(
-	    `VSpacing( 0.3 ),
-	    `HBox(`HWeight(1, `Empty()),
-		  `HWeight(8, `Frame (_("Last update information"),
-				      `VBox(`VSpacing(0.8),
-					    `HBox(`HSpacing(0.8),`Left(`Label(last_update)),
-						  `HSpacing(2.0),
-						  `PushButton( `id(`details), `opt(`notify), _("&Details"))
-						  ),
-					    `VSpacing(0.8)
-					    )
-				      )),
-		  `HWeight(1, `Empty())
-		  ),
-	    `VSpacing(1.0),
-	    `HBox(`HWeight(1, `Empty()),
-		  `HWeight(8, `Frame (_("Choice of update mode"),
-				      `RadioButtonGroup(`id(`choice),
-							`VBox(
-							      `VSpacing(0.3),
-							      `HBox(`HSpacing(0.8),
-								    `Left(`RadioButton(`id(`automatic),`opt(`notify),
-										       _("Automatic &Update"), false) )
-								    ),
-							      `VSpacing(0.3),
-							      `HBox(`HSpacing(0.8),
-								    `Left(`RadioButton(`id(`manual),`opt(`notify),
-										       _("&Manual Update") ,  false))
-								    ),
-							      `VSpacing(0.3)
-							      )
-							)
-				      )),
-		  `HWeight(1, `Empty())
-		  ),
-	    `VSpacing(1.0),
-	    `HBox(`HWeight(1, `Empty()),
-		  `HWeight(8, `Frame (_("Choice of installation source"),
-				      `RadioButtonGroup(`id(`choice),
-							`VBox(
-							      `VSpacing(0.3),
-							      `HBox(`HSpacing(1.2),
-								    `Left(`ComboBox(`id(`you), _("&Installation source"), you_server_list )),
-								    `PushButton( `id(`expert), `opt(`notify), _("&Expert"))
-								    ),
-							      `VSpacing(0.3)
-							      )
-							)
-				      )),
-		  `HWeight(1, `Empty())
-		  ),
-	    `VSpacing( 0.5 )
-	    );
+    `VBox(
+      `VSpacing( 0.3 ),
+      `HBox(
+        `HWeight(1, `Empty()),
+        `HWeight(8,
+          `Frame ( _("System &information"),
+            `VBox(
+              `VSpacing(0.3),
+              `HBox(`HSpacing(0.8),
+                `Left( `Label( sformat( _("Product: %1"), status_product ) ) )
+              ),
+              `HBox(`HSpacing(0.8),
+                `Left( `Label( sformat( _("Version: %1"), status_version ) ) )
+              ),
+              `HBox(`HSpacing(0.8),
+                `Left( `Label( sformat( _("Base architecture: %1"), status_basearch ) ) )
+              ),
+              `VSpacing(0.3)
+            )
+          )
+        ),
+        `HWeight(1, `Empty())
+      ),
+      `VSpacing(1.0),
+      `HBox(
+        `HWeight(1, `Empty()),
+        `HWeight(8, `Frame (_("&Choice of update mode"),
+                `RadioButtonGroup(`id(`choice),
+                `VBox(
+                      `VSpacing(0.3),
+                      `HBox(`HSpacing(0.8),
+                      `Left(`RadioButton(`id(`automatic),`opt(`notify),
+                             _("Automatic &Update"), false) )
+                      ),
+                      `VSpacing(0.3),
+                      `HBox(`HSpacing(0.8),
+                      `Left(`RadioButton(`id(`manual),`opt(`notify),
+                             _("&Manual Update") ,  false))
+                      ),
+                      `VSpacing(0.3)
+                      )
+                )
+                )),
+        `HWeight(1, `Empty())
+      ),
+      `VSpacing(1.0),
+      `HBox(
+        `HWeight(1, `Empty()),
+        `HWeight(8,
+          `Frame ( _("Choice of installation &source"),
+            `RadioButtonGroup(`id(`choice),
+              `VBox(
+                `VSpacing(0.3),
+                `HBox(`HSpacing(1.2),
+                  `Left(`ComboBox(`id(`you), `opt(`editable), _("&Installation source"), you_server_list ))
+//                `PushButton( `id(`expert), `opt(`notify), _("&Expert"))
+                ),
+                `VSpacing(0.3)
+              )
+            )
+          )
+        ),
+        `HWeight(1, `Empty())
+      ),
+      `VSpacing( 0.5 )
+    );
 
   string help_text = "";
 
@@ -300,6 +334,7 @@ another FTP or HTTP server.</p>
       return `next;
   }
 
+/*
   if ( OnlineUpdate::you_auto_get || OnlineUpdate::you_auto_install )
   {
       // auto mode; get patch descriptions and packages, but do not install patches
@@ -330,6 +365,7 @@ another FTP or HTTP server.</p>
 
       return `next;
   }
+*/
 
   if ( !cd_update )
   {
@@ -339,6 +375,7 @@ another FTP or HTTP server.</p>
   }
   else
   {
+/*
       // write settings for CD update and return `next
       OnlineUpdate::you_auto 	= false;
 
@@ -355,6 +392,7 @@ another FTP or HTTP server.</p>
       y2debug("ONLINE: .you.setServer( %1, %2 %3) ): %4", you_server, you_dir, you_serverkind, retval );
 
       return `next;
+*/
   }
 
 
@@ -369,10 +407,14 @@ another FTP or HTTP server.</p>
       UI::ChangeWidget(`id(`manual), `Value, true );
   }
 
+/*
   if ( you_server != "" )
   {
       UI::ChangeWidget(`id(`you), `Value, you_server );
   }
+*/
+
+  string url = "";
 
   //  Loop for User Input ....
 
@@ -396,6 +438,16 @@ another FTP or HTTP server.</p>
 
       if (ret == `next)
       {
+          Pkg::TargetInit("/",true);
+
+          boolean ok = Pkg::YouGetPatches( you_server );
+          if ( !ok ) {
+	      UI::ErrorPopup(_("Initialization failed. Try again.
+If failure continues, choose
+another SuSE FTP/HTTP server.\n"));
+	      ret = `again;            
+          }
+/*
 	  you_dir 	 = select( lookup(you_server_map, you_server, ["",""]), 0, "" );
 	  you_serverkind = select( lookup(you_server_map, you_server, ["",""]), 1, "" );
 
@@ -443,7 +495,9 @@ another SuSE FTP/HTTP server.\n"));
 		  }
 	      }
 	  }
+*/
       }
+/*
       else if ( ret == `details )
       {
 	  any retval = WFM::CallFunction(`online_update_details( true, false ) );
@@ -499,6 +553,7 @@ another SuSE FTP/HTTP server.\n"));
 	  }
 	  ret = `again;
       }
+*/
       else if ( ret == `abort && UI::ConfirmAbortUpdate(`painless) )
 	  return  `abort;
 

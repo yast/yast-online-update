@@ -1,0 +1,246 @@
+/*
+ *************************************************************
+ *
+ *     YaST2      SuSE Labs                        -o)
+ *     --------------------                        /\\
+ *                                                _\_v
+ *           www.suse.de / www.suse.com
+ * ----------------------------------------------------------
+ *
+ * Author:        Gabriele Strattner <gs@suse.de>
+ *
+ * Purpose:
+ *
+ * Modify:
+ *
+ * external function:
+ *
+ *
+ *************************************************************
+
+ $Id$
+
+*/
+
+{
+
+  textdomain "online-update";
+
+  import "OnlineUpdate";
+  
+  boolean auto_mode_install = OnlineUpdate::you_auto_install;
+
+  //////////////////////////////////////////////////////////////////////////////////////
+  //                                  P O P U P S                                     //
+  //////////////////////////////////////////////////////////////////////////////////////
+
+  // None at the moment
+    
+
+  //////////////////////////////////////////////////////////////////////////////////////
+  // MAIN:
+  ///////////////////////////////////////////////////////////////////////////////////////
+
+
+  term contents =
+      // main dialog: 
+      `VBox(
+	    `VSpacing( 0.2 ),
+            `LogView(`id(`log), _("Package Update information"), 5, 0 ),
+	    `VSpacing( 0.2 )
+	    );
+    
+  string help_text = "";
+
+  // helptext  update is finished 
+  string help_part1 =  _("<p>
+Online Update is finished.
+Your installation is up-to-date now.
+It is recommended to check regularly
+for new patches.<br></p>
+");
+  string help_part2 =  _("<p>
+If any errors occur during download or installation,
+check the <b>Details</b> for more information.
+</p>
+");
+  string help_part3 =  _("<p>
+Try to update again if important
+patches could not be installed.
+</p>
+");
+ 
+  help_text = help_part1 + help_part2 + help_part3;
+    
+  // using SetContents (define in online_update.ycp)
+  Wizard::SetContents(_("Online Update Confirmation"), contents, help_text, WFM::Args(0), WFM::Args(1) );
+
+  // changing Label to Finish for the last step
+  UI::ChangeWidget(`id(`next), `Label,  FinishButtonLabel() );
+  UI::ChangeWidget(`id(`abort), `Enabled,  false );
+
+  Pkg::YouSelectPatches();
+
+  Pkg::YouAttachSource();
+
+  map patch = Pkg::YouFirstPatch();
+
+  boolean error = false;
+  
+  if ( size( patch ) == 0 ) {
+    UI::ChangeWidget( `id(`log), `LastLine,
+                      _("No patches selected to be installed." ) );
+  } else {
+    while( size( patch ) != 0 ) {
+      UI::ChangeWidget( `id(`log), `LastLine,
+                        sformat ( _( "Retrieving %1: \"%2\" " ),
+                            lookup( patch, "name", "unknown" ),
+                            lookup( patch, "summary", "no summary" ) ) );
+
+      boolean ok = Pkg::YouGetCurrentPatch();
+      if ( ok ) {
+        UI::ChangeWidget( `id(`log), `LastLine, _("Ok\n") );
+      } else {
+        UI::ChangeWidget( `id(`log), `LastLine, _("Error\n") );
+        error = true;
+      }
+
+      patch = Pkg::YouNextPatch();
+    }
+    
+    UI::ChangeWidget( `id(`log), `LastLine, _("Download complete\n\n") );
+
+    if ( error ) {
+      UI::ErrorPopup( _("Download failed.") );
+    } else {
+    
+      patch =  Pkg::YouFirstPatch();
+
+      error = false;
+
+      if ( size( patch ) == 0 ) {
+        UI::ChangeWidget( `id(`log), `LastLine,
+                          _("No patches selected to be installed." ) );
+      } else {
+        while( size( patch ) != 0 ) {
+          UI::ChangeWidget( `id(`log), `LastLine,
+                            sformat ( _( "Installing %1: \"%2\" " ),
+                                lookup( patch, "name", "unknown" ),
+                                lookup( patch, "summary", "no summary" ) ) );
+
+          boolean ok = Pkg::YouInstallCurrentPatch();
+          if ( ok ) {
+            UI::ChangeWidget( `id(`log), `LastLine, _("Ok\n") );
+          } else {
+            UI::ChangeWidget( `id(`log), `LastLine, _("Error\n") );
+            error = true;
+          }
+
+          patch = Pkg::YouNextPatch();
+        }
+
+        if ( error ) {
+          UI::ErrorPopup( _("Installation failed.") );
+        } else {
+          UI::MessagePopup( _("Installation successful.") );
+        }
+      }
+    }
+  }
+
+
+/*
+  // set status and close update
+  y2debug("ONLINE: close update with status: %1", OnlineUpdate::you_ok );
+  any result = SCR::Execute (.you.closeUpdate,
+			     OnlineUpdate::you_ok);
+
+  if ( auto_mode_install )
+  {
+      // Do not show in auto mode
+      return `next;
+  }
+  
+  // Show results
+  map last_status = SCR::Read (.you.lastUpdateStatus );
+  y2debug( "ONLINE: SCR::Read (.you.lastUpdateStatus ) : %1", last_status );
+     
+  list patch_list = lookup( last_status, "patches", [] );
+  integer rec_no = 0;
+  integer sec_no = 0;
+  integer yast2_no = 0;
+  integer index = 0;
+     
+  while (index < size(patch_list) )
+  {
+      if ( select(patch_list, index+4, "") == "installed" )
+      {
+	  if ( select(patch_list, index+1, "") == "recommended" )    	rec_no = rec_no+1;
+	  else if ( select(patch_list, index+1, "") == "security" )    	sec_no = sec_no+1;
+	  else if ( select(patch_list, index+1, "") == "YaST2" )	yast2_no = yast2_no+1;
+      }
+      index = index+5;
+  };
+
+  UI::ChangeWidget(`id(`error), `Value, lookup(last_status, "status", "--" ) );
+  UI::ChangeWidget(`id(`sec), `Value, sformat("%1", sec_no));
+  UI::ChangeWidget(`id(`rec), `Value, sformat("%1", rec_no));
+  UI::ChangeWidget(`id(`yast2), `Value, sformat("%1", yast2_no));
+
+*/
+     
+  /////////////////////////////////////////////////////////////////////////////////////////
+  ////  Loop for User Input ....
+  /////////////////////////////////////////////////////////////////////////////////////////
+  symbol ret = `next;
+
+  repeat
+      {
+	  ret= UI::UserInput();
+
+/*	
+	  if (ret == `details)
+	  {
+
+	      any retval = WFM::CallFunction(`online_update_details( true, false ) );
+	      // changing Label to Finish for the last step
+	      UI::ChangeWidget(`id(`next), `Label,  FinishButtonLabel() );
+	      UI::ChangeWidget(`id(`abort), `Enabled,  false );
+	      
+	      if ( retval == `abort )
+	      {
+		  SCR::Execute( .you.disconnect );
+		  return `abort;
+	      }
+	    
+	      ret = `again;
+	  }
+	  if ( ret == `next && UI::QueryWidget(`id(`remove_packages),`Value ) )
+	  {
+	      y2debug( "Removing old rpm-packages" );	    
+	      // removing rpm s
+	      index = 0;
+	      while (index < size(patch_list) )
+	      {
+		  if ( select(patch_list, index+4, "") == "installed" )
+		  {
+		      SCR::Execute(.you.deletePackages,
+				   select(patch_list, index, ""));
+		  }
+		  index = index+5;
+	      };
+	  }
+*/
+
+      } until (ret == `next || ret == `back || ret == `abort || ret == `again );
+
+/*
+  // Close connection
+  SCR::Execute( .you.disconnect );
+*/
+    
+  return ret;
+}
+
+
+
