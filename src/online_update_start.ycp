@@ -407,6 +407,8 @@ another SuSE FTP/HTTP server.
 Cannot load patch information.
 ");
                   ret = `this;
+              
+                  UI::ChangeWidget( `id( `reload ), `Value, true );              
               } else if ( err == "url" ) {
                   msg = _("URL is invalid.");
               } else {
@@ -415,8 +417,6 @@ Cannot load patch information.
               }
 
               UI::YouErrorPopup( msg, details );
-              
-              UI::ChangeWidget( `id( `reload ), `Value, true );              
             }
           } else {
             Pkg::YouSelectPatches();
