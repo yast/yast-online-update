@@ -283,7 +283,7 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
 	  if ( ret_shell != 0 )
 	  {
 	      string message = sformat(
-		UI(_("The patch %1 will not be installed \ncase package %2 is corrupted")),
+		UI(_("The patch %1 will not be installed \ncause package %2 is corrupted")),
 		patch, package );
 	      
 	      y2error( "%1", message );
