@@ -13,7 +13,7 @@
   import "Mode";
   import "Wizard";
 
-  global define symbol SetupAutomatic() ``{
+  define symbol SetupAutomatic() ``{
 
     string heading = _("YOU Automatic Mode Setup");
 
@@ -149,8 +149,8 @@ the update takes place.");
   }
 
 
-  global define any YouErrorPopupGeneric( string message, string details,
-                                          symbol type )
+  define any YouErrorPopupGeneric( string message, string details,
+                                   symbol type )
   ``{
 
     if ( size( details ) == 0 ) details = _("No details available.");
@@ -234,28 +234,28 @@ the update takes place.");
     }
   }
 
-  global define symbol YouIgnoreWarningPopup( string message, string details )
+  define symbol YouIgnoreWarningPopup( string message, string details )
   ``{
     return (symbol)YouErrorPopupGeneric( message, details, `ignorewarning );
   }
 
-  global define symbol YouIgnorePopup( string message, string details )
+  define symbol YouIgnorePopup( string message, string details )
   ``{
     return (symbol)YouErrorPopupGeneric( message, details, `ignore );
   }
 
-  global define symbol YouSkipPopup( string message, string details )
+  define symbol YouSkipPopup( string message, string details )
   ``{
     return (symbol)YouErrorPopupGeneric( message, details, `skip );
   }
 
-  global define symbol YouErrorPopup( string message, string details )
+  define symbol YouErrorPopup( string message, string details )
   ``{
     return (symbol)YouErrorPopupGeneric( message, details, `plain );
   }
 
   //  ConfirmAbortUpdate has same layout as/but different text than ConfirmAbort
-  global define boolean ConfirmAbortUpdate( symbol how_to )
+  define boolean ConfirmAbortUpdate( symbol how_to )
   ``{
           string what_will_happen = "";
 
@@ -329,7 +329,7 @@ some of them might not work as expected.");
           return (ret == `really_abort);
   };
 
-  global define boolean DisplayMsgYou( string message, string header, string yes_button, string no_button )
+  define boolean DisplayMsgYou( string message, string header, string yes_button, string no_button )
   ``{
           UI::OpenDialog(
                      `opt(`decorated),
@@ -352,7 +352,7 @@ some of them might not work as expected.");
   };
 
 
-  global define boolean DisplayMsgYouOk( string message, string header, string ok_button )
+  define boolean DisplayMsgYouOk( string message, string header, string ok_button )
   ``{
           UI::OpenDialog(
                      `opt(`decorated),
@@ -373,7 +373,7 @@ some of them might not work as expected.");
           return (ret == `ok);
   };
 
-  global define boolean YouMessagePopup( list<map> patches, boolean pre )
+  define boolean YouMessagePopup( list<map> patches, boolean pre )
   ``{
       string message = "";
       string details = "";
