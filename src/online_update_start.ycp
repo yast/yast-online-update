@@ -171,7 +171,13 @@ Informations about the last update will be shown
 if you click on button <b>Details</b>.
 </p>"));
 
-    help_text = help_part1 + help_part2;
+    string help_part3 =  UI(_("<p>
+If you click on button <b>Local</b> you can select an local
+installation-source instead of a ftp-server.
+</p>"));
+    
+    
+    help_text = help_part1 + help_part2 + help_part3;
 			    
     UI(`SetWizardContents("Welcome to SuSE Package Update", contents, help_text, Args(0), Args(1) ));
 
