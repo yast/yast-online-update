@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Jan  5 16:50:24 CET 2005 - mir@suse.de
+
+- save value of checkbox remove_packages into sysconfig (#49349)
+- 2.11.2
+
+-------------------------------------------------------------------
 Thu Nov  4 15:51:58 CET 2004 - kkaempf@suse.de
 
 - adapt to new Mode:: API

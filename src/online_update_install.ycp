@@ -1,7 +1,16 @@
-/*
-   Summary: YOU installation page
-   Authors: Cornelius Schumacher <cschum@suse.de>
-*/
+/**
+ * File:	clients/online_update_install.ycp
+ * Package:	Configuration of online_update
+ * Summary: YOU installation page
+ * Authors: Cornelius Schumacher <cschum@suse.de>
+ *
+ * $Id$
+ *
+ * This is a client for autoinstallation.
+ * It displays the dialog for the actual installation,
+ * executes actual installation and removes sources when 
+ * requested.
+ */
 
 {
 
@@ -106,6 +115,15 @@ data is no longer needed. To delete this data, activate
     {
         y2debug( "Removing old rpm-packages" );
         Pkg::YouRemovePackages();
+    }
+
+    if ( ret == `next )
+    {
+        if (! SCR::Write( .sysconfig.onlineupdate.YOU_REMOVE_SOURCE_PACKAGES,
+                          (boolean)UI::QueryWidget(`id(`remove_packages), `Value) ? "yes" : "no"))
+        {
+            y2warning("Failed to write .sysconfig.onlineupdate.YOU_REMOVE_SOURCE_PACKAGES");
+        }
     }
 
     if ( ret == `cancel && !installedPackages ) ret = `abort;
