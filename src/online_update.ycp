@@ -32,8 +32,7 @@
 			`widget       : `RichText(
 				// 
 				UI(_("Launch this module to get patches (online update).
-A patch is a set of packages which correct or
-improve your existing installation."))
+A patch updates, improves or corrects your existing installation."))
 				+
 				UI(_("<p>You need to be logged in as <i>root</i> in order to do this.</p>"))), 
 			`codefragment : nil ]
@@ -239,7 +238,7 @@ You will need to do the update again." );
       };
 
 
-   define DisplayMsgFtp( string message, string header ) ``{
+   define DisplayMsgFtp( string message, string header, string yes_button, string no_button ) ``{
           OpenDialog(
                      `opt(`decorated),
                      `HBox(
@@ -248,7 +247,8 @@ You will need to do the update again." );
 				 `Left(`Heading( header)),
 				 `VSpacing(0.2),
                                  `Label(message),
-                                   `PushButton(`id(`continue), `opt(`default), _("&OK")),
+				 `HBox(`PushButton(`id(`yes), `opt(`default), yes_button ),
+				       `PushButton(`id(`no), `opt(`default), no_button )),
                                  `VSpacing(0.2)
                                  ),
                            `HSpacing(1)
@@ -256,7 +256,7 @@ You will need to do the update again." );
                      );
           any ret = UserInput();
           CloseDialog();
-          return true;
+          return (ret == `yes);
       };
  
   // show detailed information about one patch

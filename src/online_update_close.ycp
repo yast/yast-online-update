@@ -71,15 +71,31 @@ Installed recommended patches: 2")),
     
     string help_text = "";
 
-    // helptext  "main dialog online_update" 
-    help_text =  UI("<p>My helptext</p>");
-
+    // helptext  update is finished 
+    string help_part1 =  UI("<p>
+Online Update is finished.
+Your installation is update to date now.
+It is recommended to check if there
+are new patches available about once
+a month.<br></p>");
+    string help_part2 =  UI("<p>
+If any error occurs during downlod or installation
+of the patches, you can check the <b>Details</b>
+for further information.
+</p>");
+ string help_part3 =  UI("<p>
+Please try to do the update again, if important
+patches could not be installed.
+</p>");
+    help_text = help_part1 + help_part2 + help_part3;
+    
      // using SetContents (define in online_update.ycp)
      UI(`SetWizardContents("Online Update Confirmation", contents, help_text, Args(0), Args(1) ));
 
      // changing Label to Finish for the last step
      UI(`ChangeWidget(`id(`next), `Label,  _("&Finish") ) );
-      
+
+     
    /////////////////////////////////////////////////////////////////////////////////////////
    ////  Loop for User Input ....
    /////////////////////////////////////////////////////////////////////////////////////////

@@ -119,7 +119,7 @@
 								`VSpacing(0.3),
 								`HBox(`HSpacing(0.8),
 								      `Left(`RadioButton(`id(`automatic),`opt(`notify),
-											 _("&Automatic Update"), true) )
+											 _("&Automatic Update"), false) )
 								      ),
 								`VSpacing(0.3),
 								`HBox(`HSpacing(0.8),
@@ -161,6 +161,17 @@ if you click on button <b>Details</b>.
 
     UI(`ChangeWidget(`id(`abort), `Label, _("&Abort Update")) );
     
+
+    if ( lookup(user_settings, "ftp_auto", true ) )
+    {
+	UI(`ChangeWidget(`id(`automatic), `Value, true ));
+	UI(`ChangeWidget(`id(`manual), `Value, false ));
+    }
+    else
+    {
+	UI(`ChangeWidget(`id(`automatic), `Value, false ));
+	UI(`ChangeWidget(`id(`manual), `Value, true ));
+    }
 
     //  Loop for User Input ....
 

@@ -83,10 +83,13 @@
 	    // main dialog: 
 	`VBox(
 	      `VSpacing( 0.2 ),
-	       `Table(`id(`patch_table),`opt(`notify, `immediate, `hvstretch), 
+	       `Table(`id(`patch_table),`opt(`notify, `hvstretch), 
 		      `header( " ", _("Patch"), _("Mode"), _("Download"), _("Description") ),
 		      table_contents
 			      ),
+	      `HBox(`Left(`PushButton(`id(`apply), _("&Apply"))),
+		    `Left(`PushButton(`id(`info), _("&Show description")))
+		    ),
 	      `VSpacing( 0.2 )
 	      );
     
@@ -105,7 +108,7 @@ The shortcut \"rec\" means it is recommended to install the patch.
 <b>X</b>: Patches concerning your installation are preselected.
 They will be downloaded and installed on your system.
 If you don't want a certain patch, double
-click on line to deselect it.
+click on line to deselect it (or selcect line and use Crtl A).
 </p>");
     string help_part3 =  UI("<p>
 <b>G</b>: patch is available but not relevant for your installation
@@ -135,7 +138,7 @@ downloaded nor installed.
 	if ( ret == `abort && UI(`ConfirmAbortUpdate(`unusable)) )
 	    return `abort;
 
-	if (ret == `patch_table)
+	if (ret == `patch_table || ret == `apply)
 	{
 	    any id = UI(`QueryWidget(`id(`patch_table), `CurrentItem ));
 	    term  patch_info = UI( `QueryWidget(`id(`patch_table), `Item(id)) );
@@ -160,21 +163,18 @@ downloaded nor installed.
 		UpdateGetPatches( patch_name, "G" ); 
 	    }
 	}
-	
-	if (ret == `next)
+	else if ( ret == `info )
+	{
+	    string patch = UI(`QueryWidget(`id(`patch_table), `CurrentItem ) );
+	    UI(`ShowPatchInfo( patch ));   
+	}
+	else if (ret == `next)
 	{
 	    y2debug("ONLINE: get patches: %1", get_patches );
 
+	    // write patch info to user_settings
 	    user_settings = add(user_settings, "ftp_patches", get_patches);
-	    
-	    // Write all patches marked with "X" to user_settings
-	    // TODO: unterscheiden NUR download ( installieren )
 	}
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////
-	////  
-	////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	if ( ret == `back)
 	{

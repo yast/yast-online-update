@@ -175,10 +175,16 @@ closed.
 	      {
 		  string msg_str = sformat(UI(_("Can't get patch \"%1\" from
 server \"%2\".
-Try to get remaining patches.")), select(patch_list, index), ftp_server );
+You may try to download remaining patches or
+go on with installation of already got ones.")),
+					   select(patch_list, index), ftp_server );
 	      
-		  UI(`DisplayMsgFtp( msg_str, _("Notify") ));
-		  // TODO: Popup mit 2 Buttons OK -> weiter, Cancel Abbruch
+		  any ret = UI(`DisplayMsgFtp( msg_str, _("Notify"), _("&Download"), _("&Install") ));
+
+		  if (!ret)
+		  {
+		      go_on = false;
+		  }
 	      }
 	      else if ( select ( lookup(new_patches, patch, []), 3 ) == "X" )
 	      {
@@ -191,9 +197,9 @@ Try to get remaining patches.")), select(patch_list, index), ftp_server );
 
 	      // Polling input to give the user a chance to stop the download  
 	      any r = UI(`PollInput());
-
 	      if ( r == `abort && UI(`DisplayMsgFtp( _("Download of patches will be stopped.
-Continue to install already loaded patches" ), _("Warning")) ) )
+You may continue with installation of already
+loaded patches or abort update completely." ), _("Warning"), _("&Install"), _("&Abort") )) )
 	      {
 		  go_on = false;
 	      }
@@ -208,23 +214,41 @@ Continue to install already loaded patches" ), _("Warning")) ) )
   
   define InstallPatches( list patch_list ) ``{
       list package_list = [];
+      string pre_info = "";
       integer no = 1;
+      symbol ret = `ok;
+      boolean go_on = true;
       
       foreach ( `patch, patch_list, ``{
 	  if ( !test_mode )
 	  {
-	      package_list = PKGINFO(`ftpGetPackageList( patch ) );
+	      package_list = PKGINFO(`ftpGetPackages( patch ) );
 	  }
 	  else
 	  {
 	      package_list = ["/var/lib/YaST/patches/abdnf.rpm", "/var/lib/YaST/patches/yxcxc.rpm"];
 	  }
+	  if ( !test_mode )
+	  {
+	      pre_info = PKGINFO(`ftpGetPreInstallInformation);
+	  }
+	  else if ( no == 1 )
+	  {
+	      pre_info = "If you notice any strange behaviour of your system ...."; 
+	  }
+	  if ( pre_info != "" )
+	  {
+	      go_on = UI(`DisplayMsgFtp( preinfo, _("Warning"), _("&Continue"), _("&Skip patch")));
+	  }
+	  if ( go_on )
+	  {
+	      ret = CallFunction(`inst_rpmcopy(false, false, package_list ));
+	  }
 	  
-	  any ret = CallFunction(`inst_rpmcopy(false, false, package_list ));
-
 	  y2debug("ONLINE: %1. call of inst_rpmcopy returns: %2", no, ret );
 	  no = no+1;
-    });
+      });
+      
       if (ret == `abort )
       {
 	  return `cancel;
@@ -291,7 +315,7 @@ Please try to get patches from another SuSE ftp server.")));
   {
       UI(`ChangeWidget(`id(`log), `LastLine, "Starting download of patch descriptions from ftp server.\n" ));
 
-      new_patches = $["patch-001":["rec", "Patch for NFS server", "234", "G"],
+      new_patches = $["patch-001":["rec", "Patch for NFS server", "234", "X"],
 		      "patch-002":["rec", "Noch einweiterer patch", "2344", " "],
 		      "patch-003":["sec", "Security dfsdkfö", "45355", "G"],
 		      "patch-004":["sec", "Nochmal security", "34", "X"],
@@ -400,7 +424,8 @@ Please try to get patches from another SuSE ftp server.")));
 
 	  if ( ret == `back)
 	  {
-
+	      // RESET continue mode
+	      user_settings = add(user_settings, "ftp_continue", false );
 	  }
 
       } until (ret == `next || ret == `back || ret == `cancel);
