@@ -313,11 +313,10 @@ the update?
         string msg = "";
         if ( installedPatches == 0 ) {
           msg = _("No patches have been installed.");
-        } else if ( installedPatches == 1 ) {
-          msg = _("1 patch has been installed.");
         } else {
-          msg = sformat( _("%1 patches have been installed."),
-                         installedPatches );
+          msg = sformat( _("%1 patch has been installed.",
+                           "%1 patches have been installed.",
+                           installedPatches ), installedPatches );
         }
         
         UI::ChangeWidget( `id(`log), `LastLine, msg );
