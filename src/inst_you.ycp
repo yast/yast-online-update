@@ -34,7 +34,7 @@
 	    i_set_demand = true;
 	}
 
-	Internet::Start ();
+	Internet::Start ("");
 
 	integer i = 150;
 	while (i > 0)
@@ -57,7 +57,7 @@
 
     if (!already_up)
     {
-	Internet::Stop ();
+	Internet::Stop ("");
 
 	if (i_set_demand)
 	{
