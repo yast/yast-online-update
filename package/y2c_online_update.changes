@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Dec 12 09:09:25 MET 2000 - schubi@suse.de
+
+- reading targetroot via SCR
+  user messages added for pgp security
+
+-------------------------------------------------------------------
 Mon Dec 11 08:31:26 MET 2000 - schubi@suse.de
 
 - ftp-server-settings added
