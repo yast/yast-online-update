@@ -64,7 +64,7 @@
 
       term detailsTerm = 
         `HBox( `HSpacing( 0.5 ),
-          `HWeight( 1, `RichText( details ) ),
+          `HWeight( 1, `RichText( `opt(`plainText), details ) ),
           `HSpacing( 0.5 )
         );
        
@@ -191,6 +191,8 @@ data is no longer needed. To delete this data, activate
 
   symbol proceed = `ok;
 
+  map skipMap = $[];
+
   if ( size( patch ) == 0 ) {
     UI::ChangeWidget( `id(`log), `LastLine, msgNoPatches );
   } else {
@@ -208,11 +210,11 @@ data is no longer needed. To delete this data, activate
     
       UI::ChangeWidget( `id(`log), `LastLine,
                         sformat ( _("Retrieving %1: \"%2\""),
-                            patchName,
-                            lookup( patch, "summary", "no summary" ) ) + " " );
+                        patchName,
+                        lookup( patch, "summary", "no summary" ) ) + " " );
 
       string err = "skipped";
-      if ( proceed == `ok ) {
+      if ( proceed != `all ) {
         err = Pkg::YouGetCurrentPatch( OnlineUpdate::reload,
                                        OnlineUpdate::signature_check );
       }
@@ -237,7 +239,7 @@ data is no longer needed. To delete this data, activate
         UI::ChangeWidget( `id(`log), `LastLine, _("\n") );
       
         string msg = sformat( _("Error downloading patch '%1'.
-Skip this patch or
+Try again to download patch, skip this patch or
 abort the update?
 "), patchName );
       
@@ -247,10 +249,14 @@ abort the update?
         if ( proceed == `abort ) return `abort;
       }
 
-      patch = Pkg::YouNextPatch();
+      skipMap[ patchName ] = proceed;
+
+      if ( proceed != `tryagain ) patch = Pkg::YouNextPatch();
     }
     
     UI::ChangeWidget( `id(`log), `LastLine, _("Download finished.\n\n") );
+
+    y2milestone( "Skip map: %1", skipMap );
 
     if ( stop ) {
       UI::ErrorPopup( _("Download failed.") );
@@ -266,56 +272,61 @@ abort the update?
       } else {
         while( size( patch ) != 0 ) {
           string patchName = lookup( patch, "name", "unknown" );
-        
-          UI::ChangeWidget( `id(`log), `LastLine,
-                            sformat ( _("Installing %1: \"%2\" "),
-                                patchName,
-                                lookup( patch, "summary", "no summary" ) ) );
 
-          string info = lookup( patch, "preinformation", "" );
+          if ( lookup( skipMap, patchName, `ok ) == `ok ) {
+            UI::ChangeWidget( `id(`log), `LastLine,
+                              sformat ( _("Installing %1: \"%2\" "),
+                                  patchName,
+                                  lookup( patch, "summary", "no summary" ) ) );
 
-          boolean install = true;
-          
-          if ( size( info ) != 0 ) {
-            install = YouMessagePopup( patch, true );
-          }
+            string info = lookup( patch, "preinformation", "" );
 
-          if ( !install ) {
-            UI::ChangeWidget( `id(`log), `LastLine, _("Skipped\n") );
-          } else {
-            string result = "skipped";
-            if ( proceed == `ok ) result = Pkg::YouInstallCurrentPatch();
+            boolean install = true;
 
-            if ( size( result ) == 0 ) {
-              UI::ChangeWidget( `id(`log), `LastLine, _("Ok\n") );
-              installedPatches = installedPatches + 1;
+            if ( size( info ) != 0 ) {
+              install = YouMessagePopup( patch, true );
+            }
 
-              info = lookup( patch, "postinformation", "" );
-              
-              if ( size( info ) != 0 ) {
-                YouMessagePopup( patch, false );
-              }
-            } else if ( result == "skipped" ) {
+            if ( !install ) {
               UI::ChangeWidget( `id(`log), `LastLine, _("Skipped\n") );
+              proceed = `skipped;
             } else {
-              
-              UI::ChangeWidget( `id(`log), `LastLine, _("Error\n") );
-              error = true;
+              string result = "skipped";
+              if ( proceed != `all ) {
+                result = Pkg::YouInstallCurrentPatch();
+              }
 
-              string msg = sformat( _("Error installing patch '%1'.
+              if ( size( result ) == 0 ) {
+                UI::ChangeWidget( `id(`log), `LastLine, _("Ok\n") );
+                installedPatches = installedPatches + 1;
 
-Skip this patch or abort
-the update?
-"), patchName );
+                info = lookup( patch, "postinformation", "" );
 
-              string errorMsg = Pkg::Error() + "\n" + Pkg::ErrorDetails();
+                if ( size( info ) != 0 ) {
+                  YouMessagePopup( patch, false );
+                }
+              } else if ( result == "skipped" ) {
+                UI::ChangeWidget( `id(`log), `LastLine, _("Skipped\n") );
+              } else {
 
-              proceed = UI::YouSkipPopup( msg, errorMsg );
-              if ( proceed == `abort ) return `abort;
+                UI::ChangeWidget( `id(`log), `LastLine, _("Error\n") );
+                error = true;
+
+                string msg = sformat( _("Error installing patch '%1'.
+
+  Skip this patch or abort
+  the update?
+  "), patchName );
+
+                string errorMsg = Pkg::Error() + "\n" + Pkg::ErrorDetails();
+
+                proceed = UI::YouSkipPopup( msg, errorMsg );
+                if ( proceed == `abort ) return `abort;
+              }
             }
           }
 
-          patch = Pkg::YouNextPatch();
+          if ( proceed != `tryagain ) patch = Pkg::YouNextPatch();
         }
 
         UI::ChangeWidget( `id(`log), `LastLine, _("Installation finished.\n") );

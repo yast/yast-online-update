@@ -161,7 +161,8 @@ UI(``{
         if ( type == `skip ) {
           buttons = `HBox(
                         detailsButton,
-                        `PushButton( `id( `ok ), _("Skip Patch") ),
+                        `PushButton( `id( `tryagain ), _("Try again") ),
+                        `PushButton( `id( `skip ), _("Skip Patch") ),
                         `PushButton( `id( `all ), _("Skip All") ),
                         `PushButton( `id( `abort ), _("Abort Update") )
                     );
@@ -191,7 +192,8 @@ UI(``{
         symbol ret = nil;
         boolean showDetails = false;
              
-        while( ret != `ok && ret != `all && ret != `abort ) {
+        while( ret != `ok && ret != `tryagain && ret != `all &&
+               ret != `abort && ret != `skip ) {
             ret = UserInput();
             
             if ( ret == `details ) {
