@@ -42,8 +42,6 @@
   // possible status information
   string ERROR = "error";
   string INSTALLED = "installed";
-  string LOAD	= "load";
-  string NEW = "new";
   
   user_settings = add(user_settings, "ftp_ok", true );
   
@@ -129,7 +127,7 @@ The ftp connection will be closed.
   UI(`ChangeWidget(`id(`id3), `Value, _(".........") ));
 
 
-  // Fake getting of patches for fake_mode
+  // Fake getting of patches for fake_mode (NOT USED)
   integer test_id = 0;
   define FakeGetPatch( string patch) ``{
       integer counter = 0;
@@ -203,6 +201,7 @@ The ftp connection will be closed.
 	  {
 	      // set status to error
 	      PKGINFO( `ftpChangePatchUpdateStatus( select(patch_list, index), ERROR ) );
+	      y2debug("ONLINE:  PKGINFO( `ftpChangePatchUpdateStatus(%1, %2)", select(patch_list, index), ERROR );
 	      user_settings = add(user_settings, "ftp_ok", false );
 	       
 	      // put logging into LogView Widget before showing popup
@@ -263,10 +262,10 @@ loaded patches or abort update completely." ), _("Warning"), _("&Install"), _("&
       list package_list = [];
       string pre_info = "";
       integer no = 1;
-      symbol ret = `ok;
-      boolean go_on = true;
       
       foreach ( `patch, patch_list, ``{
+	  any|symbol ret = nil;
+	  boolean go_on  = true;
 
 	  package_list = PKGINFO(`ftpGetPackages( patch ) );
 	  y2debug("ONLINE: PKGINFO(`ftpGetPackages( %1 )): %1", package_list );
@@ -276,28 +275,37 @@ loaded patches or abort update completely." ), _("Warning"), _("&Install"), _("&
 	  if ( pre_info != "" )
 	  {
 	      go_on = UI(`DisplayMsgFtp( pre_info, _("Warning"), _("&Install"), _("&Skip patch")));
+	      y2debug( "RREETTURRN: %1", go_on);
 	  }
 	  if ( go_on )
 	  {
 	      ret = CallFunction(`inst_rpmcopy(false, false, package_list ));
+	      y2debug("ONLINE: %1. call of inst_rpmcopy returns: %2", no, ret );
+	  }
+	  else
+	  {
+	    // set status to error
+	      PKGINFO( `ftpChangePatchUpdateStatus( patch, ERROR ) );
+	      y2debug("ONLINE:  PKGINFO( `ftpChangePatchUpdateStatus(%1, %2)", patch, ERROR );
+	      user_settings = add(user_settings, "ftp_ok", false );    
 	  }
 	  
-	  y2debug("ONLINE: %1. call of inst_rpmcopy returns: %2", no, ret );
 	  no = no+1;
-	  //});
       
 	  if (ret == `abort )
 	  {
 	       // set status to error
 	      PKGINFO( `ftpChangePatchUpdateStatus( patch, ERROR ) );
-	      user_settings = add(user_settings, "ftp_ok", true );
+	      y2debug("ONLINE:  PKGINFO( `ftpChangePatchUpdateStatus(%1, %2)", patch, ERROR );
+	      user_settings = add(user_settings, "ftp_ok", false );
 
 	      return `cancel;
 	  }
 	  else if ( ret == `next )
 	  {
 	      // set status to INSTALLED
-	      PKGINFO( `ftpChangePatchUpdateStatus( patch, INSTALLED ) );  
+	      PKGINFO( `ftpChangePatchUpdateStatus( patch, INSTALLED ) );
+	      y2debug("ONLINE:  PKGINFO( `ftpChangePatchUpdateStatus(%1, %2)", patch, INSTALLED );
 	  }
       });
       
@@ -427,14 +435,17 @@ Please try to get patches from another SuSE ftp server.")));
 	      }
 	      else if ( r == `abort  && UI(`ConfirmAbortUpdate(`incomplete)) )
 	      {
+		  // set CloseUpdate status to false (installation NOT complete)
+		  PKGINFO(`ftpCloseUpdate(false) );
 		  PKGINFO(`ftpDisconnect());
 		  y2debug("ONLINE:  PKGINFO(`ftpDisconnect()): %1", ret );
-		  return `abort;
+		  return `abort;	// abort update
 	      }
 	  }
       }
       else
       {
+	  // do not set the CloseUpdate status -> no patch is installed
 	  PKGINFO(`ftpDisconnect());
 	  y2debug("ONLINE:  PKGINFO(`ftpDisconnect()): %1", ret );
 	  return `abort;		// abort update  

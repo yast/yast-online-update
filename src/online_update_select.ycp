@@ -29,7 +29,6 @@
 {
     // Testmode
     boolean test_mode    = lookup ( user_settings, "test_mode", false );
-    boolean fake_mode    = lookup ( user_settings, "fake_mode", false );
     
     // map ftp_patches contains information about all available patches, e.g.
     //
@@ -138,8 +137,10 @@ downloaded nor installed.
 	ret= UI(`UserInput());
 
 	if ( ret == `abort && UI(`ConfirmAbortUpdate(`unusable)) )
+	{
+	    PKGINFO(`ftpDisconnect());
 	    return `abort;
-
+	}
 	if (ret == `patch_table || ret == `apply)
 	{
 	    any id = UI(`QueryWidget(`id(`patch_table), `CurrentItem ));

@@ -35,19 +35,10 @@
   map user_settings = $[];    
 
   
-  // set a "fake" mode (you must manually change flag fake_mode)
-  boolean fake_mode = false;
-
-  if (fake_mode)
-  {
-      user_settings = add(user_settings, "fake_mode", true );
-  }
-
   //
   // test_mode will be set, if menu is called with arg .test ( y2bignfat menu '(.test)' qt )
   //
   // test_mode means: get the ftp-patches, but do not install (inst_rpmcopy runs with test_mode)
-  // use fake_mode (see above) to run test with local test_data
   
   integer arg_n = size(Args()) - 1;
   boolean test_mode = false;
@@ -309,17 +300,9 @@ You will need to do the update again." );
   define ShowPatchInfo ( string patch_name ) ``{
 
       map info_map = $[];
-      if (!fake_mode)
-      {
-	  info_map = PKGINFO( `ftpGetPatchInformation( patch_name ));
-      }
-      else
-      {
-	  info_map = $["description":"Dies ist eine Testbeschreibung zu einem Testpatch",
-		      "packages": $["netscape.rpm":	["Netscape", "1.00-34324", "1.00-78789"],
-				   "xyz-hgjj-dfa.rpm":	["XYCYXCYXC", "1.00-34324", "1.00-78789"]]
-	  ];
-      }
+
+      info_map = PKGINFO( `ftpGetPatchInformation( patch_name ));
+
       string infotext = sformat("<p>%1</p><p>%2</p>", patch_name, lookup(info_map, "description", "") );
 
       list table_input = [];

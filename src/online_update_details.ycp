@@ -26,22 +26,11 @@
     ////////////////////////////////////////////////////////////
     // Testmode, for example fo screenshots
     boolean test_mode    = lookup ( user_settings, "test_mode", false );
-    boolean fake_mode    = lookup ( user_settings, "fake_mode", false );
   
     map last_status = $[];
 
     // get last update status from PKGINFO
-    if ( !fake_mode )
-    {
-	last_status = PKGINFO(`ftpLastUpdateStatus() );
-    }
-    else
-    {
-	last_status = $["date":"12.10.2000", "days":"25", "status":"ok",
-		       "patches":["patch-0-123", "recommended", "skdakdöak sdfsdfsdf", "30", "05.10.2000",
-				 "sec-fix-988", "security", "salöda dsösld alsdäladä", "25", "12.10.2000",
-				 "sec-fix-123", "security", "bbbbbbbb asdsfdf Cdsfdsf", "25", "12.10.2000" ]];
-    }
+    last_status = PKGINFO(`ftpLastUpdateStatus() );
 
 
     //////////////////////////////////////////////////////////////////////////////////////

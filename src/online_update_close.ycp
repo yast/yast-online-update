@@ -26,7 +26,6 @@
     ////////////////////////////////////////////////////////////
     // Testmode, for example fo screenshots
     boolean test_mode    = lookup ( user_settings, "test_mode", false );
-    boolean fake_mode    = lookup ( user_settings, "fake_mode", false );
 
 
     //////////////////////////////////////////////////////////////////////////////////////
@@ -71,7 +70,7 @@
     // helptext  update is finished 
     string help_part1 =  UI(_("<p>
 Online Update is finished.
-Your installation is update to date now.
+Your installation is up to date now.
 It is recommended to check if there are
 new patches available in regular periods.<br></p>"));
     string help_part2 =  UI(_("<p>
@@ -91,8 +90,10 @@ patches could not be installed.
 
      // changing Label to Finish for the last step
      UI(`ChangeWidget(`id(`next), `Label,  _("&Finish") ) );
+     UI(`ChangeWidget(`id(`abort), `Enabled,  false ) );
 
      // set status and close update
+     y2debug("ONLINE: close update with status: %1", lookup(user_settings, "ftp_ok", false) );
      any ret = PKGINFO(`ftpCloseUpdate( lookup(user_settings, "ftp_ok", false)) );
 
      // Show results
