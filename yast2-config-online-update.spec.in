@@ -14,7 +14,7 @@ Name:         @RPMNAME@
 Release:      1
 Copyright:    (c) 2000 SuSE GmbH
 Group:        System Environment/YaST
-Requires:	yast2-trans-online-update  yast2
+Requires:	yast2-trans-online-update  yast2  yast2-agent-you  yast2-agent-ftp  yast2-agent-http
 BuildArchitectures: noarch
 
 Packager:     @MAINTAINER@
@@ -58,6 +58,7 @@ make install
 @YAST2DIR@/clients/online_update_load.ycp
 @YAST2DIR@/clients/online_update_select.ycp
 @YAST2DIR@/clients/online_update_start.ycp
+@YAST2DIR@/modules/OnlineUpdate.ycp
 %doc @DOCDIR@
 
 %post
