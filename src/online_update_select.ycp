@@ -27,7 +27,9 @@
 */
 
 {
-    // Testmode
+  textdomain "online_update";
+  
+  // Testmode
     boolean test_mode    = lookup ( user_settings, "test_mode", false );
     
     // map ftp_patches contains information about all available patches, e.g.

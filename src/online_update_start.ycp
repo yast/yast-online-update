@@ -24,9 +24,11 @@
 */
 
 {
+  textdomain "online_update";
+   
   boolean test_mode    = lookup ( user_settings, "test_mode", false );
   
-   // constant settings
+  // constant settings
   include "suseservers.ycp";
 
   // ftp_server_map = $[ "server" : [ "path", "type" ], ... ]
@@ -39,283 +41,283 @@
   string ftp_dir = lookup(user_settings, "ftp_dir", "/pub/suse" );  
 
 
-    //////////////////////////////////////////////////////////////////////////////////////
-    //                                  P O P U P S                                     //
-    //////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////
+  //                                  P O P U P S                                     //
+  //////////////////////////////////////////////////////////////////////////////////////
 
 
-    /////////////////////////////////////////////////////////////////////////////////////
-    // MAIN:
-    /////////////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////////////
+  // MAIN:
+  /////////////////////////////////////////////////////////////////////////////////////
     
-    map last_status = $[];
-    string default_language = "en";
+  map last_status = $[];
+  string default_language = "en";
      
-    map lang2yast1 = ReadY2("lang2yast1.ycp");
+  map lang2yast1 = ReadY2("lang2yast1.ycp");
 
-    string language 	 = lookup( user_settings, "language", default_language );
-    string long_language = lookup(lang2yast1, language, "english");
+  string language 	 = lookup( user_settings, "language", default_language );
+  string long_language = lookup(lang2yast1, language, "english");
 
-    string architecture = lookup( user_settings, "architecture", "i386" );
+  string architecture = lookup( user_settings, "architecture", "i386" );
 
-    list ftp_server_list = [];
+  list ftp_server_list = [];
 
-    string reloadServer =  SCR(`Read(.rc.system.YAST2_LOADFTPSERVER));
+  string reloadServer =  SCR(`Read(.rc.system.YAST2_LOADFTPSERVER));
 
-    y2milestone ( "YAST2_LOADFTPSERVER = %1", reloadServer );
+  y2milestone ( "YAST2_LOADFTPSERVER = %1", reloadServer );
     
-    if ( reloadServer != "no" )
-    {
-	// getting ftp-server-description from www.suse.de
-	SCR (`Execute(.target.bash,"/bin/cp /etc/suseservers /etc/suseservers.bak" ));
-	string command = "/usr/bin/wget -q --output-document="+
-	    SCR(`Read(.target.root))+
-	    "/etc/suseservers --tries=2 --timeout=5 http://www.suse.de/de/support/download/suseservers.txt";
-	if ( Shell( command ) != 0  )      
-	{
-	    y2error("command: %1", command);
-	    SCR (`Execute(.target.bash,
-			  "/bin/cp /etc/suseservers.bak /etc/suseservers" ));
-	}
-	else
-	{
-	    y2milestone("command %1 ok", command);
-	}
-	SCR (`Execute(.target.remove,"/etc/suseservers.bak" ));	
-    }
+  if ( reloadServer != "no" )
+  {
+      // getting ftp-server-description from www.suse.de
+      SCR (`Execute(.target.bash,"/bin/cp /etc/suseservers /etc/suseservers.bak" ));
+      string command = "/usr/bin/wget -q --output-document="+
+	  SCR(`Read(.target.root))+
+	  "/etc/suseservers --tries=2 --timeout=5 http://www.suse.de/de/support/download/suseservers.txt";
+      if ( Shell( command ) != 0  )      
+      {
+	  y2error("command: %1", command);
+	  SCR (`Execute(.target.bash,
+			"/bin/cp /etc/suseservers.bak /etc/suseservers" ));
+      }
+      else
+      {
+	  y2milestone("command %1 ok", command);
+      }
+      SCR (`Execute(.target.remove,"/etc/suseservers.bak" ));	
+  }
 
-    map ftp_server_map = read_suseservers ();
+  map ftp_server_map = read_suseservers ();
 
-    // insert local server like CD, NFS ....
-    if ( ftp_server != "" && ftp_server != "ftp.suse.com" )
-    {
-	list ftp_dir_list = [];
-	ftp_dir_list = add ( ftp_dir_list, ftp_dir );
-	ftp_server_map = add(ftp_server_map, ftp_server, ftp_dir_list );
-    }
+  // insert local server like CD, NFS ....
+  if ( ftp_server != "" && ftp_server != "ftp.suse.com" )
+  {
+      list ftp_dir_list = [];
+      ftp_dir_list = add ( ftp_dir_list, ftp_dir );
+      ftp_server_map = add(ftp_server_map, ftp_server, ftp_dir_list );
+  }
     
-    foreach(`server, `info, ftp_server_map, ``{
-	ftp_server_list = add(ftp_server_list, server);
-    });
+  foreach(`server, `info, ftp_server_map, ``{
+      ftp_server_list = add(ftp_server_list, server);
+  });
 
-	// initialize PKGINFO
-	UI(`OpenDialog(`opt(`decorated ),`Label(_("Initializing for ftp update; One moment please..."))));
+  // initialize PKGINFO
+  UI(`OpenDialog(`opt(`decorated ),`Label(_("Initializing for ftp update; One moment please..."))));
   
-	any retval = PKGINFO(`ftpSetEnvironment( $["ftpserver":"",
-						   "language":long_language,
-						  "rootpath":rootpath,
-						  "architecture":architecture,
-						  "yastpath":yastpath,
-						  "logFilename":logpath,
-						  "patchpath":patchpath] ) );
+  any retval = PKGINFO(`ftpSetEnvironment( $["ftpserver":"",
+					    "language":long_language,
+					    "rootpath":rootpath,
+					    "architecture":architecture,
+					    "yastpath":yastpath,
+					    "logFilename":logpath,
+					    "patchpath":patchpath] ) );
 
-	y2debug( "ONLINE: Return  PKGINFO(`ftpsetEnvironment() %1", retval );
-	UI(`CloseDialog());
-	// Popup is shown if the yast2 component responsible for the ftp update cannot be initialised.
-	// This does not mean, connection failed to ftp server, but any other error occured.
-	if (!retval && UI(`MessagePopup(_("Initialisation of ftp server failed.\n
+  y2debug( "ONLINE: Return  PKGINFO(`ftpsetEnvironment() %1", retval );
+  UI(`CloseDialog());
+  // Popup is shown if the yast2 component responsible for the ftp update cannot be initialised.
+  // This does not mean, connection failed to ftp server, but any other error occured.
+  if (!retval && UI(`MessagePopup(_("Initialisation of ftp server failed.\n
 Please check www.suse.de
 for further information ."))) )
-	    return `abort;
+      return `abort;
      
-    // get last update status from PKGINFO
-	last_status = PKGINFO(`ftpLastUpdateStatus() );
+  // get last update status from PKGINFO
+  last_status = PKGINFO(`ftpLastUpdateStatus() );
 
-    y2debug("ONLINE: last update status: %1", last_status );
+  y2debug("ONLINE: last update status: %1", last_status );
           
-    // layout main dialog 
+  // layout main dialog 
 
-    term contents =
-	`VBox(
-	      `VSpacing( 0.3 ),
-	      `HBox(`HWeight(1, `Empty()),
-		    `HWeight(8, `Frame (_("Last update information"),
-					`VBox(`VSpacing(0.8),
-					      `HBox(`HSpacing(0.8),`Left(`Label( sformat(UI(_("Last update was executed\n %1 days ago.")),
-								    lookup( last_status, "days", "--" )))),
-						    `HSpacing(2.0),
-						    `PushButton( `id(`details), `opt(`notify), _("&Details"))
-						    ),
-					      `VSpacing(0.8)
-					      )
-					)),
-		    `HWeight(1, `Empty())
-		    ),
-	      `VSpacing(1.0),
-	      `HBox(`HWeight(1, `Empty()),
-		    `HWeight(8, `Frame (_("Choice of update mode"),
-					`RadioButtonGroup(`id(`choice),
-							  `VBox(
-								`VSpacing(0.3),
-								`HBox(`HSpacing(0.8),
-								      `Left(`RadioButton(`id(`automatic),`opt(`notify),
-											 _("&Automatic Update"), false) )
-								      ),
-								`VSpacing(0.3),
-								`HBox(`HSpacing(0.8),
-								      `Left(`RadioButton(`id(`manual),`opt(`notify),
-											 _("&Manual Update") ,  false))
-								      ),
-								`VSpacing(0.3) 
-								)
-							  )
-					)),
-		    `HWeight(1, `Empty())
-		    ),
-	      `VSpacing(1.0),	      
-	      `HBox(`HWeight(1, `Empty()),
-		    `HWeight(8, `Frame (_("Choice of installation-source"),
-					`RadioButtonGroup(`id(`choice),
-							  `VBox(
-								`VSpacing(0.3),
-								`HBox(`HSpacing(1.2),
-								      `Left(`ComboBox(`id(`ftp), _("Installation-source"), ftp_server_list )),
-								      `PushButton( `id(`expert), `opt(`notify), _("&Expert"))
-								      ),
-								`VSpacing(0.3) 
-								)
-							  )
-					)),
-		    `HWeight(1, `Empty())
-		    ),
-	      `VSpacing( 0.5 )
-	      );
+  term contents =
+      `VBox(
+	    `VSpacing( 0.3 ),
+	    `HBox(`HWeight(1, `Empty()),
+		  `HWeight(8, `Frame (_("Last update information"),
+				      `VBox(`VSpacing(0.8),
+					    `HBox(`HSpacing(0.8),`Left(`Label( sformat(UI(_("Last update was executed\n %1 days ago.")),
+										       lookup( last_status, "days", "--" )))),
+						  `HSpacing(2.0),
+						  `PushButton( `id(`details), `opt(`notify), _("&Details"))
+						  ),
+					    `VSpacing(0.8)
+					    )
+				      )),
+		  `HWeight(1, `Empty())
+		  ),
+	    `VSpacing(1.0),
+	    `HBox(`HWeight(1, `Empty()),
+		  `HWeight(8, `Frame (_("Choice of update mode"),
+				      `RadioButtonGroup(`id(`choice),
+							`VBox(
+							      `VSpacing(0.3),
+							      `HBox(`HSpacing(0.8),
+								    `Left(`RadioButton(`id(`automatic),`opt(`notify),
+										       _("&Automatic Update"), false) )
+								    ),
+							      `VSpacing(0.3),
+							      `HBox(`HSpacing(0.8),
+								    `Left(`RadioButton(`id(`manual),`opt(`notify),
+										       _("&Manual Update") ,  false))
+								    ),
+							      `VSpacing(0.3) 
+							      )
+							)
+				      )),
+		  `HWeight(1, `Empty())
+		  ),
+	    `VSpacing(1.0),	      
+	    `HBox(`HWeight(1, `Empty()),
+		  `HWeight(8, `Frame (_("Choice of installation-source"),
+				      `RadioButtonGroup(`id(`choice),
+							`VBox(
+							      `VSpacing(0.3),
+							      `HBox(`HSpacing(1.2),
+								    `Left(`ComboBox(`id(`ftp), _("Installation-source"), ftp_server_list )),
+								    `PushButton( `id(`expert), `opt(`notify), _("&Expert"))
+								    ),
+							      `VSpacing(0.3) 
+							      )
+							)
+				      )),
+		  `HWeight(1, `Empty())
+		  ),
+	    `VSpacing( 0.5 )
+	    );
     
-    string help_text = "";
+  string help_text = "";
 
-    // helptext dialog online update start screen 
-    string help_part1 =  UI(_("<p>
+  // helptext dialog online update start screen 
+  string help_part1 =  UI(_("<p>
 SuSE online update is the easy way to get all recommended
 patches and security fixes from SuSE ftp server.<br>
 <b>Automatic Update</b> will connect to the server,
 fetch the files and install the patches.</p>"));
     
-    string help_part2 =  UI(_("<p>
+  string help_part2 =  UI(_("<p>
 <b>Manual Update</b> will display all available patches
 and you can choose which patches should be installed.<br>
 Information about the last update will be shown
 if you click on the <b>Details</b> button.
 </p>"));
 
-    string help_part3 =  UI(_("<p>
+  string help_part3 =  UI(_("<p>
 If you click on button <b>Expert</b> you can select an local
 installation-source instead of a ftp-server or select another ftp-server.
 </p>"));
     
     
-    help_text = help_part1 + help_part2 + help_part3;
+  help_text = help_part1 + help_part2 + help_part3;
 			    
-    UI(`SetWizardContents(_("Welcome to SuSE Package Update"), contents, help_text, Args(0), Args(1) ));
+  UI(`SetWizardContents(_("Welcome to SuSE Package Update"), contents, help_text, Args(0), Args(1) ));
 
-    UI(`ChangeWidget(`id(`abort), `Label, _("&Abort Update")) );
+  UI(`ChangeWidget(`id(`abort), `Label, _("&Abort Update")) );
     
 
-    if ( lookup(user_settings, "ftp_auto", false ) )
-    {
-	UI(`ChangeWidget(`id(`automatic), `Value, true ));
-	UI(`ChangeWidget(`id(`manual), `Value, false ));
-    }
-    else
-    {
-	UI(`ChangeWidget(`id(`automatic), `Value, false ));
-	UI(`ChangeWidget(`id(`manual), `Value, true ));
-    }
+  if ( lookup(user_settings, "ftp_auto", false ) )
+  {
+      UI(`ChangeWidget(`id(`automatic), `Value, true ));
+      UI(`ChangeWidget(`id(`manual), `Value, false ));
+  }
+  else
+  {
+      UI(`ChangeWidget(`id(`automatic), `Value, false ));
+      UI(`ChangeWidget(`id(`manual), `Value, true ));
+  }
 
-    if ( ftp_server != "" )
-    {
-	UI(`ChangeWidget(`id(`ftp), `Value, ftp_server ));
-    }
+  if ( ftp_server != "" )
+  {
+      UI(`ChangeWidget(`id(`ftp), `Value, ftp_server ));
+  }
 
-    //  Loop for User Input ....
+  //  Loop for User Input ....
 
-    symbol ret = `next;
+  symbol ret = `next;
 
-    repeat
-    {
-        ret= UI(`UserInput());
+  repeat
+      {
+	  ret= UI(`UserInput());
 
-	if ( UI(`QueryWidget(`id(`automatic), `Value ) ) )
-	{
-	    user_settings = add (user_settings, "ftp_auto", true);
-	}
-	else
-	{
-	    user_settings = add (user_settings, "ftp_auto", false);
-	}
+	  if ( UI(`QueryWidget(`id(`automatic), `Value ) ) )
+	  {
+	      user_settings = add (user_settings, "ftp_auto", true);
+	  }
+	  else
+	  {
+	      user_settings = add (user_settings, "ftp_auto", false);
+	  }
 
-	// add ftp_server to user_settings
-	string ftp_server =  UI(`QueryWidget(`id(`ftp), `Value ));
-	user_settings = add(user_settings, "ftp_server", ftp_server);
+	  // add ftp_server to user_settings
+	  string ftp_server =  UI(`QueryWidget(`id(`ftp), `Value ));
+	  user_settings = add(user_settings, "ftp_server", ftp_server);
 	
-        if (ret == `next)
-        {
+	  if (ret == `next)
+	  {
 
-	    ftp_dir = select( lookup(ftp_server_map, ftp_server, []), 0 );
-	    user_settings = add(user_settings, "ftp_dir", ftp_dir);
+	      ftp_dir = select( lookup(ftp_server_map, ftp_server, []), 0 );
+	      user_settings = add(user_settings, "ftp_dir", ftp_dir);
 
-	    any retval = PKGINFO(`ftpSetServer( ftp_server,
-						ftp_dir ) );
-	    y2debug("ONLINE: PKGINFO(`setFtpServer( %1, %2 ) ): %3",
-		    ftp_server, ftp_dir, retval );
+	      any retval = PKGINFO(`ftpSetServer( ftp_server,
+						  ftp_dir ) );
+	      y2debug("ONLINE: PKGINFO(`setFtpServer( %1, %2 ) ): %3",
+		      ftp_server, ftp_dir, retval );
 		
-	    if (retval == nil || retval == false)
-	    {
-		UI(`DisplayMsgFtp(_(
-				    "Initialization failed - please try again.
+	      if (retval == nil || retval == false)
+	      {
+		  UI(`DisplayMsgFtp(_(
+				      "Initialization failed - please try again.
 If failure continues, please choose
 another SuSE ftp server.")));
-		ret = `again;
-	    }
+		  ret = `again;
+	      }
 		
 
-	}
-	else if ( ret == `details )
-	{
-	    any retval = CallFunction(`online_update_details( true, false ) );
-	    if ( retval == `abort )
-		return `abort;
+	  }
+	  else if ( ret == `details )
+	  {
+	      any retval = CallFunction(`online_update_details( true, false ) );
+	      if ( retval == `abort )
+		  return `abort;
 	    
-	    ret = `again;
-	}
-	else if ( ret == `expert )
-	{
-	    ftp_dir = select( lookup(ftp_server_map,
-						ftp_server, []), 0 );
+	      ret = `again;
+	  }
+	  else if ( ret == `expert )
+	  {
+	      ftp_dir = select( lookup(ftp_server_map,
+				       ftp_server, []), 0 );
 	    
-	    user_settings = add ( user_settings, "ftp_dir", ftp_dir );
-	    user_settings = add ( user_settings,"post_install", false );
-	    any retval = CallFunction(`inst_source( true, false ) );
-	    if ( retval == `abort )
-		return `abort;
+	      user_settings = add ( user_settings, "ftp_dir", ftp_dir );
+	      user_settings = add ( user_settings,"post_install", false );
+	      any retval = CallFunction(`inst_source( true, false ) );
+	      if ( retval == `abort )
+		  return `abort;
 
-	    ftp_server = lookup ( user_settings, "ftp_server", "" );
-	    ftp_dir = lookup ( user_settings, "ftp_dir", "" );
-	    any retval = PKGINFO(`ftpSetServer( ftp_server,
-						ftp_dir ) );
-	    y2debug("ONLINE: PKGINFO(`setFtpServer( %1,%2 ) ): %3", ftp_server,
-		    ftp_dir,
-		    retval );
+	      ftp_server = lookup ( user_settings, "ftp_server", "" );
+	      ftp_dir = lookup ( user_settings, "ftp_dir", "" );
+	      any retval = PKGINFO(`ftpSetServer( ftp_server,
+						  ftp_dir ) );
+	      y2debug("ONLINE: PKGINFO(`setFtpServer( %1,%2 ) ): %3", ftp_server,
+		      ftp_dir,
+		      retval );
 		
-	    if (retval == nil || retval == false)
-	    {
-		UI(`DisplayMsgFtp(_("Initialization failed - please try again.
+	      if (retval == nil || retval == false)
+	      {
+		  UI(`DisplayMsgFtp(_("Initialization failed - please try again.
 If failure continues, please choose
 another SuSE ftp server.")));
-	    }
-	    ret = `again;
-	}
-	else if ( ret == `back)
-	{
+	      }
+	      ret = `again;
+	  }
+	  else if ( ret == `back)
+	  {
 
-	}
-	else if ( ret == `abort && UI(`ConfirmAbortUpdate(`painless)) )
-	    return  `abort;
+	  }
+	  else if ( ret == `abort && UI(`ConfirmAbortUpdate(`painless)) )
+	      return  `abort;
 	
-  } until (ret == `back || ret == `next || ret == `again);
+      } until (ret == `back || ret == `next || ret == `again);
 
-    y2debug("Return START: %1", ret );
+  y2debug("Return START: %1", ret );
     
-   return ret;
+  return ret;
 }
 
 

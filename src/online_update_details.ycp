@@ -23,7 +23,9 @@
 */
 
 {
-    ////////////////////////////////////////////////////////////
+   textdomain "online_update";
+   
+  ////////////////////////////////////////////////////////////
     // Testmode, for example fo screenshots
     boolean test_mode    = lookup ( user_settings, "test_mode", false );
   

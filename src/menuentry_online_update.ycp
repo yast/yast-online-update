@@ -1,3 +1,14 @@
+/*
+ *
+ * Module:              menuentry_online_update.ycp
+ *
+ * Author:      	Gabriele Strattner (gs@suse.de)
+ *
+ * Purpose:		creates the entry in YaST2 Control Center
+ *
+ * $Id$
+ */
+
 {
   ////////////////////////////////////////////////////////////////////////////////////////
   // set the textdomain, (generally the name of the module for example "lan" for y2c_lan

@@ -33,7 +33,7 @@
   UI(`CreateWizardDialog());
 
   // dummy message, which will be used in the future, but have to be
-  // traslated into other languages.
+  // translated into other languages.
   string d1 = UI(_("Dailing...."));
   string d2 = UI(_("Hang up...."));
   string d3 = UI(_("Could not dial to internet. Please check your settings."));
@@ -56,7 +56,7 @@
   
   //
   // test_mode will be set, if menu is called with arg .test ( y2bignfat menu '(.test)' qt )
-  //
+  // or online_update is called directly ( /sbin/yast2 online_update '(.test)' ) 
   // test_mode means: get the ftp-patches, but do not install (inst_rpmcopy runs with test_mode)
   
   integer arg_n = size(Args()) - 1;
@@ -223,7 +223,7 @@ You will need to do the update again.");
 							 `header( _("Name"), _("Installed"), _("New Version"), _("Description") ),
 							 table_input
 							 )),
-				     `PushButton(`id(`ok_info), `opt(`default), _("&OK") )
+				     `PushButton(`id(`ok_info), `opt(`default), OKButtonLabel() )
 				     )
 			       )
 			 );

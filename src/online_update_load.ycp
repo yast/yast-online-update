@@ -21,6 +21,8 @@
 */
 
 {
+  textdomain "online_update";
+  
   // Testmode
   boolean test_mode    = lookup ( user_settings, "test_mode", false );
   
