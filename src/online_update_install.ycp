@@ -180,6 +180,11 @@ abort the update?"), patchName );
             if ( ok ) {
               UI::ChangeWidget( `id(`log), `LastLine, _("Ok\n") );
               installedPatches = installedPatches + 1;
+
+              info = lookup( patch, "postinformation", "" );
+              if ( size( info ) != 0 ) {
+                UI::MessagePopup( info );
+              }
             } else {
               UI::ChangeWidget( `id(`log), `LastLine, _("Error\n") );
               error = true;
@@ -190,11 +195,6 @@ the update?"), patchName );
 
               boolean proceed = UI::YouSkipPopup( msg, Pkg::Error() );
               if ( !proceed ) return `abort;
-            }
-
-            info = lookup( patch, "postinformation", "" );
-            if ( size( info ) != 0 ) {
-              UI::MessagePopup( info );
             }
           }
 
