@@ -183,7 +183,10 @@ packages were created by SuSE.
 
   UI::CloseDialog();
 
-  if ( result == `abort ) result = `auto; 
+//this is a no-op
+//
+// this file returns integer values, 0 for success, !=0 for failure
+//  if ( result == `abort ) result = `auto; 
 
-  return result;
+  return 0;
 }
