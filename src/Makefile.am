@@ -1,11 +1,13 @@
 #
-# Makefile.am for y2c_online_update/src
+# Makefile.am for online_update/src
 #
 
 etcdir = /etc
 admdir = /var/adm/fillup-templates
+yncludedir = @yncludedir@/onlineupdate
 
 etc_DATA = suseservers
+
 adm_DATA = sysconfig.onlineupdate
 
 client_DATA =				\
@@ -26,4 +28,8 @@ config_DATA =			\
 image_DATA =			\
 	online_update_long.png
 
-EXTRA_DIST = $(client_DATA) $(module_DATA) $(config_DATA) $(etc_DATA) $(adm_DATA) $(image_DATA)
+ynclude_DATA =			\
+	suseservers.ycp
+
+EXTRA_DIST = $(client_DATA) $(module_DATA) $(config_DATA) $(etc_DATA)	\
+	$(adm_DATA) $(image_DATA) $(ynclude_DATA)

@@ -1,5 +1,5 @@
 /**
- * File:	include/onlineupdate/suseservers.ycp
+ * File:	include/online-update/suseservers.ycp
  * Package:	Online update
  * Summary:	/etc/suseservers routines
  * Authors:	Gabriele Strattner <gs@suse.de>

@@ -19,7 +19,7 @@
 
   boolean business	= false;
 
-  include "onlineupdate/suseservers.ycp";
+  include "online-update/suseservers.ycp";
 
   // you_server_map = $[ "server" : [ "path", "type" ], ... ]
 
