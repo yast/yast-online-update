@@ -9,9 +9,13 @@
  *
  * Author:        Gabriele Strattner <gs@suse.de>
  *
- * Purpose:
- *
- * Modify:
+ * Purpose:	Dialog displays a list with all available patches.
+ *		The user can select or deselect patches for download.
+ *		Patches marked with "X" will be installed afterwards,
+ *		patches marked with "G" will be downloaded, but not
+ *		installed because they are not relevant for the system.
+ *		
+ * Modify:	
  *
  * external function:
  *
@@ -25,25 +29,47 @@
 {
     // Testmode
     boolean test_mode    = lookup ( user_settings, "test_mode", false );
+    
+    // map ftp_patches contains information about all available patches, e.g.
+    //
+    // $["patch-001":["rec", "Patch for NFS server", "234", "X"],
+    //   "patch-002":["rec", "Noch ein weiterer patch", "565", " "]];
+    //
+    // status information from all patches must be stored, because if the user
+    // deselects a patch and selects it again we must know whether it was "X" or "G"
+    map all_patches = lookup( user_settings, "ftp_patches", $[] );
 
+    // if the user doesn't do any changes, get all patches
+    map get_patches = all_patches;
+    
     //////////////////////////////////////////////////////////////////////////////////////
     //  Popups and Defines			                                        //
     //////////////////////////////////////////////////////////////////////////////////////
 
+    // update map get_patches and change status in list
 
+    define UpdateGetPatches ( string pname, string pstatus ) ``{
+
+	maplist ( `patch, `value,  get_patches, ``(
+	              {  if ( patch == pname )
+		      {
+			  UI( `ChangeWidget(`id(`patch_table), `Item( patch, 0 ), sformat( " %1 ", pstatus )) );
+			  get_patches = add( get_patches, patch, [select(value, 0), select(value,1), select(value,2 ), pstatus] );
+		      }
+		      }));
+    };
+    
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     // MAIN:
     /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    //
-    // Map contains information about all new patches, e.g.
-    // $["patch-001":["rec", "Patch for NFS server", "03:56", "X"],
-    //   "patch-002":["rec", "Noch ein weiterer patch", "02:56", " "]];
-    //
-    map new_patches = lookup( user_settings, "ftp_patches", $[] );
+  
     
-    list table_contents = maplist( `key, `value,
-				   new_patches,
+    // create table input, e.g.
+    // [`item(`id(patch-001), " X ", "rec", "03:56", "Patch for NFS server"),
+    //  `item(`id(patch-002), "   ", "rec", "02:56", "Noch ein weiterer patch") ];
+    //
+    list table_contents = maplist( `key, `value, all_patches,
 				   ``(`item(`id(key),
 					    sformat( " %1 ", select(value, 3) ),
 					    select(value,0),
@@ -53,15 +79,11 @@
 				      )
 				   );
 
-//[ `item(`id(1), " X ", "Security", "234 KB", "Security fix for Netscape"),
-//  `item(`id(2), " X ", "YaST2", "500 KB", "YaST2 advanced Net module"),
-//  `item(`id(3), "   ", "IMAP", "100 KB", "IMAP Server") ];
-
     term contents =
 	    // main dialog: 
 	`VBox(
 	      `VSpacing( 0.2 ),
-	       `Table(`id(`table),`opt(`hvstretch, `shrinkable), 
+	       `Table(`id(`patch_table),`opt(`notify, `immediate, `hvstretch), 
 		      `header( " ", _("Patch"), _("Mode"), _("Download"), _("Description") ),
 		      table_contents
 			      ),
@@ -76,7 +98,7 @@
     string help_part1 =  UI("<p>This dialog shows all patches which are
 available for download on SuSE ftp server.<br>
 The shortcut \"rec\" means it is recommended to install the patch.
-\"sec\" is a security patch and is highly recommended to install it.
+\"sec\" is a security patch and it is highly recommended to install it.
 </p>");
     string help_part2 =  UI("<p>Meaning of the status flags:</p>
 <p>
@@ -97,39 +119,69 @@ downloaded nor installed.
 
     help_text = help_part1 + help_part2 + help_part3;
     
-     // using SetContents (define in online_update.ycp)
-     UI(`SetWizardContents(_("List of available patches"), contents, help_text, Args(0), Args(1) ));
+    // using SetContents (define in online_update.ycp)
+    UI(`SetWizardContents(_("List of available patches"), contents, help_text, Args(0), Args(1) ));
 
       
-   ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-   ////  Loop for User Input ....
-   ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////  Loop for User Input ....
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     symbol ret = `next;
 
-    repeat
-    {
-        ret= UI(`UserInput());
+    repeat {
+
+	ret= UI(`UserInput());
 
 	if ( ret == `abort && UI(`ConfirmAbortUpdate(`unusable)) )
-	      return `abort;
+	    return `abort;
 
+	if (ret == `patch_table)
+	{
+	    any id = UI(`QueryWidget(`id(`patch_table), `CurrentItem ));
+	    term  patch_info = UI( `QueryWidget(`id(`patch_table), `Item(id)) );
+	    y2debug("PATHCHINFO: %1", patch_info);
+
+	    string patch_name = select(patch_info, 3);
+	    y2debug("Status of selected patch %1: %2",  patch_name, select( lookup( all_patches, patch_name, []), 3 ));
+
+	    if ( select( patch_info, 1 ) == " X " || select( patch_info, 1 ) == " G " )
+	    {
+		// mark patch deselected
+		UpdateGetPatches( patch_name, " " );
+	    }
+	    else if ( select( lookup( all_patches, patch_name, []), 3 ) == "X" )
+	    {
+                // was "X" before -> mark with "X" again
+		UpdateGetPatches( patch_name, "X" ); 
+	    }
+	    else if ( select( lookup( all_patches, patch_name, []), 3 ) == "G" )
+	    {
+		// was "G" before -> mark with "G" again
+		UpdateGetPatches( patch_name, "G" ); 
+	    }
+	}
+	
 	if (ret == `next)
-        {
+	{
+	    y2debug("ONLINE: get patches: %1", get_patches );
+
+	    user_settings = add(user_settings, "ftp_patches", get_patches);
+	    
 	    // Write all patches marked with "X" to user_settings
 	    // TODO: unterscheiden NUR download ( installieren )
 	}
 
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////
-        ////  
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////  
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	if ( ret == `back)
 	{
 
 	}
 
-  } until (ret == `next || ret == `back || ret == `cancel);
+    } until (ret == `next || ret == `back || ret == `cancel || ret == `abort);
     
    return ret;
 }

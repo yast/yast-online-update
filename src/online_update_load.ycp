@@ -73,7 +73,7 @@
 	    `LogView(`id(`log),
 		     "Information about the activities",
 		     5,	// visible lines
-		     100),	// lines to store,
+		     500),	// lines to store,
 	    `VSpacing( 0.2 )
 	    );
 
@@ -114,7 +114,7 @@ closed.
       string log = "";
       map result = $[];
       
-      while (counter < 300)
+      while (counter < 100)
       {
 	  counter = counter + 1;
 	  UI(`ChangeWidget(`id(`log), `LastLine, "Neue Zeile ........\n" ));
@@ -155,45 +155,51 @@ closed.
       while ( index < size(patch_list) && go_on )
       {
 	  map result_map = $[];
+	  string patch =  select(patch_list, index);
+	  y2debug("Status of patch %1: %2", patch, select( lookup(new_patches, patch, []), 3 ));
+	  
+          // only get the patch if marked with "X" or "G" 
+	  if ( select ( lookup(new_patches, patch, []), 3 ) == "X" || select ( lookup(new_patches, patch, []), 3 ) == "G")
+	  {
+	      if ( !test_mode )
+	      {
+		  result_map = PKGINFO( `ftpGetPatch( select(patch_list, index) ) );
+		  y2debug("ONLINE: Get patch %1: %2", select(patch_list, index), retval );
+	      }
+	      else
+	      {
+		  result_map = FakeGetPatch( select(patch_list, index) );
+	      }
 
-	  if ( !test_mode )
-	  {
-	      result_map = PKGINFO( `ftpGetPatch( select(patch_list, index) ) );
-	      y2debug("ONLINE: Get patch %1: %2", select(patch_list, index), retval );
-	  }
-	  else
-	  {
-	      result_map = FakeGetPatch( select(patch_list, index) );
-	  }
-
-	  if ( !lookup(result_map, "ok", false) )
-	  {
-	      string msg_str = sformat(UI(_("Can't get patch \"%1\" from
+	      if ( !lookup(result_map, "ok", false) )
+	      {
+		  string msg_str = sformat(UI(_("Can't get patch \"%1\" from
 server \"%2\".
 Try to get remaining patches.")), select(patch_list, index), ftp_server );
 	      
-	      UI(`DisplayMsgFtp( msg_str, _("Notify") ));
-	      // TODO: Popup mit 2 Buttons OK -> weiter, Cancel Abbruch
-	  }
-	  else
-	  {
-	      // add patch to result list of successfully got patches
-	      ret_list = add( ret_list, select(patch_list, index) );
-	  }
+		  UI(`DisplayMsgFtp( msg_str, _("Notify") ));
+		  // TODO: Popup mit 2 Buttons OK -> weiter, Cancel Abbruch
+	      }
+	      else if ( select ( lookup(new_patches, patch, []), 3 ) == "X" )
+	      {
+		  // patches marked with "X" will be installed
+		  ret_list = add( ret_list, select(patch_list, index) );
+	      }
 
-          // put logging into LogView Widget
-	  UI(`ChangeWidget(`id(`log), `LastLine, lookup(result_map, "message", "" )) ); 
-	  index = index+1;
+	      // put logging into LogView Widget
+	      UI(`ChangeWidget(`id(`log), `LastLine, lookup(result_map, "message", "" )) ); 
 
-	  // Polling input to give the user a chance to stop the download  
-	  any r = UI(`PollInput());
+	      // Polling input to give the user a chance to stop the download  
+	      any r = UI(`PollInput());
 
-	  if ( r == `abort && UI(`DisplayMsgFtp( _("Download of patches will be stopped.
+	      if ( r == `abort && UI(`DisplayMsgFtp( _("Download of patches will be stopped.
 Continue to install already loaded patches" ), _("Warning")) ) )
-	  {
-	      go_on = false;
+	      {
+		  go_on = false;
+	      }
 	  }
-      };
+	  index = index+1;
+      }
 
       return ret_list;
   };
@@ -285,24 +291,26 @@ Please try to get patches from another SuSE ftp server.")));
   {
       UI(`ChangeWidget(`id(`log), `LastLine, "Starting download of patch descriptions from ftp server.\n" ));
 
-      new_patches = $["patch-001":["rec", "Patch for NFS server", "03:56", "X"],
-		      "patch-002":["rec", "Noch einweiterer patch", "02:56", " "],
-		      "patch-003":["sec", "Security dfsdkfö", "02:12", "X"],
-		      "patch-004":["sec", "Nochmal security", "02:01", "X"] ];
+      new_patches = $["patch-001":["rec", "Patch for NFS server", "234", "G"],
+		      "patch-002":["rec", "Noch einweiterer patch", "2344", " "],
+		      "patch-003":["sec", "Security dfsdkfö", "45355", "G"],
+		      "patch-004":["sec", "Nochmal security", "34", "X"],
+		      "patch-005":["sec", "Nochmal security", "3444", "X"]
+		     ];
       UI(`ChangeWidget(`id(`log), `LastLine, "Download successful - got patch descriptions.\n" )); 
   }
 		     
   if ( auto_mode )
   {
       // get the patches
-      list got_patches = GetAllPatches( new_patches );
+      list install_patches = GetAllPatches( new_patches );
 
-      if ( got_patches != `cancel )
+      if ( install_patches != `cancel )
       {
-	  y2debug( "ONLINE: automatic mode, installing: %1", got_patches );
+	  y2debug( "ONLINE: automatic mode, installing: %1", install_patches );
 
-	  // go on and install all available patches in auto_mode
-	 any ret = InstallPatches( got_patches );
+	 // go on and install all available patches in auto_mode
+	 any ret = InstallPatches( install_patches );
 	 return `next;
       }
       else
@@ -331,27 +339,30 @@ Please try to get patches from another SuSE ftp server.")));
   else if ( continue_mode )
   {
       // get selected patches (written to user_settings from online_update_select)
-      map install_patches = lookup( user_settings, "ftp_patches", $[] );
+      map get_patches = lookup( user_settings, "ftp_patches", $[] );
 
-      list got_patches = GetAllPatches( install_patches );
+      list install_patches = GetAllPatches( get_patches );
 
-      if ( got_patches != `cancel )
+      if ( install_patches != `cancel )
       {
-	  y2debug( "ONLINE: manual mode, installing: %1", got_patches );
+	  y2debug( "ONLINE: manual mode, installing: %1", install_patches );
 
-	  any r = UI(`UserInput());
-	  if ( r == `next )
+	  while (true)
 	  {
-	      // install selected patches
-	      any ret = InstallPatches( got_patches );
-	      return `next;
+	      any r = UI(`UserInput());
+	      if ( r == `next )
+	      {
+		  // install selected patches
+		  any ret = InstallPatches( install_patches );
+		  return `next;
+	      }
+	      else if ( r == `abort  && UI(`ConfirmAbortUpdate(`incomplete)) )
+		  return `abort;
 	  }
-	  else if ( r == `abort  && UI(`ConfirmAbortUpdate(`incomplete)) )
-	      return `abort;
       }
       else
       {
-	//PKGINFO(`ftpCloseConnection());
+	  PKGINFO(`ftpCloseConnection());
 	  return `abort;		// abort update  
       }
   }
