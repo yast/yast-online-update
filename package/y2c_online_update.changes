@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Jan  4 16:46:49 MET 2001 - schubi@suse.de
+
+- ftp-update via modem and isdn 
+
+-------------------------------------------------------------------
 Thu Jan  4 10:02:12 MET 2001 - schubi@suse.de
 
 - bugfix in pgp-key checking 

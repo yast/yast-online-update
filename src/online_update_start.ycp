@@ -45,6 +45,54 @@
     //                                  P O P U P S                                     //
     //////////////////////////////////////////////////////////////////////////////////////
 
+  //
+  // Checking connection to ftp-server
+  //
+  define checkConnection( string ftpServer )``{
+      y2debug("Checking connection to  %1", ftpServer );
+
+      if ( ftpServer == "local" ||
+	   ftpServer == "Net" ||
+	   ftpServer == "CD" ||
+	   ftpServer == "Harddisk" )
+      {
+	  return  true ;
+      }
+      
+      integer ret_shell = SCR(`Execute(.target.bash,
+				       "/bin/ping -c 1 -q -w 5 " +
+				       ftpServer ));
+      y2milestone ( "command: /bin/ping -c 1 -q -w 5  %1 return %2",
+		    ftpServer, ret_shell );
+      any ret = true;
+      
+      while ( ret_shell != 0 &&
+	      ret == true )
+      {
+	  string message = UI(_("There is no connection to network; please connect manually."));
+
+	  ret = UI(`DisplayMsgFtp( message, _("Connect error"),
+				   _("&ok"), _("&cancel") ));
+	  if ( ret )
+	  {
+	      ret_shell = SCR(`Execute(.target.bash,
+				       "/bin/ping -c 1 -q -w 5 " +
+				       ftpServer ));
+	      y2milestone ( "command: /bin/ping -c 1 -q -w 5  %1 return %2",
+			    ftpServer, ret_shell );
+	      
+	  }
+      }
+
+      if ( ret_shell != 0 )
+      {
+	  return  false;
+      }
+      else
+      {
+	  return true;
+      }
+  };
 
 
     /////////////////////////////////////////////////////////////////////////////////////
@@ -78,8 +126,8 @@
 	// initialize PKGINFO
 	UI(`OpenDialog(`opt(`decorated ),`Label(_("Initializing for ftp update; One moment please..."))));
   
-	any retval = PKGINFO(`ftpSetEnvironment( $["ftpserver":ftp_server,
-						  "language":long_language,
+	any retval = PKGINFO(`ftpSetEnvironment( $["ftpserver":"",
+						   "language":long_language,
 						  "rootpath":rootpath,
 						  "architecture":architecture,
 						  "yastpath":yastpath,
@@ -227,19 +275,27 @@ installation-source instead of a ftp-server or select another ftp-server.
         {
 
 	    ftp_dir = select( lookup(ftp_server_map, ftp_server, []), 0 );
-	    user_settings = add(user_settings, "ftp_dir", ftp_dir); 
-	      
-	    any retval = PKGINFO(`ftpSetServer( ftp_server,
-						ftp_dir ) );
-	    y2debug("ONLINE: PKGINFO(`setFtpServer( %1, %2 ) ): %3",
-		    ftp_server, ftp_dir, retval );
-		
-	    if (retval == nil || retval == false)
+	    user_settings = add(user_settings, "ftp_dir", ftp_dir);
+
+	    if ( checkConnection(ftp_server) )
 	    {
-		UI(`DisplayMsgFtp(_("Initialization failed - please try again.
+		any retval = PKGINFO(`ftpSetServer( ftp_server,
+						ftp_dir ) );
+		y2debug("ONLINE: PKGINFO(`setFtpServer( %1, %2 ) ): %3",
+			ftp_server, ftp_dir, retval );
+		
+		if (retval == nil || retval == false)
+		{
+		    UI(`DisplayMsgFtp(_(
+				"Initialization failed - please try again.
 If failure continues, please choose
 another SuSE ftp server.")));
-		ret = `again;
+		    ret = `again;
+		}
+	    }
+	    else
+	    {
+		    ret = `again;		
 	    }
 	}
 	else if ( ret == `details )
