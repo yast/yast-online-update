@@ -399,10 +399,20 @@ another SuSE FTP/HTTP server.\n"));
 	  you_dir 	 = select( lookup(you_server_map, you_server, ["",""]), 0, "" );
 	  you_serverkind = select( lookup(you_server_map, you_server, ["",""]), 1, "" );
 
+	  // possible values for yast2-agent-you:
+	  // "ftp", "FTP", "http", "HTTP", "cd", "CD", "harddisk", "Harddisk", "local", "nfs", "Net", ""
+	  
           // set install information for inst_source  
+	  if ( you_serverkind == "cd" || you_serverkind == "harddisk" )
+	  {
+	      Mode::youInstallMap["you_server"] = you_serverkind; 
+	  }
+	  else
+	  {
+	      Mode::youInstallMap["you_server"]	= you_server;
+	  }
 	  Mode::youInstallMap["you_dir"] 	= you_dir;
 	  Mode::youInstallMap["you_serverkind"] = you_serverkind;
-	  Mode::youInstallMap["you_server"]	= you_server;
 	  
 	  any retval = CallFunction(`inst_source( true, true ) );
 	  if ( retval == `abort )
