@@ -21,7 +21,7 @@ Packager:     @MAINTAINER@
 
 Summary:      YaST2 Modules for installation
 Version:      @VERSION@
-Source0:      @RPMNAME@-@VERSION@.tar.gz
+Source0:      @RPMNAME@-@VERSION@.tar.bz2
 
 %description
 -
@@ -46,5 +46,9 @@ make install
 %dir @YAST2DIR@/clients
 %dir @YAST2DIR@/menuentries
 @YAST2DIR@/menuentries/menuentry_online_update.ycp
-@YAST2DIR@/clients/online_update_step1.ycp
 @YAST2DIR@/clients/online_update.ycp
+@YAST2DIR@/clients/online_update_close.ycp
+@YAST2DIR@/clients/online_update_details.ycp
+@YAST2DIR@/clients/online_update_load.ycp
+@YAST2DIR@/clients/online_update_select.ycp
+@YAST2DIR@/clients/online_update_start.ycp

@@ -1,9 +1,14 @@
 -------------------------------------------------------------------
+Thu Dec  7 13:29:18 CET 2000 - arvin@suse.de
+
+- use bz2 instead of gz
+
+-------------------------------------------------------------------
 Wed Nov 29 14:24:25 MET 2000 - gs@suse.de
 
 - version 1.0.1 - runs initially - but needs more testing 
 
 -------------------------------------------------------------------
-0 - gs@suse.de
+Sun Nov 17 12:00:00 MET 2000 - gs@suse.de
 
 - initial version
