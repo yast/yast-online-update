@@ -621,9 +621,8 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
 
   if ( !continue_mode )
   {
-      // The patch-list only have to get from ftp-server in the
-      // first call.
-      
+      // The patch-list only has to loaded from ftp-server when module is called first time 
+
       string connect_string = sformat( UI(_("Starting download of patch descriptions from %1.\n")), ftp_server );
       UI(`ChangeWidget(`id(`log), `LastLine, connect_string ));
 
@@ -642,8 +641,21 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
 
       if (success)
       {
-	  // TODO: remove all patches with status .new or .error
-	  //       e.g. /var/lib/YaST/patches/i386/7.1/patches/mysql-1.20010404.new
+	  // Remove all patches with status .new or .error, because we want to download
+	  // the actual (possibly improved) descriptions from server
+	 
+	  // $[ "installedVersion":"SuSE 6.3", "updateVersion":"SuSE 6.4" ]
+	  map versions = PKGINFO(`readVersions());
+	  string version = lookup( versions, "installedVersion", "" );
+	  string patch_path = sformat("/var/lib/YaST/patches/%1/update/%2/patches/",
+				      lookup(user_settings, "architecture", "i386"),
+      				      substring( version, size(version)-7, 3 ) );
+	  
+	  string rm_files = patch_path + "*.new";
+	  y2debug("ONLINE: patch file path %1", patch_path);
+	  integer ret = SCR(`Execute(.target.bash, sformat("rm -rf %1", rm_files )));
+	  rm_files = patch_path + "*.error";
+	  SCR(`Execute(.target.bash, sformat("rm -rf %1", rm_files )));
 	  
 	  UI(`ChangeWidget(`id(`status), `Value, _("active")) );
 	  while (go_on)
