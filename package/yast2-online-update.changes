@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Feb 10 17:24:54 CET 2003 - cschum@suse.de
+
+- Return `auto instead of `abort, when user cancels update.
+- If download of mirror list fails, give user the choice to
+  continue or abort.
+
+-------------------------------------------------------------------
 Fri Feb  7 16:03:37 CET 2003 - cschum@suse.de
 
 - Return correct return value when module is finished.

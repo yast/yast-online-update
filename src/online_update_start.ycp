@@ -176,24 +176,27 @@ the update takes place.
     string err = Pkg::YouGetServers( you_server_list );
     if ( size( err ) != 0 ) {
       y2error( "Get Servers: %1", err );
+      symbol result = `ok;
       if ( err == "get" ) {
-        UI::YouErrorPopup( sformat( _("Cannot connect to %1. Check your connection."),
-                                    mirrorListServer ),
-                           Pkg::ErrorDetails() );
+        result = UI::YouIgnorePopup( sformat( _("Cannot connect to %1. Check your connection."),
+                                              mirrorListServer ),
+                                     Pkg::ErrorDetails() );
       } else if ( err == "read" ) {
-        UI::ErrorPopup( _("Unable to read server list from disk.") );
+        result = UI::YouIgnorePopup( _("Unable to read server list from disk."),
+                                     Pkg::ErrorDetails() );
       } else if ( err == "write" ) {
-        UI::ErrorPopup( _("Could not write server list to disk.") );
+        result = UI::YouIgnorePopup( _("Could not write server list to disk."),
+                                     Pkg::ErrorDetails() );
       } else {
-        UI::ErrorPopup(_("Error getting servers."));
+        result = UI::YouIgnorePopup( _("Error getting servers."),
+                                     Pkg::ErrorDetails() );        
       }
-      return `abort;
+      if ( result == `abort ) return result;
     }
   }
 
   if ( size( you_server_list ) == 0 ) {
-    UI::ErrorPopup( _("No YOU server available.") );
-    return `abort;
+    UI::WarningPopup( _("No YOU server available.") );
   }
 
   UI::CloseDialog();
