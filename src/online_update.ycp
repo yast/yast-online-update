@@ -16,6 +16,7 @@
   import "OnlineUpdateCallbacks";
   import "Version";
   import "Wizard";
+  import "GetInstArgs";
 
   string version = Version::yast2;
 
@@ -131,7 +132,7 @@ packages were created by SuSE.
     [ "online_update_start", [ false, true ], `always ],
     [ "online_update_select", [ false, true ], `manual ],
     [ "online_update_install", [ false, true ], `always ],
-    [ "inst_suseconfig", [ false, false ], `always ]
+    [ "inst_suseconfig", [GetInstArgs::Buttons(false,false) ], `always ]
   ];
 
   integer id = 0;
