@@ -372,8 +372,9 @@ without the need of user interaction.</p>
   Wizard::SetContents( _("Welcome to YaST Online Update"), contents, help_text,
                        false, true );
 
-  // sh: We now consistently use "Abort" everywhere.
-  // Wizard::SetAbortButton( `abort, _("&Abort Update") );
+  Wizard::SetNextButton(`next, Label::NextButton() );
+  Wizard::DisableBackButton();
+  Wizard::EnableAbortButton();
 
   UI::ChangeWidget( `id(`server), `Value, 1 );
 
