@@ -1,7 +1,8 @@
 -------------------------------------------------------------------
 Mon Apr  5 09:48:21 CEST 2004 - gs@suse.de
 
-- fixed cd_update.desktop for ncurses menu (bug #38088) 
+- fixed cd_update.desktop for ncurses menu (bug #38088)
+- V 2.9.11 
 
 -------------------------------------------------------------------
 Fri Apr 02 15:59:59 CEST 2004 - arvin@suse.de
