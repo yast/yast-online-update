@@ -22,8 +22,16 @@
     if (!Mode::test)
         already_up = Internet::Status ();
 
+    boolean i_set_demand = false;
+
     if (!already_up)
     {
+	if (!Internet::demand)
+	{
+	    Internet::SetDemand (true);
+	    i_set_demand = true;
+	}
+
 	Internet::Start ();
 
 	integer i = 150;
@@ -45,6 +53,11 @@
     if (!already_up)
     {
 	Internet::Stop ();
+
+	if (i_set_demand)
+	{
+	    Internet::SetDemand (false);
+	}
     }
 
     return ret;
