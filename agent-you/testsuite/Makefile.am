@@ -9,7 +9,7 @@ INCLUDES = -I$(includedir)
 noinst_PROGRAMS = runyou
 runyou_SOURCES = runyou.cc
 
-runyou_LDADD = -lpkg -lscr -ly2 -lycp -lcrypt
+runyou_LDADD = -lpkg -lscr -ly2 -lycp
 runyou_LDFLAGS = -L$(libdir)		\
 	-Xlinker --whole-archive	\
 	$(plugindir)/libpy2stdio.la	\
