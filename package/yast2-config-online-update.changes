@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Apr 30 15:29:43 MEST 2001 - gs@suse.de
+
+- name is: Patch CD Update, popup text changed again (bug 6796)
+
+-------------------------------------------------------------------
 Thu Apr 26 17:50:12 MEST 2001 - gs@suse.de
 
 - special icon for CD update
