@@ -21,3 +21,4 @@ missing
 mkinstalldirs
 online-update.pot
 stamp-h*
+Makefile.am.common
