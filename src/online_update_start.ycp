@@ -314,30 +314,36 @@ the update takes place.");
     map server = $[ "url": you_url ];
     you_server_list = add( you_server_list, server );
   } else {
-    string err = Pkg::YouGetServers( you_server_list );
-    if ( size( err ) != 0 ) {
-      y2error( "Get Servers: %1", err );
-      symbol result = `ok;
-      if ( err == "get" ) {
-        result = UI::YouIgnorePopup( sformat( _("Cannot connect to %1. Check your connection."),
-                                              mirrorListServer ),
-                                     Pkg::ErrorDetails() );
-      } else if ( err == "read" ) {
-        result = UI::YouIgnorePopup( _("Unable to read server list from disk."),
-                                     Pkg::ErrorDetails() );
-      } else if ( err == "write" ) {
-        result = UI::YouIgnorePopup( _("Could not write server list to disk."),
-                                     Pkg::ErrorDetails() );
+    symbol result = `retry;
+    do {
+      string err = Pkg::YouGetServers( you_server_list );
+      if ( size( err ) == 0 ) {
+        result = `ok;
       } else {
-        result = UI::YouIgnorePopup( _("Error getting servers."),
-                                     Pkg::ErrorDetails() );        
-      }
-      if ( result == `abort ) return result;
-    }
-  }
+        y2error( "Get Servers: %1", err );
+        if ( err == "get" ) {
+          string text = _("Cannot fetch remote server list. Only user-defined patch
+sources will be available.
 
-  if ( size( you_server_list ) == 0 ) {
-    Popup::Warning( _("No YOU server available.") );
+Possible solution:
+Check network connection.
+");
+          result = UI::YouIgnoreWarningPopup( text,
+                                              sformat( _("URL: %1"), mirrorListServer ) + "<br>" +
+                                              Pkg::ErrorDetails() );
+        } else if ( err == "read" ) {
+          result = UI::YouIgnorePopup( _("Unable to read server list from disk."),
+                                       Pkg::ErrorDetails() );
+        } else if ( err == "write" ) {
+          result = UI::YouIgnorePopup( _("Could not write server list to disk."),
+                                       Pkg::ErrorDetails() );
+        } else {
+          result = UI::YouIgnorePopup( _("Error getting servers."),
+                                       Pkg::ErrorDetails() );        
+        }
+        if ( result == `abort ) return result;
+      }
+    } while ( result == `retry );
   }
 
   UI::CloseDialog();

@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Sep  2 14:46:52 CEST 2003 - cschum@suse.de
+
+- Fix warning dialog, which appears when suseservers list can't be
+  fetched (#28589).
+
+-------------------------------------------------------------------
 Mon Sep  1 17:16:04 CEST 2003 - cschum@suse.de
 
 - Use Label and Popup modules instead of common_messages.ycp and
