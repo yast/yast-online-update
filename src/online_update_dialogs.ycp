@@ -11,6 +11,7 @@
   import "Popup";
   import "AutoOnlineUpdate";
   import "Mode";
+  import "Wizard";
 
   global define symbol SetupAutomatic() ``{
 
