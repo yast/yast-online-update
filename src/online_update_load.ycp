@@ -28,24 +28,24 @@
   import "InstMedia";
   import "Arch";
   import "Packages";
-  
+
   // selected you server
   string you_server 	= Mode::youInstallMap["you_server"]:"";
-  string you_serverkind = Mode::youInstallMap["you_serverkind"]:"";  
+  string you_serverkind = Mode::youInstallMap["you_serverkind"]:"";
   string you_dir 	= Mode::youInstallMap["you_dir"]:"";
-  
+
   // check installation mode
   boolean auto_mode 	= OnlineUpdate::you_auto;
   boolean continue_mode = OnlineUpdate::you_continue;
   boolean auto_mode_get = OnlineUpdate::you_auto_get;
   boolean auto_mode_install = OnlineUpdate::you_auto_install;
   boolean cd_update 	= OnlineUpdate::cd_update;
-  
+
   // prepare for inst_rpmcopy
   Mode::normal = true;
   InstMedia::installmode = "hd";
 
-  
+
   // possible status information
   string ERROR 	= "error";
   string INSTALLED = "installed";
@@ -56,18 +56,18 @@
   //////////////////////////////////////////////////////////////////////////////
 
   global define ShowProgress( integer percent )``{
-      
+
       y2debug("PROGRESS: %1", percent );
       UI::ChangeWidget(`id(`progress), `Value, percent );
   };
 
-  
+
   ///////////////////////////////////////////////////////////////////////////////
   // MAIN:
   ///////////////////////////////////////////////////////////////////////////////
 
   term download = nil;
-  
+
   if ( UI::HasSpecialWidget(`DownloadProgress ) )
   {
       download = `Left(`DownloadProgress(`id(`fileProgress),_("Current patch"), "", 0 ));
@@ -78,7 +78,7 @@
   }
 
   term contents =
-      // main dialog: 
+      // main dialog:
       `VBox(
 	    `VSpacing( 0.2 ),
 	    `HBox(
@@ -101,10 +101,10 @@
 	    `VSpacing( 0.2 )
 	    );
 
-  
+
   string help_text = "";
 
-  // helptext  "Connection and Data transfer" 
+  // helptext  "Connection and Data transfer"
   string help_part11 =  _("<p>After connecting to SuSE server,
 YaST2 will download all selected patches.
 This could take some time. Several details are shown.</p>");
@@ -116,22 +116,22 @@ hard disk.</p>
 ");
 
   string help_part13 = _("<p>After YaST2 retrieves the descriptions of
-the available patches from the FTP or HTTP server, 
+the available patches from the FTP or HTTP server,
 select the patches to
 download and install.</p>
 ");
-  
+
   string help_part2 =  _("<p>
 The fields above show information about the connection and
 the time for data transfer.
 The box below displays data from the FTP or HTTP log file. If something
-goes wrong, check this file for information. 
+goes wrong, check this file for information.
 </p>
 ");
   string help_part3 =  _("<p>
 If you decide to <b>Abort Update</b>, the download of
 patches will be interrupted. No patch will be installed.
-The FTP or HTTP connection will be closed. 
+The FTP or HTTP connection will be closed.
 </p>
 ");
 
@@ -145,30 +145,30 @@ The FTP or HTTP connection will be closed.
   }
   else
   {
-      help_text = help_part13 + help_part2 + help_part3; 
+      help_text = help_part13 + help_part2 + help_part3;
   }
 
   //
   // show the dialog also for CD update (!continue_mode)
   // because it can take some time to copy the patch descriptions
-  // and there could be a popup "YaST2 patches available". 
+  // and there could be a popup "YaST2 patches available".
   //
-  
+
   Wizard::SetContents(_("Connection and Data transfer"), contents, help_text, Args(0), Args(1) );
 
-  UI::ChangeWidget(`id(`id1), `Value, you_server);  
+  UI::ChangeWidget(`id(`id1), `Value, you_server);
   UI::ChangeWidget(`id(`status), `Value, _("closed") );
 
 //
 // Checking installed patches and remove not installed
-//  
+//
   global define checkLocalPatches( ) ``{
       // Remove all patches with status .new or .error, because we want to download
       // the actual (possibly improved) descriptions from server
-      //  [ "Distribution_Version":"7.2","Product_Version":"3.0", "Product_Name":"Email Server" ] 
-	 
+      //  [ "Distribution_Version":"7.2","Product_Version":"3.0", "Product_Name":"Email Server" ]
+
       map productInfo = SCR::Read (.you.productInfo);
-      y2debug("ONLINE: productInfo: %1", productInfo);	  
+      y2debug("ONLINE: productInfo: %1", productInfo);
       string patch_path = "";
 
       if ( SCR::Read (.you.isBusiness) )
@@ -184,7 +184,7 @@ The FTP or HTTP connection will be closed.
 			       Arch::architecture,
 			       lookup( productInfo, "Distribution_Version", "" ));
       }
-	  
+
       string rm_files = patch_path + "*.new";
       y2debug("ONLINE: patch file path %1", patch_path);
       integer ret = SCR::Execute(.target.bash, sformat("rm -rf %1", rm_files ));
@@ -194,12 +194,12 @@ The FTP or HTTP connection will be closed.
       // Checking already installed patches
       map last_status = $[];
 
-      // get last update status 
-      last_status = SCR::Read( .you.lastUpdateStatus); 
+      // get last update status
+      last_status = SCR::Read( .you.lastUpdateStatus);
 
       // create list for table
       integer index = 0;
-    
+
       list patch_list = lookup( last_status, "patches", [] );
 
       while (index < size(patch_list) )
@@ -212,7 +212,7 @@ The FTP or HTTP connection will be closed.
 	      map info_map = $[];
 	      info_map = SCR::Read( .you.patchInformation, patch_name );
 	      y2milestone("Checking patch %1", patch_name );
-	      
+
 	      foreach (`pac, `info_list, lookup(info_map, "packages", $[] ), ``{
 		  string installedVersion = select(info_list, 1, "");
 		  string patchVersion = select(info_list, 2, "");
@@ -231,21 +231,21 @@ The FTP or HTTP connection will be closed.
       };
   };
 
-  
+
   // Fake getting of patches for fake_mode (NOT USED)
   integer test_id = 0;
   global define FakeGetPatch( string patch) ``{
       integer counter = 0;
       string log = "";
       map result = $[];
-      
+
       while (counter < 100)
       {
 	  counter = counter + 1;
 	  UI::ChangeWidget(`id(`log), `LastLine, "Neue Zeile ........\n" );
       }
       test_id = test_id + 1;
-	 
+
       y2debug("ONLINE: Get patch %1 ( fake_mode ): %2", patch, test_id != 3 );
 
       if (test_id == 3)
@@ -262,7 +262,7 @@ The FTP or HTTP connection will be closed.
       }
       result = add(result, "progress", test_id*10);
       result = add(result, "continue", false );
-      
+
       return result;
   };
 
@@ -278,7 +278,7 @@ The FTP or HTTP connection will be closed.
       batchkind = OnlineUpdate::you_auto_batchkind;
 
       foreach( `patch, `patch_info, new_patches, ``{
-	  // only get the patch if marked with "X" or "G" 
+	  // only get the patch if marked with "X" or "G"
 	  if ( select ( lookup(new_patches, patch, []), 3, "" ) == "X"
 	       || select ( lookup(new_patches, patch, []), 3, "" ) == "G")
 	   {
@@ -314,25 +314,25 @@ The FTP or HTTP connection will be closed.
 
       ShowProgress( 5 );
 
-      string lastErrorServer = you_server; // only for error popup      
-      
+      string lastErrorServer = you_server; // only for error popup
+
       while ( (index < patch_no) && go_on )
       {
 	  map patch_result = $[];
 	  string patch = select( patch_list, index, "" );
-	  
+
 	  y2debug("Status of patch %1: %2", patch, select( lookup(new_patches, patch, []), 3, "" ));
 
 	  UI::ChangeWidget(`id(`log), `LastLine, sformat( _("Get packages for patch %1\n"), patch) );
-	  
+
 	  patch_result = SCR::Execute( .you.getPatch, patch );
 	  y2milestone("ONLINE: SCR::Execute(.you.getPatch, %1 )): %2", patch, patch_result );
-	  
+
 	  while ( lookup(patch_result, "ok", false) == true &&
 		  lookup(patch_result, "nextPackage","") != "" )
 	  {
 	      boolean otherServerConnect = false;
-	      y2milestone("ONLINE: SCR::Execute(.you.getPatch, %1 )): %2", patch, patch_result );  
+	      y2milestone("ONLINE: SCR::Execute(.you.getPatch, %1 )): %2", patch, patch_result );
 
 	      UI::ChangeWidget(`id(`log), `LastLine, "Package " +
 			    lookup(patch_result, "nextPackage","") +
@@ -348,7 +348,7 @@ The FTP or HTTP connection will be closed.
 	      {
 		  scriptName = lookup(patch_result, "nextPackage","");
 	      }
-	      
+
 	      // Checking, if the package is on another server; not when the
 	      // source is CD, Harddisk....
 	      if ( you_serverkind != "local" &&
@@ -360,7 +360,7 @@ The FTP or HTTP connection will be closed.
 		  map result = $[];
 
 		  otherServerConnect = true;
-		  
+
 		  // disconnect from the old server
 		  result = SCR::Execute( .you.disconnect,"");
 		  y2debug("ONLINE:  SCR::Execute(.you.disconnect): %1", result );
@@ -373,7 +373,7 @@ The FTP or HTTP connection will be closed.
 		  {
 		      UI::ChangeWidget(`id(`status), `Value, _("closed"));
 		  }
-		  
+
 		  // connecting to other you-server
 
 		  any retval = SCR::Execute( .you.setServer,
@@ -382,17 +382,17 @@ The FTP or HTTP connection will be closed.
 					      "path":"."]);
 		  y2debug("ONLINE: SCR::Execute(.you.setServer,( %1, %2 %3 ) ): %4",
 			  otherYouServer, ".", otherYouServerKind, retval );
-		
+
 		  if (retval == nil || retval == false)
 		  {
 		      last_logging = sformat ( _("Connection failed to %1\n"), otherYouServer );
-		      UI::ChangeWidget(`id(`log), `LastLine, last_logging );   
+		      UI::ChangeWidget(`id(`log), `LastLine, last_logging );
 		  }
 		  else
 		  {
 		      // connect to new server
 		      result = SCR::Execute(.you.connect,"");
-		      y2debug("ONLINE:  SCR::Execute(.you.connect): %1", result );		      
+		      y2debug("ONLINE:  SCR::Execute(.you.connect): %1", result );
 
 		      string connect_string = lookup (result, "message", "" );
 		      if ( size ( connect_string ) > 0 )
@@ -402,7 +402,7 @@ The FTP or HTTP connection will be closed.
 		      if (lookup( result, "ok", false )  )
 		      {
 			  UI::ChangeWidget(`id(`status), `Value, _("active"));
-			  UI::ChangeWidget(`id(`id1), `Value, otherYouServer);  			  
+			  UI::ChangeWidget(`id(`id1), `Value, otherYouServer);
 		      }
 		  }
 	      }
@@ -410,7 +410,7 @@ The FTP or HTTP connection will be closed.
 	      // Getting rpm
 	      patch_result = SCR::Execute( .you.getPatch, patch );
 	      y2debug("ONLINE: SCR::Execute(.you.getPatch, %1 )): %2", patch, patch_result );
-	      
+
 	      if ( !lookup(patch_result, "ok", false)  )
 	      {
 		  if ( otherServerConnect )
@@ -422,18 +422,18 @@ The FTP or HTTP connection will be closed.
 		      lastErrorServer = you_server;
 		  }
 	      }
-	      
+
 	      if ( otherServerConnect )
 	      {
 		  //Reconnect to old server
 		  map result = $[];
 
 		  otherServerConnect = false;
-		  
+
 		  // disconnect from  server
 		  result = SCR::Execute( .you.disconnect, "");
 		  y2debug("ONLINE:  SCR::Execute(.you.disconnect): %1", result );
-		  
+
 		  string last_logging = lookup(result, "message", "" );
 		  if ( size ( last_logging ) > 0 )
 		  {
@@ -443,23 +443,23 @@ The FTP or HTTP connection will be closed.
 		  {
 		      UI::ChangeWidget(`id(`status), `Value, _("closed"));
 		  }
-		  
+
 		  // setting to old you-server
 		  any retval = SCR::Execute( .you.setServer,
-					 $["kind":you_serverkind, "name":you_server, "path":you_dir]);		  
+					 $["kind":you_serverkind, "name":you_server, "path":you_dir]);
 		  if (retval == nil || retval == false)
 		  {
 		      last_logging = sformat ( _("Connection failed to %1\n"), you_server );
-		      UI::ChangeWidget(`id(`log), `LastLine, last_logging );    
+		      UI::ChangeWidget(`id(`log), `LastLine, last_logging );
 		  }
 
 		  // connect to old server
 		  result = SCR::Execute(.you.connect, "");
-		  y2debug("ONLINE:  SCR::Execute(.you.connect): %1", result );		      		  
+		  y2debug("ONLINE:  SCR::Execute(.you.connect): %1", result );
 		  if (lookup( result, "ok", false )  )
 		  {
 		      UI::ChangeWidget(`id(`status), `Value, _("active"));
-		      UI::ChangeWidget(`id(`id1), `Value, you_server);   
+		      UI::ChangeWidget(`id(`id1), `Value, you_server);
 		  }
 	      }
 
@@ -467,29 +467,29 @@ The FTP or HTTP connection will be closed.
 		   && select( lookup(new_patches, patch, []), 3, "" ) == "X" )
 	      {
 		  string command = "source " + scriptName;
-		  
+
 		  UI::ChangeWidget(`id(`log), `LastLine, "Execute script " + scriptName + "\n");
-		  
+
 		  integer doresult = SCR::Execute (.target.bash, command );
 
 		  if (doresult==0)
 		  {
-		      UI::ChangeWidget(`id(`log), `LastLine, "return ok\n");		      
+		      UI::ChangeWidget(`id(`log), `LastLine, "return ok\n");
 		  }
 		  else
 		  {
-		      UI::ChangeWidget(`id(`log), `LastLine, "return NOT ok\n");		      
+		      UI::ChangeWidget(`id(`log), `LastLine, "return NOT ok\n");
 		  }
 	      }
 	  }
-	  
+
 	  if ( !lookup(patch_result, "ok", false) )
 	  {
 	      // set status to error
 	      SCR::Write(.you.patchUpdateStatus, patch, ERROR );
 	      y2debug("ONLINE:  SCR::Write(.you.patchUpdateStatus,%1, %2)", patch, ERROR );
 	      OnlineUpdate::you_ok = false;
-	       
+
 	      // put logging into LogView Widget before showing popup
 	      string last_logging = lookup(patch_result, "message", "" );
 	      if ( size ( last_logging ) > 0 )
@@ -505,7 +505,7 @@ Try to download remaining patches or
 continue with installation of downloaded ones.
 "),
 					   select(patch_list, index, ""), lastErrorServer );
-	      
+
 		  any ret = UI::DisplayMsgYou( msg_str, NotifyMsg(), DownloadButtonLabel(), InstallButtonLabel() );
 
 		  if (!ret)
@@ -523,7 +523,7 @@ continue with installation of downloaded ones.
 		  ret_list = add( ret_list, patch );
 	      }
 	  }
-	  
+
 	  // put logging into LogView Widget
 	  string log_string = lookup(patch_result, "message", "" );
 	  if ( log_string != "" )
@@ -531,7 +531,7 @@ continue with installation of downloaded ones.
 	      UI::ChangeWidget(`id(`log), `LastLine, log_string+"\n" );
 	  }
 
-	  // Polling input to give the user a chance to stop the download  
+	  // Polling input to give the user a chance to stop the download
 	  any r = UI::PollInput();
 	  if ( r == `abort )
 	  {
@@ -550,22 +550,22 @@ loaded patches or abort update completely."), WarningMsg(), InstallButtonLabel()
 	  index = index+1;
 	  if (((index*100)/patch_no) > 95 )
 	  {
-	      ShowProgress( 95 );	      
+	      ShowProgress( 95 );
 	  }
 	  else
 	  {
 	      ShowProgress( (index*100)/patch_no );
 	  }
       }
-      
+
       ShowProgress( 0 );
 
-      UI::ChangeWidget(`id(`fileProgress), `Filename, "");      
+      UI::ChangeWidget(`id(`fileProgress), `Filename, "");
       UI::ChangeWidget(`id(`fileProgress), `ExpectedSize, 1024);
-      
+
       // disconnect
       map result = SCR::Execute( .you.disconnect, "");
-      y2debug("ONLINE:  SCR::Execute(.you.disconnect): %1", result );      
+      y2debug("ONLINE:  SCR::Execute(.you.disconnect): %1", result );
 
       string last_logging = lookup(result, "message", "" );
       if ( size ( last_logging ) > 0 )
@@ -576,7 +576,7 @@ loaded patches or abort update completely."), WarningMsg(), InstallButtonLabel()
       {
 	  UI::ChangeWidget(`id(`status), `Value, _("closed"));
       }
-      
+
       return ret_list;
   };
 
@@ -597,9 +597,9 @@ SuSE cannot guarantee that the packages were created by SuSE.
 
       map patchDescription = $[];
       map packageMap = $[];
-      
+
       patchDescription = SCR::Read(.you.patchInformation, patch );
-      packageMap = lookup( patchDescription, "packages", $[] );      
+      packageMap = lookup( patchDescription, "packages", $[] );
 
       if ( !(SCR::Read (.targetpkg.installed, "gpg")) )
       {
@@ -611,7 +611,7 @@ SuSE cannot guarantee that the packages were created by SuSE.
 "),
 		   patch);
       }
-      
+
       y2milestone ( "tmpfile : %1", tmpfile );
       foreach ( `package_desc, package_list, ``{
 	  string package = select ( package_desc, 0, "");
@@ -644,13 +644,13 @@ SuSE cannot guarantee that the packages were created by SuSE.
 	      else
 	      {
 		  string message = sformat(
-					   _("Patch %1 will not be installed 
+					   _("Patch %1 will not be installed
 because package %2 is corrupted.
 "),
 					   patch, package );
-	      
+
 		  y2error( "%1", message );
-	      
+
 		  UI::DisplayMsgYouOk( message, ErrorMsg(), OKButtonLabel() );
 		  install = false;
 	      }
@@ -662,11 +662,11 @@ because package %2 is corrupted.
 	      {
 		  y2warning ( "package %1 no gpg-key found",
 				package );
-		  
+
 		  if ( !dontAsk )
 		  {
 		      boolean ret = true;
-		      
+
 		      ret = UI::DisplayMsgYou( gpg_warning, WarningMsg(),
 					       InstallButtonLabel(), _("&Don't install") );
 		      if ( !ret )
@@ -677,24 +677,24 @@ because package %2 is corrupted.
 		      {
 			  y2warning ( "installing anyway" );
 		      }
-		      
+
 		      dontAsk = true;
 		  }
 	      }
 	  }
-	  
+
 	  SCR::Execute (.target.bash, "/bin/rm " + tmpfile );
 
 	  // checking the correct version of the rpm
 	  list packageList = lookup ( packageMap, packageName, [] );
-	  
+
 	  if ( size ( packageList ) > 0 )
 	  {
 	      y2milestone ( "Checking package %1 with version %2: %3",
 			    packageName,
 			    select ( packageList, 2, ""),
                             packageList );
-	      
+
 	      string command = "MYVER="+
 			select ( packageList, 2, "") +
 			";/usr/bin/test \"$MYVER\" = `/bin/rpm -qp --qf \"%{VERSION}-%{RELEASE}\\n\" " + package +"`";
@@ -717,9 +717,9 @@ because package %2 is corrupted.
 		      {
 			  y2warning ( "installing anyway" );
 		      }
-		      
+
 		      dontAsk = true;
-		  }		  
+		  }
 	      }
 	  }
 	  else
@@ -741,16 +741,16 @@ because package %2 is corrupted.
 		  {
 		      y2warning ( "installing anyway" );
 		  }
-		  
+
 		  dontAsk = true;
 	      }
-	  }	  
+	  }
       });
-      
+
       return install;
   };
 
-    
+
   //
   // InstallPatches
   // call inst_rpmcopy for every patch with list of packages belonging to the patch
@@ -766,7 +766,7 @@ because package %2 is corrupted.
       // sorting patches by name
       integer i = 0;
       integer j = 0;
-      y2milestone ( "Ordering following patches : %1", patch_list );      
+      y2milestone ( "Ordering following patches : %1", patch_list );
 
       while ( i < size( patch_list ) )
       {
@@ -788,7 +788,7 @@ because package %2 is corrupted.
 	      {
 		  patchname1 = patch1;
 	      }
-	      
+
 	      string patch2 = select ( patch_list, j+1, "" );
 	      pos = findlastof ( patch2, "-" );
 	      string patchname2 = "";
@@ -835,7 +835,7 @@ because package %2 is corrupted.
 		      {
 			  dummyList = add ( dummyList, select( patch_list, counter, "" ));
 		      }
-		      counter = counter +1;		      
+		      counter = counter +1;
 		  }
 		  patch_list = dummyList;
 	      }
@@ -847,24 +847,24 @@ because package %2 is corrupted.
 
       y2milestone ( "Installing following patches in this order: %1", patch_list );
 
-      
+
       // remove old rpm logging
-      SCR::Execute(.target.bash, "/bin/rm /var/log/y2logRPMShort" );
-      SCR::Execute(.target.bash, "/bin/rm /var/log/y2logRPM" );      
+      SCR::Execute(.target.bash, "/bin/rm /var/log/YaST2/y2logRPMShort" );
+      SCR::Execute(.target.bash, "/bin/rm /var/log/YaST2/y2logRPM" );
 
       list desc_list = [];
-      list package_list = [];      
-      
+      list package_list = [];
+
       foreach ( `patch, patch_list, ``{
 	  boolean go_on  = true;
-	  
+
 	  map check_version = SCR::Execute (.you.checkYaST2Version, version,patch );
  	  if ( lookup ( check_version, "ok", true ) )
 	  {
 	      // correct YaST2 version
 	      list info_list = [];
 	      info_list = SCR::Read(.you.packages, patch );
-	      
+
 	      y2debug("ONLINE: SCR::Read(.you.packages %1 ): %2",
 		      patch,
 		      info_list );
@@ -872,7 +872,7 @@ because package %2 is corrupted.
 	      if ( checkPackages ( info_list, patch ) )
 	      {
 		  // packages are ok
-		  
+
 		  pre_info = SCR::Read(.you.preInstallInformation,  patch);
 
 		  if ( pre_info != "" &&
@@ -880,7 +880,7 @@ because package %2 is corrupted.
 		  {
 		      string header = sformat(_("Warning for patch %1"),
 						    patch );
-		      
+
 		      go_on = UI::DisplayMsgYou( pre_info,
 						 header,
 						 InstallButtonLabel(),
@@ -892,10 +892,10 @@ because package %2 is corrupted.
 		  {
 		      // adding packages to the installationlist
 		      foreach (`pac, info_list , ``{
-			  package_list = add ( package_list, select ( pac, 0, "" ) );			  
+			  package_list = add ( package_list, select ( pac, 0, "" ) );
 			  desc_list = add ( desc_list, select( pac, 1, "" ) );
 		      });
-		      
+
 		      package_count = size ( package_list );
 		      post_info = SCR::Read(.you.postInstallInformation,  patch);
 
@@ -927,7 +927,7 @@ You have installed version %3.
       });
 
       UI::CloseDialog();
-      
+
       // don't initialize the package agent to enable the SlideShow ( time consuming! )
       // Packages::Init( false );
 
@@ -944,23 +944,23 @@ You have installed version %3.
       // setting status of the patches
       foreach ( `patch, patch_list, ``{
 	  // do not set error status - let patch status NEW
-      
+
 	  if (ret == `abort )
 	  {
 	      // set status to error
 	      SCR::Write(.you.patchUpdateStatus, patch, ERROR );
 	      y2debug("ONLINE:  SCR::Write(.you.patchUpdateStatus,%1, %2)",
-		      patch, ERROR );		      
+		      patch, ERROR );
 
 	      OnlineUpdate::you_ok = false;
-	      package_count = 0;		      
+	      package_count = 0;
 	  }
 	  else if ( ret == `next )
 	  {
 	      // set status to INSTALLED
 	      SCR::Write(.you.patchUpdateStatus, patch, INSTALLED );
 	      y2debug("ONLINE:  SCR::Write(.you.patchUpdateStatus,%1, %2)",
-		      patch, INSTALLED );		      
+		      patch, INSTALLED );
 	  }
       });
 
@@ -968,17 +968,17 @@ You have installed version %3.
       {
 	  return `cancel;
       }
-      
+
       OnlineUpdate::you_updated_packages = package_count;
-      
+
       return `ok;
   };
 
-  //  
-  // Several functions of SCR(.you....) return a map of result information, e.g. 
+  //
+  // Several functions of SCR(.you....) return a map of result information, e.g.
   // $[ "ok": "true", "continue": false, "progress":"20", "message":"Download successful" ]
   // (not all information is used on every call)
-  //  
+  //
   map result_map = $[];
   map new_patches = $[];
   boolean go_on = true;
@@ -997,7 +997,7 @@ You have installed version %3.
       if ( success )
       {
 	  result_map = SCR::Execute(.you.connect, "");
-	  y2debug("ONLINE:  SCR::Execute(.you.connect): %1", result_map );	  
+	  y2debug("ONLINE:  SCR::Execute(.you.connect): %1", result_map );
 
 	  success = lookup( result_map, "ok", false );
 	  string last_logging = lookup(result_map, "message", "" );
@@ -1012,19 +1012,19 @@ You have installed version %3.
       {
 	  // Checking installed patches and remove not installed
 	  checkLocalPatches();
-	  
+
 	  UI::ChangeWidget(`id(`status), `Value, _("active"));
-	  UI::ChangeWidget(`id(`id1), `Value, you_server);   	  
+	  UI::ChangeWidget(`id(`id1), `Value, you_server);
 
 	  map productInfo = SCR::Read (.you.productInfo);
-	  y2debug("ONLINE: productInfo: %1", productInfo);	  
+	  y2debug("ONLINE: productInfo: %1", productInfo);
 
 
-	  
+
 	  while (go_on)
 	  {
 	      //get list of patches step by step
-	      result_map = SCR::Execute(.you.getPatchList, ""); 
+	      result_map = SCR::Execute(.you.getPatchList, "");
 	      y2debug("ONLINE: SCR::Execute(.you.getPatchList) : %1", result_map );
 
 	      go_on = lookup (result_map, "continue", false );
@@ -1036,7 +1036,7 @@ You have installed version %3.
 	      }
 	      if ( lookup( result_map, "checkpatch" , "" ) != "" )
 	      {
-		  // checking gpg-key 
+		  // checking gpg-key
 		  string patchpath = lookup( result_map, "checkpatch" , "" );
 		  // for security reasons: try to delete an old, invalid .unpack file
 		  SCR::Execute (.target.bash, "/bin/rm "
@@ -1053,7 +1053,7 @@ You have installed version %3.
 		      SCR::Execute (.target.bash, "/bin/cp "
 				    + patchpath
 				    + ".unpack "
-				    + patchpath );	  		  
+				    + patchpath );
 		  }
 		  else
 		  {
@@ -1061,7 +1061,7 @@ You have installed version %3.
 					    _("Cannot check patch %1 because the GPG package is not installed
 or the patch description is corrupted.
 SuSE cannot guarantee that the patch has been created by SuSE.\n"),
-					    message);		      
+					    message);
 		      // not ok
 
 		      if ( lookup( productInfo, "Distribution_Version", "" ) == "7.1"
@@ -1073,7 +1073,7 @@ SuSE cannot guarantee that the patch has been created by SuSE.\n"),
 			  SCR::Execute (.target.bash, "/bin/cp "
 					+ patchpath
 					+ ".unpack "
-					+ patchpath );	  		  
+					+ patchpath );
 
 			  y2warning ( "installing anyway" );
 		      }
@@ -1082,17 +1082,17 @@ SuSE cannot guarantee that the patch has been created by SuSE.\n"),
 			  // removing patch
 			  SCR::Execute (.target.bash, "/bin/rm "
 					+ patchpath );
-			  
+
 		      }
 		  }
 		  SCR::Execute (.target.bash, "/bin/rm "
 				+patchpath
-				+ ".unpack"   );	  		  
+				+ ".unpack"   );
 	      }
 
 	      ShowProgress( lookup (result_map, "progress", 0 ) );
 
-	      // Polling input to give the user a chance to stop the download  
+	      // Polling input to give the user a chance to stop the download
 	      any r = UI::PollInput();
 	      if ( r == `abort
 		   && UI::ConfirmAbortUpdate(`unusable) )
@@ -1101,21 +1101,21 @@ SuSE cannot guarantee that the patch has been created by SuSE.\n"),
 		  userAbort = true;
 	      }
 	  }
-	  
+
 	  success = lookup( result_map, "ok", false );
       }
       else
       {
-	  
+
 	  UI::ChangeWidget(`id(`log), `LastLine,
-			   lookup (result_map, "message", "" ) ); 
+			   lookup (result_map, "message", "" ) );
 
 	  if ( !auto_mode_get )
 	  {
 	      // Error popup if youConnect failed -
 	      // Patch CD udpate: no CD in drive, mount failed
 	      // Online Update: connecting to you server failed
-	  
+
 	      if ( cd_update )
 	      {
 		  UI::MessagePopup(_("Cannot access the patch descriptions.
@@ -1129,20 +1129,20 @@ restart the \"Patch CD Update\".
 		  UI::MessagePopup(_("Connection to YOU server failed.
 Try to connect to another SuSE FTP/HTTP server.
 "));
-		  return `back;  
+		  return `back;
 	      }
 	  }
 	  else
 	  {
-	      SCR::Execute(.you.closeUpdate, false); 
-	      return `abort;	      
+	      SCR::Execute(.you.closeUpdate, false);
+	      return `abort;
 	  }
       }
 
       // disconnect
       map disconnect_map = SCR::Execute( .you.disconnect, "");
       y2debug("ONLINE:  SCR::Execute(.you.disconnect): %1", disconnect_map );
-  
+
       if ( lookup(disconnect_map, "ok", false ) )
       {
 	  UI::ChangeWidget(`id(`status), `Value, _("closed"));
@@ -1154,14 +1154,14 @@ Try to connect to another SuSE FTP/HTTP server.
 	  UI::ChangeWidget(`id(`log), `LastLine, disconnect_message +"\n" );
       }
 
-      ShowProgress( 0 );      
+      ShowProgress( 0 );
   }
 
   if ( userAbort )
   {
       return `abort;
   }
-  
+
   if (success)
   {
       new_patches = SCR::Read(.you.newPatchList);
@@ -1183,14 +1183,14 @@ Insert the SuSE patch CD
 (check the version)
 or update your system with YaST2
 \"Online Update\".
-")); 
+"));
 	      return `abort;
 	  }
 	  else
 	  {
 	      UI::MessagePopup(_("Cannot get the patches from the server.
 Try another SuSE FTP/HTTP server.
-"));   
+"));
 	      return `back;
 	  }
       }
@@ -1241,7 +1241,7 @@ again to install the rest of the packages.
 "));
       }
   }
-  
+
   if ( auto_mode )
   {
       if ( !auto_mode_get &&
@@ -1268,20 +1268,20 @@ Download the patches now?
 
 	      if ( !UI::AnyQuestionPopup( "", message ,YesButtonLabel(), NoButtonLabel(), `yes_default) )
 	      {
-		  return `abort;		// abort update	      
+		  return `abort;		// abort update
 	      }
 	  }
       }
 
       list install_patches = [];
-      
+
       if ( auto_mode_install )
       {
 	  string batchkind = OnlineUpdate::you_auto_batchkind;
-	  
+
 	  // only use patches which already have been loaded from server
 	  foreach( `patch, `patch_info, new_patches, ``{
-	      // only get the patch if marked with "X" or "G" 
+	      // only get the patch if marked with "X" or "G"
 	      if ( select ( lookup(new_patches, patch, []), 3, "" ) == "X" ||
 		   select ( lookup(new_patches, patch, []), 3, "" ) == "G")
 	      {
@@ -1291,7 +1291,7 @@ Download the patches now?
 		      install_patches = add(install_patches, patch);
 		  }
 	      }
-	  });	  
+	  });
       }
       else
       {
@@ -1325,7 +1325,7 @@ Download the patches now?
       {
 	  // Patches has been get only; Finish you update
 	  y2debug("ONLINE: close update with status: %1", OnlineUpdate::you_ok );
-	  SCR::Execute(.you.closeUpdate, OnlineUpdate::you_ok); 	  
+	  SCR::Execute(.you.closeUpdate, OnlineUpdate::you_ok);
 	  return `abort;
       }
   }
@@ -1335,7 +1335,7 @@ Download the patches now?
       OnlineUpdate::you_patches = new_patches;
       y2debug( "Wrote list of new patches: %1", new_patches );
 
-      // prepare for second call in manual mode 
+      // prepare for second call in manual mode
       OnlineUpdate::you_continue = true;
 
       // got patches -> go `next if CD update
@@ -1367,7 +1367,7 @@ Download the patches now?
 		  // set CloseUpdate status to false (installation NOT complete)
 		  SCR::Execute(.you.closeUpdate, false);
 		  map disconnect_map = SCR::Execute(.you.disconnect, "");
-		  y2debug("ONLINE:  SCR::Execute(.you.disconnect): %1", disconnect_map );		  
+		  y2debug("ONLINE:  SCR::Execute(.you.disconnect): %1", disconnect_map );
 		  return `abort;	// abort update
 	      }
 	  }
@@ -1376,7 +1376,7 @@ Download the patches now?
       {
 	  // do not set the CloseUpdate status -> no patch is installed
 	  map disconnect_map = SCR::Execute(.you.disconnect, "");
-	  y2debug("ONLINE:  SCR::Execute(.you.disconnect): %1", disconnect_map );		  	  
+	  y2debug("ONLINE:  SCR::Execute(.you.disconnect): %1", disconnect_map );
 	  UI::MessagePopup(_("No patch will be installed."));
 
 	  return `finish;
@@ -1386,13 +1386,13 @@ Download the patches now?
   else
   {
       map disconnect_map = SCR::Execute(.you.disconnect, "");
-      y2debug("ONLINE:  SCR::Execute(.you.disconnect): %1", disconnect_map );		  	  
-      
+      y2debug("ONLINE:  SCR::Execute(.you.disconnect): %1", disconnect_map );
+
       y2error("online_update_load - mode not set");
       return `abort;
   }
-	 
-	 
+
+
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////
   ////  Loop for User Input ....
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1408,13 +1408,13 @@ Download the patches now?
 	  if ( ret == `abort && UI::ConfirmAbortUpdate(`incomplete) )
 	  {
 	      map disconnect_map = SCR::Execute(.you.disconnect, "");
-	      y2debug("ONLINE:  SCR::Execute(.you.disconnect): %1", disconnect_map );		  	  
+	      y2debug("ONLINE:  SCR::Execute(.you.disconnect): %1", disconnect_map );
 
 	      return `abort;
 	  }
 
 	  ////////////////////////////////////////////////////////////////////////////////////////////////////////
-	  ////  
+	  ////
 	  ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	  if ( ret == `back)
