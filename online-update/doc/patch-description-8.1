@@ -1,0 +1,146 @@
+#
+# Patch description for patch xyz
+#
+# YOU-Patch-Description 1.0 -- (c) 2002 SuSE Linux AG
+# generated on Wed Feb 27 22:17:56 GMT 2002
+#
+
+Kind: [security|recommended|optional|document|YaST2] 
+
+Shortdescription.<language> : <short description; one line> 
+
+Longdescription.<language>:
+<long description of the patch; could have more lines>
+<language>.noitpircsedgnol:
+
+Preinformation.<language>:
+<Information in a popup which will be displayed before the >
+<packages of this patch will be installed. The user >
+<can abort the installation of THIS patch. >
+<language>.noitamrofnierp:
+
+Postinformation.<language>:
+<Information in a popup which will be displayed after the >
+<packages of this patch have been installed. >
+<language>.noitamrofnitsop:
+
+Size: 		<Size of this patch in KByte> 
+
+Buildtime: 	<time in seconds>
+
+MinYaSTVersion:	<minimal YaST2 version which is needed for installation> 
+
+UpdateOnlyInstalled: <true/false; Only packages ( described in this patch ) will be updated which are installed. > 
+
+Installtriggerscript: 
+<Script which will be execute in order to decide if the patch have to be installed.> 
+<return 0 --> patch will be installed. > 
+Tpircsreggirtllatsni: 
+
+Installtriggerpackages:
+<list of packages - if at least one of the packages is installed --> patch will be installed>
+Segakcapreggirtllatsni:
+
+
+Prescript:
+
+##
+## -----> <script name> <-----
+##
+
+Filename: 	<name of a shell script, C-program, ...>
+Label.<langcode>:<short description of the script>	
+InstPath: 	"scripts"
+Size:		<size of the script in byte>
+AuthorName: 	<author name>
+AuthorEmail: 	<author email>
+AuthorAddress: 	<author address>
+Version:	<version> 	
+
+
+##
+## -----> <YCP filename> <-----
+##
+
+Filename: 	<name of a ycp module, which calls a script>.ycp
+Label.<langcode>:<short description of the script>	
+InstPath: 	"ycp"
+Scripts:	<list of the scripts called in YCP module>
+Size:		<size alltogether in byte>
+AuthorName: 	<author name>
+AuthorEmail: 	<author email>
+AuthorAddress: 	<author address>
+Version:	<version>
+
+Tpircserp:
+
+
+Requires:	<list of patches which must be installed before this patch is installed>
+
+Conflicts:	<list of patches which conflict with this patch> 
+
+Obsoletes:	<list of patches which should not be installed if this patch is installed, 
+		 i.e. the list of patches will not be preselected>
+	  	  
+
+
+Packages: 
+
+
+##
+## -----> <package1> <-----
+##
+Package:        <package name> <package type: rpm|src.rpm|nosrc.rpm|patch.rpm>  # separated by whitespace!
+Version:        <package version-release>
+Requires:       <package dependencies>
+Provides:       <package dependencies>
+Conflicts:      <package dependencies>
+Obsoletes:      <package dependencies>
+InstPath:       <location of the RPMpackage relative to the installation path. (whereever/whatever-name.rpm)>
+Label.<langcode>:<short description of the script>	
+PatchVersions:  <package versions; If the installed package has one of these versions only the patch
+                 defined in "Package" (.patch.rpm) will be installed. If not the RPM defined in "Package" (.rpm) will
+                 be installed>
+
+##
+## -----> <package2> <-----
+##
+
+...
+
+
+Segakcap: 
+
+
+Postscript:
+
+##
+## -----> <script name> <-----
+##
+
+Filename: 	<name of a shell script, C-program, ...>
+Label.<langcode>:<short description of the script>	
+InstPath: 	"scripts"
+Size:		<size of the script in byte>
+AuthorName: 	<author name>
+AuthorEmail: 	<author email>
+AuthorAddress: 	<author address>
+Version:	<version> 	
+
+
+##
+## -----> <YCP filename> <-----
+##
+
+Filename: 	<name of a ycp module, which calls a script>.ycp
+Label.<langcode>:<short description of the script>	
+InstPath: 	"ycp"
+Scripts:	<list of the scripts called in YCP module>
+Size:		<size alltogether in byte>
+AuthorName: 	<author name>
+AuthorEmail: 	<author email>
+AuthorAddress: 	<author address>
+Version:	<version>
+
+Tpircstsop:
+

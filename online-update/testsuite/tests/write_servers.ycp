@@ -1,0 +1,9 @@
+{
+  include "suseservers.ycp";
+
+  map servers = read_suseservers ();
+
+  y2milestone ("servers %1", servers);
+
+  return write_suseservers (servers);
+}

@@ -1,0 +1,267 @@
+<html>
+<head>
+<title>FTP Patch Update</title>
+</head>
+
+<body bgcolor="white">
+<h1>FTP Patch Update</h1>
+
+<em>This documentation is for the YOU of SuSE Linux 8.0.</em>
+
+<h2>Overview</h2>
+<p>The ftp update has a patch structure. Each patch has a patch description
+file and n RPM packages. 
+<h2>Description</h2>
+<h3>Location of the patchdescription files ( source )</h3>
+<h4>Box Product OR Business Produkt ?</h4>
+<p>YOU will be started for a business product if following the flags have been set in
+<br>in  /var/lib/YaST/update.inf:
+<p>   Product_Name:           SuSE-SLES   ( not "SuSE Linux" )
+<br>   Product_Version:        7
+<br>
+<br>The distribution version will be set by the Flag "Distribution_Version".
+<br>
+<h4>Box Product</h4>
+The patch description files are located on the ftp server in the directory:
+<p>/var/lib/YaST/patches/&lt;ARCHITECTURE&gt;/update/&lt;SuSE-Version&gt;/patches
+<p>The concerning packages are stored on http server in the directories:
+<p>/var/lib/YaST/patches/&lt;ARCHITECTURE&gt;/update/&lt;SuSE-Version&gt;/&lt;Serie&gt;
+<p>
+<h4>Business Product</h4>
+The patch description files are located in the directory:
+<p>/var/lib/YaST/patches/&lt;architecture&gt;/update/&lt;product_name&gt;/&lt;product_version&gt;/patches
+<p>The concerning packages are stored in the directories:
+<p>/var/lib/YaST/patches/&lt;architecture&gt;/update/&lt;product_name&gt;/&lt;product_version&gt;/&lt;serie&gt;/&lt;packagename&gt;.rpm
+<p>
+<h3>Location of the patchdescription files on the client ( destination )</h3>
+<h4>Box Product</h4>
+The patch description files are located in the directory:
+<p>/pub/suse/&lt;ARCHITECTURE&gt;/update/&lt;SuSE-Version&gt;/patches
+<p>The concerning packages are stored on ftp server in the directories:
+<p>/pub/suse/&lt;ARCHITECTURE&gt;/update/&lt;SuSE-Version&gt;/&lt;Serie&gt;
+<p>
+<h4>Business Product</h4>
+The patch description files are located on the http server in the directory:
+<p>http://sdb.suse.de/download/&lt;architecture&gt;/update/&lt;product_name&gt;/&lt;product_version&gt;/patches
+<p>The concerning packages are stored on ftp server in the directories:
+<p>http://sdb.suse.de/download/&lt;architecture&gt;/update/&lt;product_name&gt;/&lt;product_version&gt;/&lt;serie&gt;/&lt;packagename&gt;.rpm
+<p>
+<h3>Filename of the patch description files</h3>
+<p>&lt;shortcut&gt;-&lt;version number&gt;
+<p>
+<p>Shortcut should be a name like "yast2", "NIS" ....
+<p>
+<h3>Format of the patch description file</h3>
+
+<p>Kind: [security|recommended|optional|document|YaST2]
+
+<p>Shortdescription.&lt;language&gt; : &lt;short description; one line&gt;
+
+<p>Longdescription.&lt;language&gt;:<br>
+&lt;long description of the patch; could have more lines&gt;<br>
+&lt;language&gt;.noitpircsedgnol:<br>
+
+<p>Preinformation.&lt;language&gt;:<br>
+&lt;Information in a popup which will be displayed before the &gt;<br>
+&lt;packages of this patch will be installed. The user        &gt;<br>
+&lt;can abort the installation of THIS patch.                 &gt;<br>
+&lt;language&gt;.noitamrofnierp:<br>
+
+<p>Postinformation.&lt;language&gt;:<br>
+&lt;Information in a popup which will be displayed after the &gt;<br>
+&lt;packages of this patch have been installed.              &gt;<br>
+&lt;language&gt;.noitamrofnitsop:<br>
+
+<p>Size: &lt;Size of this patch in KByte&gt;
+
+<p># buildtime Tue Nov 14 12:46:42 UTC 2000 <br>
+Buildtime:     &lt; time in seconds&gt;
+
+<p>MinYaST1Version:&lt;minimal YaST1 version which is needed for installation&gt;
+<p>MinYaST2Version:&lt;minimal YaST2 version which is needed for installation&gt;
+<p>
+<p>UpdateOnlyInstalled: &lt;true/false; Only packages ( described in this patch ) will be updated which are installed. &gt;
+<p>
+<p>Installtrigger:
+<br>&lt;Script which will be execute in order to decide if the patch have to be installed.&gt;
+<br>&lt;return 0 --> patch will be installed. &gt;
+<br>Reggirtllatsni:
+<p>
+<p>Packages:
+<p>&lt;package description of the patch&gt;
+<p>.<br>
+..<br>
+...<br>
+<p>like:
+<p>##<br>
+## -----&gt; bash &lt;-----<br>
+##<br>
+<p>Filename:      bash.rpm<br>
+Label:         The GNU Bourne-Again Shell<br>
+Series:        a<br>
+Package:       a1/bash-version-release.arch.rpm<br>
+Size:          2116014 838521<br>
+Buildtime:     973570238<br>
+BuiltFrom:     zq1/bash-version-release.[no]src.rpm<br>
+DepAND:        bash ncurses  <br>
+DepOR:          <br>
+DepExcl:       <br>
+Flag:          A2E A(sh ) ELF <br>
+Category:      <br>
+RpmGroup:      System Environment/Shells<br>
+Copyright:     1989 Free Software Foundation, Inc.<br>
+AuthorName:    Chet Ramey &lt;chet@po.cwru.edu&gt;<br>
+AuthorEmail:   <br>
+AuthorAddress: <br>
+Version:       2.04-81<br>
+StartCommand:  <br>
+Requires:       /bin/sh   ld-linux.so.2   libc.so.6   libc.so.6(GLIBC_2.0)   libc.so.6(GLIBC_2.1)   libdl.so.2   libdl.so.2(GLIBC_2.0)   libdl.so.2(GLIBC_2.1)   libhistory.so.4   libncurses.so.5   libreadline.so.4   
+Provides:       sh   bash   rbash   libhistory.so.4   libreadline.so.4   <br>
+Conflicts       ..<br>
+Oboletes:       ..<br>
+<p>...<br>
+..<br>
+.<br>
+<p>Segakcap:
+<p>
+<h3>Which patch will be preselected for installation?</h3>
+<p>There are some criterions for preselecting patches which will be installed
+<br>by YOU:
+<p> - The scripted defined in the patchdescription ( flag "Installtrigger" ) 
+<br>   returns true.
+<br> - One or more packages of patch are installed and have older versions.
+<br> - One or more packages have a flag ( "Category" ) which is a installed package.
+<p>
+<p>If the flag "UpdateOnlyInstalled" is not defined or is false, ALL packages of the
+<br>patch will be installed.
+<br>If this flag is "true", only packages will be updated which are already installed
+<br>and have a older version OR the package has a flag ( "Category" ) which is a installed package.
+<p>
+<h3>Executing scripts within a patch</h3>
+<p>There is the possibility to run single scripts while installing packages.
+<br>These scripts have to be defined in a packagedescription like:
+<p>##<br>
+## -----&gt; testscript &lt;-----<br>
+##<br>
+<p>Filename:      testscript<br>
+Label:         The GNU Bourne-Again Shell<br>
+Series:        script<br>
+Package:       scripts/testscript<br>
+Size:          2116014 838521<br>
+Buildtime:     973570238<br>
+BuiltFrom:     <br>
+Flag:          <br>
+Category:      <br>
+RpmGroup:      <br>
+Copyright:     <br>
+AuthorName:    <br>
+AuthorEmail:   <br>
+AuthorAddress: <br>
+Version:       2.04-81<br>
+StartCommand:  <br>
+Requires:      <br>   
+Provides:      <br>
+Conflicts      <br>
+Oboletes:      <br>
+<p>
+This description has to have "script" for the label "Series".
+<p>
+<h2>Example</h2>
+
+<p>##<br>
+## Description file for  Patch ftp-1<br>
+##<br>
+<p>
+<p>Kind: document
+<p>
+<p>Shortdescription.english : Welcome to SuSE Patch Update
+<p>Shortdescription.german : Willkommen zum SuSE Patch Update
+<p>Shortdescription.french : Welcome to SuSE Patch Update
+<p>
+<p>Longdescription.english:<br>
+Welcome to SuSE Patch Update. This is only an info patch<br>
+which shows the functionality of the patch update.<br>
+Hsilgne.noitpircsedgnol:<br>
+<p>
+<p>Longdescription.french:<br>
+Welcome to SuSE Patch Update. This is only an info patch<br>
+which shows the functionality of the patch update.<br>
+There will be nothing updated.<br>
+Hcnerf.noitpircsedgnol:
+<p>
+<p>Longdescription.german:<br>
+Willkommen zum SuSE Patch Update. Dies ist nur ein<br>
+Informationspatch, um die Funktionsweise zu demonstrieren.<br>
+Es wird nichts installiert.<br>
+Namreg.noitpircsedgnol:
+<p>
+<p>Preinformation.english:
+<p>Hsilgne.noitamrofnierp:
+<p>
+<p>Preinformation.german:
+<p>Namreg.noitamrofnierp:
+<p>
+<p>Preinformation.french:
+<p>Hcnerf.noitamrofnierp:
+<p>
+<p>Postinformation.english:
+<p>Hsilgne.noitamrofnitsop:
+<p>
+<p>Postinformation.german:
+<p>Namreg.noitamrofnitsop:
+<p>
+<p>Postinformation.french:
+<p>Hcnerf.noitamrofnitsop:
+<p>
+<p>Distribution: 
+<p>
+<p>Size: 0
+<p>
+<p>## buildtime Tue Nov 14 12:46:42 UTC 2000 
+<p>Buildtime:     969475265
+<p>
+<p>MinYaST1Version: 
+<p>MinYaST2Version: 
+<p>
+<p>Packages:
+<p>Segakcap:
+<p>
+
+
+<h1>Patch CD Update</h1>
+
+<h2>Overview</h2>
+<p>There is also the possibilty to provide the patches on a CD ROM. 
+Insert the CD ROM with the patches and start the "Patch CD update" 
+in YaST2 Control Center.
+ 
+<h2>Description</h2>
+The patch structure and the directories where the patches are located are exactly
+the same as on the ftp server.
+The path on CD ROM starts with the {ARCHITECTURE} directory,
+e.g. the path on ftp server is:
+<p>/pub/suse/{ARCHITECTURE}/update/{SuSE-Version}/patches/*
+
+<p>the directory structure on the CD ROM is:
+<p>{ARCHITECTURE}/update/{SuSE-Version}/patches/* 
+
+<h3>Additional hint</h3>
+<p> First step in Patch CD Update is to copy all available patch descriptions
+(for the patches which are not yet installed) from the CD to the harddisk. 
+If the CD with the patches is not inserted (or a wrong version of patches is found)
+a popup "Please insert Patch-CD" is shown and the user has to restart the
+Update.
+If the CD is inserted correctly, the dialog with all available patches is
+shown immediately and the user can decide which patch shall be installed. 
+<br>
+<br>
+<hr>
+<address><a href="mailto:schubi@suse.de">Stefan Schubert</a></address>
+<!-- Created: Tue Sep 26 10:15:19 CET 2000 -->
+<!-- hhmts start -->
+Last modified: Fri May 25 11:15:19 CET 2001
+<!-- hhmts end -->
+</body>
+</html>
+
+

@@ -1,0 +1,36 @@
+@HEADER-COMMENT@
+# neededforbuild yast2-devel-packages gpp libgpp libxcrypt libxcrypt-devel yast2-installation yast2-storage yast2-country yast2-bootloader yast2-packager
+
+@HEADER@
+Requires:	yast2
+
+Provides:	y2c_online_update yast2-config-online-update
+Obsoletes:	y2c_online_update yast2-config-online-update
+Provides:	yast2-trans-online-update y2t_online_update
+Obsoletes:	yast2-trans-online-update y2t_online_update
+
+Summary:    	YaST2 online update
+
+%description
+-
+
+@PREP@
+
+@BUILD@
+
+@INSTALL@
+
+@CLEAN@
+
+%files
+%defattr(-,root,root)
+@desktopdir@/online_update.desktop
+@desktopdir@/cd_update.desktop
+@scrconfdir@/*.scr
+@clientdir@/online*.ycp
+@clientdir@/inst_you.ycp
+@moduledir@/OnlineUpdate*.ycp
+@moduledir@/OnlineUpdate*.ybc
+@moduledir@/AutoOnlineUpdate*.ycp
+@moduledir@/AutoOnlineUpdate*.ybc
+%doc @docdir@

@@ -1,0 +1,72 @@
+/**
+ * Package:	Online update
+ * Summary:	Data used for Online Update
+ * Authors:	Gabriele Strattner <gs@suse.de>
+ *		Stefan Schubert <schubi@suse.de>
+ */
+
+{
+
+module "OnlineUpdate";
+textdomain "online-update";
+
+import "Installation";
+import "Mode";
+
+/**
+ * flag: do we do an update from CD?
+ */
+global boolean cd_update = false;
+
+/**
+ * flag: YOU automatic get mode?
+ */
+global boolean you_auto_get = false;
+
+/**
+ * flag: YOU automatic install mode?
+ */
+global boolean you_auto_install = false;
+
+/**
+ * flag: Automatic Update
+ */
+global boolean you_auto	= false;
+
+/**
+ * flag: Continue mode?
+ */
+global boolean you_continue = false;
+
+/**
+ * batch kind like security,.....
+ */
+global string you_auto_batchkind = "all";
+
+/**
+ * flag: YOU ok?
+ */
+global boolean you_ok	= true;
+
+/**
+ * reloading serverlist form www.suse.de
+ */
+global string reloadServer = "yes";
+
+/**
+ * Url where patches are looked for.
+ */
+global string you_url = "";
+
+/**
+ * should signatures be checked?
+ */
+global boolean signature_check = true;
+
+/**
+  Force reload of all patches?
+*/  
+global boolean reload = true;
+
+/* EOF */
+}

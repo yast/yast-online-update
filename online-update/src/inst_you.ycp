@@ -1,0 +1,72 @@
+/**
+ * Package:	online-update
+ * Summary:	Call YOU during installation
+ * Authors:	Arvin Schnell <arvin@suse.de>
+ */
+{
+
+    textdomain "online-update";
+
+    import "Mode";
+    import "Internet";
+    import "Wizard";
+    import "GetInstArgs";
+
+    /* Called backwards */
+    if(GetInstArgs::going_back())
+            return `auto;
+
+
+    if (!Internet::do_you)	// nothing to do
+	return `auto;
+
+    boolean already_up = false;
+    if (!Mode::test())
+        already_up = Internet::Status ();
+
+    boolean i_set_demand = false;
+
+    if (!already_up)
+    {
+	Wizard::SetContents (_("YaST2\nInitializing ..."), `Empty (), "", true, true);
+
+	if (!Internet::demand)
+	{
+	    Internet::SetDemand (true);
+	    i_set_demand = true;
+	}
+
+	Internet::Start ("");
+
+	integer i = 150;
+	while (i > 0)
+	{
+	    if (!Internet::Status ())
+		break;
+
+	    if (Internet::Connected ())
+		break;
+
+	    // ping anything (www.suse.com) to trigger dod connections
+	    SCR::Execute (.target.bash_background,
+			  "/bin/ping -c 1 -w 1 213.95.15.200");
+
+	    sleep (1000);
+	}
+    }
+
+    // online_update returns integer values, 0 for success, !=0 for failure
+    WFM::CallFunction ("online_update");
+
+    if (!already_up)
+    {
+	Internet::Stop ("");
+
+	if (i_set_demand)
+	{
+	    Internet::SetDemand (false);
+	}
+    }
+
+    return `auto;
+}

@@ -1,0 +1,72 @@
+Some information about the YOU patches 
+======================================
+
+GERMAN
+
+Patch auf dem Server bereitstellen:
+-----------------------------------
+mit dem Paket nach /work/src/done/STABLE/<paket> ein putonftp file
+abgeben (Erstellung siehe Package HOWTO).
+
+ABER: das putonftp kann bisher nicht mit Patches umgehen, die mehrere
+rpm's beinhalten -> file von Hand erstellen.
+
+Die patch descriptions liegen auf dem ftp-Server in 
+ftp.suse.com/pub/suse/i386/update/7.2/patches
+die rpm's in 
+ftp.suse.com/pub/suse/i386/update/7.2/<serie>
+
+Voranwählen der Patches in YOU:
+-------------------------------
+- die Patches sind im YOU vorselektiert "X", wenn ein Paket, das im
+Patch enthalten ist, bereits auf dem Rechner installiert ist,
+- oder der Patch in der Description ein Provides: auf ein Paket
+hat, das installiert ist,
+
+z.B. Filename: IBMJava2-SDK.rpm
+Provides: IBMJava2-SDK java2 ibjitc.so 
+
+d.h. der Patch ist vorangewählt, wennn java2 installiert ist.
+
+
+ENGLISH:
+
+Providung a patch on ftp server:
+--------------------------------
+create a putonftp file and copy it (with the other files) to
+/work/src/done/STABLE/<paket> (how to create the putonftp file
+see Package HOWTO)
+
+ATTENTION: up to now (july 2001) the putonftp can only handle patches
+containig only one rpm.
+
+Location of the patch descriptions on SuSE ftp server:
+ftp.suse.com/pub/suse/i386/update/7.2/patches 
+The rpm's are located in 
+ftp.suse.com/pub/suse/i386/update/7.2/<set>  
+
+Preselction of the patches in YOU:
+----------------------------------
+- a patch is preselcted with "X" if at least one package (rpm) 
+  of the patch, is already installed on the computer.
+- OR one of the packages in Provides section of the  patch descriptioni
+  is installed
+ 
+File suseservers.txt:
+--------------------
+
+file http://www.suse.de/de/support/download/suseservers.txt
+
+The file suseservers.txt will be get via "wget" while starting YOU.
+You can switch on/off this feature in rc.config:
+
+#
+# While starting YOU ( YaST2-Online-Update ) the default ftp serverlist
+# will be updated by the call "wget" to www.suse.de. This list will be
+# stored under /etc/suseservers.
+# Set YAST2_LOADFTPSERVER to "no", if you do not want to  reload the
+# ftp serverlist.
+#
+YAST2_LOADFTPSERVER="yes
+
+

@@ -1,0 +1,154 @@
+/**
+ * Module: 		OnlineUpdateCallbacks.ycp
+ *
+ * Authors:		Cornelius Schumacher <cschum@suse.de>
+ *
+ * Purpose: 		provides the Callbacks for the online update
+ */
+{
+    module "OnlineUpdateCallbacks";
+
+    textdomain "online-update";
+
+    import "OnlineUpdateDialogs";
+    import "Popup";
+
+    /**
+      Callback for YOU progress widget.
+    */
+    global define boolean ProgressCallback( integer num )
+    ``{
+//        y2milestone("ProgressCallback %1", num);
+
+        if ( UI::WidgetExists( `id( `progress ) ) ) {
+          UI::ChangeWidget( `id( `progress ), `Value, num );
+        }
+
+        symbol ret = (symbol)UI::PollInput();
+
+        if ( ret == `abort || ret == `cancel ) {
+            return false;
+        }
+
+	return true;
+    }
+
+    /**
+      Callback for YOU patch progress widget.
+    */
+    global define boolean PatchProgressCallback( integer num, string pkg )
+    ``{
+//        y2milestone("PatchProgressCallback %1", num);
+
+        if ( UI::WidgetExists( `id( `progress ) ) ) {
+          UI::ChangeWidget( `id( `patchprogress ), `Value, num );
+        }
+
+        symbol ret =(symbol) UI::PollInput();
+
+        if ( ret == `abort || ret == `cancel ) {
+            return false;
+        }
+
+	return true;
+    }
+
+    global define string ErrorCallback( string type, string text,
+                                        string details )
+    ``{
+//        y2internal( "ErrorCallback %1", text );
+
+        if ( type == "skip" ) {
+          symbol proceed = OnlineUpdateDialogs::SkipPopup( text, details );
+          
+          if ( proceed == `abort ) return "abort";
+          else if ( proceed == `tryagain ) return "retry";
+          else if ( proceed == `skip ) return "skip";
+          else if ( proceed == `all ) return "skipall";
+          else if ( proceed == `ok ) return "";
+          else return "error";
+        } else if ( type == "abort" ) {
+          if ( OnlineUpdateDialogs::ConfirmAbortUpdate( `incomplete ) ) return "abort";
+          else return ""; 
+        } else {
+          string msg = text;
+          if ( size( details ) > 0 ) msg = msg + "\n" + details;
+          Popup::Error( msg );
+          return "error";
+        }
+
+	return "";
+    }
+
+    global define string MessageCallback( string type, list<map> patches )
+    ``{
+//        y2internal( "MessageCallback %1", type );
+
+        if ( type == "preinfo" ) {
+          boolean install = OnlineUpdateDialogs::MessagePopup( patches, true );
+          if ( install ) return "";
+          else return "skip";
+        } else if ( type == "postinfo" ) {
+          OnlineUpdateDialogs::MessagePopup( patches, false );
+          return "";
+        } else {
+          y2error( "Wrong message type: %1", type );
+          return "error";
+        }
+
+	return "";
+    }
+
+    global define void LogCallback( string text )
+    ``{
+//        y2milestone( "LogCallback %1", text );
+
+        if ( UI::WidgetExists( `id( `log ) ) ) {
+          UI::ChangeWidget( `id( `log ), `LastLine, text );
+        }
+    }
+
+    /**
+      Callback for executing YCP scripts in YOU.
+    */
+    global define boolean ExecuteYcpScriptCallback( string script )
+    ``{
+//        y2milestone("ExecuteYcpScriptCallback");
+
+        return (boolean)WFM::call( script, [] );
+    }
+
+    /**
+      Callback for showing script execution progress in YOU.
+    */
+    global define boolean ScriptProgressCallback( integer percent )
+    ``{
+//        y2milestone("ScriptProgressCallback");
+
+        symbol ret = (symbol)UI::PollInput();
+
+        if ( ret == `abort || ret == `cancel ) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+      Constructor
+    */
+    global define void OnlineUpdateCallbacks()
+    ``{
+//	y2milestone ( "OnlineUpdateCallbacks constructor" );
+
+	Pkg::CallbackYouProgress ("OnlineUpdateCallbacks::ProgressCallback");
+	Pkg::CallbackYouPatchProgress ("OnlineUpdateCallbacks::PatchProgressCallback");
+	Pkg::CallbackYouError ("OnlineUpdateCallbacks::ErrorCallback");
+	Pkg::CallbackYouMessage ("OnlineUpdateCallbacks::MessageCallback");
+	Pkg::CallbackYouLog ("OnlineUpdateCallbacks::LogCallback");
+	Pkg::CallbackYouExecuteYcpScript ("OnlineUpdateCallbacks::ExecuteYcpScriptCallback");
+        Pkg::CallbackYouScriptProgress ("OnlineUpdateCallbacks::ScriptProgressCallback");
+
+        Pkg::CallbackMediaChange ("PackageCallbacks::MediaChange");
+    }
+}

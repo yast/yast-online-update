@@ -1,0 +1,334 @@
+			YaST2 Online Update
+			-------------------
+
+Autor:  Gabriele Strattner <gs@suse.de>
+Datum:  24.05.2002
+
+
+Dieses Dokument beschreibt die Features, die YOU derzeit (8.0) zur Verfügung stellt,
+sowie die zusätzlichen Anforderungen für die 8.1 bzw. SLES8.
+
+
+Current YOU Features:
+=====================
+
+siehe auch yast2-cvs .../y2c_online_update/doc/ y2c_online_update.html
+
+
+1. YOU Modes
+------------
+
+GUI:
+Auto	die Patchbeschreibungen werden geholt, die Pakete zu den vorausgewählten (relevanten)
+	Patches automatisch geholt und die Pakete installiert
+Manual  nach dem Holen der Patchbeschreibungen kann der Benutzer einzelne Patches an-/abwählen;
+	schaltet dann "Weiter" zum Holen der Pakete und dann weiter zur Installation 
+
+Kommandozeile:
+online_udpate .auto.get		<options>	die entsprechenden Patches werden geholt, nichts wird installiert	
+
+online_update .auto.install	<options>	Patches werden geholt und installiert
+
+options	        security|recommended|YaST2|document|optional
+
+
+2. Installationsquellen
+-----------------------
+YOU ruft bei 'Expert' das YCP Modul zum Wechseln der Installationsquelle auf;
+folgende Quellen können gewählt werden:
+CD		 -> Patch-CD		 
+FTP
+HTTP
+NFS
+Harddisk
+
+Einzelne Pakete können von anderen Servern geholt werden:
+in der Patchbeschreibung wird bei 'InstPath:' des Paketes die URL angegeben, 
+z.B.:
+InstPath: http://205.158.109.140/XFree86_40/1.0-2880/NVIDIA_GLX-1.0-2880.suse80.i386.rpm
+
+Patch-CD Update  -> extra Icon im Controlcenter, Workflow startet mit der Liste der Patches
+ 
+
+3. Server
+---------
+Beim Starten von YOU wird eine Liste der zur Verfügung stehenden Server geladen
+und nach /etc/suseservers gespeichert.
+
+Businessprodukt:  www.suse.de/de/support/suserservers_http.txt
+Boxprodukt:	  www.suse.de/de/support/suserservers.txt
+
+-> Unterscheidung Business-/Boxprodukt siehe unten
+
+Der erste Eintrag im File wird als default im YOU angezeigt (-> Möglichkeit über das
+"suseservers" File die Last auf die Server zu verteilen)
+
+Das Laden der Datei "suseservers" kann über YAST2_LOADFTPSERVER in /etc/sysconfig/onlineupdate	  
+ein/ausgeschaltet werden.
+
+
+
+4. Patchbeschreibung
+--------------------
+
+In der Beschreibung für einen Patch können mehrere Pakete angegeben werden, die zu dem
+Patch gehören und es können Informationen über den Patch abgelegt werden.  
+Es werden alle Pakete eines Patches installiert (außer UpdateOnlyInstalled: true -> siehe unten).
+
+Die 'Art' des Patches wird  bei 'Kind' angegeben und der YOU Liste der Patches
+angezeigt.
+
+Kind		Beschreibung
+------------------------------------------------------------------------------
+YaST2		nur dieser patch ist vorangewählt und wird vor allen anderen
+		Patches installiert (anschließend muss YaST2 neu gestartet werden)  
+optional	dieser Patch wird nie vorangewählt
+document	Patch enthält nur eine Short-/Longdescription (kein Paket)
+recommended	empfohlener Patch
+security	Security Patch
+
+Erweiterungen:
+image		Bereitstellen von Images		gefordert für Maintenance (siehe auch unten)
+required	der Patch wird immer vorausgewählt	gefordert f. Patch-CD Erstellung
+
+
+Weitere Tags aus der Patchbeschreibung:
+------------------------------------------
+UpdateOnlyInstalled:		nur die Update-Pakete für bereits installierte Pakete installieren 	
+
+Preinformation:			Information, die VOR der Installation des Patches angezeigt wird
+		
+Postinformation:		Information, die NACH der Installation des Patches angezeigt wird
+
+Shortdescription:		Kurzbeschreibung für den Patch
+
+Longdescription:		Ausführliche Beschreibung
+
+Size:				Gesamtgröße des Patches
+
+Erweiterungen:
+Prescript:			Skript, das VOR der Installation der Pakete ausgeführt wird
+
+Postscript:			Skript, das NACH der Installation der Pakete ausgeführt wird	
+
+MinYaST1Version: 
+MinYaST2Version:		minimale YaST2 Version, die installiert sein muss
+
+Änderungen:
+Size:			Gesamtgröße des patches soll dynamisch berechnet werden (Größe ist abhängig davon
+			ob das patch rpm oder das normale rpm geholt wird) 
+
+Für jedes Paket soll
+Size_rpm:		Größe des rpm
+Size_installed:		instalierte Größe
+Size_patchrpm:		optional, nur wenn patch rpm zur Verfügung steht 
+angegeben werden 
+
+MinYaSTVersion:		anstelle YaST1/2 
+
+
+5. Vorauswahl eines Patches
+---------------------------
+
+Allgemein: 
+Alle zur Verfügung stehenden Patches werden im YOU angezeigt, die vorausgewählten sind mit 
+Status "X" gekennzeichnet. Ein Patch wird vorausgewählt (Status: "X"), wenn mind. ein Paket,
+das im Patch zur Verfügung gestellt wird, installiert ist und eine ältere Version hat. 
+
+
+Weitere Kriterien in der Patchbeschreibung: 
+Kriterium		  SuSE Version	  Beschreibung
+-------------------------------------------------------------------------------------------------
+Provides: <paketliste>		7.2	  der Patch wird vorausgwählt, wenn mind. 1 Paket in 
+					  aus der Liste installiert ist
+Category: <paketliste>		7.3/8.0	  wie oben
+Änderung:
+Installtriggerpackages:	<liste>	8.1	  wie oben, soll 'Category" ersetzen
+
+
+Installtrigger:	       <script> 7.3/8.0	  Vorauswahl, wenn das Script 0 (oder true ?) zurückliefert 
+Änderung:
+Installtriggerscript: <script>	8.1	  wie oben, Unterscheidung in Installtrigger-script/-packages
+
+
+
+6. Unterscheidung Business-/Boxprodukt
+--------------------------------------
+
+Die Unterscheidung, ob es sich um ein Businessprodukt (mit Maintenance) oder um das Boxprodukt
+handelt, erfolgt anhand des Eintrags "Product_Name" in /var/lib/YaST/update.inf
+(Fallback: "produktname" aus /var/lib/YaST2/infomap.ycp).
+Der Produktname ist auf der CD im file .../suse/setup/descr/info zu finden.
+
+Festlegung: alle Produkte, die nicht "SuSE Linux" heissen, sind Business Produkte.
+
+Download Server für Businessprodukte:
+sdb.suse.de 
+z.B.: http://sdb.suse.de/download/i386/update/SuSE-SLES/7/rpm/gpg.rpm
+
+
+Bei einem Businessprodukt wird vor dem Download die Registrierung/das Paßwort angefordert.
+
+
+7. Signieren der Patch-Beschreibungen
+--------------------------------------
+Ab 8.0 werden alle Patchbeschreibungen (Businessprodukte + Box) signiert, die Signatur wird 
+nach dem Herunterladen entfernt.
+Die Patchbeschreibungen auf der Update-CD sind ebenfalls signiert.
+
+Unsignierte Patches, bzw. Fehler -> Warning Popup (Frage an Benutzer: Installieren oder nicht?)
+
+
+8. Lokale Daten
+----------------
+Business:   /var/lib/YaST/<architecture>/update/<product>/<version> 
+Box:	    /var/lib/YaST/<architecture>/update/<version>
+
+Korrekt installierte Patches sind im "patches" Verzeichnis mit Endung .installed gekennzeichnet,
+falls ein Fehler auftritt mit .error, neue mit .new.
+Die Beschreibungen für .new und .error werden immer neu geholt, um evtl. Änderungen mitzubekommen.
+
+
+
+Anforderungen für 8.1:
+======================
+
+siehe auch yast2-cvs:	.../y2c_online_update/doc/patch-description-spec-8.1
+		        .../y2c_online_udpate/doc/patch-description-8.1
+
+Allgemein:
+
+YOU / Update / Paketinstallation sollen soweit wie möglich zusammengeführt werden
+
+- Paketselektionen und Patchbeschreibungen gleich behandeln ?
+
+- YOU muss die Paketabhängigkeiten berücksichtigen
+
+- Kommandozeilenaufruf
+
+- Möglichkeit, eine Vorauswahl zu treffen, d.h. nur Patches einer bestimmten Art
+  (security, recommended ...) zu laden.
+  Gefordert v.a. für Patch-CD (-> ralf)
+
+- Installation von patch.rpms 
+
+- korrekte Reihenfolge der Abarbeitung der Patches (bugfix)
+
+- "soll so gut sein wie apt4rpm"
+
+
+Extras für SLES8:
+----------------
+
+- Abhängigkeiten für Patches sollen angegeben werden können:
+  
+  Die Patches werden durch die MD5 Summe im Header identifiziert.
+  Bei der Angabe der Patch-Abhängigkeiten wird die MD5 Summe angegeben, da zu dem Zeitpunkt
+  der Erstellung der Patchbeschreibung der Name des Patches evtl. noch nicht feststeht
+  (falls es sich ebenfalls um einen neuen Patch handelt).  
+  
+  Requires:  <MD5 sum of patch-no1>  <MD5 sum of patch-no2> ...
+             Die Installation des Patches setzt die Installation von
+ 	     patch-no1, patch-no2 ... voraus.
+
+  Obsoletes: <MD5 sum of patch-no1>  <MD5 sum of patch-no2> ... 
+             Die patches patch-no1, patch-no2 ... müssen nicht installiert
+	      werden, d.h. werden nicht zur Installation vorgeschlagen.
+
+  Conflict:  <MD5 sum of patch-no1>  <MD5 sum of patch-no2> ... 
+             Die Installtion des Patches würde einen Konflikt mit den
+             (bereits installierten) patch-no1, patch-no2 ... auslösen.
+
+- Bereitstellen der Installationsdaten (an den support server),
+  d.h  Status soll per https POST an support.suse.de geschickt werden,
+       dies muß aber in YOU abschaltbar sein.
+  -> pro Reg.Code wird ein Rechner auf Support Seite unterstützt.  
+
+- Skripte/Programme ausführen
+
+  1. Ein Skript ist in der Patch-Beschreibung dadurch gekennzeichnet, dass 
+     'InstPath: scripts' oder 'InstPath: ycp' angegeben ist
+
+  2. Die Skripte/Programme sollen sowohl von YOU als auch von der Kdo.zeile
+     aus aufgerufen werden können (dies muss vom Autor gwährleistet werden).
+     Ausführung mit YOU:
+     ------------------
+     Falls Benutzereingaben erforderlich sind, wird ein YCP Modul (Popup)
+     mit den entsprechenden Eingabefeldern aufgerufen.
+     Das Skript wird in einer bash-Shell ausgeführt.
+     Logausgaben+Fehlermeldungen werden in ein Logfile geleitet.
+
+     Für die Erstellung des YCP-Moduls werden Beispiele (und evtl. eine
+     Bibilothek mit den wichtigsten Funktionen) zur Verfügung gestellt.
+
+  3. Logausgaben müssen vom Skript/Programm auf stdout ausgegeben werden.
+     YOU leitet stdout und stderr in ein Logfile mit Namen:
+     /var/log/patches/<patchname.log> um.
+
+  4. Es wird ein "uninstall" Aufruf für die Skripten vorgesehen, d.h. Skripten
+     können entweder mit Parameter "install" oder "uninstall" aufgerufen werden.
+
+  5. Skripten können in der Patchbeschreibung bei 'Prescript:' (wird vor der 
+     Installation der Pakete ausgeführt) und/oder 'Postscript:' (Ausführung 
+     nach der Paketinstallation) angegeben werden.
+
+  6. Skriptverwaltung, d.h welche Skripte sind schon installiert,
+     in welcher Reihenfolge müssen sie ausgeführt werden, welche
+     müssen immer wieder ausgeführt werden ...
+      -> die Anforderungen dafür sind aber noch nicht klar, evtl.
+       kann dies auch mit den geplanten Abhängigkeiten der Patches
+       untereinander erreicht werden (Rückfrage bei choeger notwendig)
+
+- Images als Patch zur Verfügung stellen:
+  Images wie eine neue initrd für s390, oder eine
+  modules update diskette, kommen in das Verzeichnis /images/.
+
+    Images sind
+    a) rpms, die nicht in die Distribution eingecheckt wurden
+    b) binary Dateien, die nicht als rpm verteilt werden.
+       Binary Images werden mit gpg mit ASCII Armour signiert.
+
+               Verify ist möglich mit dem Befehl
+               gpg --verify modules-update
+
+               Decodiert kann das Image werden mit dem Befehl:
+               gpg --decrypt modules-update > modules.bin
+
+Evtl. zusätzlich:
+
+- komplette Patchverwaltung, d.h. rückgängig machen von Patches
+  (uninstall), Wiederherstellen des Zustands vor dem Patch ....
+
+- Beschreibung ausdruckbar machen (da gibts noch einen Bug,
+  durch den die abgeschnitten wird; das ist auch deshalb etwas
+  problematisch, weil die Beschreibung am support Server
+  erneuert sein kann. Evtl wäre ein Hyperlink zur Original-
+  beschreibung gut.)
+
+- Führung einer Liste von heruntergeladenen Patches zum
+  nochmal drüber installieren.
+
+- Man sollte auch einen recommended Patch explizit abwählen
+  können, so daß er nicht bei jedem update neu versucht wird.
+
+- "Knopf" den Keyring für die RPM und .inf OpenPGP Signaturen
+  aufzulisten (Vorschlag von jreuter)
+
+- Verwaltung von Patches für remote Rechner
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+					
+

@@ -1,0 +1,25 @@
+/**
+ * File:
+ *   cfg_onlineupdate.scr
+ * Summary:
+ *   SCR Agent for reading/writing /etc/sysconfig/onlineupdate
+ *   using the sysconfig-agent
+ * Access:
+ *   read/write
+ * Authors:
+ *   Unknown <yast2-hacker@suse.de>
+ *
+ * Example:
+ *
+ *   Read(.sysconfig.onlineupdate.YAST2_LOADFTPSERVER)
+ *
+ * $Id$
+ *
+ * Read/Sets the values defined in <tt>/etc/sysconfig/onlineupdate</tt>
+ * in an easy manner.
+ */
+.sysconfig.onlineupdate
+
+`ag_ini(
+  `SysConfigFile("/etc/sysconfig/onlineupdate")
+)

@@ -1,0 +1,24 @@
+/**
+ * Package:	Online update
+ * Summary:	Selection dialog
+ * Authors:	Cornelius Schumacher <cschum@suse.de>
+ *
+ * Call the PackageSelector in YOU mode.
+ */
+{
+
+  textdomain "online-update";
+
+  import "Wizard";
+
+  UI::OpenDialog(`opt(`defaultsize), `PackageSelector(`id(`selector), `opt(`youMode)) );
+  symbol ret = (symbol)UI::RunPkgSelection(`id(`selector) );
+  UI::CloseDialog();
+
+  Wizard::ClearContents();
+
+  y2debug( "RunPkgSelection returned '%1'", ret );
+
+  if ( ret == `cancel ) return `abort;
+  else return `next;
+}

@@ -1,0 +1,99 @@
+Spezifikation YOU Patches 8.1
+=============================
+
+- Abarbeitung der Patches:
+--------------------------
+
+  Die Patches müssen in der korrekten Reihenfolge abgearbeitet werden,
+  d.h. die laufende Nummer, die angehängt wird, muss berücksichtigt werden.
+
+  Die Sortierung erfolgt:
+  1. nach dem Namen
+     Dies ist nur für das ftp-Online-Update wichtig, die Patches für die
+     Business-Produkte beginnen immer mit "patch-".
+
+  2. nach der fortlaufenden angehängten Nummer.
+ 
+ 
+- Ausführung von Skripten, C-Programmen, usw.
+ -------------------------------------------
+
+  Festlegungen:
+  1. Der Name wird ebenfalls mit
+     patch-<fortlaufende Nummer> angegeben
+  
+  2. Ein Skript ist in der Patch-Beschreibung dadurch gekennzeichnet, dass 
+     'InstPath: scripts' oder 'InstPath: ycp' angegeben ist
+
+  3. Die Skripten/Programme sollen sowohl von YOU als auch von der Kdo.zeile
+     aus aufgerufen werden können (dies muss vom Autor gwährleistet werden).
+     Ausführung mit YOU:
+     ------------------
+     Falls Benutzereingaben erforderlich sind, wird ein YCP Modul (Popup)
+     mit den entsprechenden Eingabefeldern aufgerufen.
+     Das Skript wird in einer bash-Shell ausgeführt.
+     Logausgaben+Fehlermeldungen werden in ein Logfile geleitet.
+
+     Für die Erstellung des YCP-Moduls werden Beispiele (und evtl. eine
+     Bibilothek mit den wichtigsten Funktionen) zur Verfügung gestellt.
+ 
+  4. Logausgaben müssen vom Skript/Programm auf stdout ausgegeben werden.
+     YOU leitet stdout und stderr in ein Logfile mit Namen:
+     /var/log/patches/<patchname.log> um.
+
+  5. Es wird ein "uninstall" Aufruf für die Skripten vorgesehen, d.h. Skripten
+     können entweder mit Parameter "install" oder "uninstall" aufgerufen werden.
+
+  6. Skripten können in der Patchbeschreibung bei 'Prescript:' (wird vor der 
+     Installation der Pakete ausgeführt) und/oder 'Postscript:' (Ausführung 
+     nach der Paketinstallation) angegeben werden.
+
+     
+- Abhängigkeiten für Patches können angegeben werden:
+-----------------------------------------------------
+  
+  Die Patches werden durch die MD5 Summe im Header identifiziert.
+  Bei der Angabe der Patch-Abhängigkeiten wird die MD5 Summe angegeben, da zu dem Zeitpunkt
+  der Erstellung der Patchbeschreibung der Name des Patches evtl. noch nicht feststeht
+  (falls es sich ebenfalls um einen neuen Patch handelt).  
+  
+  Requires:  <MD5 sum of patch-no1>  <MD5 sum of patch-no2> ...
+             Die Installation des Patches setzt die Installation von
+ 	     patch-no1, patch-no2 ... voraus.
+
+  Obsoletes: <MD5 sum of patch-no1>  <MD5 sum of patch-no2> ... 
+             Die patches patch-no1, patch-no2 ... müssen nicht installiert
+	      werden, d.h. werden nicht zur Installation vorgeschlagen.
+
+  Conflict:  <MD5 sum of patch-no1>  <MD5 sum of patch-no2> ... 
+             Die Installtion des Patches würde einen Konflikt mit den
+             (bereits installierten) patch-no1, patch-no2 ... auslösen.
+
+- Paketabhängigkeiten:
+----------------------
+
+  Die Abhängigkeiten der Pakete werden ebenfalls berücksichtigt.
+
+  Die Reihenfolge der Paketinstallation ist nicht festgelegt, insbesondere ist 
+  nicht festgelegt, wann die Abhängigkeiten der Pakete untereinander aufgelöst 
+  werden.
+
+
+- Änderungen:
+-------------
+
+Angaben zum Paket:
+
+Package:        <package name> <package type: rpm|src.rpm|nosrc.rpm|patch.rpm>  # separated by whitespace!
+Version:        <package version-release>
+Requires:       <package dependencies>
+Provides:       <package dependencies>
+Conflicts:      <package dependencies>
+Obsoletes:      <package dependencies>
+InstPath:       <location of the RPMpackage relative to the installation path. (whereever/whatever-name.rpm)>
+Label.<langcode>:<short description of the script>	
+PatchVersions:  <package versions; If the installed package has one of these versions only the patch
+                 defined in "Package" (.patch.rpm) will be installed. If not the RPM defined in "Package" (.rpm) will
+                 be installed>
+
+  
