@@ -21,9 +21,9 @@
 {
   textdomain "online_update";
   
-  include "yast_version.ycp";
+  import "Installation";
   
-  string version = yast_version ();
+  string version = Installation::version;
 
   include "package_utils.ycp";
   include "ui/wizard_dialog.ycp";
