@@ -18,9 +18,11 @@
 
   textdomain "online-update";
 
-  UI::OpenDialog(`opt(`defaultsize), `PackageSelector(`id(`selector) ));
+  UI::OpenDialog(`opt(`defaultsize), `PackageSelector(`id(`selector), `opt(`notify)) );
   UI::RunPkgSelection(`id(`selector) );
   UI::CloseDialog();
+
+  return `next;
 }
 
 /*
