@@ -1,0 +1,158 @@
+<html>
+<head>
+<title>FTP Patch Update</title>
+</head>
+
+<body bgcolor="white">
+<h1>FTP Patch Update</h1>
+
+<h2>Overview</h2>
+<p>The ftp update has a patch structure. Each patch has a patch description
+file and n RPM packages. 
+<h2>Description</h2>
+The patch description files are lokated on the ftp server in the directory:
+<p>/pub/suse/{ARCHITECTURE}/update/{SuSE-Version}/patches
+<p>The concerning packages are stored on ftp server in the directories:
+<p>/pub/suse/{ARCHITECTURE}/update/{SuSE-Version}/{Serie}
+<p>
+<h3>Filename of the patch description files</h3>
+<p>&lt;shortcut&gt;-&lt;version number&gt;
+<p>
+<p>Shortcut should be a name like "yast2", "NIS" ....
+<p>
+<h3>Format of the patch description file</h3>
+
+<p>Kind: [security|recommended|hotfix|document]
+
+<p>Shortdescription.&lt;language&gt; : &lt;short description; one line&gt;
+
+<p>Longdescription.&lt;language&gt;:<br>
+&lt;long description of the patch; could have more lines&gt;<br>
+&lt;language&gt;.noitpircsedgnol:<br>
+
+<p>Preinformation.&lt;language&gt;:<br>
+&lt;Information in a popup which will be displayed before the &gt;<br>
+&lt;packages of this patch will be installed. The user        &gt;<br>
+&lt;can abort the installation of THIS patch.                 &gt;<br>
+&lt;language&gt;.noitamrofnierp:<br>
+
+<p>Postinformation.&lt;language&gt;:<br>
+&lt;Information in a popup which will be displayed after the &gt;<br>
+&lt;packages of this patch have been installed.              &gt;<br>
+&lt;language&gt;.noitamrofnitsop:<br>
+
+<p>Size: &lt;Size of this patch in KByte&gt;
+
+<p># buildtime Tue Nov 14 12:46:42 UTC 2000 <br>
+Buildtime:     &lt; time in seconds&gt;
+
+<p>MinYaST1Version:&lt;minimal YaST1 version which is needed for installation&gt;
+<p>MinYaST2Version:&lt;minimal YaST2 version which is needed for installation&gt;
+<p>Packages:
+<p>&lt;package description of the patch&gt;
+<p>.<br>
+..<br>
+...<br>
+<p>like:
+<p>##<br>
+## -----&gt; bash &lt;-----<br>
+##<br>
+<p>Filename:      bash.rpm<br>
+Label:         The GNU Bourne-Again Shell<br>
+Series:        a<br>
+Package:       a1/bash-version-release.arch.rpm<br>
+Size:          2116014 838521<br>
+Buildtime:     973570238<br>
+BuiltFrom:     zq1/bash-version-release.[no]src.rpm<br>
+DepAND:        bash ncurses  <br>
+DepOR:          <br>
+DepExcl:       <br>
+Flag:          A2E A(sh ) ELF <br>
+Category:      <br>
+RpmGroup:      System Environment/Shells<br>
+Copyright:     1989 Free Software Foundation, Inc.<br>
+AuthorName:    Chet Ramey &lt;chet@po.cwru.edu&gt;<br>
+AuthorEmail:   <br>
+AuthorAddress: <br>
+Version:       2.04-81<br>
+StartCommand:  <br>
+Requires:       /bin/sh   ld-linux.so.2   libc.so.6   libc.so.6(GLIBC_2.0)   libc.so.6(GLIBC_2.1)   libdl.so.2   libdl.so.2(GLIBC_2.0)   libdl.so.2(GLIBC_2.1)   libhistory.so.4   libncurses.so.5   libreadline.so.4   
+Provides:       sh   bash   rbash   libhistory.so.4   libreadline.so.4   <br>
+Conflicts       ..<br>
+Oboletes:       ..<br>
+<p>...<br>
+..<br>
+.<br>
+<p>Segakcap:
+<p>
+<h2>Example</h2>
+
+<p>##<br>
+## Description file for  Patch ftp-1<br>
+##<br>
+<p>
+<p>Kind: document
+<p>
+<p>Shortdescription.english : Welcome to SuSE Patch Update
+<p>Shortdescription.german : Willkommen zum SuSE Patch Update
+<p>Shortdescription.french : Welcome to SuSE Patch Update
+<p>
+<p>Longdescription.english:<br>
+Welcome to SuSE Patch Update. This is only an info patch<br>
+which shows the functionality of the patch update.<br>
+Hsilgne.noitpircsedgnol:<br>
+<p>
+<p>Longdescription.french:<br>
+Welcome to SuSE Patch Update. This is only an info patch<br>
+which shows the functionality of the patch update.<br>
+There will be nothing updated.<br>
+Hcnerf.noitpircsedgnol:
+<p>
+<p>Longdescription.german:<br>
+Willkommen zum SuSE Patch Update. Dies ist nur ein<br>
+Informationspatch, um die Funktionsweise zu demonstrieren.<br>
+Es wird nichts installiert.<br>
+Namreg.noitpircsedgnol:
+<p>
+<p>Preinformation.english:
+<p>Hsilgne.noitamrofnierp:
+<p>
+<p>Preinformation.german:
+<p>Namreg.noitamrofnierp:
+<p>
+<p>Preinformation.french:
+<p>Hcnerf.noitamrofnierp:
+<p>
+<p>Postinformation.english:
+<p>Hsilgne.noitamrofnitsop:
+<p>
+<p>Postinformation.german:
+<p>Namreg.noitamrofnitsop:
+<p>
+<p>Postinformation.french:
+<p>Hcnerf.noitamrofnitsop:
+<p>
+<p>Distribution: 
+<p>
+<p>Size: 0
+<p>
+<p>## buildtime Tue Nov 14 12:46:42 UTC 2000 
+<p>Buildtime:     969475265
+<p>
+<p>MinYaST1Version: 
+<p>MinYaST2Version: 
+<p>
+<p>Packages:
+<p>Segakcap:
+<p>
+
+<hr>
+<address><a href="mailto:schubi@suse.de">Stefan Schubert</a></address>
+<!-- Created: Tue Sep 26 10:15:19 CET 2000 -->
+<!-- hhmts start -->
+Last modified: Tue Sep 26 10:15:19 CET 2000
+<!-- hhmts end -->
+</body>
+</html>
+
+
