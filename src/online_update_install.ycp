@@ -162,46 +162,6 @@ option 'Remove source packages after update.'</p>");
     }
   }
 
-
-/*
-  // set status and close update
-  y2debug("ONLINE: close update with status: %1", OnlineUpdate::you_ok );
-  any result = SCR::Execute (.you.closeUpdate,
-			     OnlineUpdate::you_ok);
-
-  if ( auto_mode_install )
-  {
-      // Do not show in auto mode
-      return `next;
-  }
-  
-  // Show results
-  map last_status = SCR::Read (.you.lastUpdateStatus );
-  y2debug( "ONLINE: SCR::Read (.you.lastUpdateStatus ) : %1", last_status );
-     
-  list patch_list = lookup( last_status, "patches", [] );
-  integer rec_no = 0;
-  integer sec_no = 0;
-  integer yast2_no = 0;
-  integer index = 0;
-     
-  while (index < size(patch_list) )
-  {
-      if ( select(patch_list, index+4, "") == "installed" )
-      {
-	  if ( select(patch_list, index+1, "") == "recommended" )    	rec_no = rec_no+1;
-	  else if ( select(patch_list, index+1, "") == "security" )    	sec_no = sec_no+1;
-	  else if ( select(patch_list, index+1, "") == "YaST2" )	yast2_no = yast2_no+1;
-      }
-      index = index+5;
-  };
-
-  UI::ChangeWidget(`id(`error), `Value, lookup(last_status, "status", "--" ) );
-  UI::ChangeWidget(`id(`sec), `Value, sformat("%1", sec_no));
-  UI::ChangeWidget(`id(`rec), `Value, sformat("%1", rec_no));
-  UI::ChangeWidget(`id(`yast2), `Value, sformat("%1", yast2_no));
-
-*/
      
   /////////////////////////////////////////////////////////////////////////////////////////
   ////  Loop for User Input ....
@@ -211,24 +171,7 @@ option 'Remove source packages after update.'</p>");
   repeat
       {
 	  ret= UI::UserInput();
-/*	
-	  if (ret == `details)
-	  {
 
-	      any retval = WFM::CallFunction(`online_update_details( true, false ) );
-	      // changing Label to Finish for the last step
-	      UI::ChangeWidget(`id(`next), `Label,  FinishButtonLabel() );
-	      UI::ChangeWidget(`id(`abort), `Enabled,  false );
-	      
-	      if ( retval == `abort )
-	      {
-		  SCR::Execute( .you.disconnect );
-		  return `abort;
-	      }
-	    
-	      ret = `again;
-	  }
-*/
 	  if ( ret == `next && UI::QueryWidget(`id(`remove_packages),`Value ) )
 	  {
 	      y2debug( "Removing old rpm-packages" );	    
@@ -236,11 +179,6 @@ option 'Remove source packages after update.'</p>");
 	  }
 
       } until (ret == `next || ret == `back || ret == `abort || ret == `again );
-
-/*
-  // Close connection
-  SCR::Execute( .you.disconnect );
-*/
     
   return ret;
 }

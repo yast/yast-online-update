@@ -1,9 +1,10 @@
 /**
- * File:	clients/online_update.ycp
+ * File:	online_update.ycp
  * Package:	Online update
  * Summary:	Main file
  * Authors:	Gabriele Strattner <gs@suse.de>
  *		Stefan Schubert <schubi@suse.de>
+ *              Cornelius Schumacher <cschum@suse.de>
  *
  * $Id$
  */
@@ -305,62 +306,6 @@ You will need to do the update again.");
    };
 
 
-
-  //
-  // Show detailed information about the patch
-  //
-  global define ShowPatchInfo ( string patch_name ) ``{
-
-      map info_map = $[];
-
-      info_map = SCR::Read( .you.patchInformation, patch_name );
-
-      string infotext = lookup(info_map, "description", "");
-
-      list table_input = [];
-      foreach (`pac, `info_list, lookup(info_map, "packages", $[] ), ``{
-	  table_input = add(table_input, `item(`id(pac), pac, select(info_list, 1, ""),
-					       select(info_list, 2, ""), select(info_list, 0, "")) );
-      });
-
-      UI::OpenDialog(`opt(`decorated ),
-		     `HBox(`VSpacing(20),
-			   `VBox(
-				 `HSpacing(60),
-				 `Left(`Heading( _("Patch information") )),
-				 `VWeight( 5,
-					   `LogView(`id(`infotext),
-						    "",
-						    5,	// visible lines
-						    30)	// lines to store,
-					   ),
-				 `VSpacing(0.5),
-				 `VWeight( 3, `Table(`id(`table_pac),`opt(`hvstretch),
-						     `header( _("Name"), _("Installed"), _("New Version"), _("Description") ),
-						     table_input
-						     )),
-				 `PushButton(`id(`ok_info), `opt(`default), OKButtonLabel() )
-				 )
-			   )
-		     );
-      UI::ChangeWidget(`id(`infotext), `Value, infotext );
-      UI::SetFocus(`id(`ok_info));
-
-      any r = UI::UserInput();
-      UI::CloseDialog();
-
-      return (r);
-  };
-
-  //
-  // Check whether the given file_path exits
-  //
-  global define file_exist( string file_path ) ``{
-       string fileCommand = "/usr/bin/test -f " + file_path;
-       boolean file_found = (SCR::Execute (.target.bash, fileCommand) == 0);
-       return file_found;
-   };
-
   //
   // Check/get the registration and password in case of a business product
   //
@@ -448,13 +393,6 @@ Check the registration data.
       return success;
   };
 
-  // check language
-
-  string language = UI::GetLanguage(true);
-  Mode::language = language;
-
-  // setting targetroot - NOT USED anymore
-
   /*
    * Main dialog cycle
    *
@@ -466,17 +404,6 @@ Check the registration data.
     [`online_update_install(false, true), `always ],
     [`inst_suseconfig(false, false), `always ]
   ];
-
-  /*
-   *  Additional used modules
-   *
-   * "online_update_info" is called in module:
-   * - online_update_start
-   * - online_update_close
-   * "inst_rpmcopy" is called in module:
-   * - online_update_load
-   *
-   */
 
   integer id = 0;
   any result = `next;
@@ -515,6 +442,4 @@ Check the registration data.
   }
 
   return UI::CloseDialog();
-
-/* EOF */
 }

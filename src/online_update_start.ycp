@@ -4,6 +4,7 @@
  * Summary:	Start update, display last update info, choose mode (auto|manual)
  * Authors:	Gabriele Strattner <gs@suse.de>
  *		Stefan Schubert <schubi@suse.de>
+ *              Cornelius Schumacher <cschum@suse.de>
  *
  * $Id$
  */
@@ -66,8 +67,6 @@
 
   string str1 = _("Getting available serverlist from www.suse.de ...");
   string str3 = _("Last update was executed\n %1 day ago.", "Last update was executed\n %1 days ago.", 0);
-
-//  Pkg::TargetInit("/",false);
 
   map statusmap = Pkg::YouStatus();
 
@@ -161,9 +160,7 @@ fetch the files, and install the patches.</p>
 
   string help_part2 =  _("<p>
 <b>Manual Update</b> will display all available patches
-and you can choose which patches should be installed.<br>
-Information about the last update will be shown
-if you click on the <b>Details</b> button.
+and you can choose which patches should be installed.
 </p>");
 
   string help_part3 =  _("<p>After clicking <b>Expert</b>, select a local
@@ -173,14 +170,6 @@ another FTP or HTTP server.</p>
 
 
   help_text = help_part1 + help_part2 + help_part3;
-
-  if ( OnlineUpdate::you_auto_install )
-  {
-      // auto mode; install patches which are currently on the server
-      // Do not use internet
-
-      return `next;
-  }
 
   Wizard::SetContents(_("Welcome to SuSE Package Update"), contents, help_text, WFM::Args(0), WFM::Args(1) );
 
@@ -281,67 +270,11 @@ internal error.
 
           Pkg::YouSelectPatches();
       }
-/*
-      else if ( ret == `details )
-      {
-	  any retval = WFM::CallFunction(`online_update_details( true, false ) );
-	  if ( retval == `abort )
-	      return `abort;
-
-	  ret = `again;
-      }
-*/
       else if ( ret == `expert )
       {
           string url = getUrl( "" );
 
           UI::ChangeWidget( `id(`you), `Value, url );
-/*
-	  you_dir 	 = select( lookup(you_server_map, you_server, ["",""]), 0, "" );
-	  you_serverkind = select( lookup(you_server_map, you_server, ["",""]), 1, "" );
-
-	  // Possible values for you_serverkind (see also inst_source.ycp):
-	  // "ftp", "http", "cd", "hd", "local", "nfs" ( "local" )
-
-          // set install information for inst_source
-	  if ( you_serverkind == "cd" || you_serverkind == "hd" )
-	  {
-	      Mode::youInstallMap["you_server"] = you_serverkind;
-	  }
-	  else
-	  {
-	      Mode::youInstallMap["you_server"]	= you_server;
-	  }
-	  Mode::youInstallMap["you_dir"] 	= you_dir;
-	  Mode::youInstallMap["you_serverkind"] = you_serverkind;
-
-	  // call dialog Change source of installation
-	  any retval = WFM::CallFunction(`inst_source( true, true ) );
-	  if ( ( retval == `abort
-		 || retval == `cancel )
-	       && UI::ConfirmAbortUpdate(`painless) )
-	      return `abort;
-
-	  // get install information after returning from inst_source
-	  you_server 		= Mode::youInstallMap["you_server"]:"";
-	  you_serverkind 	= Mode::youInstallMap["you_serverkind"]:"";
-	  you_dir 		= Mode::youInstallMap["you_dir"]:"";
-
-	  retval = SCR::Execute( .you.setServer,
-				 $["kind":you_serverkind,
-				  "name":you_server,
-				  "path":you_dir]);
-
-	  y2debug("ONLINE: .you.setServer( %1, %2 %3) ): %4", you_server, you_dir, you_serverkind, retval );
-
-	  if (retval == nil || retval == false)
-	  {
-	      UI::ErrorPopup(_("Initialization failed. Try again.
-If failure continues, choose
-another SuSE FTP/HTTP server.\n"));
-	  }
-	  ret = `again;
-*/
       }
       else if ( ret == `abort && UI::ConfirmAbortUpdate(`painless) )
 	  return  `abort;
@@ -351,6 +284,4 @@ another SuSE FTP/HTTP server.\n"));
   y2debug("Return START: %1", ret );
 
   return ret;
-
-/* EOF */
 }
