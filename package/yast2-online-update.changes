@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Mar 11 15:30:48 CET 2003 - arvin@suse.de
+
+- avoid empty screen before starting you during installation
+
+-------------------------------------------------------------------
 Mon Mar 10 13:33:22 CET 2003 - arvin@suse.de
 
 - during installation wait with starting of you until connection

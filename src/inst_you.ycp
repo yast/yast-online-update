@@ -26,6 +26,8 @@
 
     if (!already_up)
     {
+	Wizard::SetContents (_("YaST2\nInitializing ..."), `Empty (), "", true, true);
+
 	if (!Internet::demand)
 	{
 	    Internet::SetDemand (true);
@@ -37,6 +39,9 @@
 	integer i = 150;
 	while (i > 0)
 	{
+	    if (!Internet::Status ())
+		break;
+
 	    if (Internet::Connected ())
 		break;
 
