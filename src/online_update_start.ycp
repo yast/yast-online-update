@@ -27,7 +27,7 @@
     UI::OpenDialog( `opt( `decorated ),
       `VBox(
         `VSpacing( 0.2 ),
-        `ProgressBar( `id( `progress ), _("Getting patch information.") ),
+        `ProgressBar( `id( `progress ), _("Getting patch information...") ),
         `VSpacing( 0.2 ),
         `PushButton( `id( `abort ), AbortButtonLabel() ),
         `VSpacing( 0.2 )
@@ -46,9 +46,10 @@
 
   global define SetupAutomatic() ``{
 
-    string txt = _("Automatic update is executed by a daily cronjob. Note
-that a network connection has to be available when
-the update takes place.");
+    string txt = _("Automatic update is executed by a daily cronjob. 
+A network connection must be available when
+the update takes place.
+");
 
     string cronfile = "/etc/cron.d/yast2-online-update";
 
@@ -83,9 +84,9 @@ the update takes place.");
         `VSpacing( 0.2 ),
         `Label( txt ),
         `VSpacing( 0.2 ),
-        `CheckBox( `id( `enable ), `opt( `notify ), _("Enable automatic update"), enabled ),
+        `CheckBox( `id( `enable ), `opt( `notify ), _("Enable Automatic Update"), enabled ),
         `VSpacing( 0.2 ),
-        `CheckBox( `id( `autoget ), _("Only download patches."), autoget ),
+        `CheckBox( `id( `autoget ), _("Only Download Patches"), autoget ),
         `VSpacing( 0.2 ),
         `Label( `id( `crontime ), _("Time when update is performed:") ),
         `HBox(
@@ -162,10 +163,10 @@ the update takes place.");
 
   string initMessage = "";
   if ( cd_update ) {
-    initMessage = _("Initializing for CD update.");
+    initMessage = _("Initializing for CD update...");
     you_url = "cd:///";
   } else {
-    initMessage = sformat( _("Getting list of mirror servers."), mirrorListServer );
+    initMessage = sformat( _("Getting a list of mirror servers..."), mirrorListServer );
   }
   UI::OpenDialog(`opt(`decorated ),`Label( initMessage ));
 
@@ -206,13 +207,13 @@ the update takes place.");
   string lastupdateLabel = "";
   
   if ( status_lastupdate == -1 ) {
-    lastupdateLabel = _( "There was no update executed up to now." );
+    lastupdateLabel = _("There was no update executed up to now.");
   } else if ( status_lastupdate == 0 ) {
-    lastupdateLabel = _( "Last successfull update was performed less than one day ago." );
+    lastupdateLabel = _("Last successful update was performed less than one day ago.");
   } else {
-    lastupdateLabel = _( "Last successfull update was performed %1 day ago.",
-                         "Last successfull update was performed %1 days ago.",
-                         status_lastupdate );
+    lastupdateLabel = _("Last successful update was performed %1 day ago.",
+                        "Last successful update was performed %1 days ago.",
+                        status_lastupdate );
   }
 
   // layout main dialog
@@ -234,7 +235,7 @@ the update takes place.");
                           `Left( `Label( sformat( _("Version: %1"), status_version ) ) )
                       ),
                       `HBox(`HSpacing(0.8),
-                          `Left( `Label( sformat( _("Base architecture: %1"), status_basearch ) ) )
+                          `Left( `Label( sformat( _("Base Architecture: %1"), status_basearch ) ) )
                       ),
                       `VSpacing(0.5),
                       `HBox(`HSpacing(0.8),
@@ -262,17 +263,17 @@ the update takes place.");
                       `VSpacing(0.3),
                       `HBox(`HSpacing(0.8),
                           `Left(`CheckBox(`id(`manual),
-                                _("&Manually select patches"), true ) )
+                                _("&Manually Select Patches"), true ) )
                       ),
                       `HBox(`HSpacing(0.8),
                           `Left(`CheckBox(`id(`reload),
-                                _("&Reload all patches from server"), false ) )
+                                _("&Reload All Patches from Server"), false ) )
                       ),
                       `VSpacing( 0.5 ),
                       `HBox(
                           `HSpacing( 0.8 ),
                           `Left( `PushButton( `id( `automatic ),
-                                 _("&Configure fully automatic update..." ) ) )
+                                 _("&Configure Fully Automatic Update...") ) )
                       ),
                       `VSpacing( 0.3 )
                   )
@@ -292,22 +293,24 @@ patches and security fixes from a SuSE update server.
 ");
 
   string help_part2 =  _("<p>
-If <b>Manually select patches</b> is checked, all available patches will be shown
-and you can choose which patches should be installed.<br>
-If <b>Reload all patches from server</b> is checked, all patches will be fetched
+If <b>Manually Select Patches</b> is checked, all available patches will be shown
+from which to select the patches to install.<br>
+If <b>Reload All Patches from Server</b> is checked, all patches will be fetched
 from the server even when they already are locally available from a previous
 download.
-</p>");
+</p>
+");
 
   string help_part3 =  _("<p>After clicking <b>Expert</b>, select a local
 installation source instead of an FTP or HTTP server or select
 another FTP or HTTP server.</p>
 ");
 
-  string help_part4 = _("<p>Clicking on <b>Configure fully automatic update</b>
-will open a dialog where you can configure YOU to check for updates once a day
+  string help_part4 = _("<p>Clicking <b>Configure Fully Automatic Update</b>
+opens a dialog in which to configure YOU to check for updates once a day
 and automatically download and install updates when new ones are available
-without the need of user interaction.</p>");
+without the need of user interaction.</p>
+");
 
   help_text = help_part1 + help_part2 + help_part3 + help_part4;
 
@@ -377,25 +380,31 @@ without the need of user interaction.</p>");
               string msg = "";
               string details = Pkg::ErrorDetails();
               if ( err == "login" ) {
-                msg = _("Login failed. Please check that you have provided
-the correct username and password.\n");
+                msg = _("Login failed. Check that you have provided
+the correct user name and password.
+");
               } else if ( err == "media" ) {
                 if ( cd_update ) {
-                  msg = _("Initialization failed. Please check that
-you have inserted the correct CD.\n");
+                  msg = _("Initialization failed. Check that
+you have inserted the correct CD.
+");
+                  details = Pkg::Error() + "\n" + details;
                 } else {
 	          msg = _("Initialization failed. Try again.
 If failure continues, choose
-another SuSE FTP/HTTP server.\n");
+another SuSE FTP/HTTP server.
+");
+                  details = Pkg::Error() + "\n" + details;
                 }
               } else if ( err == "sig" ) {
                   msg = _("Signature check for patch info files failed.
-Can't load patch information.\n");
+Cannot load patch information.
+");
                   ret = `this;
               } else if ( err == "url" ) {
                   msg = _("URL is invalid.");
               } else {
-                  msg = _("Getting patch information failed.");
+                  msg = _("Patch information retrieval failed.");
                   details = err + "\n" + details;
               }
 

@@ -70,8 +70,8 @@
       if ( pre ) {
         buttons = `HBox(
                       detailsButton,
-                      `PushButton( `id( `ok ), _("Install patch") ),
-                      `PushButton( `id( `skip ), _("Skip patch") )
+                      `PushButton( `id( `ok ), _("Install Patch") ),
+                      `PushButton( `id( `skip ), _("Skip Patch") )
                   );
       } else {
         buttons = `HBox(
@@ -125,13 +125,13 @@
       // main dialog: 
       `VBox(
 	    `VSpacing( 0.2 ),
-            `LogView(`id(`log), _("Progress log"), 5, 0 ),
+            `LogView(`id(`log), _("Progress Log"), 5, 0 ),
 	    `VSpacing( 0.5 ),
             `ProgressBar( `id( `patchprogress ), _("Patch Progress") ),
             `VSpacing( 0.2 ),
             `ProgressBar( `id( `progress ), _("Total Progress") ),
 	    `VSpacing( 0.5 ),
-	    `Left(`CheckBox(`id(`remove_packages),_("&Remove source packages after update"), false)),
+	    `Left(`CheckBox(`id(`remove_packages),_("&Remove Source Packages after Update"), false)),
             `VSpacing( 0.2 )
             );
     
@@ -141,14 +141,16 @@
 YaST2 will download all selected patches.
 This could take some time. Download details are shown in the log window.</p>");
 
-  string help_part2 =  _("<p>When the download succesfully was finished, the
+  string help_part2 =  _("<p>When the download has finished successfully, the
 patches will be installed. The progress is shown in the log window. If there
-are special messages associated with patches they will be shown in an
-extra dialog, when the patch is being installed.</p>");
+are special messages associated with patches, they will be shown in an
+extra dialog when the patch is being installed.</p>
+");
 
-  string help_part3 = _("<p>After patches are installed the downloaded
-data isn't needed anymore. If you want to delete this data, activate the
-option <b>Remove source packages after update</b></p>");
+  string help_part3 = _("<p>After patches are installed, the downloaded
+data is no longer needed. To delete this data, activate 
+<b>Remove Source Packages after Update</b>.</p>
+");
  
   help_text = help_part1 + help_part2 + help_part3;
     
@@ -169,7 +171,7 @@ option <b>Remove source packages after update</b></p>");
   // If stop is set to true the update stops, if there are download errors
   boolean stop = false;
 
-  string msgNoPatches = _( "No patches have been selected for installation." );
+  string msgNoPatches = _("No patches have been selected for installation.");
 
   integer installedPatches = 0;
 
@@ -191,7 +193,7 @@ option <b>Remove source packages after update</b></p>");
       string patchName = lookup( patch, "name", "unknown" );
     
       UI::ChangeWidget( `id(`log), `LastLine,
-                        sformat ( _( "Retrieving %1: \"%2\"" ),
+                        sformat ( _("Retrieving %1: \"%2\""),
                             patchName,
                             lookup( patch, "summary", "no summary" ) ) + " " );
 
@@ -211,7 +213,7 @@ option <b>Remove source packages after update</b></p>");
           UI::ChangeWidget( `id(`log), `LastLine, _("Aborted") );
           if ( UI::ConfirmAbortUpdate( `painless ) ) return `abort;
         } else if ( err == "media" ) {
-          UI::ChangeWidget( `id(`log), `LastLine, _("Error: Can't get files.") );
+          UI::ChangeWidget( `id(`log), `LastLine, _("Error: Cannot get files.") );
         } else if ( err == "sig" ) {
           UI::ChangeWidget( `id(`log), `LastLine, _("Error: Signature check failed.") );
         } else {
@@ -221,8 +223,9 @@ option <b>Remove source packages after update</b></p>");
         UI::ChangeWidget( `id(`log), `LastLine, _("\n") );
       
         string msg = sformat( _("Error downloading patch '%1'.
-Do you want to skip this patch or
-abort the update?"), patchName );
+Skip this patch or
+abort the update?
+"), patchName );
       
         string errorMsg = Pkg::Error() + "\n" + Pkg::ErrorDetails();
 
@@ -251,7 +254,7 @@ abort the update?"), patchName );
           string patchName = lookup( patch, "name", "unknown" );
         
           UI::ChangeWidget( `id(`log), `LastLine,
-                            sformat ( _( "Installing %1: \"%2\" " ),
+                            sformat ( _("Installing %1: \"%2\" "),
                                 patchName,
                                 lookup( patch, "summary", "no summary" ) ) );
 
@@ -285,9 +288,11 @@ abort the update?"), patchName );
               UI::ChangeWidget( `id(`log), `LastLine, _("Error\n") );
               error = true;
 
-              string msg = sformat( _("Error installing patch '%1'.\n
-Do you want to skip this patch or abort
-the update?"), patchName );
+              string msg = sformat( _("Error installing patch '%1'.
+
+Skip this patch or abort
+the update?
+"), patchName );
 
               string errorMsg = Pkg::Error() + "\n" + Pkg::ErrorDetails();
 
@@ -303,11 +308,11 @@ the update?"), patchName );
 
         string msg = "";
         if ( installedPatches == 0 ) {
-          msg = _( "No patches have been installed.");
+          msg = _("No patches have been installed.");
         } else if ( installedPatches == 1 ) {
-          msg = _( "1 patch has been installed." );
+          msg = _("1 patch has been installed.");
         } else {
-          msg = sformat( _( "%1 patches have been installed." ),
+          msg = sformat( _("%1 patches have been installed."),
                          installedPatches );
         }
         

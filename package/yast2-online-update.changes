@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Wed Jan 29 13:44:49 CET 2003 - cschum@suse.de
+
+- Merged proofread texts.
+
+-------------------------------------------------------------------
 Fri Jan 24 13:57:05 CET 2003 - cschum@suse.de
 
 - Moved sysconfig/online-update from yast2-online-update to

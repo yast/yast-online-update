@@ -156,9 +156,9 @@ UI(``{
         if ( skip ) {
           buttons = `HBox(
                         detailsButton,
-                        `PushButton( `id( `ok ), _("Skip patch") ),
-                        `PushButton( `id( `all ), _("Skip all") ),
-                        `PushButton( `id( `abort ), _("Abort update") )
+                        `PushButton( `id( `ok ), _("Skip Patch") ),
+                        `PushButton( `id( `all ), _("Skip All") ),
+                        `PushButton( `id( `abort ), _("Abort Update") )
                     );
         } else {
           buttons = `HBox(
@@ -453,7 +453,7 @@ Check the registration data.
 		  }
 		  else
 		  {
-		      msg_string = _("Login to server failed.");
+		      msg_string = _("Log in to server failed.");
 
 		      UI::ErrorPopup( msg_string );
 		      go_on = false;
