@@ -235,7 +235,7 @@ installation-source instead of a ftp-server or select another ftp-server.
     UI(`ChangeWidget(`id(`abort), `Label, _("&Abort Update")) );
     
 
-    if ( lookup(user_settings, "ftp_auto", true ) )
+    if ( lookup(user_settings, "ftp_auto", false ) )
     {
 	UI(`ChangeWidget(`id(`automatic), `Value, true ));
 	UI(`ChangeWidget(`id(`manual), `Value, false ));

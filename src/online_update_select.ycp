@@ -190,7 +190,7 @@ be downloaded nor installed.
 		    string message = sformat(
 			UI(_("This patch needs the version %1 of YaST2.\nYou have installed version %2")),
 			lookup ( check_version, "minYaST2Version", "-" ), version );
-		    UI(`DisplayMsgFtpOk( message, _("Error"), _("not install") ));
+		    UI(`DisplayMsgFtpOk( message, _("Error"), _("Don't install") ));
 		}
 	    }
 	    else if ( select( lookup( all_patches, patch_name, []), 3 ) == " " )
@@ -206,7 +206,7 @@ be downloaded nor installed.
 		    string message = sformat(
 			UI(_("This patch needs the version %1 of YaST2.\nYou have installed version %2")),
 			lookup ( check_version, "minYaST2Version", "-" ), version );
-		    UI(`DisplayMsgFtpOk( message, _("Error"), _("not install") ));
+		    UI(`DisplayMsgFtpOk( message, _("Error"), _("Don't install") ));
 		}
 	    }
 	}

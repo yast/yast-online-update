@@ -337,7 +337,7 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
 		  if ( !dontAsk )
 		  {
 		      ret = UI(`DisplayMsgFtp( pgp_warning, _("Warning"),
-					       _("&Install"), _("&Not install") ));
+					       _("&Install"), _("&Don't install") ));
 		      if ( !ret )
 		      {
 			  install = false;
@@ -369,7 +369,7 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
 		  if ( !dontAsk )
 		  {
 		      ret = UI(`DisplayMsgFtp( pgp_warning, _("Warning"),
-					       _("&Install"), _("&Not install") ));
+					       _("&Install"), _("&Don't install") ));
 		      if ( !ret )
 		      {
 			  install = false;
@@ -535,7 +535,7 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
 		patch,
 		lookup ( check_version, "minYaST2Version", "-" ),
 		version );
-	      UI(`DisplayMsgFtpOk( message, _("Error"), _("not install") ));
+	      UI(`DisplayMsgFtpOk( message, _("Warning"), _("Don't install") ));
 	  }
       });
 
