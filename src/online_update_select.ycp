@@ -125,13 +125,13 @@
     // Helptext  "List of available patches"
     // This text is shown if patches will be installed from CD.
     string help_part01 = UI(_("<p>This dialog shows the patches from
-SuSE patch CD which are not yet installed on your system.<br>"));
+SuSE patch CD which are not yet installed on your system.</p>"));
     // This is the text for ftp installation.
     string help_part02 =  UI(_("<p>This dialog shows all new patches which are
-available for download on SuSE ftp server.<br>"));
+available for download on SuSE ftp server.</p>"));
     // Don't translate "recommended" and "security". The patch mode is shown in a list
     // and will always be english text.
-    string help_part1 = UI(_("Mode \"recommended\" means you should install the patch.
+    string help_part1 = UI(_("<p>Mode \"recommended\" means you should install the patch.
 \"security\" is a security patch and it is highly recommended to install it.
 \"YaST2\" patches will be always installed first, other patches will be only
 downloaded and must be installed on a second run.
@@ -212,7 +212,7 @@ click on line (or select line and use Crtl A).
 		    string message = sformat(
 			UI(_("This patch needs the version %1 of YaST2.\nYou have installed version %2")),
 			lookup ( check_version, "minYaST2Version", "-" ), version );
-		    UI(`DisplayMsgFtpOk( message, _("Error"), _("Don't install") ));
+		    UI(`DisplayMsgFtpOk( message, ErrorMsg(), _("Don't install") ));
 		}
 	    }
 	    else if ( select( lookup( all_patches, patch_name, []), 3 ) == " " )
@@ -236,7 +236,7 @@ click on line (or select line and use Crtl A).
 		    string message = sformat(
 			UI(_("This patch needs the version %1 of YaST2.\nYou have installed version %2")),
 			lookup ( check_version, "minYaST2Version", "-" ), version );
-		    UI(`DisplayMsgFtpOk( message, _("Error"), _("Don't install") ));
+		    UI(`DisplayMsgFtpOk( message, ErrorMsg(), _("Don't install") ));
 		}
 	    }
 	}
