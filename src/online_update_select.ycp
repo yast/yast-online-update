@@ -142,7 +142,7 @@ downloaded and must be installed on a second run.
 <b>X</b>: Patches concerning your installation are preselected.
 They will be downloaded and installed on your system.
 If you don't want a certain patch, double
-click on line to deselect it (or select line and use Crtl A).
+click on line to deselect it (or select line and use Alt A).
 </p>"));
 
     string help_part3 =  UI(_("<p>
@@ -154,7 +154,7 @@ You can download the patch but it will not be installed.
     string help_part4 = UI(_("<p>
 <b>_</b>: this patch is not selected, it will neither
 be downloaded nor installed. To select the patch, double
-click on line (or select line and use Crtl A).
+click on line (or select line and use Alt A).
 </p>"));
 
     if ( cd_update )
