@@ -67,10 +67,10 @@ data is no longer needed. To delete this data, activate
   Wizard::SetContents( _("Patch Download and Installation"), contents,
                        help_text, true, true );
 
-  Wizard::ReplaceNextButton( `PushButton( `id( `next ), Label::FinishButton() ) );
 
-  UI::ChangeWidget(`id(`back), `Enabled, false );
-  UI::ChangeWidget(`id(`next), `Enabled, false );
+  Wizard::SetNextButton(`next, Label::FinishButton() );
+  Wizard::DisableBackButton();
+  Wizard::DisableNextButton();
 
   boolean success = Pkg::YouProcessPatches();
   
@@ -79,9 +79,9 @@ data is no longer needed. To delete this data, activate
     YouErrorPopup( _("Patch processing failed."), details );
   }
 
-  UI::ChangeWidget(`id(`back), `Enabled, true );
-  UI::ChangeWidget(`id(`next), `Enabled, true );
-  UI::SetFocus(`id(`next));
+  Wizard::EnableBackButton();
+  Wizard::EnableNextButton();
+  Wizard::SetFocusToNextButton();
 
   map status = Pkg::YouStatus();
   integer installedPatches = status[ "installedpatches" ]:0;
@@ -90,7 +90,7 @@ data is no longer needed. To delete this data, activate
 
   if ( !installedPackages ) {
     Wizard::DisableAbortButton();
-    Wizard::ReplaceNextButton( `PushButton( `id( `next ), Label::CloseButton() ) );
+    Wizard::SetNextButton(`next, Label::CloseButton() );
     UI::ChangeWidget( `id( `patchprogress ), `Value, 100 );
     UI::ChangeWidget( `id( `progress ), `Value, 100 );
   }
