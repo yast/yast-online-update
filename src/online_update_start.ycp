@@ -62,6 +62,7 @@
 
   if ( reloadServer != "no" )
   {
+
       // getting ftp-server-description from www.suse.de
       SCR (`Execute(.target.bash,"/bin/cp /etc/suseservers /etc/suseservers.bak" ));
       string command = "/usr/bin/wget -q --output-document="+
@@ -204,6 +205,43 @@ installation-source instead of a ftp-server or select another ftp-server.
     
   help_text = help_part1 + help_part2 + help_part3;
 
+  if ( lookup( user_settings, "ftp_auto_install", false ) )
+  {
+      // auto mode; install patches which are currently on the server
+      // Do not use internet
+      
+      return `next;      
+  }  
+
+  if ( lookup( user_settings, "ftp_auto_get", false ) )
+  {
+      // auto mode; get patch descriptions and packages, but do not install patches
+      if ( size ( ftp_server_list ) <= 0 )
+      {
+	  y2error ( "No serverlist available" );
+	  return `abort;
+      }
+      string ftp_server = read_first_suseserver(); 
+      user_settings = add(user_settings, "ftp_server", ftp_server);
+
+      string ftp_dir = select( lookup(ftp_server_map, ftp_server, []), 0 );
+      user_settings = add(user_settings, "ftp_dir", ftp_dir);
+
+      any retval = PKGINFO(`ftpSetServer( ftp_server,
+					  ftp_dir ) );
+		
+      if (retval == nil || retval == false)
+      {
+	  return `abort;
+	  y2error("ONLINE: PKGINFO(`setFtpServer( %1, %2 ) ): %3",
+		  ftp_server, ftp_dir, retval );
+      }
+      y2debug("ONLINE: PKGINFO(`setFtpServer( %1, %2 ) ): %3",
+	      ftp_server, ftp_dir, retval );
+      
+      return `next;      
+  }  
+  
   if ( !cd_update )
   {
       UI(`SetWizardContents(_("Welcome to SuSE Package Update"), contents, help_text, Args(0), Args(1) ));

@@ -33,7 +33,9 @@
   // check installation mode
   boolean auto_mode 	= lookup( user_settings, "ftp_auto", false );
   boolean continue_mode = lookup( user_settings, "ftp_continue", false );
-
+  boolean auto_mode_get = lookup( user_settings, "ftp_auto_get", false );
+  boolean auto_mode_install = lookup( user_settings, "ftp_auto_install",
+				      false );
   boolean cd_update 	= lookup( user_settings, "cd_update", false );
   
   // prepare for inst_rpmcopy
@@ -194,12 +196,19 @@ The ftp connection will be closed.
       integer index = 0;
       boolean go_on = true;
       integer patch_no = 0;
-      
+      string batchkind = "";
+
+      batchkind = lookup ( user_settings, "ftp_auto_batchkind", "all" );
+
       foreach( `patch, `patch_info, new_patches, ``{
 	  // only get the patch if marked with "X" or "G" 
 	  if ( select ( lookup(new_patches, patch, []), 3 ) == "X" || select ( lookup(new_patches, patch, []), 3 ) == "G")
 	   {
-	       patch_list = add(patch_list, patch);
+	       if ( batchkind == "all" ||
+		    batchkind == select ( lookup(new_patches, patch, []), 0 ) )
+	       {
+		   patch_list = add(patch_list, patch);
+	       }
 	   }
       });
       patch_no = size(patch_list);
@@ -321,7 +330,6 @@ The ftp connection will be closed.
 		      lastErrorServer = ftp_server;
 		  }
 	      }
-
 	      
 	      if ( otherServerConnect )
 	      {
@@ -379,27 +387,34 @@ The ftp connection will be closed.
 	      {
 		  UI(`ChangeWidget(`id(`log), `LastLine, last_logging+"\n" ));
 	      }
-	      
-	      string msg_str = sformat(UI(_("Can't get patch \"%1\" from
+
+	      if (  !auto_mode_get )
+	      {
+		  string msg_str = sformat(UI(_("Can't get patch \"%1\" from
 server \"%2\".
 You may try to download remaining patches or
 go on with installing of already got ones.")),
-				       select(patch_list, index), lastErrorServer );
+					   select(patch_list, index), lastErrorServer );
 	      
-	      any ret = UI(`DisplayMsgFtp( msg_str, _("Notify"), _("&Download"), _("&Install") ));
+		  any ret = UI(`DisplayMsgFtp( msg_str, _("Notify"), _("&Download"), _("&Install") ));
 
-	      if (!ret)
-	      {
-		  go_on = false;
+		  if (!ret)
+		  {
+		      go_on = false;
+		  }
 	      }
 	  }
 	  else if ( select ( lookup(new_patches, patch, []), 3 ) == "X" )
 	  {
 	      // patches marked with "X" will be installed
-	      ret_list = add( ret_list, select(patch_list, index) );
-	      // put logging into LogView Widget
+	      if ( batchkind == "all" ||
+		   batchkind == select ( lookup(new_patches, patch, []), 0 ) )
+	      {
+		  ret_list = add( ret_list, select(patch_list, index) );
+	      }
 	  }
-
+	  
+	  // put logging into LogView Widget
 	  string log_string = lookup(patch_result, "message", "" );
 	  if ( log_string != "" )
 	  {
@@ -666,9 +681,11 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
   boolean go_on = true;
   boolean success = true;
 
-  if ( !continue_mode )
+  if ( !continue_mode &&
+       !auto_mode_install )
   {
-      // The patch-list only has to loaded from ftp-server when module is called first time 
+      // The patch-list only has to loaded from ftp-server when module is called first time
+      // and not only install local available patches.
 
       string connect_string = sformat( UI(_("Starting download of patch descriptions from %1.\n")), ftp_server );
       UI(`ChangeWidget(`id(`log), `LastLine, connect_string ));
@@ -726,26 +743,35 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
       }
       else
       {
+	  
 	  UI(`ChangeWidget(`id(`log), `LastLine,
 			   lookup (result_map, "message", "" ) )); 
 
-          // Error popup if ftpConnect failed -
-	  // Patch CD udpate: no CD in drive, mount failed
-	  // Online Update: connecting to ftp server failed
-	  
-          //if ( lookup( user_settings, "ftp_server", "" ) == "CD" )
-	  if ( cd_update )
+	  if ( !auto_mode_get )
 	  {
-	      UI(`MessagePopup(_("Can't get the patch descriptions.
+	      // Error popup if ftpConnect failed -
+	      // Patch CD udpate: no CD in drive, mount failed
+	      // Online Update: connecting to ftp server failed
+	  
+	      //if ( lookup( user_settings, "ftp_server", "" ) == "CD" )
+	      if ( cd_update )
+	      {
+		  UI(`MessagePopup(_("Can't get the patch descriptions.
 Please insert SuSE patch CD and
 restart the \"Patch CD-Update\".")));
-	      return `abort;
+		  return `abort;
+	      }
+	      else
+	      {
+		  UI(`MessagePopup(_("Connection to ftp server failed.
+Please try to get connection to another SuSE ftp server.")));
+		  return `back;  
+	      }
 	  }
 	  else
 	  {
-	      UI(`MessagePopup(_("Connection to ftp server failed.
-Please try to get connection to another SuSE ftp server.")));
-	      return `back;  
+	      PKGINFO(`ftpCloseUpdate( false));  
+	      return `abort;	      
 	  }
       }
 
@@ -779,24 +805,30 @@ Please try to get connection to another SuSE ftp server.")));
       // Patch CD update: wrong CD in drive (path must be: <architecture>/update/<version>
       // Online Update: path on ftp server not found
 
-      if ( cd_update )
+      if ( !auto_mode_get &&
+	   !auto_mode_install )
       {
-	  UI(`MessagePopup(_("Can't get the patches from CD.
+	  if ( cd_update )
+	  {
+	      UI(`MessagePopup(_("Can't get the patches from CD.
 Please insert the SuSE patch CD
 (mind the correct version!) -
 or update your system with YaST2
 \"Online-Update\"."))); 
-	  return `abort;
-      }
-      else
-      {
-	  UI(`MessagePopup(_("Can't get the patches from server.
+	      return `abort;
+	  }
+	  else
+	  {
+	      UI(`MessagePopup(_("Can't get the patches from server.
 Please try to get patches from another SuSE ftp server.")));   
-	  return `back;
+	      return `back;
+	  }
       }
   }
 
-  if ( !continue_mode )
+  if ( !continue_mode &&
+       !auto_mode_get &&
+       !auto_mode_install )
   {
       // Evaluate, if there are YaST2 packages which have to be
       // updated first
@@ -841,44 +873,82 @@ again to install the rest of the packages.")));
   
   if ( auto_mode )
   {
-      // calculate required download size
-      integer disk_size = 0;
-      foreach( `patch, `patch_info, new_patches, ``{
-	  disk_size = disk_size + tointeger(
-		    select ( lookup(new_patches, patch, []), 2 ) )*1024;
-      });
-
-      if ( disk_size > 1000000 )
+      if ( !auto_mode_get &&
+	   !auto_mode_install )
       {
-	  // only greater than 1 MB
-	  string message = sformat (
-	       UI(_("There are %1 patches on ftp. Downloading may take a while.\n Do you really want to download the patches now?")),
- 	       size_text( disk_size ) );
+	  // calculate required download size
+	  integer disk_size = 0;
+	  foreach( `patch, `patch_info, new_patches, ``{
+	      disk_size = disk_size + tointeger(
+						select ( lookup(new_patches, patch, []), 2 ) )*1024;
+	  });
 
-	  if ( !UI(`AnyQuestionPopup( "", message ,YesButtonLabel(), NoButtonLabel(), `yes_default)) )
+	  if ( disk_size > 1000000 )
 	  {
-	      return `abort;		// abort update	      
+	      // only greater than 1 MB
+	      string message = sformat (
+		UI(_("There are %1 patches on ftp. Downloading may take a while.\n Do you really want to download the patches now?")),
+		size_text( disk_size ) );
+
+	      if ( !UI(`AnyQuestionPopup( "", message ,YesButtonLabel(), NoButtonLabel(), `yes_default)) )
+	      {
+		  return `abort;		// abort update	      
+	      }
 	  }
       }
 
+      list install_patches = [];
       
-      // get the patches
-      list install_patches = GetAllPatches( new_patches );
-
-      if ( size (install_patches) >0 )
+      if ( auto_mode_install )
       {
-	  y2debug( "ONLINE: automatic mode, installing: %1", install_patches );
-
-	 // go on and install all available patches in auto_mode
-	 any ret = InstallPatches( install_patches );
-	 return `next;
+	  string batchkind = lookup ( user_settings, "ftp_auto_batchkind", "all" );
+	  // only use patches which already have been loaded from server
+	  foreach( `patch, `patch_info, new_patches, ``{
+	      // only get the patch if marked with "X" or "G" 
+	      if ( select ( lookup(new_patches, patch, []), 3 ) == "X" ||
+		   select ( lookup(new_patches, patch, []), 3 ) == "G")
+	      {
+		  if ( batchkind == "all" ||
+		       batchkind == select ( lookup(new_patches, patch, []), 0 ) )
+		  {
+		      install_patches = add(install_patches, patch);
+		  }
+	      }
+	  });	  
       }
       else
       {
-	  any ret = PKGINFO(`ftpDisconnect());
-	  y2debug("ONLINE:  PKGINFO(`ftpDisconnect()): %1", ret );
-	  UI(`MessagePopup(_("There is no patch which will have to be installed.")));	  
-	  return `abort;		// abort update
+	  // get the patches
+	  install_patches = GetAllPatches( new_patches );
+      }
+
+      if ( !auto_mode_get )
+      {
+	  if ( size (install_patches) >0 )
+	  {
+	      y2debug( "ONLINE: automatic mode, installing: %1", install_patches );
+
+	      // go on and install all available patches in auto_mode
+	      any ret = InstallPatches( install_patches );
+	      return `next;
+	  }
+	  else
+	  {
+	      if ( !auto_mode_install )
+	      {
+		  any ret = PKGINFO(`ftpDisconnect());
+		  y2debug("ONLINE:  PKGINFO(`ftpDisconnect()): %1", ret );
+		  UI(`MessagePopup(_("There is no patch which will have to be installed.")));
+	      }
+	      return `abort;		// abort update
+	  }
+      }
+      else
+      {
+	  // Patches has been get only; Finish ftp update
+	  y2debug("ONLINE: close update with status: %1", lookup(user_settings, "ftp_ok", false) );
+	  any result = PKGINFO(`ftpCloseUpdate( lookup(user_settings, "ftp_ok", false)) );	  
+	  return `abort;
       }
   }
   else if ( !continue_mode )

@@ -30,6 +30,7 @@
   // Testmode, for example fo screenshots
   boolean test_mode    = lookup ( user_settings, "test_mode", false );
 
+  boolean auto_mode_install = lookup( user_settings, "ftp_auto_install", false );
 
   //////////////////////////////////////////////////////////////////////////////////////
   //                                  P O P U P S                                     //
@@ -104,6 +105,12 @@ patches could not be installed.
   y2debug("ONLINE: close update with status: %1", lookup(user_settings, "ftp_ok", false) );
   any result = PKGINFO(`ftpCloseUpdate( lookup(user_settings, "ftp_ok", false)) );
 
+  if ( auto_mode_install )
+  {
+      // Do not show in auto mode
+      return `next;
+  }
+  
   // Show results
   map last_status = PKGINFO(`ftpLastUpdateStatus() );
   y2debug( "ONLINE:  PKGINFO(`ftpLastUpdateStatus(): %1", last_status );

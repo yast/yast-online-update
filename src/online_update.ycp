@@ -83,6 +83,22 @@
 	  user_settings = add( user_settings, "ftp_server", "CD" );
 	  user_settings = add( user_settings, "cd_update", true );
       }
+      else if (Args(arg_n) == .auto.get)
+      {
+	  user_settings = add( user_settings, "ftp_auto_get", true );
+	  user_settings = add( user_settings, "ftp_auto", true );
+      }
+      else if (Args(arg_n) == .auto.install)
+      {
+	  user_settings = add( user_settings, "ftp_auto_install", true );
+	  user_settings = add( user_settings, "ftp_auto", true );	  
+      }
+      else
+      {
+	  // batch kind like security,.....
+	  user_settings = add( user_settings, "ftp_auto_batchkind", sformat("%1", Args(arg_n)) );
+	  y2milestone( "Getting patches for kind %1 only",  Args(arg_n) );
+      }
 	  
       arg_n = arg_n - 1;
   }
