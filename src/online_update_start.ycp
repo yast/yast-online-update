@@ -70,7 +70,7 @@
   y2debug( "ONLINE: Return  .you.setEnvironment() %1", retval );
   UI::CloseDialog();
 
-  string reloadServer =  SCR::Read(.sysconfig.onlineupdate.YAST2_LOADFTPSERVER);
+  string reloadServer =  SCR::Read(.sysconfig.you.YAST2_LOADFTPSERVER);
   y2milestone ( "YAST2_LOADFTPSERVER = %1", reloadServer );
 
   // Check wether YOU runs on a business product
