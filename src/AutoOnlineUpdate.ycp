@@ -65,18 +65,25 @@ global define boolean Read() ``{
 
     options = (string)SCR::Read( .sysconfig.onlineupdate.CMDLINE_OPTIONS );
 
-    string cronjob = (string)SCR::Read( .target.string, cronfile );
-    if ( size( cronjob ) > 0 ) {
-	  enabled = true;
-      string h  = regexpsub( cronjob, "[0-9]+ ([0-9]+) ", "\\1" );
-      string m = regexpsub( cronjob, "([0-9]+) ([0-9]+) ", "\\1" );
-	  hour = tointeger( h );
-      minute = tointeger( m );
-	  if ( regexpmatch( cronjob, "-g" ) ) autoget = true;
-    } else {
-      hour = random( 24 );
-      minute = random( 60 );
+
+    string cronjob = "";
+    if (SCR::Read(.target.size, cronfile)!= -1 )
+    {
+        cronjob = (string)SCR::Read( .target.string, cronfile );
     }
+
+    if ( size( cronjob ) > 0 ) {
+        enabled = true;
+        string h  = regexpsub( cronjob, "[0-9]+ ([0-9]+) ", "\\1" );
+        string m = regexpsub( cronjob, "([0-9]+) ([0-9]+) ", "\\1" );
+        hour = tointeger( h );
+        minute = tointeger( m );
+        if ( regexpmatch( cronjob, "-g" ) ) autoget = true;
+    } else {
+        hour = random( 24 );
+        minute = random( 60 );
+    }
+    y2milestone("hour: %1, minutes: %2", hour, minute );
     return true;
 }
 
@@ -141,12 +148,12 @@ global define string Summary() ``{
 
     string hour_str = (hour>9) ? sformat("%1", hour) : sformat("0%1", hour);
     string minute_str = (minute>9) ? sformat("%1", minute) : sformat("0%1", minute);
-    
+
     string timestr = sformat(_("Daily at %1:%2"), hour_str, minute_str);
-    
+
     summary = Summary::AddHeader(summary, _("Time of scheduled Online Update?"));
     summary = Summary::AddLine(summary, (hour!=-1 && minute!= -1 ) ? timestr  : nc );
-    
+
     summary = Summary::AddHeader(summary, _("Only Download Patches"));
     summary = Summary::AddLine(summary, autoget ? _("Yes") : _("No") );
 
