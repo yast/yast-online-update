@@ -266,7 +266,7 @@ the update takes place.");
                       ),
                       `HBox(`HSpacing(0.8),
                           `Left(`CheckBox(`id(`reload),
-                                _("&Reload all patches from server"), true ) )
+                                _("&Reload all patches from server"), false ) )
                       ),
                       `VSpacing( 0.5 ),
                       `HBox(
