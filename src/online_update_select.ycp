@@ -40,8 +40,19 @@
     map all_patches = lookup( user_settings, "ftp_patches", $[] );
     y2debug("ONLINE: %1", all_patches );
     
-    // if the user doesn't do any changes, get all patches
-    map get_patches = all_patches;
+    // if the user doesn't do any changes and the current YaST2 has the right versin, the user
+    // get all patches
+    map get_patches = $[];
+    maplist ( `patch, `value,  all_patches, ``(
+    {
+	// checking YaST2-version
+	map check_version = PKGINFO(`ftpCheckYaST2Version(version,patch));
+	if ( lookup ( check_version, "ok", true ) )
+	{
+	    get_patches = add ( get_patches, patch, value );
+	}
+    }));
+
     
     //////////////////////////////////////////////////////////////////////////////////////
     //  Popups and Defines			                                        //
@@ -168,13 +179,35 @@ downloaded nor installed.
 	    }
 	    else if ( select( lookup( all_patches, patch_name, []), 3 ) == "X" )
 	    {
-                // was "X" before -> mark with "X" again
-		UpdateGetPatches( patch_name, "X" ,select ( patch_info, 2 ) ); 
+		map check_version = PKGINFO(`ftpCheckYaST2Version(version,patch_name));
+		if ( lookup ( check_version, "ok", true ) )
+		{
+		    // was "X" before -> mark with "X" again
+		    UpdateGetPatches( patch_name, "X" ,select ( patch_info, 2 ) );
+		}
+		else
+		{
+		    string message = sformat(
+			UI(_("This patch needs the version %1 of YaST2.\nYou have installed version %2")),
+			lookup ( check_version, "minYaST2Version", "-" ), version );
+		    UI(`DisplayMsgFtpOk( message, "Error", "not install" ));
+		}
 	    }
 	    else if ( select( lookup( all_patches, patch_name, []), 3 ) == " " )
 	    {
-		// was not "X" before -> mark with "G" 
-		UpdateGetPatches( patch_name, "G" ,select ( patch_info, 2 ) ); 
+		map check_version = PKGINFO(`ftpCheckYaST2Version(version,patch_name));
+		if ( lookup ( check_version, "ok", true ) )
+		{
+		    // was not "X" before -> mark with "G" 
+		    UpdateGetPatches( patch_name, "G" ,select ( patch_info, 2 ) );
+		}
+		else
+		{
+		    string message = sformat(
+			UI(_("This patch needs the version %1 of YaST2.\nYou have installed version %2")),
+			lookup ( check_version, "minYaST2Version", "-" ), version );
+		    UI(`DisplayMsgFtpOk( message, "Error", "not install" ));
+		}
 	    }
 	}
 	else if ( ret == `info )

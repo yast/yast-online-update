@@ -305,47 +305,72 @@ loaded patches or abort update completely." ), _("Warning"), _("&Install"), _("&
 	  any|symbol ret = nil;
 	  boolean go_on  = true;
 
-	  package_list = PKGINFO(`ftpGetPackages( patch ) );
-	  y2debug("ONLINE: PKGINFO(`ftpGetPackages( %1 )): %1", package_list );
-
-	  pre_info = PKGINFO(`ftpGetPreInstallInformation(patch));
-
-	  if ( pre_info != "" )
+	  map check_version = PKGINFO(`ftpCheckYaST2Version(version,patch));
+	  if ( lookup ( check_version, "ok", true ) )
 	  {
-	      go_on = UI(`DisplayMsgFtp( pre_info, _("Warning"), _("&Install"), _("&Skip patch")));
-	      y2debug( "RREETTURRN: %1", go_on);
-	  }
-	  if ( go_on )
-	  {
-	      ret = CallFunction(`inst_rpmcopy(false, false, package_list ));
-	      y2debug("ONLINE: %1. call of inst_rpmcopy returns: %2", no, ret );
-	      package_count = package_count + size ( package_list );
-	      no = no+1;
-	      post_info = PKGINFO(`ftpGetPostInstallInformation(patch));
+	      // correct YaST2 version
+	      package_list = PKGINFO(`ftpGetPackages( patch ) );
+	      y2debug("ONLINE: PKGINFO(`ftpGetPackages( %1 )): %1",
+		      package_list );
 
-	      if ( post_info != "" )
+	      pre_info = PKGINFO(`ftpGetPreInstallInformation(patch));
+
+	      if ( pre_info != "" )
 	      {
-		  go_on = UI(`DisplayMsgFtpOk( post_info,
-					       _("Information"), _("&Ok")));
+		  go_on = UI(`DisplayMsgFtp( pre_info,
+					     _("Warning"),
+					     _("&Install"),
+					     _("&Skip patch")));
+		  y2debug( "RREETTURRN: %1", go_on);
+	      }
+	      if ( go_on )
+	      {
+		  ret = CallFunction(`inst_rpmcopy(false, false,
+						   package_list ));
+		  y2debug("ONLINE: %1. call of inst_rpmcopy returns: %2",
+			  no, ret );
+		  package_count = package_count + size ( package_list );
+		  no = no+1;
+		  post_info = PKGINFO(`ftpGetPostInstallInformation(patch));
+
+		  if ( post_info != "" )
+		  {
+		      go_on = UI(`DisplayMsgFtpOk( post_info,
+						_("Information"), _("&Ok")));
+		  }
+	      }
+
+	      // do not set error status - let patch status NEW
+      
+	      if (ret == `abort )
+	      {
+		  // set status to error
+		  PKGINFO( `ftpChangePatchUpdateStatus( patch, ERROR ) );
+		  y2debug(
+		    "ONLINE:  PKGINFO( `ftpChangePatchUpdateStatus(%1, %2)",
+		    patch, ERROR );
+		  user_settings = add(user_settings, "ftp_ok", false );
+
+		  return `cancel;
+	      }
+	      else if ( ret == `next )
+	      {
+		  // set status to INSTALLED
+		  PKGINFO( `ftpChangePatchUpdateStatus( patch, INSTALLED ) );
+		  y2debug(
+		    "ONLINE:  PKGINFO( `ftpChangePatchUpdateStatus(%1, %2)",
+		    patch, INSTALLED );
 	      }
 	  }
-
-	  // do not set error status - let patch status NEW
-      
-	  if (ret == `abort )
+	  else
 	  {
-	       // set status to error
-	      PKGINFO( `ftpChangePatchUpdateStatus( patch, ERROR ) );
-	      y2debug("ONLINE:  PKGINFO( `ftpChangePatchUpdateStatus(%1, %2)", patch, ERROR );
-	      user_settings = add(user_settings, "ftp_ok", false );
-
-	      return `cancel;
-	  }
-	  else if ( ret == `next )
-	  {
-	      // set status to INSTALLED
-	      PKGINFO( `ftpChangePatchUpdateStatus( patch, INSTALLED ) );
-	      y2debug("ONLINE:  PKGINFO( `ftpChangePatchUpdateStatus(%1, %2)", patch, INSTALLED );
+	      // not the correct YaST2 Verison
+	      string message = sformat(
+		UI(_("The patch %1 needs the version %2 of YaST2.\nYou have installed version %3")),
+		patch,
+		lookup ( check_version, "minYaST2Version", "-" ),
+		version );
+	      UI(`DisplayMsgFtpOk( message, "Error", "not install" ));
 	  }
       });
 
