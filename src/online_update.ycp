@@ -207,27 +207,27 @@ You will need to do the update again.");
 					       select(info_list, 2), select(info_list, 0)) );
       });
 
-      UI( ``{ OpenDialog(`opt(`decorated ),
-			 `HBox(`VSpacing(20),
-			       `VBox(
-				     `HSpacing(60),
-				     `Left(`Heading( _("Patch information") )),
-				     `VWeight( 5,
-					       `LogView(`id(`infotext),
-							"",
-							5,	// visible lines
-							30)	// lines to store,
-					       ),
-				     `VSpacing(0.5),
-				     `VWeight( 3, `Table(`id(`table_pac),`opt(`hvstretch), 
-							 `header( _("Name"), _("Installed"), _("New Version"), _("Description") ),
-							 table_input
-							 )),
-				     `PushButton(`id(`ok_info), `opt(`default), OKButtonLabel() )
-				     )
-			       )
-			 );
-      });
+      UI(`OpenDialog(`opt(`decorated ),
+		     `HBox(`VSpacing(20),
+			   `VBox(
+				 `HSpacing(60),
+				 `Left(`Heading( _("Patch information") )),
+				 `VWeight( 5,
+					   `LogView(`id(`infotext),
+						    "",
+						    5,	// visible lines
+						    30)	// lines to store,
+					   ),
+				 `VSpacing(0.5),
+				 `VWeight( 3, `Table(`id(`table_pac),`opt(`hvstretch), 
+						     `header( _("Name"), _("Installed"), _("New Version"), _("Description") ),
+						     table_input
+						     )),
+				 `PushButton(`id(`ok_info), `opt(`default), OKButtonLabel() )
+				 )
+			   )
+		     )
+	 );
       UI(`ChangeWidget(`id(`infotext), `Value, infotext ));      
       UI(`SetFocus(`id(`ok_info)));
 	  
