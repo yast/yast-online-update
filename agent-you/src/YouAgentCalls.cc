@@ -397,22 +397,22 @@ YCPValue YouAgent::setEnvironment ( YCPMap setMap )
    // evaluate Proxy entries
    if ( mainscragent )
    {
-       YCPPath rcpath = ".rc.system.HTTP_PROXY_PASSWORD";
+       YCPPath rcpath = ".sysconfig.onlineupdate.PROXY_PASSWORD";
        YCPValue ret = mainscragent->Read( rcpath, YCPString("") );
        if ( ret->isString() )	// success ??
        {
 	   httpProxyPassword = ret->asString()->value();
-	   y2debug( "HTTP_PROXY_PASSWORD : %s",
+	   y2debug( "PROXY_PASSWORD : %s",
 		    httpProxyPassword.c_str() );
        }
 
-       YCPPath rcuserpath = ".rc.system.HTTP_PROXY_USER";
+       YCPPath rcuserpath = ".sysconfig.onlineupdate.PROXY_USER";
        ret = mainscragent->Read( rcuserpath, YCPString("") );
        if ( ret->isString() )	// success ??
        {
 	   httpProxyUser = ret->asString()->value();
-	   y2debug( "HTTP_PROXY_USER : %s",
-		    httpProxyUser.c_str() );
+	   y2debug( "PROXY_USER : %s",
+		    httpProxyUser.c_str() );	   
        }
 
        YCPPath path = ".http.setProxyUser";
