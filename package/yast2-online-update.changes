@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Sep  2 17:16:33 CEST 2002 - cschum@suse.de
+
+- added new title picture.
+- reactivated authentification code.
+
+-------------------------------------------------------------------
 Thu Aug 29 17:05:43 CEST 2002 - gs@suse.de
 
 - online udpate uses new package manager interface
