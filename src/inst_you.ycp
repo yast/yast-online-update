@@ -52,7 +52,7 @@
 	}
     }
 
-    symbol ret = WFM::CallFunction ("online_update");
+    symbol ret = (symbol) WFM::CallFunction ("online_update");
 
     if (!already_up)
     {
