@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon May  7 17:03:54 CEST 2001 - sh@suse.de
+
+- Use new UI(`GetLanguate()) parameter 
+
+-------------------------------------------------------------------
 Mon Apr 30 15:29:43 MEST 2001 - gs@suse.de
 
 - name is: Patch CD Update, popup text changed again (bug 6796)
