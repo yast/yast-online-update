@@ -1,3 +1,7 @@
+## Path:	System/Yast2/OnlineUpdate
+## Description:	YaST Online Update Configuration
+## Type:	yesno
+## Default:	yes
 #
 # While starting YOU ( YaST2-Online-Update ) the default server list will be
 # updated from a "master" server, usually www.suse.de. This list will be stored
