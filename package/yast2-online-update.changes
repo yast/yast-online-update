@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Jul 11 15:58:57 CEST 2002 - arvin@suse.de
+
+- make package build
+
+-------------------------------------------------------------------
 Wed Jul  3 14:50:07 CEST 2002 - msvec@suse.cz
 
 - renamed to yast2-online-update
@@ -14,9 +19,9 @@ Fri Mar 22 12:15:54 CET 2002 - schubi@suse.de
 -------------------------------------------------------------------
 Wed Mar 20 17:35:57 CET 2002 - gs@suse.de
 
-- use /usr/lib/rpm/gnupg/pubring.gpg to check the signature in 
+- use /usr/lib/rpm/gnupg/pubring.gpg to check the signature in
   the patch descriptions
-- show the new special online update image 
+- show the new special online update image
 - don't load the /etc/suseservers file if it's a CD update
 
 -------------------------------------------------------------------
@@ -27,40 +32,40 @@ Mon Mar  4 15:00:10 CET 2002 - schubi@suse.de
 -------------------------------------------------------------------
 Wed Feb 27 11:07:30 CET 2002 - gs@suse.de
 
-- bugfixes: disable the Abort button in details dialog, initialize 
+- bugfixes: disable the Abort button in details dialog, initialize
   the agent also in mode auto_install, show correct info 'Connected to'
 
 -------------------------------------------------------------------
 Mon Feb 25 15:27:45 CET 2002 - gs@suse.de
 
 - internal changes (don't initialize the package agent, use correct
-  language information) 
+  language information)
 
 -------------------------------------------------------------------
 Fri Feb 22 14:25:10 CET 2002 - schubi@suse.de
 
-- Starting YOU in batchmode corrected #13196 
+- Starting YOU in batchmode corrected #13196
 - Aborting dialog correctly #13274
 - Showing popup while loading available serverlist
-- prefent flickering when installing new packages #12889; 
+- prefent flickering when installing new packages #12889;
 - Checking uploaded packages for the correct version
 - bugix while writing mode::you_server
 
 -------------------------------------------------------------------
 Mon Feb 18 17:37:43 CET 2002 - gs@suse.de
 
-- internal changes 
+- internal changes
 
 -------------------------------------------------------------------
 Tue Feb 12 14:07:42 CET 2002 - gs@suse.de
 
-- check for string arguments; correct settings for YOU agent 
+- check for string arguments; correct settings for YOU agent
 - rename sysconfig/you to sysconfig/onlineupdate
 
 -------------------------------------------------------------------
 Mon Feb 11 17:31:59 CET 2002 - schubi@suse.de
 
-- checking version of the package which has been uploaded 
+- checking version of the package which has been uploaded
 
 -------------------------------------------------------------------
 Fri Feb  8 18:27:45 CET 2002 - lnussel@suse.de
@@ -72,23 +77,23 @@ Fri Feb  8 17:22:21 CET 2002 - gs@suse.de
 
 - bugfixes and internal changes (replace the user_settings,
   initialize for package installation, change source medium
-  works correctly, Requires for new agents added ...) 
+  works correctly, Requires for new agents added ...)
 
 -------------------------------------------------------------------
 Mon Feb  4 15:01:00 CET 2002 - gs@suse.de
 
 - rename rc.config.y2c_online_update to sysconfig.you
-- internal changes 
+- internal changes
 
 -------------------------------------------------------------------
 Tue Dec  4 13:51:59 CET 2001 - schubi@suse.de
 
-- DisplayRegistrationPopup added 
+- DisplayRegistrationPopup added
 
 -------------------------------------------------------------------
 Mon Sep 24 18:11:49 CEST 2001 - gs@suse.de
 
-- first server entry in /etc/suseservers is default ftp server 
+- first server entry in /etc/suseservers is default ftp server
 
 -------------------------------------------------------------------
 Tue Sep 18 16:59:20 CEST 2001 - gs@suse.de
@@ -108,7 +113,7 @@ Fri Aug 24 14:06:27 MEST 2001 - schubi@suse.de
 Mon Aug 20 17:22:52 CEST 2001 - gs@suse.de
 
 - Patch CD Update: write the information to install from CD
-  to /var/lib/YaST/install.inf  
+  to /var/lib/YaST/install.inf
 
 -------------------------------------------------------------------
 Mon Aug  6 12:13:00 CEST 2001 - gs@suse.de
@@ -118,7 +123,7 @@ Mon Aug  6 12:13:00 CEST 2001 - gs@suse.de
 -------------------------------------------------------------------
 Mon May  7 17:03:54 CEST 2001 - sh@suse.de
 
-- Use new UI(`GetLanguate()) parameter 
+- Use new UI(`GetLanguate()) parameter
 - accept next button in export mode.
 - error popup xxx server not found ( Bug 8872 )
 - Enable installing NEW packages
@@ -133,12 +138,12 @@ Mon Apr 30 15:29:43 MEST 2001 - gs@suse.de
 Thu Apr 26 17:50:12 MEST 2001 - gs@suse.de
 
 - special icon for CD update
-- delete patches with status .new or .error before download of new path descriptions 
+- delete patches with status .new or .error before download of new path descriptions
 
 -------------------------------------------------------------------
 Tue Apr 24 11:24:58 MEST 2001 - gs@suse.de
 
-- helptext and popup text (bug 6796) changed 
+- helptext and popup text (bug 6796) changed
 
 -------------------------------------------------------------------
 Thu Apr 19 19:09:47 MEST 2001 - gs@suse.de
@@ -154,7 +159,7 @@ Tue Apr 17 13:48:06 MEST 2001 - gs@suse.de
 -------------------------------------------------------------------
 Fri Apr 13 12:18:15 MEST 2001 - gs@suse.de
 
-- Patch installation from CD starts with screen Available Patches  
+- Patch installation from CD starts with screen Available Patches
 
 -------------------------------------------------------------------
 Fri Apr  6 15:21:34 MEST 2001 - gs@suse.de
@@ -201,7 +206,7 @@ Mon Jan 15 19:03:17 MET 2001 - schubi@suse.de
 -------------------------------------------------------------------
 Fri Jan 12 17:42:31 MET 2001 - schubi@suse.de
 
-- Getting ftp server list from suse.de 
+- Getting ftp server list from suse.de
 
 -------------------------------------------------------------------
 Mon Jan  8 18:05:06 CET 2001 - kkaempf@suse.de
@@ -216,12 +221,12 @@ Mon Jan  8 17:57:02 CET 2001 - kkaempf@suse.de
 -------------------------------------------------------------------
 Thu Jan  4 16:46:49 MET 2001 - schubi@suse.de
 
-- ftp-update via modem and isdn 
+- ftp-update via modem and isdn
 
 -------------------------------------------------------------------
 Thu Jan  4 10:02:12 MET 2001 - schubi@suse.de
 
-- bugfix in pgp-key checking 
+- bugfix in pgp-key checking
 
 -------------------------------------------------------------------
 Thu Dec 21 17:21:21 MET 2000 - schubi@suse.de
@@ -242,7 +247,7 @@ Mon Dec 18 13:21:00 CET 2000 - kkaempf@suse.de
 -------------------------------------------------------------------
 Wed Dec 13 19:14:57 MET 2000 - schubi@suse.de
 
-- new menue-entry 
+- new menue-entry
 
 -------------------------------------------------------------------
 Tue Dec 12 09:09:25 MET 2000 - schubi@suse.de
@@ -263,7 +268,7 @@ Thu Dec  7 13:29:18 CET 2000 - arvin@suse.de
 -------------------------------------------------------------------
 Wed Nov 29 14:24:25 MET 2000 - gs@suse.de
 
-- version 1.0.1 - runs initially - but needs more testing 
+- version 1.0.1 - runs initially - but needs more testing
 
 -------------------------------------------------------------------
 Sun Nov 17 12:00:00 MET 2000 - gs@suse.de
