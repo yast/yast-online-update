@@ -93,6 +93,9 @@
 #define TRUE		"true"
 #define FALSE		"false"
 #define SCRIPT		"script"
+#define SERVER		"server"
+#define PROXY		"proxy"
+#define TIMEOUT		"timeout"
 
 /*-------------------------------------------------------------*/
 /* Create all parent directories of @param name, as necessary  */
@@ -470,6 +473,33 @@ YCPValue YouAgent::setEnvironment ( YCPMap setMap )
       }
    }
 
+   // evaluate Proxy entries
+   if ( mainscragent )
+   {
+       YCPPath rcpath = ".rc.system.HTTP_PROXY_PASSWORD";
+       YCPValue ret = mainscragent->Read( rcpath, YCPString("") );
+       if ( ret->isString() )	// success ??
+       {
+	   httpProxyPassword = ret->asString()->value();
+	   y2debug( "HTTP_PROXY_PASSWORD : %s",
+		    httpProxyPassword.c_str() );
+       }
+
+       YCPPath rcuserpath = ".rc.system.HTTP_PROXY_USER";
+       ret = mainscragent->Read( rcuserpath, YCPString("") );
+       if ( ret->isString() )	// success ??
+       {
+	   httpProxyUser = ret->asString()->value();
+	   y2debug( "HTTP_PROXY_USER : %s",
+		    httpProxyUser.c_str() );	   
+       }
+
+       YCPPath path = ".http.setProxyUser";
+       ret = mainscragent->Execute( path,
+				    YCPString( httpProxyUser ),
+				    YCPString( httpProxyPassword ));       
+   }
+
    if ( ok->value() )
    {
       y2debug( "SetEnvironment: RETURN TRUE");
@@ -763,40 +793,103 @@ YCPValue YouAgent::connect ( )
       // connecting via ftp
        if ( mainscragent )
        {
-	   YCPPath path = ".ftp.connect_to";
-	   YCPString value ( server );
-	   YCPValue ret = mainscragent->Execute( path, value );
-
-	   if ( ret->isMap() )	// success ??
+	   string proxy = "";
+	   ok = false;
+	   YCPPath rcpath = ".rc.system.FTP_PROXY";
+	   YCPValue ret = mainscragent->Read( rcpath, YCPString("") );
+	   if ( ret->isString() )	// success ??
 	   {
-	       YCPMap retMap = ret->asMap();
-	       YCPValue dummyValue = YCPVoid();
+	       proxy = ret->asString()->value();
+	   }
 
-	       dummyValue = retMap->value(YCPString(OK));
-	       if ( !dummyValue.isNull() && dummyValue->isBoolean() )
+	   YCPPath path = ".ftp.connect_to";
+	   if ( proxy.length() > 0 )
+	   {
+	       // trying to connect with proxy
+	       message = "Trying to connect via proxy : " + proxy + "\n";
+	       y2debug ( "%s", message.c_str() );
+	       YCPMap value;
+
+	       value->add( YCPString ( SERVER ), YCPString( server ));
+	       value->add( YCPString ( PROXY ), YCPString( proxy ));
+	       value->add( YCPString ( TIMEOUT ), YCPInteger(1));
+	   
+	       ret = mainscragent->Execute( path, value );
+
+	       if ( ret->isMap() )	// success ??
 	       {
-		   ok = dummyValue->asBoolean()->value();
-	       }
-	       dummyValue = retMap->value(YCPString(MESSAGE));
-	       if ( !dummyValue.isNull() && dummyValue->isString() )
-	       {
-		   message = dummyValue->asString()->value();
-	       }
-	       if ( ok )
-	       {
-		   y2debug( "%s connected", server.c_str() );
+		   YCPMap retMap = ret->asMap();
+		   YCPValue dummyValue = YCPVoid();
+
+		   dummyValue = retMap->value(YCPString(OK));
+		   if ( !dummyValue.isNull() && dummyValue->isBoolean() )
+		   {
+		       ok = dummyValue->asBoolean()->value();
+		   }
+		   dummyValue = retMap->value(YCPString(MESSAGE));
+		   if ( !dummyValue.isNull() && dummyValue->isString() )
+		   {
+		       message += dummyValue->asString()->value() + "\n";
+		   }
+		   if ( ok )
+		   {
+		       y2debug( "%s connected", proxy.c_str() );
+		   }
+		   else
+		   {
+		       y2error( "proxy %s not connected (%s)",
+				proxy.c_str(),
+				message.c_str() );
+		       message += "connect to " + server + " directly ";
+		   }
 	       }
 	       else
 	       {
-		   y2error( "server %s not connected (%s)",
-			    server.c_str(),
-			    message.c_str() );
+		   y2error("<.ftp.connect_to> System agent returned nil.");
+		   ok = false;
 	       }
 	   }
-	   else
+	   if ( !ok )
 	   {
-	       y2error("<.ftp.connect_to> System agent returned nil.");
-	       ok = false;
+	       // not over proxy
+	       YCPMap value;
+
+	       value->add( YCPString ( SERVER ), YCPString( server ));
+	       value->add( YCPString ( TIMEOUT ), YCPInteger(5));
+	   
+	       ret = mainscragent->Execute( path, value );
+
+	       if ( ret->isMap() )	// success ??
+	       {
+		   YCPMap retMap = ret->asMap();
+		   YCPValue dummyValue = YCPVoid();
+
+		   dummyValue = retMap->value(YCPString(OK));
+		   if ( !dummyValue.isNull() && dummyValue->isBoolean() )
+		   {
+		       ok = dummyValue->asBoolean()->value();
+		   }
+		   dummyValue = retMap->value(YCPString(MESSAGE));
+		   if ( !dummyValue.isNull() && dummyValue->isString() )
+		   {
+		       message += dummyValue->asString()->value() + "\n";
+		   }
+		   if ( ok )
+		   {
+		       y2debug( "%s connected", server.c_str() );
+		   }
+		   else
+		   {
+		       y2error( "server %s not connected (%s)",
+				server.c_str(),
+				message.c_str() );
+		   }
+	       }
+	       else
+	       {
+		   y2error("<.ftp.connect_to> System agent returned nil.");
+		   ok = false;
+	       }	       
 	   }
        }
        else
@@ -2009,6 +2102,11 @@ YCPValue YouAgent::getPatch ( const YCPString patchName )
 		       YCPValue ret = mainscragent->Execute( path,
 						   YCPString( "" ),
 						   YCPString( "" ));
+		       path = ".http.setProxyUser";
+		       ret = mainscragent->Execute( path,
+						   YCPString( "" ),
+						   YCPString( "" ));
+		       
 
 		       path = ".http.getFile";
 		       ret = mainscragent->Execute( path,
@@ -2051,6 +2149,10 @@ YCPValue YouAgent::getPatch ( const YCPString patchName )
 		       ret = mainscragent->Execute( path,
 						    YCPString( httpUser ),
 						    YCPString( httpPassword ));
+		       path = ".http.setProxyUser";
+		       ret = mainscragent->Execute( path,
+						    YCPString( httpProxyUser ),
+						    YCPString( httpProxyPassword ));
 		   }
 		   else
 		   {
