@@ -50,6 +50,23 @@
 	return true;
     }
 
+    global define string ErrorCallback( string type, string text,
+                                        string details )
+    ``{
+        y2milestone( "ErrorCallback %1", text );
+
+	return "";
+    }
+
+    global define void LogCallback( string text )
+    ``{
+        y2milestone( "LogCallback %1", text );
+
+        if ( UI::WidgetExists( `id( `log ) ) ) {
+          UI::ChangeWidget( `id( `log ), `LastLine, text );
+        }
+    }
+
     /**
       Callback for executing YCP scripts in YOU.
     */
@@ -85,6 +102,7 @@
 
 	Pkg::CallbackYouProgress ("OnlineUpdateCallbacks::ProgressCallback");
 	Pkg::CallbackYouPatchProgress ("OnlineUpdateCallbacks::PatchProgressCallback");
+	Pkg::CallbackYouLog ("OnlineUpdateCallbacks::LogCallback");
 	Pkg::CallbackYouExecuteYcpScript ("OnlineUpdateCallbacks::ExecuteYcpScriptCallback");
         Pkg::CallbackYouScriptProgress ("OnlineUpdateCallbacks::ScriptProgressCallback");
     }
