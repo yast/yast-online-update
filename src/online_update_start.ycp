@@ -16,13 +16,9 @@
   import "Mode";
   import "OnlineUpdate";
 
-  boolean business	= false;
+  include "inst_source_dialogs.ycp";
 
-  // constant settings
-  string rootpath = "/";
-  string yastpath = "/var/lib/YaST";
-  string patchpath = "/var/lib/YaST/patches";
-  string serverdescr_file = "suseservers.txt";
+  boolean business	= false;
 
 
   /////////////////////////////////////////////////////////////////////////////////////
@@ -63,136 +59,8 @@
     // Error
   }
 
-
-  if ( 0 ) {
-    // initialize You Agent
-    any retval = SCR::Execute(.you.setEnvironment, $[ "language":language,
-						    "rootpath":rootpath,
-						    "architecture":Arch::architecture,
-						    "yastpath":yastpath,
-						    "patchpath":patchpath] );
-
-    y2debug( "ONLINE: Return  .you.setEnvironment() %1", retval );
-    UI::CloseDialog();
-
-    if ( OnlineUpdate::reloadServer != "no" )
-    {
-        // checking if already exists
-        OnlineUpdate::reloadServer =
-	    SCR::Read(.sysconfig.onlineupdate.YAST2_LOADFTPSERVER);
-        y2milestone ( "YAST2_LOADFTPSERVER = %1", OnlineUpdate::reloadServer );
-    }
-
-    // Check whether YOU runs on a business product
-
-    if ( SCR::Read(.you.isBusiness) )
-    {
-        OnlineUpdate::business = true;
-        business = true;
-        serverdescr_file = "suseservers_http.txt";
-    }
-
-    // only get the suseservers if reloadServer is "yes" and it's not a CD update
-    if ( OnlineUpdate::reloadServer != "no" && !cd_update )
-    {
-        // getting you-server-description from www.suse.de
-
-        OnlineUpdate::reloadServer = "no"; //resetting
-
-        SCR::Execute(.target.bash,"/bin/cp /etc/suseservers /etc/suseservers.bak" );
-        string command = "/usr/bin/wget -q --output-document="+
-	    "/etc/suseservers --tries=2 --timeout=5 http://www.suse.de/de/support/download/"
-	    + serverdescr_file;
-
-        UI::OpenDialog(`opt(`decorated ),`Label(_("Getting available serverlist from www.suse.de ...")));
-        sleep( 1000 );
-
-        if ( SCR::Execute(.target.bash, command) != 0  )
-        {
-	    y2error("command: %1", command);
-	    if ( SCR::Read(.you.isBusiness) )
-	    {
-	        UI::ErrorPopup(_("Cannot connect to www.suse.de. Check your connection."));
-	        return  `abort;
-	    }
-	    else
-	    {
-	        SCR::Execute(.target.bash,
-			     "/bin/cp /etc/suseservers.bak /etc/suseservers" );
-	    }
-        }
-        else
-        {
-	    y2milestone("command %1 ok", command);
-        }
-        SCR::Execute(.target.remove,"/etc/suseservers.bak" );
-        UI::CloseDialog();
-    }
-
-    // read /etc/suseservers
-    map you_server_map 	= read_suseservers ();
-
-    y2debug( "/ETC/SUSESERVERS *** initial ***: %1", you_server_map );
-
-    string you_server	= "";
-    string you_serverkind = "";
-    string you_dir 	= "";
-
-    if ( Mode::youInstallMap != $[] && Mode::youInstallMap["you_serverkind"]:"" != "" )
-    {
-        you_server 	= Mode::youInstallMap["you_server"]:"";
-        you_serverkind 	= Mode::youInstallMap["you_serverkind"]:"";
-        you_dir 		= Mode::youInstallMap["you_dir"]:"";
-    }
-    else
-    {
-        // if no server/directory is set in Expert mode (inst_source), take the
-        // first entry in file /etc/suseservers (instead of "ftp.suse.com/pub/suse")
-        you_server     = read_first_suseserver();
-        y2debug( "FIRST SERVER: %1", you_server );
-
-        you_serverkind = select( lookup(you_server_map, you_server, ["",""]), 1, "" );
-        you_dir        = select( lookup(you_server_map, you_server, ["",""]), 0, "" );
-    }
-
-    y2milestone("YOU Server: %1, directory: %2, kind: %3", you_server, you_dir, you_serverkind );
-
-    // insert local server like CD, NFS ....
-    if ( Mode::youInstallMap["you_serverkind"]:"" != "" )
-    {
-        list you_dir_list = [];
-        you_dir_list = add ( you_dir_list, you_dir );
-        you_dir_list = add ( you_dir_list, you_serverkind );
-        you_server_map = add(you_server_map, you_server, you_dir_list );
-
-        y2debug( "/ETC/SUSESERVERS *** extended ***: %1", you_server_map );
-    }
-
-
-    // create list for the combo box installation source
-    foreach(`server, `info, you_server_map, ``{
-        you_server_list = add(you_server_list, server);
-    });
-
-
-    if (!retval)
-    {
-        // Message popup: yast2 component responsible for the you update cannot be initialised.
-        // This does not mean, connection failed to you server, but any other error occured.
-        UI::MessagePopup(_("Initialization of FTP/HTTP server failed:
-  internal error.
-  "));
-        return `abort;
-    }
-
-    // get last update status from YOU agent
-    last_status = SCR::Read(.you.lastUpdateStatus);
-
-    y2debug("ONLINE: last update status: %1", last_status );
-
-    integer num = tointeger( lookup( last_status, "days", "0" ));
-    string last_update = sformat( _("Last update was executed\n %1 day ago.", "Last update was executed\n %1 days ago.", num), num );
-  }
+  string str1 = _("Getting available serverlist from www.suse.de ...");
+  string str3 = _("Last update was executed\n %1 day ago.", "Last update was executed\n %1 days ago.", num);
 
 //  Pkg::TargetInit("/",false);
 
@@ -264,8 +132,8 @@
               `VBox(
                 `VSpacing(0.3),
                 `HBox(`HSpacing(1.2),
-                  `Left(`ComboBox(`id(`you), `opt(`editable), _("&Installation source"), you_server_list ))
-//                `PushButton( `id(`expert), `opt(`notify), _("&Expert"))
+                  `Left(`ComboBox(`id(`you), `opt(`editable), _("&Installation source"), you_server_list )),
+                  `PushButton( `id(`expert), `opt(`notify), _("&Expert"))
                 ),
                 `VSpacing(0.3)
               )
@@ -308,39 +176,6 @@ another FTP or HTTP server.</p>
 
       return `next;
   }
-
-/*
-  if ( OnlineUpdate::you_auto_get || OnlineUpdate::you_auto_install )
-  {
-      // auto mode; get patch descriptions and packages, but do not install patches
-      if ( size ( you_server_list ) <= 0 )
-      {
-	  y2error ( "No serverlist available" );
-	  return `abort;
-      }
-      string you_server = read_first_suseserver();
-      string you_serverkind = read_first_suseserverkind();
-      string you_dir = select( lookup(you_server_map, you_server, ["",""]), 0, "" );
-
-      Mode::youInstallMap["you_server"]	= you_server;
-      Mode::youInstallMap["you_dir"] 	= you_dir;
-      Mode::youInstallMap["you_serverkind"] = you_serverkind;
-
-      any retval = SCR::Execute( .you.setServer,
-				 $["kind":you_serverkind,
-				   "name":you_server,
-				   "path":you_dir]);
-
-      if (retval == nil || retval == false)
-      {
-	  y2error("ONLINE: .you.setServer( %1, %2 %3) ): %4", you_server, you_dir, you_serverkind, retval );
-	  return `abort;
-      }
-      y2debug("ONLINE: .you.setServer( %1, %2 %3) ): %4", you_server, you_dir, you_serverkind, retval );
-
-      return `next;
-  }
-*/
 
   Wizard::SetContents(_("Welcome to SuSE Package Update"), contents, help_text, WFM::Args(0), WFM::Args(1) );
 
@@ -431,55 +266,6 @@ internal error.
           }
 
           Pkg::YouSelectPatches();
-/*
-	  you_dir 	 = select( lookup(you_server_map, you_server, ["",""]), 0, "" );
-	  you_serverkind = select( lookup(you_server_map, you_server, ["",""]), 1, "" );
-
-	  any retval = SCR::Execute( .you.setServer,
-				     $["kind":you_serverkind,
-				       "name":you_server,
-				       "path":you_dir]);
-
-	  y2debug("ONLINE: .you.setServer( %1, %2 %3) ): %4", you_server, you_dir, you_serverkind, retval );
-
-	  if (retval == nil || retval == false)
-	  {
-	      UI::ErrorPopup(_("Initialization failed. Try again.
-If failure continues, choose
-another SuSE FTP/HTTP server.\n"));
-	      ret = `again;
-	  }
-	  else
-	  {
-	      // save install information in Mode.ycp
-	      if ( you_serverkind == "cd" || you_serverkind == "hd" )
-	      {
-		  Mode::youInstallMap["you_server"] = you_serverkind;
-	      }
-	      else
-	      {
-		  Mode::youInstallMap["you_server"]	= you_server;
-	      }
-	      Mode::youInstallMap["you_dir"] 	= you_dir;
-	      Mode::youInstallMap["you_serverkind"] = you_serverkind;
-
-	      // Show popup to get the registration and password in case of business product
-	      // and no local installation
-	      if ( business
-		   && you_serverkind != "cd"
-		   && you_serverkind != "hd"
-		   && you_serverkind != "nfs" )
-	      {
-		  // get, check and possibly save the registration and password
-		  boolean success = CheckAuthorization( );
-
-		  if ( !success )
-		  {
-		      return `abort;
-		  }
-	      }
-	  }
-*/
       }
 /*
       else if ( ret == `details )
@@ -490,8 +276,13 @@ another SuSE FTP/HTTP server.\n"));
 
 	  ret = `again;
       }
+*/
       else if ( ret == `expert )
       {
+          string url = getDirectory( "" );
+
+          UI::ChangeWidget( `id(`you), `Value, url );
+/*
 	  you_dir 	 = select( lookup(you_server_map, you_server, ["",""]), 0, "" );
 	  you_serverkind = select( lookup(you_server_map, you_server, ["",""]), 1, "" );
 
@@ -536,8 +327,8 @@ If failure continues, choose
 another SuSE FTP/HTTP server.\n"));
 	  }
 	  ret = `again;
-      }
 */
+      }
       else if ( ret == `abort && UI::ConfirmAbortUpdate(`painless) )
 	  return  `abort;
 
