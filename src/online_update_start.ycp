@@ -179,6 +179,8 @@ the update takes place.");
         UI::YouErrorPopup( sformat( _("Cannot connect to %1. Check your connection."),
                                     mirrorListServer ),
                            Pkg::ErrorDetails() );
+      } else if ( err == "read" ) {
+        UI::ErrorPopup( _("Unable to read server list from disk.") );
       } else if ( err == "write" ) {
         UI::ErrorPopup( _("Could not write server list to disk.") );
       } else {
