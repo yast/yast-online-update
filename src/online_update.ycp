@@ -369,7 +369,7 @@ You will need to do the update again.");
 
 	      login_status = Pkg::YouCheckAuthorization( you_server, reg_password, reg_code );
 
-	      if ( login_status == "ok" ) 	// registration was successful
+	      if ( login_status == "" ) 	// registration was successful
 	      {
 		  success = true;
 		  go_on = false;
