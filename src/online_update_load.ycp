@@ -112,6 +112,11 @@ from the patch CD.<br>
 After that all selected patches will be copied to the
 harddisk.</p>"));
 
+  string help_part13 = UI(_("<p>YaST2 first gets the descriptions of
+the available patches from the ftp server.
+After that you will have the possibitlity to select which patches
+should be downloaded and installed.</p>"));
+  
   string help_part2 =  UI(_("<p>
 The fields above show information about the connection and
 time of data transfer.
@@ -124,21 +129,25 @@ patches will be interrupted. No patch will be installed.
 The ftp connection will be closed. 
 </p>"));
 
-  if ( !cd_update )
+  if ( cd_update )
+  {
+      help_text = help_part12;
+  }
+  else if (auto_mode || continue_mode)
   {
       help_text = help_part11 + help_part2 + help_part3;
   }
   else
   {
-      help_text = help_part12;
+      help_text = help_part13 + help_part2 + help_part3; 
   }
 
   //
   // show the dialog also for CD update (!continue_mode)
   // because it can take some time to copy the patch descriptions
-  // and there could be a popup "YaST2" 
-  // if ( !cd_update || continue_mode )
+  // and there could be a popup "YaST2 patches available". 
   //
+  
   UI(`SetWizardContents(_("Connection and Data transfer"), contents, help_text, Args(0), Args(1) ));
 
   UI(`ChangeWidget(`id(`id1), `Value, ftp_server) );  
@@ -844,9 +853,9 @@ again to install the rest of the packages.")));
 	  // only greater than 1 MB
 	  string message = sformat (
 	       UI(_("There are %1 patches on ftp. Downloading may take a while.\n Do you really want to download the patches now?")),
- 	       my_size_text( disk_size ) );
+ 	       size_text( disk_size ) );
 
-	  if ( !UI(`DisplayAnyQuestion( `none, message ,_("&Yes"), _("&No"), `yes_default)) )
+	  if ( !UI(`AnyQuestionPopup( "", message ,YesButtonLabel(), NoButtonLabel(), `yes_default)) )
 	  {
 	      return `abort;		// abort update	      
 	  }
