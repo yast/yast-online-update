@@ -20,6 +20,8 @@
  */
 
 {
+  textdomain "online_update";
+      
   // includes for wizard dialog
   // include "ui/wizard_dialog.ycp";
   // include "ui/wizard_error.ycp";
