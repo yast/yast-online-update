@@ -199,18 +199,37 @@ click on line (or select line and use Alt A).
 	    }
 	    else if ( select( lookup( all_patches, patch_name, []), 3 ) == "X" )
 	    {
-		map check_version = PKGINFO(`ftpCheckYaST2Version(version,patch_name));
-		if ( lookup ( check_version, "ok", true ) )
+		string pre_info = PKGINFO(`ftpGetPreInstallInformation(patch_name));
+		boolean go_on = true;
+
+		if ( pre_info != "" )
 		{
-		    // was "X" before -> mark with "X" again
-		    UpdateGetPatches( patch_name, "X" ,select ( patch_info, 2 ) );
+		    string header = sformat(UI(_("Warning for patch %1")),
+					    patch_name );
+		      
+		    go_on = UI(`DisplayMsgFtp( pre_info,
+					       header,
+					       _("&Install"),
+					       _("&Skip patch")));
+
+		    y2debug( "RREETTURRN: %1", go_on);
 		}
-		else
+
+		if ( go_on )
 		{
-		    string message = sformat(
-			UI(_("This patch needs the version %1 of YaST2.\nYou have installed version %2")),
+		    map check_version = PKGINFO(`ftpCheckYaST2Version(version,patch_name));
+		    if ( lookup ( check_version, "ok", true ) )
+		    {
+			// was "X" before -> mark with "X" again
+			UpdateGetPatches( patch_name, "X" ,select ( patch_info, 2 ) );
+		    }
+		    else
+		    {
+			string message = sformat(
+			 UI(_("This patch needs the version %1 of YaST2.\nYou have installed version %2")),
 			lookup ( check_version, "minYaST2Version", "-" ), version );
-		    UI(`DisplayMsgFtpOk( message, ErrorMsg(), _("Don't install") ));
+			UI(`DisplayMsgFtpOk( message, ErrorMsg(), _("Don't install") ));
+		    }
 		}
 	    }
 	    else if ( select( lookup( all_patches, patch_name, []), 3 ) == " " )
@@ -221,12 +240,31 @@ click on line (or select line and use Alt A).
 		    if ( select( patch_info, 1 ) == " G " )
 		    {
 			// was "G" before -> mark with "X"
-			UpdateGetPatches( patch_name, "X" ,select ( patch_info, 2 ) );			
+			UpdateGetPatches( patch_name, "X" ,select ( patch_info, 2 ) );	
 		    }
 		    else
 		    {
-			// was not "X" and not "G" before -> mark with "G" 
-			UpdateGetPatches( patch_name, "G" ,select ( patch_info, 2 ) );
+			// was not "X" and not "G" before -> mark with "G"
+			string pre_info = PKGINFO(`ftpGetPreInstallInformation(patch_name));
+			boolean go_on = true;
+
+			if ( pre_info != "" )
+			{
+			    string header = sformat(UI(_("Warning for patch %1")),
+						    patch_name );
+		      
+			    go_on = UI(`DisplayMsgFtp( pre_info,
+						       header,
+						       _("&Install"),
+						       _("&Skip patch")));
+
+			    y2debug( "RREETTURRN: %1", go_on);
+			}
+
+			if ( go_on )
+			{
+			    UpdateGetPatches( patch_name, "G" ,select ( patch_info, 2 ) );
+			}
 		    }
 		}
 		else

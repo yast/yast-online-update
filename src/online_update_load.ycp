@@ -594,7 +594,8 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
 		  
 		  pre_info = PKGINFO(`ftpGetPreInstallInformation(patch));
 
-		  if ( pre_info != "" )
+		  if ( pre_info != "" &&
+		       !auto_mode_install )
 		  {
 		      string header = sformat(UI(_("Warning for patch %1")),
 						    patch );
@@ -618,7 +619,8 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
 		      post_info = PKGINFO(`ftpGetPostInstallInformation(
 								patch));
 
-		      if ( post_info != "" )
+		      if ( post_info != "" &&
+			   !auto_mode_install )
 		      {
 			  string header = sformat(UI(_("Information for patch %1")),
 						  patch );

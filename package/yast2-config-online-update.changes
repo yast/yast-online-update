@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Fri Aug 24 14:06:27 MEST 2001 - schubi@suse.de
+
+- YOU has and batchmode
+  yast2 online_update .auto.get ( getting all patches )
+  yast2 online_update .auto.install ( installing patches )
+- New batch class "optional"
+
+-------------------------------------------------------------------
 Mon Aug 20 17:22:52 CEST 2001 - gs@suse.de
 
 - Patch CD Update: write the information to install from CD
