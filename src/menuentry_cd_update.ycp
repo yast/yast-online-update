@@ -48,17 +48,7 @@ to correct and improve your existing installation
      
       ////////////////////////////////////////////////////////////////////////////////
       // explanation in YaST2 Control Center                                         //
-      `helptext     : UI(_("Install patches from CD to correct and improve your existing installation
-
-Project-Id-Version: YaST2
-POT-Creation-Date: 2001-09-28 15:55:56+0200
-PO-Revision-Date: 2001-09-19 12:19+0200
-Last-Translator: Jay Migliacio <jam@suse.com>
-Language-Team: English_US <i18n@suse.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8bit
-")),
+      `helptext     : UI(_("Install patches from CD to correct and improve your existing installation.")),
    
       ////////////////////////////////////////////////////////////////////////////////
       // leaf nil, experts only ;-)
