@@ -120,6 +120,7 @@ packages were created by SuSE.
   y2debug("ONLINE: Testmode %1", Mode::test );
 
   Wizard::CreateDialog();
+  Wizard::SetDesktopIcon("online_update");
 
   /*
    * Main dialog cycle

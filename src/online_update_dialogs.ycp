@@ -100,6 +100,7 @@ the update takes place.");
                                 if (Mode::config) {
                                     term dlg_contents = `Top( content);
                                     Wizard::CreateDialog();
+                                    Wizard::SetDesktopIcon("online_update");
                                     Wizard::SetContentsButtons(heading, dlg_contents, txt,
                                             Label::BackButton(), Label::FinishButton());
 
