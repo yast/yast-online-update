@@ -121,9 +121,6 @@ packages were created by SuSE.
 
   Wizard::CreateDialog();
 
-  // show the special YOU image
-  Wizard::SetImage( (byteblock)SCR::Read (.local.byte, Directory::themedir + "/current/online_update_long.png") );
-
   /*
    * Main dialog cycle
    *
