@@ -10,8 +10,8 @@
 
 {
 
-textdomain "online-update";
 module "OnlineUpdate";
+textdomain "online-update";
 
 import "Arch";
 import "Installation";
