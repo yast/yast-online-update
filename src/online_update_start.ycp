@@ -86,7 +86,7 @@
       `VSpacing( 0.3 ),
       `HBox(
         `HWeight(1, `Empty()),
-        `HWeight(8,
+        `HWeight(10,
           `Frame ( _("System &information"),
             `VBox(
               `VSpacing(0.3),
@@ -108,7 +108,7 @@
       `VSpacing(1.0),
       `HBox(
         `HWeight(1, `Empty()),
-        `HWeight(8, `Frame (_("&Choice of update mode"),
+        `HWeight(10, `Frame (_("&Choice of update mode"),
                 `RadioButtonGroup(`id(`choice),
                 `VBox(
                       `VSpacing(0.3),
@@ -130,13 +130,13 @@
       `VSpacing(1.0),
       `HBox(
         `HWeight(1, `Empty()),
-        `HWeight(8,
+        `HWeight(10,
           `Frame ( _("Choice of installation &source"),
             `RadioButtonGroup(`id(`choice),
               `VBox(
                 `VSpacing(0.3),
                 `HBox(`HSpacing(1.2),
-                  `Left(`ComboBox(`id(`you), `opt(`editable), _("&Installation source"), you_server_list )),
+                  `HWeight(1,`Left(`ComboBox(`id(`you), `opt(`editable), _("&Installation source"), you_server_list ))),
                   `PushButton( `id(`expert), `opt(`notify), _("&Expert"))
                 ),
                 `VSpacing(0.3)
