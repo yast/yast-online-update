@@ -147,5 +147,7 @@
 	Pkg::CallbackYouLog ("OnlineUpdateCallbacks::LogCallback");
 	Pkg::CallbackYouExecuteYcpScript ("OnlineUpdateCallbacks::ExecuteYcpScriptCallback");
         Pkg::CallbackYouScriptProgress ("OnlineUpdateCallbacks::ScriptProgressCallback");
+
+        Pkg::CallbackMediaChange ("PackageCallbacks::MediaChange");
     }
 }
