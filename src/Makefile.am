@@ -9,7 +9,7 @@ modulesdir = $(YAST2DIR)/clients
 menudir = $(YAST2DIR)/menuentries
 
 etc_DATA = suseservers
-adm_DATA = rc.config.y2c_online_update
+adm_DATA = sysconfig.you
 
 modules_DATA = online_update_start.ycp	\
 		online_update_load.ycp	\
