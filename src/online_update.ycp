@@ -340,7 +340,7 @@ You will need to do the update again.");
   //
   // Check/get the registration and password in case of a business product
   //
-  global define CheckAuthorization ( ) ``{
+  global define CheckAuthorization ( string you_server ) ``{
 
       boolean success = false;
       boolean go_on = true;
@@ -367,7 +367,7 @@ You will need to do the update again.");
 	      reg_password = lookup( registration_map, "reg_password", "");
 	      reg_code = lookup( registration_map, "reg_code", "");
 
-	      login_status = SCR::Execute( .you.checkAuthorization, reg_password, reg_code );
+	      login_status = Pkg::YouCheckAuthorization( you_server, reg_password, reg_code );
 
 	      if ( login_status == "ok" ) 	// registration was successful
 	      {
@@ -402,13 +402,10 @@ You will need to do the update again.");
 Check the registration data.
 ") ;
 		  }
-		  else if  ( login_status == "error_path" )
+		  else
 		  {
-		      msg_string = _("Login to http server failed.
-Restart the Online Update and
-use the 'Expert' mode to check the
-server data.
-");
+		      msg_string = _("Login to server failed.");
+
 		      UI::ErrorPopup( msg_string );
 		      go_on = false;
 		      success = false;
