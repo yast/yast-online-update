@@ -99,6 +99,7 @@
 	    `VSpacing( 0.2 )
 	    );
 
+  
   string help_text = "";
 
   // helptext  "Connection and Data transfer" 
@@ -106,11 +107,11 @@
 YaST2 will download all selected patches.
 This could take some time. Several details are shown.</p>"));
 
-  string help_part12 = UI(_("<p>The patches will be copied
-to the harddisk.<br>
-Informations about the ftp connection are not relevant
-for CD installation.</p>"));
-  
+  string help_part12 = UI(_("<p>YaST2 first gets the patch descriptions
+from the patch CD.<br>
+After that all selected patches will be copied to the
+harddisk.</p>"));
+
   string help_part2 =  UI(_("<p>
 The fields above show information about the connection and
 time of data transfer.
@@ -129,16 +130,19 @@ The ftp connection will be closed.
   }
   else
   {
-      help_text = help_part12 + help_part2 + help_part3;
+      help_text = help_part12;
   }
 
-  if ( !cd_update || continue_mode )
-  {
-      UI(`SetWizardContents(_("Connection and Data transfer"), contents, help_text, Args(0), Args(1) ));
+  //
+  // show the dialog also for CD update (!continue_mode)
+  // because it can take some time to copy the patch descriptions
+  // and there could be a popup "YaST2" 
+  // if ( !cd_update || continue_mode )
+  //
+  UI(`SetWizardContents(_("Connection and Data transfer"), contents, help_text, Args(0), Args(1) ));
 
-      UI(`ChangeWidget(`id(`id1), `Value, ftp_server) );  
-      UI(`ChangeWidget(`id(`status), `Value, _("closed") ));
-  }
+  UI(`ChangeWidget(`id(`id1), `Value, ftp_server) );  
+  UI(`ChangeWidget(`id(`status), `Value, _("closed") ));
 
   // Fake getting of patches for fake_mode (NOT USED)
   integer test_id = 0;
@@ -818,6 +822,7 @@ Please try to get patches from another SuSE ftp server.")));
 	  new_patches = yast2map;
 	  y2milestone( " YaST2 patches found; only install %1",
 		       new_patches );
+	  // Message popup text: YaST2 patches found which should be installed first
 	  UI(`MessagePopup(_("There are YaST2 patches available.
 These patches should be installed first.
 Please install these patches and call YaST2 online update once
