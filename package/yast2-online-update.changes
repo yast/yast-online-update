@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Mar 10 01:50:44 CET 2004 - sh@suse.de
+
+- Migration to new wizard 
+- V 2.9.6
+
+-------------------------------------------------------------------
 Fri Mar  5 11:10:30 CET 2004 - cschum@suse.de
 
 - Adapt to stricter type checking of YCP interpreter.
