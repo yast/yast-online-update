@@ -33,5 +33,6 @@ AM_CONDITIONAL(ISPPC, test `uname -m` = ppc)
 AC_OUTPUT(Makefile
 	package/y2c_online_update.spec:y2c_online_update.spec.in
 	src/Makefile
+	src/include/Makefile
 	conf/Makefile
 	doc/Makefile)

@@ -1,6 +1,7 @@
 #
 # Makefile.am for y2c_online_update/src
 #
+SUBDIRS = include
 
 modulesdir = $(YAST2DIR)/clients
 menudir = $(YAST2DIR)/menuentries
