@@ -7,7 +7,9 @@ Requires:	yast2 yast2-agent-ftp yast2-agent-http
 Provides:	y2c_online_update yast2-config-online-update
 Obsoletes:	y2c_online_update yast2-config-online-update
 
-Summary:	YaST2 online update
+Summary:    	YaST2 online update
+
+PreReq:    	%fillup_prereq
 
 %description
 -
