@@ -200,7 +200,7 @@ You will need to do the update again.");
       info_map = PKGINFO( `ftpGetPatchInformation( patch_name ));
 
       string infotext = lookup(info_map, "description", "");
-
+      
       list table_input = [];
       foreach (`pac, `info_list, lookup(info_map, "packages", $[] ), ``{
 	  table_input = add(table_input, `item(`id(pac), pac, select(info_list, 1),
@@ -210,7 +210,7 @@ You will need to do the update again.");
       UI( ``{ OpenDialog(`opt(`decorated ),
 			 `HBox(`VSpacing(20),
 			       `VBox(
-				     `HSpacing(50),
+				     `HSpacing(60),
 				     `Left(`Heading( _("Patch information") )),
 				     `VWeight( 5,
 					       `LogView(`id(`infotext),
