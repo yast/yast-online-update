@@ -21,7 +21,8 @@
 {
   textdomain "online_update";
   
-  Include (`yast_version());
+  include "yast_version.ycp";
+  
   string version = yast_version ();
 
   include "ui/wizard_dialog.ycp";
@@ -75,7 +76,6 @@
   user_settings = add( user_settings, "test_mode", test_mode );
   y2debug("ONLINE: Testmode %1", test_mode );
   y2debug("ONLINE: YaST2-version %1", version );  
-
   
 UI(``{
     
