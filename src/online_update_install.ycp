@@ -76,8 +76,6 @@ option 'Remove source packages after update.'</p>");
   UI::ChangeWidget(`id(`next), `Label,  FinishButtonLabel() );
   UI::ChangeWidget(`id(`abort), `Enabled,  false );
 
-  Pkg::YouSelectPatches();
-
   Pkg::YouAttachSource();
 
   map patch = Pkg::YouFirstPatch();

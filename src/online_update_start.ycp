@@ -452,6 +452,8 @@ internal error.
               return `abort;
             }
           }
+
+          Pkg::YouSelectPatches();
 /*
 	  you_dir 	 = select( lookup(you_server_map, you_server, ["",""]), 0, "" );
 	  you_serverkind = select( lookup(you_server_map, you_server, ["",""]), 1, "" );
