@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Feb  2 14:35:08 CET 2004 - cschum@suse.de
+
+- Adapted to new YCP interpreter.
+- 2.9.0
+
+-------------------------------------------------------------------
 Fri Nov 21 15:32:08 CET 2003 - cschum@suse.de
 
 - Added module you_server for configuration of local YOU server.
