@@ -49,7 +49,11 @@ II. Verzeichnisstruktur auf den Servern:
 
                 product_name:	Feld "CD-Produkt-Name" in Datei
 				/work/cd/data/maintained-CDs/<product>.<architecture>
-                       WICHTIG: Leerzeichen sind durch _ ersetzt.
+
+                       Festlegung: 
+		       Führende und "trailing" (hintenanhängende) Leerzeichen werden entfernt, 
+		       sonstige Leerzeichen im Namen werden durch '-' ersetzt.
+
                 product_version: Feld "CD-Produkt-Version" in Datei
 				 /work/cd/data/maintained-CDs/<product>.<architecture>
 
