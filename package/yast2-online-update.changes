@@ -1,4 +1,15 @@
 -------------------------------------------------------------------
+Fri Jan 24 13:57:05 CET 2003 - cschum@suse.de
+
+- Moved sysconfig/online-update from yast2-online-update to
+  yast2-packagemanager.
+
+-------------------------------------------------------------------
+Mon Jan 20 13:18:02 CET 2003 - cschum@suse.de
+
+- Adapted help texts to actually describe the current interface.
+
+-------------------------------------------------------------------
 Thu Dec 19 14:25:57 CET 2002 - cschum@suse.de
 
 - Removed obsolete code (online_update_load.ycp,

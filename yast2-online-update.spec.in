@@ -11,8 +11,6 @@ Obsoletes:	yast2-trans-online-update y2t_online_update
 
 Summary:    	YaST2 online update
 
-PreReq:    	%fillup_prereq
-
 %description
 -
 
@@ -26,13 +24,9 @@ PreReq:    	%fillup_prereq
 
 %files
 %defattr(-,root,root)
-/var/adm/fillup-templates/sysconfig.onlineupdate
 @configdir@/online_update.y2cc
 @configdir@/cd_update.y2cc
 @scrconfdir@/*.scr
 @clientdir@/online*.ycp
 @moduledir@/OnlineUpdate*.ycp
 %doc @docdir@
-
-%post
-%{fillup_only -n onlineupdate}
