@@ -144,7 +144,7 @@ option 'Remove source packages after update.'</p>");
             error = true;
           }
 
-          string info = lookup( patch, "postinformation", "" );
+          info = lookup( patch, "postinformation", "" );
           if ( size( info ) != 0 ) {
             UI::MessagePopup( info );
           }
