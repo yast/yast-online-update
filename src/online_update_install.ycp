@@ -134,6 +134,10 @@
   // MAIN:
   ///////////////////////////////////////////////////////////////////////////////////////
 
+  boolean removeSourcePackages = false;
+  if ( SCR::Read( .sysconfig.onlineupdate.YOU_REMOVE_SOURCE_PACKAGES ) == "yes" ) {
+    removeSourcePackages = true;
+  }
 
   term contents =
       // main dialog: 
@@ -145,7 +149,8 @@
             `VSpacing( 0.2 ),
             `ProgressBar( `id( `progress ), _("Total Progress") ),
 	    `VSpacing( 0.5 ),
-	    `Left(`CheckBox(`id(`remove_packages),_("&Remove Source Packages after Update"), false)),
+	    `Left( `CheckBox( `id(`remove_packages), _("&Remove Source Packages after Update"),
+                              removeSourcePackages ) ),
             `VSpacing( 0.2 )
             );
     

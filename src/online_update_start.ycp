@@ -339,6 +339,12 @@ the update takes place.
     i = i + 1;
   }
 
+  boolean manualSelection = true;
+  if ( OnlineUpdate::you_auto || 
+       SCR::Read( .sysconfig.onlineupdate.YOU_MANUAL_SELECTION ) == "no" ) {
+    manualSelection = false;
+  }
+
   // layout main dialog
 
   term contents =
@@ -397,7 +403,7 @@ the update takes place.
                       `VSpacing(0.3),
                       `HBox(`HSpacing(0.8),
                           `Left(`CheckBox(`id(`manual),
-                                _("&Manually Select Patches"), true ) )
+                                _("&Manually Select Patches"), manualSelection ) )
                       ),
                       `HBox(`HSpacing(0.8),
                           `Left(`CheckBox(`id(`reload),
@@ -451,17 +457,6 @@ without the need of user interaction.</p>
   Wizard::SetContents(_("Welcome to YaST Online Update"), contents, help_text, WFM::Args(0), WFM::Args(1) );
 
   Wizard::ReplaceAbortButton( `PushButton(`id(`abort), _("&Abort Update")));
-
-  if ( OnlineUpdate::you_auto )
-  {
-      UI::ChangeWidget( `id(`automatic), `Value, true );
-      UI::ChangeWidget( `id(`manual), `Value, false );
-  }
-  else
-  {
-      UI::ChangeWidget( `id(`automatic), `Value, false );
-      UI::ChangeWidget( `id(`manual), `Value, true );
-  }
 
   UI::ChangeWidget( `id(`server), `Value, 1 );
 

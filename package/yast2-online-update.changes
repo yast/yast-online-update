@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Jul 25 13:59:54 CEST 2003 - cschum@suse.de
+
+- Make configurable in /etc/sysconfig/online_update if manual patch
+  selection is called and if packages are removed after
+  installation (#22244).
+
+-------------------------------------------------------------------
 Tue Jul 22 14:26:00 CEST 2003 - cschum@suse.de
 
 - Added support for YCP scripts as part of patches.
