@@ -647,6 +647,27 @@ Please try to get patches from another SuSE ftp server.")));
   
   if ( auto_mode )
   {
+      // calculate required download size
+      integer disk_size = 0;
+      foreach( `patch, `patch_info, new_patches, ``{
+	  disk_size = disk_size + tointeger(
+		    select ( lookup(new_patches, patch, []), 2 ) )*1024;
+      });
+
+      if ( disk_size > 1000000 )
+      {
+	  // only greater than 1 MB
+	  string message = sformat (
+	       UI(_("There are %1 patches on ftp. Downloading may take a while.\n Do you really want to download the patches now?")),
+ 	       my_size_text( disk_size ) );
+
+	  if ( !UI(`YesNoOpt( message ,_("&Yes"), _("&No"), `yes_default)) )
+	  {
+	      return `abort;		// abort update	      
+	  }
+      }
+
+      
       // get the patches
       list install_patches = GetAllPatches( new_patches );
 
