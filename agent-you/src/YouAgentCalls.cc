@@ -637,9 +637,9 @@ YCPValue YouAgent::setServer ( YCPMap setMap )
       y2debug( "setServer: KIND = %s", kind.c_str() );
 
       string availString[] =
-	  { "ftp", "http", "cd", "CD", "harddisk", "local", "nfs", "Net", "" };
+	  { "ftp", "FTP", "http", "HTTP", "cd", "CD", "harddisk", "Harddisk", "local", "nfs", "Net", "" };
       ServerKind availKind[] =
-	  {  FTP,   HTTP,   CD,   CD,   HD,         HD,      NFS,   NFS,  NO };
+	  {  FTP,   FTP,  HTTP,   HTTP,   CD,   CD,   HD,         HD,          HD,      NFS,   NFS,  NO };
 
       serverKind = NO;
       for ( int i = 0; availString[i] != ""; i++ )
