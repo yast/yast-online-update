@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Wed Feb  4 16:45:35 CET 2004 - cschum@suse.de
+
+- Split off you_server to own package.
+
+-------------------------------------------------------------------
 Wed Feb  4 11:28:07 CET 2004 - nashif@suse.de
 
 - Enable automatic online-update with autoyast

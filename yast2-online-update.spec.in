@@ -26,18 +26,14 @@ Summary:    	YaST2 online update
 %defattr(-,root,root)
 @configdir@/online_update.y2cc
 @configdir@/cd_update.y2cc
-@configdir@/you_server.y2cc
 @desktopdir@/online_update.desktop
 @desktopdir@/cd_update.desktop
 @scrconfdir@/*.scr
 @clientdir@/online*.ycp
 @clientdir@/inst_you.ycp
-@clientdir@/you_server.ycp
 @yncludedir@/online_update*.ycp
 @moduledir@/OnlineUpdate*.ycp
 @moduledir@/OnlineUpdate*.ybc
+@moduledir@/AutoOnlineUpdate*.ycp
 @moduledir@/AutoOnlineUpdate*.ybc
 %doc @docdir@
-/etc/httpd/modules/you_server
-/etc/httpd/you_server.conf
-/var/adm/fillup-templates/sysconfig.apache-you_server
