@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Wed Oct  6 10:48:28 CEST 2004 - jsrain@suse.cz
+
+- append slash to the end of URL if it is missing (#46631)
+
+-------------------------------------------------------------------
 Wed Sep 29 11:48:16 CEST 2004 - jsrain@suse.cz
 
 - do not show wrong base architecture (#46319)

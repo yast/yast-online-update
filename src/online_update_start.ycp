@@ -133,7 +133,11 @@
 	usermap = Pkg::YouGetUserPassword();
     }
 
+y2error ("Server: %1", server);
+
     string err = Pkg::YouGetDirectory();
+
+y2error ("err: %1");
 
     if ( err == "login" ) {
       string username = usermap[ "username" ]:"";
@@ -434,7 +438,10 @@ without the need of user interaction.</p>
           return  `abort;
       } else if (ret == `next) {
           if ( serverId == 0 ) {
-            server[ "url" ] = UI::QueryWidget( `id( `url ), `Value );
+	    string url = (string)UI::QueryWidget( `id( `url ), `Value );
+	    if (substring (url, size (url) - 1, 1) != "/")
+		url = url + "/";
+            server[ "url" ] = url;
 	    server[ "type" ] = "custom";
             you_server_list[ 0 ] = server;
           }
