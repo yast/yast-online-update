@@ -94,7 +94,7 @@ patches could not be installed.
   help_text = help_part1 + help_part2 + help_part3;
     
   // using SetContents (define in online_update.ycp)
-  Wizard::SetContents(_("Online Update Confirmation"), contents, help_text, Args(0), Args(1) );
+  Wizard::SetContents(_("Online Update Confirmation"), contents, help_text, WFM::Args(0), WFM::Args(1) );
 
   // changing Label to Finish for the last step
   UI::ChangeWidget(`id(`next), `Label,  FinishButtonLabel() );
@@ -148,7 +148,7 @@ patches could not be installed.
 	
 	  if (ret == `details)
 	  {
-	      any retval = CallFunction(`online_update_details( true, false ) );
+	      any retval = WFM::CallFunction(`online_update_details( true, false ) );
 	      // changing Label to Finish for the last step
 	      UI::ChangeWidget(`id(`next), `Label,  FinishButtonLabel() );
 	      UI::ChangeWidget(`id(`abort), `Enabled,  false );

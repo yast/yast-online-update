@@ -109,7 +109,7 @@ then click <b>Show Patch Info</b>.
     help_text = help_part1 + help_part2;
     
      // using Wizard::SetContents (define in online_update.ycp)
-     Wizard::SetContents(_("Detailed Information "), contents, help_text, Args(0), Args(1) );
+     Wizard::SetContents(_("Detailed Information "), contents, help_text, WFM::Args(0), WFM::Args(1) );
 
      UI::ChangeWidget(`id(`next),  `Label, NextButtonLabel()   );
      UI::ChangeWidget(`id(`abort), `Enabled,  false );

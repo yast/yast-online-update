@@ -57,25 +57,25 @@ packages were created by SuSE.
   // or online_update is called directly ( /sbin/yast2 online_update '(.test)' )
   // test mode means: get the patches, but do not install (inst_rpmcopy runs with test mode)
 
-  integer arg_n = size(Args()) - 1;
+  integer arg_n = size(WFM::Args()) - 1;
 
   while (arg_n >= 0) {
-      if (Args(arg_n) == .test || Args(arg_n) == ".test")
+      if (WFM::Args(arg_n) == .test || WFM::Args(arg_n) == ".test")
       {
 	  Mode::test = true;
       }
-      else if (Args(arg_n) == .cd_default || Args(arg_n) == ".cd_default")
+      else if (WFM::Args(arg_n) == .cd_default || WFM::Args(arg_n) == ".cd_default")
       {
 	  Mode::youInstallMap["you_server"]	= "CD";		// text for output field
 	  Mode::youInstallMap["you_serverkind"] = "cd";
 	  OnlineUpdate::cd_update	=  true;
       }
-      else if (Args(arg_n) == .auto.get || Args(arg_n) == ".auto.get")
+      else if (WFM::Args(arg_n) == .auto.get || WFM::Args(arg_n) == ".auto.get")
       {
 	  OnlineUpdate::you_auto_get	= true;
 	  OnlineUpdate::you_auto	= true;
       }
-      else if (Args(arg_n) == .auto.install || Args(arg_n) == ".auto.install")
+      else if (WFM::Args(arg_n) == .auto.install || WFM::Args(arg_n) == ".auto.install")
       {
 	  OnlineUpdate::you_auto_install = true;
 	  OnlineUpdate::you_auto	 = true;
@@ -83,8 +83,8 @@ packages were created by SuSE.
       else
       {
 	  // batch kind like security,.....
-	  OnlineUpdate::you_auto_batchkind = sformat("%1", Args(arg_n) );
-	  y2milestone( "Getting patches for kind %1 only",  Args(arg_n) );
+	  OnlineUpdate::you_auto_batchkind = sformat("%1", WFM::Args(arg_n) );
+	  y2milestone( "Getting patches for kind %1 only",  WFM::Args(arg_n) );
       }
 
       arg_n = arg_n - 1;
@@ -466,11 +466,11 @@ server data.
 	  // call all modules in manual mode
 	  if ( !OnlineUpdate::you_auto )
 	  {
-	      result = CallFunction( module_name );
+	      result = WFM::CallFunction( module_name );
 	  }
 	  else if ( select( select(dialog, id, []), 1, `none ) == `always )
 	  {
-	      result = CallFunction( module_name );
+	      result = WFM::CallFunction( module_name );
 	  }
       }
 

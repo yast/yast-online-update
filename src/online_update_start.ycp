@@ -333,7 +333,7 @@ another FTP/HTTP server.</p>
 
   if ( !cd_update )
   {
-      Wizard::SetContents(_("Welcome to SuSE Package Update"), contents, help_text, Args(0), Args(1) );
+      Wizard::SetContents(_("Welcome to SuSE Package Update"), contents, help_text, WFM::Args(0), WFM::Args(1) );
 
       Wizard::ReplaceAbortButton( `PushButton(`id(`abort), _("&Abort Update")));
   }
@@ -446,7 +446,7 @@ another SuSE FTP/HTTP server.\n"));
       }
       else if ( ret == `details )
       {
-	  any retval = CallFunction(`online_update_details( true, false ) );
+	  any retval = WFM::CallFunction(`online_update_details( true, false ) );
 	  if ( retval == `abort )
 	      return `abort;
 
@@ -473,7 +473,7 @@ another SuSE FTP/HTTP server.\n"));
 	  Mode::youInstallMap["you_serverkind"] = you_serverkind;
 
 	  // call dialog Change source of installation
-	  any retval = CallFunction(`inst_source( true, true ) );
+	  any retval = WFM::CallFunction(`inst_source( true, true ) );
 	  if ( ( retval == `abort
 		 || retval == `cancel )
 	       && UI::ConfirmAbortUpdate(`painless) )

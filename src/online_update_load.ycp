@@ -154,7 +154,7 @@ The FTP or HTTP connection will be closed.
   // and there could be a popup "YaST2 patches available".
   //
 
-  Wizard::SetContents(_("Connection and Data transfer"), contents, help_text, Args(0), Args(1) );
+  Wizard::SetContents(_("Connection and Data transfer"), contents, help_text, WFM::Args(0), WFM::Args(1) );
 
   UI::ChangeWidget(`id(`id1), `Value, you_server);
   UI::ChangeWidget(`id(`status), `Value, _("closed") );
@@ -934,7 +934,7 @@ You have installed version %3.
       symbol ret = nil;
 
       // installing all packages
-      ret = CallFunction(`inst_rpmcopy(false, false,
+      ret = WFM::CallFunction(`inst_rpmcopy(false, false,
 				       package_list,
 				       desc_list ));
       y2debug("ONLINE:  call of inst_rpmcopy ( %1, %2) returns: %3",

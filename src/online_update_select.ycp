@@ -159,7 +159,7 @@ double-click the line (or select it and use Alt + A).
     }
 
     // using SetContents (define in online_update.ycp)
-    Wizard::SetContents(_("List of available patches"), contents, help_text, Args(0), Args(1) );
+    Wizard::SetContents(_("List of available patches"), contents, help_text, WFM::Args(0), WFM::Args(1) );
 
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
