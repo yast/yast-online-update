@@ -213,24 +213,24 @@ A patch updates, improves or corrects your existing installation."))
 	  if ( how_to == `painless )
 	  {
 	      // Warning text for aborting the update before a patch is installed
-	      what_will_happen = _( "If you abort the installation now,
+	      what_will_happen = _("If you abort the installation now,
 no patch will be installed.
 An existing connection to ftp server will be closed.
-Your installation will remain untouched." );
+Your installation will remain untouched.");
 	  }
 	  else if ( how_to == `incomplete )
 	  {
 	      // Warning text for aborting if some patches are installed, some not
-	      what_will_happen = _( "If you abort the installation now,
+	      what_will_happen = _("If you abort the installation now,
 the patches are not yet downloaded and installed.
-You will need to do the update again." );
+You will need to do the update again.");
 	  }
 	  else if ( how_to == `unusable )
 	  {
 	      // Warning text for aborting an installation during the install process
-	      what_will_happen = _( "If you abort the installation now,
+	      what_will_happen = _("If you abort the installation now,
 at least one patch is not installed correctly.
-You will need to do the update again." );
+You will need to do the update again.");
 	  }
 	  else
 	  {
@@ -258,7 +258,7 @@ You will need to do the update again." );
 				       `HStretch(),
 
 				       // Button that will continue with the installation
-				       `PushButton(`id(`continue), `opt(`default), _("&Continue Update" ) )
+				       `PushButton(`id(`continue), `opt(`default), _("&Continue Update") )
 				       ),
 				 `VSpacing(0.2)
 				 ),

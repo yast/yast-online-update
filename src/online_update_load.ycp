@@ -246,7 +246,7 @@ In manual mode click on Next to proceed.")),
 	  any r = UI(`PollInput());
 	  if ( r == `abort && UI(`DisplayMsgFtp( _("Download of patches will be stopped.
 You may continue with installation of already
-loaded patches or abort update completely." ), _("Warning"), _("&Install"), _("&Abort") )) )
+loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&Abort") )) )
 	  {
 	      go_on = false;
 	  }
@@ -330,8 +330,7 @@ loaded patches or abort update completely." ), _("Warning"), _("&Install"), _("&
 
 		  if ( pre_info != "" )
 		  {
-		      string header = sformat(UI(_(
-						    "Warning for patch %1")),
+		      string header = sformat(UI(_("Warning for patch %1")),
 						    patch );
 		      
 		      go_on = UI(`DisplayMsgFtp( pre_info,
@@ -354,8 +353,7 @@ loaded patches or abort update completely." ), _("Warning"), _("&Install"), _("&
 
 		      if ( post_info != "" )
 		      {
-			  string header = sformat(UI(_(
-						  "Information for patch %1")),
+			  string header = sformat(UI(_("Information for patch %1")),
 						  patch );
 
 			  go_on = UI(`DisplayMsgFtpOk( post_info,
