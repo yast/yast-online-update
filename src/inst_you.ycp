@@ -12,12 +12,6 @@
 
     import "Internet";
 
-    if (!Internet::Fastest())	// nothing to do
-	return `auto;
-
-    if (!Internet::do_test)	// nothing to do
-	return `auto;
-
     if (!Internet::do_you)	// nothing to do
 	return `auto;
 
