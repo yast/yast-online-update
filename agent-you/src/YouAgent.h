@@ -29,7 +29,7 @@ typedef enum _CompareVersion {
 } CompareVersion;
 
 
-class YouAgent : public SCRAgent 
+class YouAgent : public SCRAgent
 {
 public:
     YouAgent();
@@ -42,12 +42,12 @@ public:
      */
     YCPValue Read(const YCPPath& path, const YCPValue& arg = YCPNull());
 
-   YCPValue Execute (const YCPPath& path,
-		     const YCPValue& value = YCPNull(),
-		     const YCPValue& arg = YCPNull());
-   
+    YCPValue Execute (const YCPPath& path,
+		      const YCPValue& value = YCPNull(),
+		      const YCPValue& arg = YCPNull());
+
     /**
-     * Writes data. 
+     * Writes data.
      */
     YCPValue Write(const YCPPath& path, const YCPValue& value,
 		   const YCPValue& arg = YCPNull());
@@ -56,13 +56,13 @@ public:
      * Get a list of all subtrees.
      */
     YCPValue Dir(const YCPPath& path);
-   
+
 protected:
 
    /**
     * Initialize the server for ftp-update with the environment
     * delivered by the setMap:
-    * $[ 
+    * $[
     *   "language":"german",
     *	"architecture":"i386",
     *	"rootpath":"/",
@@ -77,7 +77,7 @@ protected:
     * Returns a map like :
     * $[ "days":"3","status":"ok",
     *    "patches":[ <patch-ID1>, <patch-mode1>, <patch-description1>,
-    *		     <update-date1>,<status1>, 	
+    *		     <update-date1>,<status1>,
     *                <patch-ID2>, <patch-mode2>, <patch-description2>,
     *		     <update-date2>,<status2>, ...	]]
     **/
@@ -93,18 +93,18 @@ protected:
 
    /**
     * Connecting to server
-    * 
+    *
     * Returns $[ "ok": false, "message","Connection refused" ]
     **/
    YCPValue	connect ( );
 
    /**
     * Disconnecting from server
-    * 
+    *
     * Returns $[ "ok": false, "message","not connected" ]
     **/
    YCPValue	disconnect ( );
-   
+
    /**
     * Read the patch-list from the server
     * Returns $[ "ok": false, "message","not connected",
@@ -146,7 +146,7 @@ protected:
     * Returns the post-install-information of a patch
     **/
    YCPValue	getPostInstallInformation ( const YCPString patchName );
-   
+
    /**
     * Returns a list of packages ( with path ) which belong to the patch.
     **/
@@ -164,7 +164,7 @@ protected:
     * Returns true or false
     **/
    YCPValue	deletePackages ( const YCPString patchName );
-   
+
    /**
     * Writes the installation-status of a patch.
     * Valid stati: installed, error, new
@@ -179,20 +179,20 @@ protected:
     **/
    YCPValue	closeUpdate ( const YCPBoolean success );
 
-   /** 
+   /**
     * Is the installed system a business product ?
     * Returns true or false
     **/
     bool isBusiness ( void );
 
    /**
-    * Checking authorization of the user	
+    * Checking authorization of the user
     * Returns stati: "ok", "error_login", "error_path"
     **/
     YCPValue checkAuthorization ( YCPString password,
 					    YCPString registrationCode );
 
-   /** 
+   /**
     * Getting SuSE product informations.
     * Returns a map like [ "Distribution_Verison":"7.2",
     *			   "Product_Version":"3.0",
@@ -204,9 +204,9 @@ protected:
      * Create all parent directories of @param name, as necessary
      **/
     void create_directories(string name);
-    
+
     /**
-     * compare two versions of a package    
+     * compare two versions of a package
      **/
     CompareVersion CompVersion( string left,
 				string right );
@@ -217,7 +217,7 @@ protected:
    string architecture; // like i386
    string distributionVersion; // like 7.0
    string productVersion;
-   string productName; 
+   string productName;
    string destPatchPath; // like /var/lib/YaST/patches
    string ftpLogFilename;
    string sourcePath; // of the server
@@ -229,8 +229,8 @@ protected:
    string language; // Selected language
    string httpProxyUser;
    string httpProxyPassword;
-   string patchDirectory; 
-   PatchInfo *currentPatchInfo; //Patch-info about all patches on the client   
+   string patchDirectory;
+   PatchInfo *currentPatchInfo; //Patch-info about all patches on the client
 };
 
 

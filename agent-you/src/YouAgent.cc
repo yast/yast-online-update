@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/types.h>
-#include <regex.h>       
+#include <regex.h>
 #include <string>
 
 #include <YCP.h>
@@ -51,7 +51,7 @@ YouAgent::YouAgent()
     currentPatchInfo = NULL;
     httpProxyUser = "";
     httpProxyPassword = "";
-    patchDirectory = "";     
+    patchDirectory = "";
 }
 
 
@@ -67,8 +67,8 @@ YouAgent::~YouAgent()
  * Execute path of the you agent
  *--------------------------------------------------------------------------*/
 YCPValue YouAgent::Execute (const YCPPath& path,
-			    const YCPValue& value = YCPNull(),
-			    const YCPValue& arg = YCPNull())
+			    const YCPValue& value,
+			    const YCPValue& arg)
 {
    string path_name = path->component_str (0);
    YCPValue ret = YCPVoid();
@@ -76,7 +76,7 @@ YCPValue YouAgent::Execute (const YCPPath& path,
    if (  path_name == SETENVIRONMENT )
    {
       // setting user and password for the you-server
-      
+
       if ( !value.isNull()
 	   && value->isMap() )
       {
@@ -107,10 +107,10 @@ YCPValue YouAgent::Execute (const YCPPath& path,
    }
    else if (  path_name  == GETPATCHLIST )
    {
-      //Read the patch-list from the server 
+      //Read the patch-list from the server
 
        ret = getPatchList ( );
-   }   
+   }
    else if (  path_name  == GETPATCH )
    {
       //  Reading patch with all RPMs from server.
@@ -164,11 +164,11 @@ YCPValue YouAgent::Execute (const YCPPath& path,
 	   ret = checkAuthorization( value->asString(),
 				     arg->asString() );
        }
-   }      
+   }
    else
    {
       y2error ( "Path %s not found", path_name.c_str() );
-      ret = YCPError ("Agentpath not found", YCPVoid());      
+      ret = YCPError ("Agentpath not found", YCPVoid());
    }
 
    return ret;
@@ -178,7 +178,7 @@ YCPValue YouAgent::Execute (const YCPPath& path,
 /*--------------------------------------------------------------------------*
  * Read path of the you agent
  *--------------------------------------------------------------------------*/
-YCPValue YouAgent::Read(const YCPPath& path, const YCPValue& arg = YCPNull())
+YCPValue YouAgent::Read(const YCPPath& path, const YCPValue& arg)
 {
    string path_name = path->component_str (0);
    YCPValue ret = YCPVoid();
@@ -204,7 +204,7 @@ YCPValue YouAgent::Read(const YCPPath& path, const YCPValue& arg = YCPNull())
    }
    else if (  path_name  == PREINSTALLINFORMATION )
    {
-       // Returns the pre-install-information of a patch       
+       // Returns the pre-install-information of a patch
        if ( !arg.isNull()
 	    && arg->isString() )
        {
@@ -213,7 +213,7 @@ YCPValue YouAgent::Read(const YCPPath& path, const YCPValue& arg = YCPNull())
    }
    else if (  path_name  == POSTINSTALLINFORMATION )
    {
-       // Returns the post-install-information of a patch       
+       // Returns the post-install-information of a patch
        if ( !arg.isNull()
 	    && arg->isString() )
        {
@@ -232,17 +232,17 @@ YCPValue YouAgent::Read(const YCPPath& path, const YCPValue& arg = YCPNull())
    else if (  path_name  == ISBUSINESS )
    {
        // Returns true if the installed system is a business product.
-       ret = YCPBoolean ( isBusiness() ); 
+       ret = YCPBoolean ( isBusiness() );
    }
    else if (  path_name  == PRODUCTINFO )
    {
        // Getting SuSE product informations.
-       ret = getProductInfo( ); 
-   }                  
+       ret = getProductInfo( );
+   }
    else
    {
       y2error ( "Path %s not found", path_name.c_str() );
-      ret = YCPError ("Agentpath not found", YCPVoid());      
+      ret = YCPError ("Agentpath not found", YCPVoid());
    }
 
    return ret;
@@ -253,7 +253,7 @@ YCPValue YouAgent::Read(const YCPPath& path, const YCPValue& arg = YCPNull())
  * Write path of the you agent ( dummy )
  *--------------------------------------------------------------------------*/
 YCPValue YouAgent::Write(const YCPPath& path, const YCPValue& value,
-			 const YCPValue& arg = YCPNull())
+			 const YCPValue& arg)
 {
    string path_name = path->component_str (0);
    YCPValue ret = YCPVoid();
@@ -273,7 +273,7 @@ YCPValue YouAgent::Write(const YCPPath& path, const YCPValue& value,
    else
    {
        y2error ( "Path %s not found", path_name.c_str() );
-       ret = YCPError ("Agentpath not found", YCPVoid());      
+       ret = YCPError ("Agentpath not found", YCPVoid());
    }
 
    return ret;
