@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Apr 02 15:59:59 CEST 2004 - arvin@suse.de
+
+- finally changed license to GPL for good
+
+-------------------------------------------------------------------
 Thu Mar 25 10:28:22 CET 2004 - cschum@suse.de
 
 - Add yast2-packager to neededforbuilds.
