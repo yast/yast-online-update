@@ -306,6 +306,8 @@ the update?
 
         UI::ChangeWidget( `id(`log), `LastLine, _("Installation finished.\n") );
 
+        UI::ChangeWidget( `id(`log), `LastLine, "\n" );
+
         string msg = "";
         if ( installedPatches == 0 ) {
           msg = _("No patches have been installed.");
