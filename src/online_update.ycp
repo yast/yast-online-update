@@ -401,8 +401,8 @@ some of them might not work as expected.");
       string reg_code = "";
 
       // try to get the data from /etc/sysconfig/onlineupdate
-      reg_password = SCR::Read(.sysconfig.onlineupdate.REG_PASSWORD);
-      reg_code = SCR::Read(.sysconfig.onlineupdate.REG_CODE);
+      reg_password = SCR::Read(.you.password.REG_PASSWORD);
+      reg_code = SCR::Read(.you.password.REG_CODE);
 
       if ( reg_password == nil ) reg_password = "";
       if ( reg_code == nil ) reg_code = "";
@@ -426,24 +426,18 @@ some of them might not work as expected.");
 		  success = true;
 		  go_on = false;
 
-		  if ( lookup( registration_map, "keep_reg_data", false ))
+		  if ( !lookup( registration_map, "keep_reg_data", false ))
 		  {
-		      // write registration data
-		      SCR::Write(.sysconfig.onlineupdate.REG_PASSWORD,
-				 lookup( registration_map, "reg_password", ""));
-		      SCR::Write(.sysconfig.onlineupdate.REG_CODE,
-				 lookup( registration_map, "reg_code", ""));
+                        reg_code = "";
+                        reg_password = "";
+                  }
+                  
+		  SCR::Write(.you.password.REG_PASSWORD, reg_password);
+		  SCR::Write(.you.password.REG_CODE, reg_code);
 
-		      SCR::Write(.sysconfig.onlineupdate, nil);
-		  }
-		  else
-		  {
-		      // reset entries in registration file
-		      SCR::Write(.sysconfig.onlineupdate.REG_PASSWORD, "");
-		      SCR::Write(.sysconfig.onlineupdate.REG_CODE, "");
-
-		      SCR::Write(.sysconfig.onlineupdate, nil);
-		  }
+		  SCR::Write(.you.password, nil);
+                  
+                  SCR::Execute(.target.bash,"chmod go-rw /var/lib/YaST2/you/password");
 	      }
 	      else	// let the user try again to enter the correct registration/password
 	      {
