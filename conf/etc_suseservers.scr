@@ -7,8 +7,8 @@
     false,				// read-only
     ``(List (
       Tuple (
-	`type (String("^:")), ":",
-	Separator ("/"),
+	`type (String("^:")),
+	`sep(String (":/")),
 	`server (String ("^/")),
 	`path (String ("^\n"))
       ),
