@@ -522,9 +522,7 @@ SuSE cannot guarantee that the packages has been created by SuSE.
 ")),
 			       patch);
       
-      list packageVersion = PKGINFO (`getPackageVersion("gpg"));
-      if ( size ( packageVersion ) >= 0 &&
-	   select( packageVersion, 0 ) == "not known" )
+      if ( !(SCR::Read (.targetpkg.installed, "gpg")) )
       {
 	  // package gpg not found
 	  gpg_warning = sformat(
