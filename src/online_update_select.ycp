@@ -29,6 +29,7 @@
 {
     // Testmode
     boolean test_mode    = lookup ( user_settings, "test_mode", false );
+    boolean fake_mode    = lookup ( user_settings, "fake_mode", false );
     
     // map ftp_patches contains information about all available patches, e.g.
     //

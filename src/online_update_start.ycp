@@ -25,14 +25,16 @@
 
 {
   boolean test_mode    = lookup ( user_settings, "test_mode", false );
-
+  boolean fake_mode    = lookup ( user_settings, "fake_mode", false );
+  
    // constant settings
-  map ftp_server_map = $["ftp.suse.com"	: ["/usr/patches"],
-		      "ftp.suse.de"	: ["/patchroot"] ];
+  map ftp_server_map = $["mack"		: ["/update-test/suse"],
+			"ftp.suse.com"	: ["/usr/patches"],
+			"ftp.suse.de"	: ["/patchroot"] ];
   string rootpath = "/";
   string yastpath = "/var/lib/YaST";
   string patchpath = "/var/lib/YaST/patches";
-  string logpath = "/var/log/y2ftplog";
+  string logpath = "/var/log/y2ftp";
 
 
     //////////////////////////////////////////////////////////////////////////////////////
@@ -61,25 +63,31 @@
 	ftp_server_list = add(ftp_server_list, server);
     });
 	    
-    if ( !test_mode )
+    if ( !fake_mode )
     {
 	// initialize PKGINFO
 	UI(`OpenDialog(`opt(`decorated ),`Label(_("Initializing for ftp update; One moment please..."))));
   
-	any retval = PKGINFO(`ftpSetEnvironment( $["rootpath":rootpath,
+	any retval = PKGINFO(`ftpSetEnvironment( $["ftpserver":"ftp.suse.com",
 						  "language":long_language,
+						  "rootpath":rootpath,
 						  "architecture":architecture,
 						  "yastpath":yastpath,
-						  "patchpath":patchpath,
-						  "logfilename":logpath ] ) );
+						  "logFilename":logpath,
+						  "patchpath":patchpath] ) );
 
 	y2debug( "ONLINE: Return  PKGINFO(`ftpsetEnvironment() %1", retval );
 	UI(`CloseDialog());
-
+	// Popup is shown if the yast2 component responsible for the ftp update cannot be initialised.
+	// This does not mean, connection failed to ftp server, but any other error occured.
+	if (!retval && UI(`DisplayMessage(_("Initialisation of ftp server failed.\n
+Please check www.suse.de
+for further information ."))) )
+	    return `abort;
     }
      
     // get last update status from PKGINFO
-    if ( !test_mode )
+    if ( !fake_mode )
     {
 	last_status = PKGINFO(`ftpLastUpdateStatus() );
     }
@@ -197,7 +205,7 @@ if you click on button <b>Details</b>.
 
 	    string update_path = select( lookup(ftp_server_map, ftp_server, ""), 0 );
 	      
-	    if ( !test_mode )
+	    if ( !fake_mode )
 	    {
 		any retval = PKGINFO(`ftpSetServer( ftp_server,
 						   update_path) );
@@ -205,7 +213,7 @@ if you click on button <b>Details</b>.
 		
 		if (retval == nil || retval == false)
 		{
-		    UI(`DisplayFtpMsg(_("Initialization failed - please try again.
+		    UI(`DisplayMsgFtp(_("Initialization failed - please try again.
 If failure continues, please choose
 another SuSE ftp server.")));
 		    ret = `again;

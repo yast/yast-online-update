@@ -26,11 +26,7 @@
     ////////////////////////////////////////////////////////////
     // Testmode, for example fo screenshots
     boolean test_mode    = lookup ( user_settings, "test_mode", false );
-
-    ////////////////////////////////////////////////////////////
-    // Read the current architecture (no architecture depended modes yet
-    // string architecture = lookup( user_settings, "architecture", default_architecture);
-
+    boolean fake_mode    = lookup ( user_settings, "fake_mode", false );
 
 
     //////////////////////////////////////////////////////////////////////////////////////
@@ -44,11 +40,6 @@
     // MAIN:
     /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    // Options to test this modules, but the other modules are in testmode:
-    // test_mode   = true;
-    // test_mode   = false;
-    // todo: comment all options above
-
 
     term contents =
 	    // main dialog: 
@@ -56,13 +47,14 @@
 	      `VSpacing( 0.2 ),
 	      `Frame( _("Package Update information"),
 		      `VBox(`VSpacing(0.5),
-			    `Label(_("Update is finished.
-Error messages: 0
-Installed security patches: 3
-Installed recommended patches: 2")),
+			    `Label(_("Update is finished.")),
+			    `Label(`id(`error), " " ),
+			    `Label(`id(`sec), " " ),
+			    `Label(`id(`rec), " " ),
+
 			    `VSpacing(0.5),
 			    `PushButton(`id(`details), `opt(`notify),
-					_("Show &details") ),
+					_("&Details") ),
 			    `VSpacing(0.5)
 			    )
 		      ),
@@ -75,9 +67,8 @@ Installed recommended patches: 2")),
     string help_part1 =  UI("<p>
 Online Update is finished.
 Your installation is update to date now.
-It is recommended to check if there
-are new patches available about once
-a month.<br></p>");
+It is recommended to check if there are
+new patches available in regular periods.<br></p>");
     string help_part2 =  UI("<p>
 If any error occurs during downlod or installation
 of the patches, you can check the <b>Details</b>
@@ -95,6 +86,27 @@ patches could not be installed.
      // changing Label to Finish for the last step
      UI(`ChangeWidget(`id(`next), `Label,  _("&Finish") ) );
 
+
+     // Show results
+     map last_status = PKGINFO(`ftpLastUpdateStatus() );
+
+     list patch_list = lookup( last_status, "patches", [] );
+     integer rec_no = 0;
+     integer sec_no = 0;
+     integer index = 0;
+     
+     while (index < size(patch_list) )
+     {
+	 if ( select(patch_list, index+1) == "recommended" )    	rec_no = rec_no+1;
+	 else if ( select(patch_list, index+1) == "security" )    	sec_no = sec_no+1;
+	
+	 index = index+5;
+     };
+
+     UI(`ChangeWidget(`id(`error), `Value, sformat(_("Status of update: %1"),  lookup(last_status, "status", "--" ))));
+     UI(`ChangeWidget(`id(`error), `Value, sformat(_("Installed security patches: %1"), sec_no )));
+
+     UI(`ChangeWidget(`id(`error), `Value, sformat(_("Installed recommended patches: %1"), rec_no )));
      
    /////////////////////////////////////////////////////////////////////////////////////////
    ////  Loop for User Input ....
@@ -111,7 +123,10 @@ patches could not be installed.
 	}
 
 	
-  } until (ret == `next || ret == `back || ret == `abort);
+    } until (ret == `next || ret == `back || ret == `abort);
+
+    // Close connection
+    PKGINFO(`ftpCloseUpdate());
     
    return ret;
 }

@@ -23,7 +23,34 @@
   // definition of map user_settings  
   map user_settings = $[];    
 
-   
+  
+  // set a "fake" mode (you must manually change flag fake_mode)
+  boolean fake_mode = false;
+
+  if (fake_mode)
+  {
+      user_settings = add(user_settings, "fake_mode", true );
+  }
+
+  //
+  // test_mode will be set, if menu is called with arg .test ( y2bignfat menu '(.test)' qt )
+  //
+  // test_mode means: get the ftp-patches, but do not install (inst_rpmcopy runs with test_mode)
+  // use fake_mode (see above) to run test with local test_data
+  
+  integer arg_n = size(Args()) - 1;
+  boolean test_mode = false;
+  
+  while (arg_n >= 0) {
+      if (Args(arg_n) == .test) {
+	  test_mode = true;
+      }            
+      arg_n = arg_n - 1;
+  }
+  user_settings = add( user_settings, "test_mode", test_mode );
+  y2debug("ONLINE: Testmode %1", test_mode );
+
+  
   // Menuentry for the YaST2 menu
   if (Args() == [ "get_menuentry" ]) 
     return [ "online_update", $[
@@ -101,14 +128,16 @@ A patch updates, improves or corrects your existing installation."))
 		    `VSpacing(0.2),
 		    `Label(message),
 			// "OK" button: User confirmation
-		    `PushButton(`opt(`default), _("&OK")),
+		    `PushButton(`id(`ok), `opt(`default), _("&OK")),
 		    `VSpacing(0.2)
 		    ),
 		`HSpacing(1)
 		)
 	    );
-	UserInput();
+	any ret = UserInput();
 	CloseDialog();
+
+	return ( ret == `ok );
     };
 
     
@@ -263,9 +292,9 @@ You will need to do the update again." );
    define ShowPatchInfo ( string patch_name ) ``{
 
        map info_map = $[];
-       if (!test_mode)
+       if (!fake_mode)
        {
-	   info_map = PKGINFO( `getPatchInformation( patch_name ));
+	   info_map = PKGINFO( `ftpGetPatchInformation( patch_name ));
        }
        else
        {
@@ -307,18 +336,7 @@ You will need to do the update again." );
   });
   
   
-  // check test_mode
-  integer arg_n = size(Args()) - 1;
-  boolean test_mode = false;
-  
-  while (arg_n >= 0) {
-      if (Args(arg_n) == .test) {
-	  test_mode = true;
-      }            
-      arg_n = arg_n - 1;
-  }
-  user_settings = add( user_settings, "test_mode", test_mode );
-  y2debug("ONLINE: Testmode %1", test_mode );
+ 
 
   // check architecture
   string architecture = SCR(`Read(.probe.architecture));
@@ -340,7 +358,7 @@ You will need to do the update again." );
 		 [`online_update_load(true, true),	 	`always ],
 		 [`online_update_select(false, true), 		`manual ],
 		 [`online_update_load(false, true), 		`manual ],
-		 //[`inst_suseconfig(false, true), 		`always ],
+		 [`inst_suseconfig(false, true), 		`always ],
 		 [`online_update_close(false, true), 		`always ]
 		 
   ];
@@ -378,7 +396,7 @@ You will need to do the update again." );
 	  continue;
       else if (result == `cancel || result == `abort)
 	  break;
-      else if (result == `next)
+      else if (result == `next || result == `auto )	// SuSEConfig returns `auto
 	  id = id + 1;
       else if (result == `back)
 	  id = id - 1;

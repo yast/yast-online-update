@@ -26,20 +26,21 @@
     ////////////////////////////////////////////////////////////
     // Testmode, for example fo screenshots
     boolean test_mode    = lookup ( user_settings, "test_mode", false );
-
+    boolean fake_mode    = lookup ( user_settings, "fake_mode", false );
+  
     map last_status = $[];
 
     // get last update status from PKGINFO
-    if ( !test_mode )
+    if ( !fake_mode )
     {
 	last_status = PKGINFO(`ftpLastUpdateStatus() );
     }
     else
     {
 	last_status = $["date":"12.10.2000", "days":"25", "status":"ok",
-		       "patches":["patch-0-123", "rec", "skdakdöak sdfsdfsdf", "30", "05.10.2000",
-				 "sec-fix-988", "sec", "salöda dsösld alsdäladä", "25", "12.10.2000",
-				 "sec-fix-123", "sec", "bbbbbbbb asdsfdf Cdsfdsf", "25", "12.10.2000" ]];
+		       "patches":["patch-0-123", "recommended", "skdakdöak sdfsdfsdf", "30", "05.10.2000",
+				 "sec-fix-988", "security", "salöda dsösld alsdäladä", "25", "12.10.2000",
+				 "sec-fix-123", "security", "bbbbbbbb asdsfdf Cdsfdsf", "25", "12.10.2000" ]];
     }
 
 
@@ -68,8 +69,8 @@
 	patch_input = add( patch_input,
 			   `item(`id(select(patch_list, index)), select(patch_list, index+3),
 				 select(patch_list, index), select(patch_list, index+2)) );
-	if ( select(patch_list, index+1) == "rec" )    		rec_no = rec_no+1;
-	else if ( select(patch_list, index+1) == "sec" )    	sec_no = sec_no+1;
+	if ( select(patch_list, index+1) == "recommended" )    		rec_no = rec_no+1;
+	else if ( select(patch_list, index+1) == "security" )    	sec_no = sec_no+1;
 	
 	index = index+5;
     };
