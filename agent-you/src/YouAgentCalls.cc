@@ -424,6 +424,11 @@ YCPValue YouAgent::setEnvironment ( YCPMap setMap )
       }
    }
 
+   y2debug ( "Produkt_Name : %s; Produkt_Version: %s; Distribution: %s",
+	     productName.c_str(),
+	     productVersion.c_str(),
+	     distributionVersion.c_str() );
+   
    if ( ok->value() )
    {
       dummyValue = setMap->value(YCPString(PATCHPATH));
@@ -2801,10 +2806,12 @@ bool YouAgent::isBusiness ( void )
 	productName != "SuSE-Linux" )
    {
        ret = true;
+       y2debug( "return true" );
    }
    else
    {
        ret = false;
+       y2debug( "return false" );       
    }
    
    return ret;

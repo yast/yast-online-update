@@ -37,6 +37,7 @@
 #define DELETEPACKAGES "deletePackages"	//Execute
 #define ISBUSINESS "isBusiness" //READ
 #define CHECKAUTHORIZATION "checkAuthorization" //Execute
+#define PRODUCTINFO "productInfo" //Read
 
 /*==========================================================================
  * Public member functions
@@ -230,7 +231,12 @@ YCPValue YouAgent::Read(const YCPPath& path, const YCPValue& arg = YCPNull())
    {
        // Returns true if the installed system is a business product.
        ret = YCPBoolean ( isBusiness() ); 
-   }               
+   }
+   else if (  path_name  == PRODUCTINFO )
+   {
+       // Getting SuSE product informations.
+       ret = getProductInfo( ); 
+   }                  
    else
    {
       y2error ( "Path %s not found", path_name.c_str() );
