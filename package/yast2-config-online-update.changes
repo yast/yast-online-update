@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Aug  6 12:13:00 CEST 2001 - gs@suse.de
+
+- Patch CD Update shows correct error popup if the patch CD is not found
+
+-------------------------------------------------------------------
 Mon May  7 17:03:54 CEST 2001 - sh@suse.de
 
 - Use new UI(`GetLanguate()) parameter 
