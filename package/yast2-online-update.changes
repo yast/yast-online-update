@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Sep  6 17:00:41 CEST 2002 - cschum@suse.de
+
+- Added Provides/Obsoletes for y2t_online_update.
+
+-------------------------------------------------------------------
 Thu Sep  5 18:16:54 CEST 2002 - cschum@suse.de
 
 - Fixed pre-selection of patches.

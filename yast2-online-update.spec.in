@@ -6,8 +6,8 @@ Requires:	yast2
 
 Provides:	y2c_online_update yast2-config-online-update
 Obsoletes:	y2c_online_update yast2-config-online-update
-Provides:	yast2-trans-online-update
-Obsoletes:	yast2-trans-online-update
+Provides:	yast2-trans-online-update y2t_online_update
+Obsoletes:	yast2-trans-online-update y2t_online_update
 
 Summary:    	YaST2 online update
 
