@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Mar 23 14:19:43 CET 2004 - lnussel@suse.de
+
+- set sort key in desktop file to move module icon to front (#36466)
+
+-------------------------------------------------------------------
 Mon Mar 15 10:43:26 CET 2004 - arvin@suse.de
 
 - ignore return value of online_update in inst_you (bug #35848)
