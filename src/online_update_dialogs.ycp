@@ -397,7 +397,7 @@ some of them might not work as expected.");
 
         details = details + header;
 
-        list packages = patch[ "packages" ]:[];
+        list<string> packages = patch[ "packages" ]:[];
 
         details = details + _("<b>Packages:</b>");
 
