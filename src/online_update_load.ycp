@@ -516,7 +516,7 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
 
       string tmpfile = SCR::Read(.run.mktemp);
 
-      string pgp_warning = sformat(
+      string gpg_warning = sformat(
 				   UI(_("Cannot check patch %1 because the GPG key is not installed or is corrupted.
 SuSE cannot guarantee that the packages has been created by SuSE.
 ")),
@@ -526,8 +526,8 @@ SuSE cannot guarantee that the packages has been created by SuSE.
       if ( size ( packageVersion ) >= 0 &&
 	   select( packageVersion, 0 ) == "not known" )
       {
-	  // package pgp not found
-	  pgp_warning = sformat(
+	  // package gpg not found
+	  gpg_warning = sformat(
 		   UI(_("Cannot check patch %1 because the GPG package is not installed or is corrupted.
 SuSE cannot guarantee that the packages has been created by SuSE.
 ")),
@@ -544,11 +544,11 @@ SuSE cannot guarantee that the packages has been created by SuSE.
 	      {
 		  boolean ret = true;
 
-		  y2warning ( "package %1 returned pgp-error",
+		  y2warning ( "package %1 returned gpg-error",
 				package );
 		  if ( !dontAsk )
 		  {
-		      ret = UI::DisplayMsgYou( pgp_warning, _("Warning"),
+		      ret = UI::DisplayMsgYou( gpg_warning, _("Warning"),
 					       _("&Install"), _("&Don't install") );
 		      if ( !ret )
 		      {
@@ -577,14 +577,14 @@ because package %2 is corrupted
 	      // Checking, if gpg was available
 	      if ( SCR::Execute (.target.bash, "/bin/grep -i \"GPG\" " + tmpfile ) != 0 )
 	      {
-		  y2warning ( "package %1 no pgp-key found",
+		  y2warning ( "package %1 no gpg-key found",
 				package );
 		  
 		  if ( !dontAsk )
 		  {
 		      boolean ret = true;
 		      
-		      ret = UI::DisplayMsgYou( pgp_warning, _("Warning"),
+		      ret = UI::DisplayMsgYou( gpg_warning, _("Warning"),
 					       _("&Install"), _("&Don't install") );
 		      if ( !ret )
 		      {
@@ -799,6 +799,56 @@ You have installed version %3.
 	      if ( message != "" )
 	      {
 		  UI::ChangeWidget(`id(`log), `LastLine, message +"\n" );
+	      }
+	      if ( lookup( result_map, "checkpatch" , "" ) != "" )
+	      {
+		  // checking gpg-key
+		  string patchpath = lookup( result_map, "checkpatch" , "" );
+
+		  string command = "/usr/bin/gpg -o " + patchpath
+		      + ".unpack " + patchpath;
+		  integer doresult = SCR::Execute (.target.bash, command );
+
+		  if (doresult==0)
+		  {
+		      // check has been ok
+		      SCR::Execute (.target.bash, "/bin/cp "
+				    + patchpath
+				    + ".unpack "
+				    + patchpath );	  		  
+		  }
+		  else
+		  {
+		      string gpg_warning = sformat(
+					    UI(_("Cannot check patch %1 because the GPG package is not installed
+or the patchdescription is corrupted.
+SuSE cannot guarantee that the patch has been created by SuSE.
+")),
+					    message);		      
+		      // not ok
+		      boolean ret = UI::DisplayMsgYou( gpg_warning, _("Warning"),
+					       _("&Install"), _("&Don't install") );
+		      if ( ret )
+		      {
+			  // Does not matter
+			  SCR::Execute (.target.bash, "/bin/cp "
+					+ patchpath
+					+ ".unpack "
+					+ patchpath );	  		  
+
+			  y2warning ( "installing anyway" );
+		      }
+		      else
+		      {
+			  // removing patch
+			  SCR::Execute (.target.bash, "/bin/rm "
+					+ patchpath );
+			  
+		      }
+		  }
+		  SCR::Execute (.target.bash, "/bin/rm "
+				+patchpath
+				+ ".unpack"   );	  		  
 	      }
 
 	      ShowProgress( lookup (result_map, "progress", 0 ) );

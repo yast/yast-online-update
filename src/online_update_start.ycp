@@ -48,7 +48,7 @@
   map last_status = $[];
   string default_language = "en";
 
-  map lang2yast1 = ReadY2("lang2yast1.ycp");  
+  map lang2yast1 = SCR::Read (.target.yast2, "lang2yast1.ycp");  
   
   string language 	= lookup( user_settings, "language", default_language );
   boolean cd_update 	= lookup( user_settings, "cd_update", false );
@@ -140,7 +140,6 @@
 						  "rootpath":rootpath,
 						  "architecture":architecture,
 						  "yastpath":yastpath,
-						  "logFilename":logpath,
 						  "patchpath":patchpath] );
 
   y2debug( "ONLINE: Return  .you.setEnvironment() %1", retval );
@@ -413,7 +412,7 @@ another SuSE FTP/HTTP server.
 	      
 	      retval = SCR::Execute( .you.setServer, $["kind":you_serverkind, "name":you_server, "path":you_dir]);
       
-	      y2error("ONLINE: .you.setServer( %1, %2 %3) ): %4",
+	      y2debug("ONLINE: .you.setServer( %1, %2 %3) ): %4",
 		      you_server, you_dir, you_serverkind, retval );		
 	      if (retval == nil || retval == false)
 	      {

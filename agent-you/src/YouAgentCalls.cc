@@ -55,6 +55,7 @@
 #define OK		"ok"
 #define MESSAGE 	"message"
 #define CONTINUE 	"continue"
+#define CHECKPATCH	"checkpatch"
 #define PROGRESS 	"progress"
 #define NEW		"new"
 #define DELETED		"deleted"
@@ -934,6 +935,7 @@ YCPValue YouAgent::getPatchList (  )
    bool ok = true;
    bool cont = true;
    string message = "";
+   string checkpatch = "";
    int progress = 0;
    static int counter;
 
@@ -963,6 +965,7 @@ YCPValue YouAgent::getPatchList (  )
    {
       // installation from local source
       message = "";
+      checkpatch = "";
       cont = false;
       progress = 100;
 
@@ -1433,6 +1436,11 @@ YCPValue YouAgent::getPatchList (  )
 			  else
 			  {
 			      message = patchname;
+			      checkpatch =  destPatchPath +
+				  PATCH +
+				  "/" +
+				  patchname +
+				  "." + date + ".new";
 			  }
 		      }
 		      else
@@ -1489,6 +1497,7 @@ YCPValue YouAgent::getPatchList (  )
 		      if ( ok )
 		      {
 			  message = sourcefile;
+			  checkpatch =  destfile;
 		      }
 		  }
 	       }
@@ -1506,6 +1515,7 @@ YCPValue YouAgent::getPatchList (  )
 
    ret->add ( YCPString ( OK ), YCPBoolean ( ok ) );
    ret->add ( YCPString ( MESSAGE ), YCPString( message ) );
+   ret->add ( YCPString ( CHECKPATCH ), YCPString( checkpatch ) );   
    ret->add ( YCPString ( CONTINUE ), YCPBoolean( cont ) );
    ret->add ( YCPString ( PROGRESS ), YCPInteger ( progress ) );
 
