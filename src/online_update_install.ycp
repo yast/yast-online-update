@@ -176,8 +176,8 @@ abort the update?"), patchName );
           if ( !install ) {
             UI::ChangeWidget( `id(`log), `LastLine, _("Skipped\n") );
           } else {
-            boolean ok = Pkg::YouInstallCurrentPatch();
-            if ( ok ) {
+            string result = Pkg::YouInstallCurrentPatch();
+            if ( size( result ) == 0 ) {
               UI::ChangeWidget( `id(`log), `LastLine, _("Ok\n") );
               installedPatches = installedPatches + 1;
 
@@ -185,7 +185,10 @@ abort the update?"), patchName );
               if ( size( info ) != 0 ) {
                 UI::MessagePopup( info );
               }
+            } else if ( result == "skipped" ) {
+              UI::ChangeWidget( `id(`log), `LastLine, _("Skipped\n") );
             } else {
+              
               UI::ChangeWidget( `id(`log), `LastLine, _("Error\n") );
               error = true;
 
@@ -202,6 +205,18 @@ the update?"), patchName );
         }
 
         UI::ChangeWidget( `id(`log), `LastLine, _("Installation finished.\n") );
+
+        string msg = "";
+        if ( installedPatches == 0 ) {
+          msg = _( "No patches have been installed.");
+        } else if ( installedPatches == 1 ) {
+          msg = _( "1 patch has been installed." );
+        } else {
+          msg = sformat( _( "%1 patches have been installed." ),
+                         installedPatches );
+        }
+        
+        UI::ChangeWidget( `id(`log), `LastLine, msg );
 
         if ( stop ) {
           UI::ErrorPopup( _("Installation failed.") );
