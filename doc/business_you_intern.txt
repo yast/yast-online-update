@@ -1,7 +1,26 @@
 ----------------------------------------
 - the english text is not yet available
 -----------------------------------------
- 
+
+YOU allgemein:
+--------------
+
+Ab Version 8.0 werden alle Patchbeschreibungen signiert
+(Businessprodukte + Box).
+Die Patchbeschreibungen auf der Update-CD sind ebenfalls signiert,
+wenn die CD den Directory Tree vom ftp-Server enthält.
+Falls unsignierte Beschreibungen auf der CD sind, kommt ein
+Warning Popup.
+
+Der GPG Schlüssel wird mit folgendem Kommando gecheckt:
+
+ /usr/bin/gpg --no-default-keyring --keyring /usr/lib/rpm/gnupg/pubring.gpg -o ....
+
+/usr/lib/rpm/gnuppg/pubring.gpg	   ist im Paket suse-build-key enthalten.
+
+(~root/.gnupg/pubring.gpg wird aus Sicherheitsgründen nicht mehr verwendet)
+
+
 Spezifikation f. "Business"-YOU
 ===============================
 
@@ -102,6 +121,6 @@ Spezifikation f. "Business"-YOU
   (Aufruf `ftpGetProductInfo)      
 
 - Zusätzliche Anforderungen: 
-  Patch Beschreibungsdateien werden auch signiert, d.h. PGB Schlüssel prüfen
+  Patch Beschreibungsdateien werden auch signiert, d.h. Schlüssel mit gpg ... prüfen
 
 

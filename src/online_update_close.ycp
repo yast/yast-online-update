@@ -149,6 +149,10 @@ patches could not be installed.
 	  if (ret == `details)
 	  {
 	      any retval = CallFunction(`online_update_details( true, false ) );
+	      // changing Label to Finish for the last step
+	      UI::ChangeWidget(`id(`next), `Label,  FinishButtonLabel() );
+	      UI::ChangeWidget(`id(`abort), `Enabled,  false );
+	      
 	      if ( retval == `abort )
 	      {
 		  SCR::Execute( .you.disconnect );

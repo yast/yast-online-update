@@ -27,6 +27,7 @@
   import "OnlineUpdate";
   import "InstMedia";
   import "Arch";
+  import "Packages";
   
   // selected you server
   string you_server 	= Mode::youInstallMap["you_server"]:"";
@@ -49,8 +50,7 @@
   string ERROR 	= "error";
   string INSTALLED = "installed";
   string LOAD 	= "load";
-  
-  
+
   //////////////////////////////////////////////////////////////////////////////
   //                                  P O P U P S                             //
   //////////////////////////////////////////////////////////////////////////////
@@ -159,6 +159,79 @@ The FTP or HTTP connection will be closed.
   UI::ChangeWidget(`id(`id1), `Value, you_server);  
   UI::ChangeWidget(`id(`status), `Value, _("closed") );
 
+//
+// Checking installed patches and remove not installed
+//  
+  global define checkLocalPatches( ) ``{
+      // Remove all patches with status .new or .error, because we want to download
+      // the actual (possibly improved) descriptions from server
+      //  [ "Distribution_Version":"7.2","Product_Version":"3.0", "Product_Name":"Email Server" ] 
+	 
+      map productInfo = SCR::Read (.you.productInfo);
+      y2debug("ONLINE: productInfo: %1", productInfo);	  
+      string patch_path = "";
+
+      if ( SCR::Read (.you.isBusiness) )
+      {
+	  patch_path = sformat("/var/lib/YaST/patches/%1/update/%2/%3/patches/",
+			       Arch::architecture,
+			       lookup( productInfo, "Product_Name", "" ),
+			       lookup( productInfo, "Product_Version", "" ));
+      }
+      else
+      {
+	  patch_path = sformat("/var/lib/YaST/patches/%1/update/%2/patches/",
+			       Arch::architecture,
+			       lookup( productInfo, "Distribution_Version", "" ));
+      }
+	  
+      string rm_files = patch_path + "*.new";
+      y2debug("ONLINE: patch file path %1", patch_path);
+      integer ret = SCR::Execute(.target.bash, sformat("rm -rf %1", rm_files ));
+      rm_files = patch_path + "*.error";
+      SCR::Execute(.target.bash, sformat("rm -rf %1", rm_files ));
+
+      // Checking already installed patches
+      map last_status = $[];
+
+      // get last update status 
+      last_status = SCR::Read( .you.lastUpdateStatus); 
+
+      // create list for table
+      integer index = 0;
+    
+      list patch_list = lookup( last_status, "patches", [] );
+
+      while (index < size(patch_list) )
+      {
+	  string patch_name = select(patch_list, index, "");
+	  string status = select(patch_list, index+4, "");
+
+	  if ( status == "installed" )
+	  {
+	      map info_map = $[];
+	      info_map = SCR::Read( .you.patchInformation, patch_name );
+	      y2milestone("Checking patch %1", patch_name );
+	      
+	      foreach (`pac, `info_list, lookup(info_map, "packages", $[] ), ``{
+		  string installedVersion = select(info_list, 1, "");
+		  string patchVersion = select(info_list, 2, "");
+		  if ( installedVersion != ""
+		       && installedVersion != patchVersion )
+		  {
+		      y2milestone ("package %1: %2<->%3; --> reinit",
+				   pac, installedVersion, patchVersion );
+		      rm_files = patch_path + patch_name + ".*";
+		      y2milestone("removing %1", rm_files);
+		      SCR::Execute(.target.bash, sformat("rm -rf %1", rm_files ));
+		  }
+	      });
+	  }
+	  index = index +1;
+      };
+  };
+
+  
   // Fake getting of patches for fake_mode (NOT USED)
   integer test_id = 0;
   global define FakeGetPatch( string patch) ``{
@@ -281,7 +354,7 @@ The FTP or HTTP connection will be closed.
 	      if ( you_serverkind != "local" &&
 		   you_serverkind != "nfs" &&
 		   you_serverkind != "cd" &&
-		   you_serverkind != "harddisk" &&
+		   you_serverkind != "hd" &&
 		   size ( otherYouServer ) > 0 )
 	      {
 		  map result = $[];
@@ -305,7 +378,7 @@ The FTP or HTTP connection will be closed.
 
 		  any retval = SCR::Execute( .you.setServer,
 					     $["kind":otherYouServerKind,
-					      "name":otherYouServerr,
+					      "name":otherYouServer,
 					      "path":"."]);
 		  y2debug("ONLINE: SCR::Execute(.you.setServer,( %1, %2 %3 ) ): %4",
 			  otherYouServer, ".", otherYouServerKind, retval );
@@ -433,7 +506,7 @@ continue with installation of downloaded ones.
 "),
 					   select(patch_list, index, ""), lastErrorServer );
 	      
-		  any ret = UI::DisplayMsgFtp( msg_str, _("Notify"), _("&Download"), _("&Install") );
+		  any ret = UI::DisplayMsgYou( msg_str, NotifyMsg(), DownloadButtonLabel(), InstallButtonLabel() );
 
 		  if (!ret)
 		  {
@@ -462,9 +535,9 @@ continue with installation of downloaded ones.
 	  any r = UI::PollInput();
 	  if ( r == `abort )
 	  {
-	      any ret = UI::DisplayMsgFtp( _("Download of patches will be stopped.
+	      any ret = UI::DisplayMsgYou( _("Download of patches will be stopped.
 You may continue with installation of already
-loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&Abort"));
+loaded patches or abort update completely."), WarningMsg(), InstallButtonLabel(), AbortButtonLabel());
 	      go_on = false;
 
 	      if ( !ret )
@@ -514,7 +587,7 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
       boolean install = true;
       boolean dontAsk = false;
 
-      string tmpfile = SCR::Read(.run.mktemp);
+      string tmpfile = SCR::Read(.target.tmpdir) + "/you.sig";
 
       string gpg_warning = sformat(
 				   _("Cannot check patch %1 because the GPG key is not installed or is corrupted.
@@ -525,9 +598,9 @@ SuSE cannot guarantee that the packages were created by SuSE.
       map patchDescription = $[];
       map packageMap = $[];
       
-      patchDescription = PKGINFO( `ftpGetPatchInformation(patch) );
+      patchDescription = SCR::Read(.you.patchInformation, patch );
       packageMap = lookup( patchDescription, "packages", $[] );      
-      
+
       if ( !(SCR::Read (.targetpkg.installed, "gpg")) )
       {
 	  // package gpg not found
@@ -540,7 +613,9 @@ SuSE cannot guarantee that the packages were created by SuSE.
       }
       
       y2milestone ( "tmpfile : %1", tmpfile );
-      foreach ( `package, package_list, ``{
+      foreach ( `package_desc, package_list, ``{
+	  string package = select ( package_desc, 0, "");
+	  string packageName = select ( package_desc, 2, "");
 	  integer ret_shell = SCR::Execute(.target.bash,
 				"/bin/rpm --checksig " + package + " >" + tmpfile + " 2>>" + tmpfile );
 	  if ( ret_shell != 0 )
@@ -553,8 +628,8 @@ SuSE cannot guarantee that the packages were created by SuSE.
 				package );
 		  if ( !dontAsk )
 		  {
-		      ret = UI::DisplayMsgYou( gpg_warning, _("Warning"),
-					       _("&Install"), _("&Don't install") );
+		      ret = UI::DisplayMsgYou( gpg_warning, WarningMsg(),
+					       InstallButtonLabel(), _("&Don't install") );
 		      if ( !ret )
 		      {
 			  install = false;
@@ -576,7 +651,7 @@ because package %2 is corrupted.
 	      
 		  y2error( "%1", message );
 	      
-		  UI::DisplayMsgYouOk( message, _("Error"), _("&ok") );
+		  UI::DisplayMsgYouOk( message, ErrorMsg(), OKButtonLabel() );
 		  install = false;
 	      }
 	  }
@@ -592,8 +667,8 @@ because package %2 is corrupted.
 		  {
 		      boolean ret = true;
 		      
-		      ret = UI::DisplayMsgYou( gpg_warning, _("Warning"),
-					       _("&Install"), _("&Don't install") );
+		      ret = UI::DisplayMsgYou( gpg_warning, WarningMsg(),
+					       InstallButtonLabel(), _("&Don't install") );
 		      if ( !ret )
 		      {
 			  install = false;
@@ -611,19 +686,6 @@ because package %2 is corrupted.
 	  SCR::Execute (.target.bash, "/bin/rm " + tmpfile );
 
 	  // checking the correct version of the rpm
-	  integer rpm_pos = findlastof ( package, "/" );	// find trailing slash
-	  string packageName = "";
-
-	  if ( rpm_pos > 0 )
-	  {
-	      // cut off trailing build no.
-	      packageName = substring( package, rpm_pos+1, size( package )-4 -rpm_pos -1 );
-	  }
-	  else
-	  {
-	      packageName = substring( package, 0, size( package )-4 );
-	  }
-
 	  list packageList = lookup ( packageMap, packageName, [] );
 	  
 	  if ( size ( packageList ) > 0 )
@@ -645,8 +707,8 @@ because package %2 is corrupted.
 			      package, packageName );
 		  if ( !dontAsk )
 		  {
-		      ret = UI(`DisplayMsgFtp( "There will be not installed the correct version of the package !\nSo SuSE cannot guarantee that the patch has been created by SuSE", _("Warning"),
-					       _("&Install"), _("&Don't install") ));
+		      ret = UI::DisplayMsgYou( "There will be not installed the correct version of the package !\nSo SuSE cannot guarantee that the patch has been created by SuSE", WarningMsg(),
+					       InstallButtonLabel(), _("&Don't install") );
 		      if ( !ret )
 		      {
 			  install = false;
@@ -669,8 +731,8 @@ because package %2 is corrupted.
 			  packageName );
 	      if ( !dontAsk )
 	      {
-		  ret = UI(`DisplayMsgFtp( "There will be not installed the correct version of the package !\nSo SuSE cannot guarantee that the patch has been created by SuSE", _("Warning"),
-					   _("&Install"), _("&Don't install") ));
+		  ret = UI::DisplayMsgYou( "There will be not installed the correct version of the package !\nSo SuSE cannot guarantee that the patch has been created by SuSE", WarningMsg(),
+					   InstallButtonLabel(), _("&Don't install") );
 		  if ( !ret )
 		  {
 		      install = false;
@@ -699,33 +761,30 @@ because package %2 is corrupted.
       integer no = 1;
       integer package_count = 0;
 
+      UI::OpenDialog(`opt(`decorated ),`Label(_("Checking packages. One moment please...")));
+      
       // remove old rpm logging
       SCR::Execute(.target.bash, "/bin/rm /var/log/y2logRPMShort" );
       SCR::Execute(.target.bash, "/bin/rm /var/log/y2logRPM" );      
+
+      list desc_list = [];
+      list package_list = [];      
       
       foreach ( `patch, patch_list, ``{
-	  symbol ret = nil;
 	  boolean go_on  = true;
 	  
 	  map check_version = SCR::Execute (.you.checkYaST2Version, version,patch );
  	  if ( lookup ( check_version, "ok", true ) )
 	  {
 	      // correct YaST2 version
-	      list package_list = [];
 	      list info_list = [];
-	      list desc_list = [];
 	      info_list = SCR::Read(.you.packages, patch );
-
-	      foreach (`pac, info_list , ``{
-		  package_list = add ( package_list, select ( pac, 0, "" ) );
-		  desc_list = add ( desc_list, select( pac, 1, "" ) );
-	      });
 	      
-	      y2debug("ONLINE: SCR::Read(.you.packages %1 ): %2 %3",
+	      y2debug("ONLINE: SCR::Read(.you.packages %1 ): %2",
 		      patch,
-		      package_list,
-		      desc_list);
-	      if ( checkPackages ( package_list, patch ) )
+		      info_list );
+
+	      if ( checkPackages ( info_list, patch ) )
 	      {
 		  // packages are ok
 		  
@@ -739,20 +798,20 @@ because package %2 is corrupted.
 		      
 		      go_on = UI::DisplayMsgYou( pre_info,
 						 header,
-						 _("&Install"),
+						 InstallButtonLabel(),
 						 _("&Skip patch"));
 
 		      y2debug( "RREETTURRN: %1", go_on);
 		  }
 		  if ( go_on )
 		  {
-		      ret = CallFunction(`inst_rpmcopy(false, false,
-						       package_list,
-						       desc_list ));
-		      y2debug("ONLINE: %1. call of inst_rpmcopy returns: %2",
-			      no, ret );
-		      package_count = package_count + size ( package_list );
-		      no = no+1;
+		      // adding packages to the installationlist
+		      foreach (`pac, info_list , ``{
+			  package_list = add ( package_list, select ( pac, 0, "" ) );			  
+			  desc_list = add ( desc_list, select( pac, 1, "" ) );
+		      });
+		      
+		      package_count = size ( package_list );
 		      post_info = SCR::Read(.you.postInstallInformation,  patch);
 
 		      if ( post_info != "" &&
@@ -766,27 +825,6 @@ because package %2 is corrupted.
 				_("&Ok"));
 		      }
 		  }
-
-		  // do not set error status - let patch status NEW
-      
-		  if (ret == `abort )
-		  {
-		      // set status to error
-		      SCR::Write(.you.patchUpdateStatus, patch, ERROR );
-		      y2debug("ONLINE:  SCR::Write(.you.patchUpdateStatus,%1, %2)",
-			      patch, ERROR );		      
-
-		      OnlineUpdate::you_ok = false;
-		      // ********************* foreach abbrechen **************
-		      return `cancel;
-		  }
-		  else if ( ret == `next )
-		  {
-		      // set status to INSTALLED
-		      SCR::Write(.you.patchUpdateStatus, patch, INSTALLED );
-		      y2debug("ONLINE:  SCR::Write(.you.patchUpdateStatus,%1, %2)",
-			      patch, INSTALLED );		      
-		  }
 	      }
 	  }
 	  else
@@ -799,10 +837,53 @@ You have installed version %3.
 		patch,
 		lookup ( check_version, "minYaST2Version", "-" ),
 		version );
-	      UI::DisplayMsgYouOk( message, _("Warning"), _("Don't install") );
+	      UI::DisplayMsgYouOk( message, WarningMsg(), _("Don't install") );
 	  }
       });
 
+      UI::CloseDialog();
+      
+      // don't initialize the package agent to enable the SlideShow ( time consuming! )
+      // Packages::Init( false );
+
+      symbol ret = nil;
+
+      // installing all packages
+      ret = CallFunction(`inst_rpmcopy(false, false,
+				       package_list,
+				       desc_list ));
+      y2debug("ONLINE:  call of inst_rpmcopy ( %1, %2) returns: %3",
+	      package_list,
+	      desc_list,
+	      ret );
+      // setting status of the patches
+      foreach ( `patch, patch_list, ``{
+	  // do not set error status - let patch status NEW
+      
+	  if (ret == `abort )
+	  {
+	      // set status to error
+	      SCR::Write(.you.patchUpdateStatus, patch, ERROR );
+	      y2debug("ONLINE:  SCR::Write(.you.patchUpdateStatus,%1, %2)",
+		      patch, ERROR );		      
+
+	      OnlineUpdate::you_ok = false;
+	      package_count = 0;		      
+	  }
+	  else if ( ret == `next )
+	  {
+	      // set status to INSTALLED
+	      SCR::Write(.you.patchUpdateStatus, patch, INSTALLED );
+	      y2debug("ONLINE:  SCR::Write(.you.patchUpdateStatus,%1, %2)",
+		      patch, INSTALLED );		      
+	  }
+      });
+
+      if (ret == `abort )
+      {
+	  return `cancel;
+      }
+      
       OnlineUpdate::you_updated_packages = package_count;
       
       return `ok;
@@ -817,6 +898,7 @@ You have installed version %3.
   map new_patches = $[];
   boolean go_on = true;
   boolean success = true;
+  boolean userAbort = false;
 
   if ( !continue_mode &&
        !auto_mode_install )
@@ -843,35 +925,17 @@ You have installed version %3.
 
       if (success)
       {
-	  // Remove all patches with status .new or .error, because we want to download
-	  // the actual (possibly improved) descriptions from server
-	  //  [ "Distribution_Version":"7.2","Product_Version":"3.0", "Product_Name":"Email Server" ] 
-	 
-	  map productInfo = SCR::Read (.you.productInfo);
-	  y2debug("ONLINE: productInfo: %1", productInfo);	  
-	  string patch_path = "";
-
-	  if ( SCR::Read (.you.isBusiness) )
-	  {
-	      patch_path = sformat("/var/lib/YaST/patches/%1/update/%2/%3/patches/",
-				   Arch::architecture,
-				   lookup( productInfo, "Product_Name", "" ),
-				   lookup( productInfo, "Product_Version", "" ));
-	  }
-	  else
-	  {
-	      patch_path = sformat("/var/lib/YaST/patches/%1/update/%2/patches/",
-				   Arch::architecture,
-				   lookup( productInfo, "Distribution_Version", "" ));
-	  }
-	  
-	  string rm_files = patch_path + "*.new";
-	  y2debug("ONLINE: patch file path %1", patch_path);
-	  integer ret = SCR::Execute(.target.bash, sformat("rm -rf %1", rm_files ));
-	  rm_files = patch_path + "*.error";
-	  SCR::Execute(.target.bash, sformat("rm -rf %1", rm_files ));
+	  // Checking installed patches and remove not installed
+	  checkLocalPatches();
 	  
 	  UI::ChangeWidget(`id(`status), `Value, _("active"));
+	  UI::ChangeWidget(`id(`id1), `Value, you_server);   	  
+
+	  map productInfo = SCR::Read (.you.productInfo);
+	  y2debug("ONLINE: productInfo: %1", productInfo);	  
+
+
+	  
 	  while (go_on)
 	  {
 	      //get list of patches step by step
@@ -887,10 +951,14 @@ You have installed version %3.
 	      }
 	      if ( lookup( result_map, "checkpatch" , "" ) != "" )
 	      {
-		  // checking gpg-key
+		  // checking gpg-key 
 		  string patchpath = lookup( result_map, "checkpatch" , "" );
-
-		  string command = "/usr/bin/gpg -o " + patchpath
+		  // for security reasons: try to delete an old, invalid .unpack file
+		  SCR::Execute (.target.bash, "/bin/rm "
+				+patchpath
+				+ ".unpack"   );
+		  // don't use ~root/.gnu/pubring.gpg but /usr/lib/rpm/gnupg/pubring.gpg
+		  string command = "/usr/bin/gpg --no-default-keyring --keyring /usr/lib/rpm/gnupg/pubring.gpg -o " + patchpath
 		      + ".unpack " + patchpath;
 		  integer doresult = SCR::Execute (.target.bash, command );
 
@@ -906,16 +974,17 @@ You have installed version %3.
 		  {
 		      string gpg_warning = sformat(
 					    _("Cannot check patch %1 because the GPG package is not installed
-or the patchdescription is corrupted.
-SuSE cannot guarantee that the patch has been created by SuSE.
-"),
+or the patch description is corrupted.
+SuSE cannot guarantee that the patch has been created by SuSE.\n"),
 					    message);		      
 		      // not ok
-		      boolean ret = UI::DisplayMsgYou( gpg_warning, _("Warning"),
-					       _("&Install"), _("&Don't install") );
-		      if ( ret )
+
+		      if ( lookup( productInfo, "Distribution_Version", "" ) == "7.1"
+			   || lookup( productInfo, "Distribution_Version", "" ) == "7.2"
+			   || UI::DisplayMsgYou( gpg_warning, WarningMsg(),
+						 InstallButtonLabel(), _("&Don't install") ) )
 		      {
-			  // Does not matter
+			  // Does not matter or version is less then 7.3
 			  SCR::Execute (.target.bash, "/bin/cp "
 					+ patchpath
 					+ ".unpack "
@@ -937,6 +1006,15 @@ SuSE cannot guarantee that the patch has been created by SuSE.
 	      }
 
 	      ShowProgress( lookup (result_map, "progress", 0 ) );
+
+	      // Polling input to give the user a chance to stop the download  
+	      any r = UI::PollInput();
+	      if ( r == `abort
+		   && UI::ConfirmAbortUpdate(`unusable) )
+	      {
+		  go_on = false;
+		  userAbort = true;
+	      }
 	  }
 	  
 	  success = lookup( result_map, "ok", false );
@@ -992,6 +1070,11 @@ Try to connect to another SuSE FTP/HTTP server.
       }
 
       ShowProgress( 0 );      
+  }
+
+  if ( userAbort )
+  {
+      return `abort;
   }
   
   if (success)
@@ -1082,8 +1165,11 @@ again to install the rest of the packages.
 	  // calculate required download size
 	  integer disk_size = 0;
 	  foreach( `patch, `patch_info, new_patches, ``{
-	      disk_size = disk_size + tointeger(
-						select ( lookup(new_patches, patch, []), 2, "" ) )*1024;
+	      if (  select ( patch_info, 3, "" ) == "X" )
+	      {
+		  disk_size = disk_size + tointeger(
+						    select ( lookup(new_patches, patch, []), 2, "" ) )*1024;
+	      }
 	  });
 
 	  if ( disk_size > 1000000 )

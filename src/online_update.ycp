@@ -25,25 +25,26 @@
   import "Wizard";
   import "Mode";
   import "OnlineUpdate";
-  import "Packages";
   
   include "ui/common_popups.ycp";
   include "ui/common_functions.ycp";
   include "ui/common_messages.ycp";
+  include "ui/wizard_dialog.ycp";
 
   string version = Version::yast2;
   
   Wizard::CreateDialog();
 
-  Packages::Init( false );
-  
+  // show the special YOU image
+  UI::SetWizardImage( Read (.local.byte, "/usr/lib/YaST2/images/online_update_long.png") );
+
   // dummy message, which will be used in the future, but have to be
   // translated into other languages.
   string d1 = _("Dialing....");
   string d2 = _("Hang up....");
   string d3 = _("Could not dial to the Internet. Check your settings.");
   string d4 = _("Could not dial to the Internet. Connect manually.");
-  string d5 = _("Error occured while closing connection to Internet.");
+  string d5 = _("Error occured while closing the connection to the Internet.");
 
   string d8 = _("Do not show this message again.");
   string d7 = _("Skip");
@@ -74,6 +75,7 @@ packages were created by SuSE.
       }
       else if (Args(arg_n) == .cd_default || Args(arg_n) == ".cd_default")
       {
+	  Mode::youInstallMap["you_server"]	= "CD";		// text for output field
 	  Mode::youInstallMap["you_serverkind"] = "cd";
 	  OnlineUpdate::cd_update	=  true;
       }
@@ -180,7 +182,7 @@ You will need to do the update again.");
 				 `Left(`Heading( header)),
 				 `VSpacing(0.2),
                                  `Label(message),
-				 `HBox(`PushButton(`id(`yes), `opt(`default), yes_button ),
+				 `HBox(`PushButton(`id(`yes), yes_button ),
 				       `PushButton(`id(`no), `opt(`default), no_button )),
                                  `VSpacing(0.2)
                                  ),
@@ -429,8 +431,6 @@ server data.
 
   // check language
 
-  // TODO: use long_language (lang2yast1.ycp)  ?????
-  
   string language = UI::GetLanguage(true);
   Mode::language = language;
 

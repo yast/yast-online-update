@@ -184,10 +184,18 @@ double-click the line (or select it and use Alt + A).
 
 	ret= UI::UserInput();
 
-	if ( ret == `abort && UI::ConfirmAbortUpdate(`unusable) )
+	if ( ret == `abort
+	     || ret == `cancel )
 	{
-	    SCR::Execute (.you.disconnect);
-	    return `abort;
+	    if ( UI::ConfirmAbortUpdate(`unusable) )
+	    {
+		SCR::Execute (.you.disconnect);
+		return `abort;
+	    }
+	    else
+	    {
+		ret = `again;
+	    }
 	}
 	if (ret == `patch_table || ret == `apply)
 	{
@@ -216,7 +224,7 @@ double-click the line (or select it and use Alt + A).
 		      
 		    go_on = UI::DisplayMsgYou( pre_info,
 					       header,
-					       _("&Install"),
+					       InstallButtonLabel(),
 					       _("&Skip patch"));
 
 		    y2debug( "RREETTURRN: %1", go_on);
@@ -262,7 +270,7 @@ double-click the line (or select it and use Alt + A).
 		      
 			    go_on = UI::DisplayMsgYou( pre_info,
 						       header,
-						       _("&Install"),
+						       InstallButtonLabel(),
 						       _("&Skip patch"));
 
 			    y2debug( "RREETTURRN: %1", go_on);
@@ -294,11 +302,6 @@ double-click the line (or select it and use Alt + A).
 
 	    // store map of patches
 	    OnlineUpdate::you_patches = get_patches;
-	}
-
-	if ( ret == `back)
-	{
-
 	}
 
     } until (ret == `next || ret == `back || ret == `cancel || ret == `abort);

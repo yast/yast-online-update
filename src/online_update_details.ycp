@@ -81,7 +81,7 @@
 				 )
 			),
 	      `VSpacing(0.2),
-	      `Left(`Label(_("Information about all installed patches"))),
+	      `Left(`Label(_("Information about all available patches"))),
 	      `VWeight( 4,`Table(`id(`patch_table),`opt(`hvstretch), 
 				 `header( _("YYYY.MM.DD"), _("Patch"), _("Status"), _("Description") ),
 				 patch_input
@@ -111,6 +111,8 @@ then click <b>Show Patch Info</b>.
      // using Wizard::SetContents (define in online_update.ycp)
      Wizard::SetContents(_("Detailed Information "), contents, help_text, Args(0), Args(1) );
 
+     UI::ChangeWidget(`id(`next),  `Label, NextButtonLabel()   );
+     UI::ChangeWidget(`id(`abort), `Enabled,  false );
       
    /////////////////////////////////////////////////////////////////////////////////////////
    ////  Loop for User Input ....

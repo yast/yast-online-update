@@ -47,7 +47,9 @@
 
     // map containing the new patches
     global map you_patches = $[];
-    
+
+    // reloading serverlist form www.suse.de
+    global string reloadServer = "yes";
 
     //
     // Constructor

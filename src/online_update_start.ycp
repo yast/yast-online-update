@@ -26,6 +26,7 @@
 {
   textdomain "online_update";
 
+  import "Language";
   import "Arch";
   import "Mode";
   import "OnlineUpdate";
@@ -49,21 +50,55 @@
 
   
   map last_status = $[];
-  string default_language = "en";
 
-  // TODO language ???????????
-  map lang2yast1 = SCR::Read (.target.yast2, "lang2yast1.ycp");  
+  // Evaluate correct language 
+  map lang2yast1 =       $[
+        "en_GB"         : "english",
+        "en_US"         : "english",
+        "en"            : "english",
+        "de_DE"         : "german",
+        "de_CH"         : "german",
+        "de"            : "german",
+        "fr"            : "french",
+        "br_FR"         : "french",
+        "fr_FR"         : "french",
+        "fr_CH"         : "french",
+        "it"            : "italian",
+        "it_IT"         : "italian",
+        "es"            : "spanish",
+        "es_ES"         : "spanish",
+        "nl"            : "dutch",
+        "nl_NL"         : "dutch",
+        "pt"            : "portuguese",
+        "pt_PT"         : "portuguese",
+        "pt_BR"         : "brazilian",
+        "hu"            : "hungarian",
+        "hu_HU"         : "hungarian",
+        "pl"            : "polish",
+        "pl_PL"         : "polish",
+        "el_GR"         : "greek",
+        "tr_TR"         : "turkish",
+        "tr"            : "turkish",
+        "ru"            : "russian",
+        "ru_RU"         : "russian",
+        "ru_RU.KOI8-R"  : "russian",
+        "cs"            : "czech",
+        "cs_CZ"         : "czech",
+        "ja"            : "japanese",
+        "ja_JP"         : "japanese",
+        "ko"            : "korean",
+        "ko_KR"         : "korean"
+  ];
+  string language = lookup(lang2yast1,  Language::language, "english");
   
-  string language 	= Mode::language;
   boolean cd_update 	= OnlineUpdate::cd_update;
-  string long_language 	= lookup(lang2yast1, language, "english");  
   
   list you_server_list = [];
 
   // initialize You Agent
   UI::OpenDialog(`opt(`decorated ),`Label(_("Initializing for FTP/HTTP update. One moment please...")));
 
-  any retval = SCR::Execute(.you.setEnvironment, $[ "language":long_language,
+  any retval = SCR::Execute(.you.setEnvironment, $[ "language":language,
 						  "rootpath":rootpath,
 						  "architecture":Arch::architecture,
 						  "yastpath":yastpath,
@@ -72,9 +107,14 @@
   y2debug( "ONLINE: Return  .you.setEnvironment() %1", retval );
   UI::CloseDialog();
 
-  string reloadServer =  SCR::Read(.sysconfig.you.YAST2_LOADFTPSERVER);
-  y2milestone ( "YAST2_LOADFTPSERVER = %1", reloadServer );
-
+  if ( OnlineUpdate::reloadServer != "no" )
+  {
+      // checking if already exists
+      OnlineUpdate::reloadServer =
+	  SCR::Read(.sysconfig.onlineupdate.YAST2_LOADFTPSERVER);
+      y2milestone ( "YAST2_LOADFTPSERVER = %1", OnlineUpdate::reloadServer );
+  }
+  
   // Check wether YOU runs on a business product
 
   if ( SCR::Read(.you.isBusiness) )
@@ -83,15 +123,22 @@
       business = true;
       serverdescr_file = "suseservers_http.txt"; 
   }
-  
-  if ( reloadServer != "no" )
-  {
 
+  // only get the suseservers if reloadServer is "yes" and it's not a CD update
+  if ( OnlineUpdate::reloadServer != "no" && !cd_update )
+  {
       // getting you-server-description from www.suse.de
+
+      OnlineUpdate::reloadServer = "no"; //resetting
+	  
       SCR::Execute(.target.bash,"/bin/cp /etc/suseservers /etc/suseservers.bak" );
       string command = "/usr/bin/wget -q --output-document="+
 	  "/etc/suseservers --tries=2 --timeout=5 http://www.suse.de/de/support/download/"
 	  + serverdescr_file;
+      
+      UI::OpenDialog(`opt(`decorated ),`Label(_("Getting available serverlist from www.suse.de ...")));
+      sleep( 1000 );
+      
       if ( SCR::Execute(.target.bash, command) != 0  )      
       {
 	  y2error("command: %1", command);
@@ -102,7 +149,8 @@
       {
 	  y2milestone("command %1 ok", command);
       }
-      SCR::Execute(.target.remove,"/etc/suseservers.bak" );	
+      SCR::Execute(.target.remove,"/etc/suseservers.bak" );
+      UI::CloseDialog();
   }
 
   // read /etc/suseservers
@@ -258,7 +306,7 @@ another FTP/HTTP server.</p>
       return `next;      
   }  
 
-  if ( OnlineUpdate::you_auto_get )
+  if ( OnlineUpdate::you_auto_get || OnlineUpdate::you_auto_install )
   {
       // auto mode; get patch descriptions and packages, but do not install patches
       if ( size ( you_server_list ) <= 0 )
@@ -270,6 +318,10 @@ another FTP/HTTP server.</p>
       string you_serverkind = read_first_suseserverkind(); 
       string you_dir = select( lookup(you_server_map, you_server, ["",""]), 0, "" );
 
+      Mode::youInstallMap["you_server"]	= you_server;
+      Mode::youInstallMap["you_dir"] 	= you_dir;
+      Mode::youInstallMap["you_serverkind"] = you_serverkind;
+	      
       any retval = SCR::Execute( .you.setServer,
 				 $["kind":you_serverkind,
 				   "name":you_server,
@@ -369,11 +421,23 @@ another SuSE FTP/HTTP server.\n"));
 	  }
 	  else
 	  {
+	      // save install information in Mode.ycp  
+	      if ( you_serverkind == "cd" || you_serverkind == "hd" )
+	      {
+		  Mode::youInstallMap["you_server"] = you_serverkind; 
+	      }
+	      else
+	      {
+		  Mode::youInstallMap["you_server"]	= you_server;
+	      }
+	      Mode::youInstallMap["you_dir"] 	= you_dir;
+	      Mode::youInstallMap["you_serverkind"] = you_serverkind;
+	      
 	      // Show popup to get the registration and password in case of business product
 	      // and no local installation
 	      if ( business
 		   && you_serverkind != "cd"
-		   && you_serverkind != "harddisk"
+		   && you_serverkind != "hd"
 		   && you_serverkind != "nfs" )
 	      {
 		  // get, check and possibly save the registration and password
@@ -400,10 +464,10 @@ another SuSE FTP/HTTP server.\n"));
 	  you_serverkind = select( lookup(you_server_map, you_server, ["",""]), 1, "" );
 
 	  // Possible values for you_serverkind (see also inst_source.ycp):
-	  // "ftp", "http", "cd", "harddisk", "local", "nfs"
+	  // "ftp", "http", "cd", "hd", "local", "nfs" ( "local" )
 	  
           // set install information for inst_source  
-	  if ( you_serverkind == "cd" || you_serverkind == "harddisk" )
+	  if ( you_serverkind == "cd" || you_serverkind == "hd" )
 	  {
 	      Mode::youInstallMap["you_server"] = you_serverkind; 
 	  }
@@ -416,10 +480,12 @@ another SuSE FTP/HTTP server.\n"));
 
 	  // call dialog Change source of installation
 	  any retval = CallFunction(`inst_source( true, true ) );
-	  if ( retval == `abort )
+	  if ( ( retval == `abort
+		 || retval == `cancel )
+	       && UI::ConfirmAbortUpdate(`painless) )
 	      return `abort;
 
-	  // get install information after erturning from inst_source
+	  // get install information after returning from inst_source
 	  you_server 		= Mode::youInstallMap["you_server"]:"";
 	  you_serverkind 	= Mode::youInstallMap["you_serverkind"]:"";	      
 	  you_dir 		= Mode::youInstallMap["you_dir"]:"";
@@ -438,10 +504,6 @@ If failure continues, choose
 another SuSE FTP/HTTP server.\n"));
 	  }
 	  ret = `again;
-      }
-      else if ( ret == `back)
-      {
-
       }
       else if ( ret == `abort && UI::ConfirmAbortUpdate(`painless) )
 	  return  `abort;

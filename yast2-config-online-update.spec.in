@@ -45,13 +45,13 @@ make install
 
 %files
 
-/var/adm/fillup-templates/sysconfig.you
+/var/adm/fillup-templates/sysconfig.onlineupdate
 /etc/suseservers
 @YAST2DIR@/menuentries/menuentry_online_update.y2cc
 @YAST2DIR@/menuentries/menuentry_cd_update.y2cc
 @YAST2DIR@/include/suseservers.ycp
 @YAST2DIR@/scrconf/etc_suseservers.scr
-@YAST2DIR@/scrconf/cfg_you.scr
+@YAST2DIR@/scrconf/cfg_onlineupdate.scr
 @YAST2DIR@/clients/online_update.ycp
 @YAST2DIR@/clients/online_update_close.ycp
 @YAST2DIR@/clients/online_update_details.ycp
@@ -60,6 +60,7 @@ make install
 @YAST2DIR@/clients/online_update_start.ycp
 @YAST2DIR@/modules/OnlineUpdate.ycp
 %doc @DOCDIR@
+/usr/lib/YaST2/images/online_update_long.png
 
 %post
-%{fillup_only -n you}
+%{fillup_only -n onlineupdate}

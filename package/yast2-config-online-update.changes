@@ -1,7 +1,54 @@
 -------------------------------------------------------------------
+Fri Mar 22 12:15:54 CET 2002 - schubi@suse.de
+
+- taking long language names for patch descriptions #15365
+  otherwise only english patchdescriptions are shown.
+
+-------------------------------------------------------------------
+Wed Mar 20 17:35:57 CET 2002 - gs@suse.de
+
+- use /usr/lib/rpm/gnupg/pubring.gpg to check the signature in 
+  the patch descriptions
+- show the new special online update image 
+- don't load the /etc/suseservers file if it's a CD update
+
+-------------------------------------------------------------------
+Mon Mar  4 15:00:10 CET 2002 - schubi@suse.de
+
+- Bugfix while updating strange packages via http #14041
+
+-------------------------------------------------------------------
+Wed Feb 27 11:07:30 CET 2002 - gs@suse.de
+
+- bugfixes: disable the Abort button in details dialog, initialize 
+  the agent also in mode auto_install, show correct info 'Connected to'
+
+-------------------------------------------------------------------
+Mon Feb 25 15:27:45 CET 2002 - gs@suse.de
+
+- internal changes (don't initialize the package agent, use correct
+  language information) 
+
+-------------------------------------------------------------------
+Fri Feb 22 14:25:10 CET 2002 - schubi@suse.de
+
+- Starting YOU in batchmode corrected #13196 
+- Aborting dialog correctly #13274
+- Showing popup while loading available serverlist
+- prefent flickering when installing new packages #12889; 
+- Checking uploaded packages for the correct version
+- bugix while writing mode::you_server
+
+-------------------------------------------------------------------
+Mon Feb 18 17:37:43 CET 2002 - gs@suse.de
+
+- internal changes 
+
+-------------------------------------------------------------------
 Tue Feb 12 14:07:42 CET 2002 - gs@suse.de
 
-- check for string arguments; correct settings for YOU server 
+- check for string arguments; correct settings for YOU agent 
+- rename sysconfig/you to sysconfig/onlineupdate
 
 -------------------------------------------------------------------
 Mon Feb 11 17:31:59 CET 2002 - schubi@suse.de
