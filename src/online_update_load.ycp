@@ -444,8 +444,18 @@ loaded patches or abort update completely."), _("Warning"), _("&Install"), _("&A
       string tmpfile = SCR(`Read(.run.mktemp));
 
       string pgp_warning = sformat(
-				   UI(_("Cannot check the patch %1 cause the PGP key is not installed or is corrupted.\nSo SuSE cannot guarantee that the packages has been created by SuSE")),
+				   UI(_("Cannot check the patch %1 cause the GPG key is not installed or is corrupted.\nSo SuSE cannot guarantee that the packages has been created by SuSE")),
 			       patch);
+      
+      list packageVersion = PKGINFO (`getPackageVersion("gpg"));
+      if ( size ( packageVersion ) >= 0 &&
+	   select( packageVersion, 0 ) == "not known" )
+      {
+	  // package pgp not found
+	  pgp_warning = sformat(
+		   UI(_("Cannot check the patch %1 cause the GPG package is not installed or is corrupted.\nSo SuSE cannot guarantee that the packages has been created by SuSE")),
+		   patch);
+      }
       
       y2milestone ( "tmpfile : %1", tmpfile );
       foreach ( `package, package_list, ``{
