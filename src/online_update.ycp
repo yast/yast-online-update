@@ -212,14 +212,14 @@ You will need to do the update again.");
 			       `VBox(
 				     `HSpacing(50),
 				     `Left(`Heading( _("Patch information") )),
-				     `VWeight( 4,
+				     `VWeight( 5,
 					       `LogView(`id(`infotext),
 							"",
 							5,	// visible lines
 							30)	// lines to store,
 					       ),
 				     `VSpacing(0.5),
-				     `VWeight( 4, `Table(`id(`table_pac),`opt(`hvstretch), 
+				     `VWeight( 3, `Table(`id(`table_pac),`opt(`hvstretch), 
 							 `header( _("Name"), _("Installed"), _("New Version"), _("Description") ),
 							 table_input
 							 )),
