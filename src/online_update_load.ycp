@@ -661,7 +661,7 @@ Please try to get patches from another SuSE ftp server.")));
 	       UI(_("There are %1 patches on ftp. Downloading may take a while.\n Do you really want to download the patches now?")),
  	       my_size_text( disk_size ) );
 
-	  if ( !UI(`YesNoOpt( message ,_("&Yes"), _("&No"), `yes_default)) )
+	  if ( !UI(`DisplayAnyQuestion( `none, message ,_("&Yes"), _("&No"), `yes_default)) )
 	  {
 	      return `abort;		// abort update	      
 	  }
