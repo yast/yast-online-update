@@ -19,6 +19,6 @@
 
   y2debug( "RunPkgSelection returned '%1'", ret );
 
-  if ( ret == `cancel ) return `back;
+  if ( ret == `cancel ) return `abort;
   else return `next;
 }
