@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Sep  5 18:16:54 CEST 2002 - cschum@suse.de
+
+- Fixed pre-selection of patches.
+- Fixed bug which prevented the patch selection from taking effect.
+
+-------------------------------------------------------------------
 Thu Sep  5 11:34:43 CEST 2002 - cschum@suse.de
 
 - Implemented regcode/password authentification for business
