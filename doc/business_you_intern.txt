@@ -1,0 +1,107 @@
+----------------------------------------
+- the english text is not yet available
+-----------------------------------------
+ 
+Spezifikation f. "Business"-YOU
+===============================
+
+-  Vor Abschluss der Installation übernimmt das Script 
+   /usr/lib/YaST2/bin/create_update_inf die Informationen
+   DIST_IDENT, PRODUKT_NAME, PRODUKT_VERSION aus 
+   /suse/setup/descr/info auf der CD in die Datei 
+   "/var/lib/YaST/update.inf".
+
+- Handelt es sich sich ein "Business" Produkt?
+   
+   Auswertung erfolgt im SERVER:
+   -----------------------------        
+   Business Produkte sind alle Produkte, die nicht "SuSE Linux" heissen.
+   
+   1. Die Information über Produktname und -version wird aus
+      /var/lib/YaST/update.inf gelesen.
+
+   2. Fallback f. bereits ausgelieferte Produkte:
+      /var/lib/YaST2/infomap.ycp
+
+   Abfrage `ftpIsBusiness im YOU:
+   -----------------------------
+   "Business" ->   YOU holt die Datei "suseservers" von www.support.de
+	      ->   Registriercode und Passwort müssen angegeben werden
+
+   Falls angekreuzt (Checkbox) wird die Information lokal gespeichert.
+   Es wird nur erneut nach den Daten gefragt, wenn das Login fehlschlägt
+   (evtl. neuer Registriercode).	 
+   
+   "Normal"   ->   YOU holt die Datei "suseservers" von www.suse.de
+
+
+- YOU holt /etc/suseservers
+  ------------------------- 
+  Datei: www.suse.de/de/support/suserservers_http.txt) wird mit wget geholt
+  (ohne Paßwort)
+
+   Die Datei /etc/suseservers enthält immer den Basispfad, 
+   d.h. ohne Architektur/Produkt/Version,  z.B.:
+   
+   ftp://ftp.suse.com/pub/suse
+   oder
+   https://www.support.de/support/suse
+   
+
+- Eingabe eines beliebiger Pfades im YOU Expert Mode:
+  ----------------------------------------------------    
+  Im Expert Mode kann ein beliebiger Server/Pfad angegeben werden, die
+  default-Werte werden überschrieben.
+  Ausser FTP kann CD, NFS oder Harddisk angegeben werden. 
+
+- YOU ruft `setServer mit dem ermittelten Pfad auf
+  -------------------------------------------------
+  Ausnahme: CD, Harddisk, NFS 
+	    Hier erfolgt die Pfadübergabe (bisher) über den "Umweg" /var/lib/YaST/install.inf
+
+
+- Mögliche Pfade zu den Patches:
+  ------------------------------
+      1. auf einem ftp bzw. http Server
+	 "Normal":	 z.B.	/pub/suse/<architecture>/update/<version>/patches
+	 "Business":	 z.B.	/support/suse/<architecture>/update/<product>/<version>/patches
+	 oder beliebig		    
+
+      2. auf CD (gilt auch für NFS)
+
+	 "Normal":	/var/adm/mount/<architecture>/update/<version>/patches
+	 "Business":    /var/adm/mount/<architecture>/update/<product>/<version>/patches
+	 oder		/var/adm/mount/patches			
+	      
+      3. Harddisk
+	 "Normal":	 z.B.	/usr/patches/suse/<architecture>/update/<version>/patches
+	 "Business":	 z.B.	/tmp/suse/<architecture>/update/<product>/<version>/patches
+	 oder beliebig		
+
+- SERVER-Vorgehen bei der Suche nach den Patches, d.h. nach dem "patches"-Verzeichnis:
+  ------------------------------------------------------------------------------------
+  1. das "patches" Verzeichnis wird direkt im angegebenen Pfad gesucht
+     (dadurch sind beliebige Pfade möglich; auf CD muss das "patches" Verzeichnis aber
+      das Oberste sein)
+
+  2. falls nicht gefunden, wird in:
+
+     "Normal":	  <base_path>/<version>/<architecture>/update/<version> bzw.
+     "Business":  <base_path>/<version>/<architecture>/update/<product>/<version>
+
+     nach dem "patches" Verzeichnis gesucht
+
+- Die lokalen Daten werden vom SERVER im Verzeichnis: 
+  --------------------------------------------------
+      "Normal":	    /var/lib/YaST/<architecture>/update/<version> bzw.
+      "Business":   /var/lib/YaST/<architecture>/update/<product>/<version> 
+
+       abgelegt.
+
+- YOU löscht die Dateien *.new und *.error im lokalen Verzeichnis
+  (Aufruf `ftpGetProductInfo)      
+
+- Zusätzliche Anforderungen: 
+  Patch Beschreibungsdateien werden auch signiert, d.h. PGB Schlüssel prüfen
+
+

@@ -1,0 +1,179 @@
+-------------------------------------------
+-  the english text is not yet available -
+--------------------------------------------
+
+
+Erweiterung YOU - Unterstützung des Maintenance Konzepts f. Business Produkte
+=============================================================================
+
+I. Allgemeines/Begriffe:
+
+ftp Server: 	der Server, z.B. ftp.suse.com, auf dem die Patches für die
+		"normalen" Versionen liegen
+support Server: der Server, auf dem die Patches/Updates für die
+		Business Produkte liegen
+putonftp:	Script bzw. Beschreibungsdatei f. einen Patch, der auf
+		den ftp Server soll.
+patchinfo:	Script (ähnlich "putonftp") nur für den support Server
+
+"putonftp" und "patchinfo" erzeugen Patches Files (patch descriptions),
+d.h. die Patchbeschreibungsdateien, die dann unter .../patches abgelegt
+werden.
+
+
+II. Verzeichnisstruktur auf den Servern:
+
+1. Verzeichnisstruktur auf dem ftp Server:
+   - bleibt wie bisher -
+   .../i386/update/<version>
+
+2. Verzeichnisstruktur auf dem support Server:
+      
+    2.1 Liste möglicher http-Server
+
+     Diese Liste wird unter http://www.suse.de/de/support/download/suseservers_http.txt"
+     abgelegt und kann OHNE Paßwort abgeholt werden. 
+     
+     Format/Beispieldatei:
+
+        #
+        # /etc/suseservers
+        # Tue Oct  2 13:59:20 CEST 2001
+        #
+        http://sdb.suse.de/download/
+
+    2.2 Baumstruktur unter http://sdb.suse.de/download
+        2.2.1 Produktverzeichnis
+    
+               ./<architecture>/update/<product_name>/<product_version>
+
+                product_name:	Feld "CD-Produkt-Name" in Datei
+				/work/cd/data/maintained-CDs/<product>.<architecture>
+                       WICHTIG: Leerzeichen sind durch _ ersetzt.
+                product_version: Feld "CD-Produkt-Version" in Datei
+				 /work/cd/data/maintained-CDs/<product>.<architecture>
+
+        2.2.2 RPM-Pakete
+                Die Pakete sind unterhalb des Produktverzeichnisses in den 
+		zugehörigen Serienverzeichnissen abgelegt.
+                Beispiel:
+                        http://sdb.suse.de/download/i386/update/SuSE_SLES/7/n1/mod_php4.rpm
+			
+		
+        2.2.3 Patchbeschreibungen
+                Alle Patchbeschreibungen sind im Verzeichnis:
+        
+		http://sdb.suse.de/download/<architecture>/update/<product_name>/<product_version>/patches
+                
+		Pro Patch wird eine Datei mit dem Namen <Patchname>-<fortlaufende Nummer> angelegt.
+                Format:
+
+                        Kind: [security|recommended|YaST2|document] 
+
+                        Shortdescription.<language> : <short description; one line> 
+
+                        Longdescription.<language>:
+                        <long description of the patch; could have more lines>
+                        <language>.noitpircsedgnol:
+
+                        Preinformation.<language>:
+                        <Information in a popup which will be displayed before the >
+                        <packages of this patch will be installed. The user >
+                        <can abort the installation of THIS patch. >
+                        <language>.noitamrofnierp:
+        
+                        Postinformation.<language>:
+                        <Information in a popup which will be displayed after the >
+                        <packages of this patch have been installed. >
+                        <language>.noitamrofnitsop:
+
+                        Size: <Size of this patch in KByte> 
+
+                        # buildtime Tue Nov 14 12:46:42 UTC 2000 
+                        Buildtime: < time in seconds> 
+
+                        MinYaST1Version:<minimal YaST1 version which is needed for installation> 
+
+                        MinYaST2Version:<minimal YaST2 version which is needed for installation> 
+
+                        Packages: 
+
+                        <package description of the patch> 
+
+                        .
+                        ..
+                        ...
+
+
+                        like: 
+
+                        ##
+                        ## -----> bash <-----
+                        ##
+
+
+                        Filename: bash.rpm
+                        Label: The GNU Bourne-Again Shell
+                        Series: a
+                        InstPath: a1/bash-version-release.arch.rpm
+                        Size: 2116014 838521
+                        Buildtime: 973570238
+                        BuiltFrom: zq1/bash-version-release.[no]src.rpm
+                        Flag: A2E A(sh ) ELF 
+                        Category: 
+                        RpmGroup: System Environment/Shells
+                        Copyright: 1989 Free Software Foundation, Inc.
+                        AuthorName: Chet Ramey <chet@po.cwru.edu>
+                        AuthorEmail: 
+                        AuthorAddress: 
+                        Version: 2.04-81
+                        StartCommand: 
+                        Requires: /bin/sh ld-linux.so.2 libc.so.6 libc.so.6(GLIBC_2.0) libc.so.6(GLIBC_2.1)  
+                        Conflicts ..
+                        Oboletes: ..
+
+
+                        ...
+                        ..
+                        .
+
+
+                        Segakcap: 
+
+
+                Zusätzlich sollte die ASCII-Datei:
+
+		http://sdb.suse.de/download/<architecture>/update/<product_name>/>product_version>/patches/directory
+                vohanden sein, in der der Inhalt vom Verzeichnis "patches" steht.
+ 
+
+III. Produktinformation
+ 
+ Die Information, um welches Produkt/welche Version es sich handelt
+ ist in der Datei  "/suse/setup/descr/info"  auf der CD abgelegt,	
+ z.B.
+ 
+  ELF
+  MIN_YAST_VERSION 1.05
+  DIST_STRING      SuSE
+  DIST_IDENT       SuSE-Linux-eMail-Server-i386-7.2.0#0
+  MIN_DIST_VERSION 7.2
+  PRODUKT_NAME     eMail Server
+  PRODUKT_VERSION  3.0
+
+
+IV. Übertragungsprotokoll
+
+ 1. Business Produkte
+
+ Die Übertragung erfolgt mittels wget ( https, Benutzername, Paßwort ).
+ Sollte die Verbindung wegen falscher oder abgelaufener Benutzerangeben abgelehnt
+ werden, so wird dies mit dem Error-Code 401 quittiert. Eine Unterscheidung ist
+ im ersten Schritt noch nicht möglich.
+
+ 2. Standardprodukt ( Box )
+
+ Die Übertragung erfolgt über ftp.
+
+
+
