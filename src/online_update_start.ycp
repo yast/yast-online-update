@@ -27,9 +27,7 @@
   boolean test_mode    = lookup ( user_settings, "test_mode", false );
   
    // constant settings
-  map ftp_server_map = $["mack"		: ["/update-test/suse"],
-			"ftp.suse.com"	: ["/usr/patches"],
-			"ftp.suse.de"	: ["/patchroot"] ];
+  map ftp_server_map = SCR(`Read(.target.yast2, "update/ftp_server.ycp"));
   string rootpath = "/";
   string yastpath = "/var/lib/YaST";
   string patchpath = "/var/lib/YaST/patches";

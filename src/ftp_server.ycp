@@ -1,0 +1,5 @@
+// file ftp_server.ycp
+// ftp-server for patch-update
+ $["mack"		: ["/update-test/suse"],
+  "ftp.suse.com"	: ["/usr/patches"],
+  "ftp.suse.de"	: ["/patchroot"] ];
