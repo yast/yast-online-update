@@ -6,3 +6,14 @@
 # ftp serverlist.
 #
 YAST2_LOADFTPSERVER="yes"
+
+#
+# Registration code for business products
+# 
+REG_CODE=""
+
+#
+# Registration password for business products
+#
+
+REG_PASSWORD=""
