@@ -342,8 +342,9 @@ loaded patches or abort update completely." ), _("Warning"), _("&Install"), _("&
 
   if ( !continue_mode )
   {
-      // second call from this module. --> patch list already
-      // exists on local machine.
+      // The patch-list only have to get from ftp-server in the
+      // first call.
+      
       string connect_string = "Starting download of patch descriptions from "
 	  + ftp_server + ".\n";
       UI(`ChangeWidget(`id(`log), `LastLine, connect_string ));
@@ -420,7 +421,7 @@ Please try to get patches from another SuSE ftp server.")));
       // get the patches
       list install_patches = GetAllPatches( new_patches );
 
-      if ( install_patches != `cancel )
+      if ( size (install_patches) >0 )
       {
 	  y2debug( "ONLINE: automatic mode, installing: %1", install_patches );
 
@@ -432,6 +433,7 @@ Please try to get patches from another SuSE ftp server.")));
       {
 	  any ret = PKGINFO(`ftpDisconnect());
 	  y2debug("ONLINE:  PKGINFO(`ftpDisconnect()): %1", ret );
+	  UI(`DisplayMessage(_("No patch will be installed.")));	  
 	  return `abort;		// abort update
       }
   }
@@ -452,35 +454,27 @@ Please try to get patches from another SuSE ftp server.")));
 
       list install_patches = GetAllPatches( get_patches );
 
-      if ( install_patches != `cancel )
+      if ( size ( install_patches ) > 0 )
       {
 	  y2debug( "ONLINE: manual mode, installing: %1", install_patches );
 
-	  if ( size ( install_patches ) > 0 )
+	  while (true)
 	  {
-	      while (true)
+	      any r = UI(`UserInput());
+	      if ( r == `next )
 	      {
-		  any r = UI(`UserInput());
-		  if ( r == `next )
-		  {
-		      // install selected patches
-		      any ret = InstallPatches( install_patches );
-		      return `next;
-		  }
-		  else if ( r == `abort  && UI(`ConfirmAbortUpdate(`incomplete)) )
-		  {
-		      // set CloseUpdate status to false (installation NOT complete)
-		      PKGINFO(`ftpCloseUpdate(false) );
-		      PKGINFO(`ftpDisconnect());
-		      y2debug("ONLINE:  PKGINFO(`ftpDisconnect()): %1", ret );
-		      return `abort;	// abort update
-		  }
+		  // install selected patches
+		  any ret = InstallPatches( install_patches );
+		  return `next;
 	      }
-	  }
-	  else
-	  {
-	      y2debug( "There will be no patch installed --> return" );	      
-	      return `next;	      
+	      else if ( r == `abort  && UI(`ConfirmAbortUpdate(`incomplete)) )
+	      {
+		  // set CloseUpdate status to false (installation NOT complete)
+		  PKGINFO(`ftpCloseUpdate(false) );
+		  PKGINFO(`ftpDisconnect());
+		  y2debug("ONLINE:  PKGINFO(`ftpDisconnect()): %1", ret );
+		  return `abort;	// abort update
+	      }
 	  }
       }
       else
@@ -488,6 +482,8 @@ Please try to get patches from another SuSE ftp server.")));
 	  // do not set the CloseUpdate status -> no patch is installed
 	  PKGINFO(`ftpDisconnect());
 	  y2debug("ONLINE:  PKGINFO(`ftpDisconnect()): %1", ret );
+	  UI(`DisplayMessage(_("No patch will be installed.")));
+	  
 	  return `abort;		// abort update  
       }
   }
