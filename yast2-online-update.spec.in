@@ -24,8 +24,6 @@ Summary:    	YaST2 online update
 
 %files
 %defattr(-,root,root)
-@configdir@/online_update.y2cc
-@configdir@/cd_update.y2cc
 @desktopdir@/online_update.desktop
 @desktopdir@/cd_update.desktop
 @scrconfdir@/*.scr

@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Sat Feb 07 23:11:28 CET 2004 - arvin@suse.de
+
+- removed config files (*.y2cc)
+
+-------------------------------------------------------------------
 Wed Feb  4 16:45:35 CET 2004 - cschum@suse.de
 
 - Split off you_server to own package.
@@ -68,7 +73,7 @@ Tue Aug 20 10:55:04 CEST 2003 - cschum@suse.de
 -------------------------------------------------------------------
 Tue Aug 12 14:42:32 CEST 2003 - gs@suse.de
 
-- merge texts from proofread 
+- merge texts from proofread
 
 -------------------------------------------------------------------
 Fri Jul 25 13:59:54 CEST 2003 - cschum@suse.de

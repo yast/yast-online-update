@@ -18,14 +18,10 @@ module_DATA =				\
 	AutoOnlineUpdate.ycp		\
 	OnlineUpdateCallbacks.ycp
 
-config_DATA =				\
-	online_update.y2cc		\
-	cd_update.y2cc
-
 desktop_DATA =				\
 	online_update.desktop		\
 	cd_update.desktop
 
-EXTRA_DIST = $(client_DATA) $(module_DATA) $(config_DATA) $(desktop_DATA)
+EXTRA_DIST = $(client_DATA) $(module_DATA) $(desktop_DATA)
 
 include $(top_srcdir)/Makefile.am.common
