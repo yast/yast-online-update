@@ -320,8 +320,7 @@ the update takes place.");
   } else {
     symbol result = `retry;
     do {
-//      string err = Pkg::YouGetServers( you_server_list );
-      string err = "FIXME";
+      string err = Pkg::YouGetServers( you_server_list );
       if ( size( err ) == 0 ) {
         result = `ok;
       } else {
