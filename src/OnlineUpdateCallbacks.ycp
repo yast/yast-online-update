@@ -55,7 +55,23 @@
     ``{
         y2milestone("ExecuteYcpScriptCallback");
 
-        return CallFile( script, [] );
+        return CallModule( script, [] );
+    }
+
+    /**
+      Callback for showing script execution progress in YOU.
+    */
+    global define boolean ScriptProgressCallback( integer percent )
+    ``{
+        y2milestone("ScriptProgressCallback");
+
+        symbol ret = UI::PollInput();
+
+        if ( ret == `abort ) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -68,5 +84,6 @@
 	Pkg::CallbackYouProgress ("OnlineUpdateCallbacks::ProgressCallback");
 	Pkg::CallbackYouPatchProgress ("OnlineUpdateCallbacks::PatchProgressCallback");
 	Pkg::CallbackYouExecuteYcpScript ("OnlineUpdateCallbacks::ExecuteYcpScriptCallback");
+        Pkg::CallbackYouScriptProgress ("OnlineUpdateCallbacks::ScriptProgressCallback");
     }
 }

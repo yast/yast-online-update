@@ -313,11 +313,21 @@ abort the update?
                 UI::ChangeWidget( `id(`log), `LastLine, _("Error\n") );
                 error = true;
 
-                string msg = sformat( _("Error installing patch '%1'.
+                string msg = "";
+                
+                if ( result == "abort" ) {
+                  msg = sformat( _("Installation of patch was aborted by user.
+  
+Warning! This can cause an inconsistent system. Please select 'Try Again' to
+repeat installation of this patch.
+"), patchName );
+                } else {
+                  msg = sformat( _("Error installing patch '%1'.
 
-  Skip this patch or abort
-  the update?
-  "), patchName );
+Skip this patch or abort
+the update?
+"), patchName );
+                }
 
                 string errorMsg = Pkg::Error() + "\n" + Pkg::ErrorDetails();
 
