@@ -33,8 +33,7 @@
   string patchpath = "/var/lib/YaST/patches";
   string logpath = "/var/log/y2ftp";
   string ftp_server = lookup(user_settings, "ftp_server", "ftp.suse.com" );
-
-  
+  string ftp_dir = lookup(user_settings, "ftp_dir", "/pub/suse" );  
 
 
     //////////////////////////////////////////////////////////////////////////////////////
@@ -59,21 +58,22 @@
 
     list ftp_server_list = [];
 
+    // insert local server like CD, NFS ....
+    if ( ftp_server != "" )
+    {
+	list ftp_dir_list = [];
+	ftp_dir_list = add ( ftp_dir_list, ftp_dir );
+	ftp_server_map = add(ftp_server_map, ftp_server, ftp_dir_list );
+    }
+    
     foreach(`server, `info, ftp_server_map, ``{
 	ftp_server_list = add(ftp_server_list, server);
     });
 
-    // insert local server like CD, NFS ....
-    if ( ftp_server != "" )
-    {
-	ftp_server_list = add(ftp_server_list, ftp_server );
-	ftp_server_list = toset(ftp_server_list);
-    }
-	    
 	// initialize PKGINFO
 	UI(`OpenDialog(`opt(`decorated ),`Label(_("Initializing for ftp update; One moment please..."))));
   
-	any retval = PKGINFO(`ftpSetEnvironment( $["ftpserver":"ftp.suse.com",
+	any retval = PKGINFO(`ftpSetEnvironment( $["ftpserver":ftp_server,
 						  "language":long_language,
 						  "rootpath":rootpath,
 						  "architecture":architecture,
@@ -142,7 +142,7 @@ for further information ."))) )
 								`VSpacing(0.3),
 								`HBox(`HSpacing(1.2),
 								      `Left(`ComboBox(`id(`ftp), _("Installation-source"), ftp_server_list )),
-								      `PushButton( `id(`local), `opt(`notify), _("&Local"))
+								      `PushButton( `id(`expert), `opt(`notify), _("&Expert"))
 								      ),
 								`VSpacing(0.3) 
 								)
@@ -170,8 +170,8 @@ if you click on the <b>Details</b> button.
 </p>"));
 
     string help_part3 =  UI(_("<p>
-If you click on button <b>Local</b> you can select an local
-installation-source instead of a ftp-server.
+If you click on button <b>Expert</b> you can select an local
+installation-source instead of a ftp-server or select another ftp-server.
 </p>"));
     
     
@@ -221,11 +221,13 @@ installation-source instead of a ftp-server.
         if (ret == `next)
         {
 
-	    string update_path = select( lookup(ftp_server_map, ftp_server, ""), 0 );
+	    ftp_dir = select( lookup(ftp_server_map, ftp_server, []), 0 );
+	    user_settings = add(user_settings, "ftp_dir", ftp_dir); 
 	      
 	    any retval = PKGINFO(`ftpSetServer( ftp_server,
-						update_path) );
-	    y2debug("ONLINE: PKGINFO(`setFtpServer( %1, %2 ) ): %3", ftp_server, update_path, retval );
+						ftp_dir ) );
+	    y2debug("ONLINE: PKGINFO(`setFtpServer( %1, %2 ) ): %3",
+		    ftp_server, ftp_dir, retval );
 		
 	    if (retval == nil || retval == false)
 	    {
@@ -243,16 +245,23 @@ another SuSE ftp server.")));
 	    
 	    ret = `again;
 	}
-	else if ( ret == `local )
+	else if ( ret == `expert )
 	{
+	    ftp_dir = select( lookup(ftp_server_map,
+						ftp_server, []), 0 );
+	    
+	    user_settings = add ( user_settings, "ftp_dir", ftp_dir );
+	    user_settings = add ( user_settings,"post_install", false );
 	    any retval = CallFunction(`inst_source( true, false ) );
 	    if ( retval == `abort )
 		return `abort;
 
 	    ftp_server = lookup ( user_settings, "ftp_server", "" );
+	    ftp_dir = lookup ( user_settings, "ftp_dir", "" );
 	    any retval = PKGINFO(`ftpSetServer( ftp_server,
-						"" ) );
-	    y2debug("ONLINE: PKGINFO(`setFtpServer( %1, ) ): %3", ftp_server,
+						ftp_dir ) );
+	    y2debug("ONLINE: PKGINFO(`setFtpServer( %1,%2 ) ): %3", ftp_server,
+		    ftp_dir,
 		    retval );
 		
 	    if (retval == nil || retval == false)
