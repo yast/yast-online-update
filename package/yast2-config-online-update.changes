@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Apr 19 19:09:47 MEST 2001 - gs@suse.de
+
+- menuentry file for CD installation added
+- CD Update: return to start dialog, if source media is not set to CD
+
+-------------------------------------------------------------------
 Tue Apr 17 13:48:06 MEST 2001 - gs@suse.de
 
 - rename of translation package
