@@ -25,7 +25,7 @@
 
         symbol ret = UI::PollInput();
 
-        if ( ret == `abort ) {
+        if ( ret == `abort || ret == `cancel ) {
             return false;
         }
 
@@ -45,7 +45,7 @@
 
         symbol ret = UI::PollInput();
 
-        if ( ret == `abort ) {
+        if ( ret == `abort || ret == `cancel ) {
             return false;
         }
 
@@ -71,7 +71,7 @@
 
         symbol ret = UI::PollInput();
 
-        if ( ret == `abort ) {
+        if ( ret == `abort || ret == `cancel ) {
             return false;
         }
 

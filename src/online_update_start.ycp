@@ -475,6 +475,8 @@ without the need of user interaction.</p>
 
       ret = UI::UserInput();
 
+      if ( ret == `cancel ) ret = `abort;
+
       OnlineUpdate::you_auto = !UI::QueryWidget( `id( `manual ), `Value );
       OnlineUpdate::reload = UI::QueryWidget( `id( `reload ), `Value );
 

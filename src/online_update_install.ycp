@@ -389,13 +389,17 @@ the update?
         Pkg::YouRemovePackages();
     }
 
+    if ( ret == `cancel && installedPatches != 0 ) ret = `abort;
+
     if ( ret == `abort ) {
         if ( !UI::ConfirmAbortUpdate( `suseconfig ) ) ret = `this;
     }
 
-    if ( ret == `next && installedPatches == 0 ) ret = `abort;
+    if ( installedPatches == 0 &&
+         ( ret == `next || ret == `cancel ) ) ret = `abort;
 
-  } until (ret == `next || ret == `back || ret == `abort || ret == `again );
-    
+  } until ( ret == `next || ret == `back || ret == `abort || ret == `again ||
+            ret == `cancel );
+
   return ret;
 }
