@@ -138,11 +138,13 @@ if you click on button <b>Details</b>.
 
 	if ( ret == `details )
 	{
-	    
+	    CallFunction(`online_update_details( true, false ) );
+	    return `again;
 	}
 
-	if ( ret == `abort )
+	if ( ret == `abort && ConfirmAbort(`painless) )
 	    return `abort;
+
 	
 	if ( ret == `back)
 	{

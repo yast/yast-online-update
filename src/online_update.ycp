@@ -163,8 +163,7 @@ improve your existing installation."))
     };
 
    define ConfirmAbort( symbol how_to ) ``{
-	  string what_will_happen = "";
-
+	  locale|any what_will_happen = nil;
 
 	  if ( how_to == `painless )
 	  {
@@ -229,7 +228,7 @@ You will need to do the update again." );
 	  return (ret == `really_abort);
       };
     
-        define YesOrNo(any message, string yes_button_message, string no_button_message) ``{
+   define YesOrNo(any message, string yes_button_message, string no_button_message) ``{
       OpenDialog(`opt(`decorated),
 	`HBox(`HSpacing(1),
 	      `VBox(`VSpacing(0.2),
@@ -244,6 +243,7 @@ You will need to do the update again." );
       CloseDialog();
       return (ret == `yes);
     };
+
   });
 
   // check test_mode
@@ -339,13 +339,14 @@ You will need to do the update again." );
 	  auto_mode = true;
 	  id = id + 1;
       }
-      if ( result == `manual )
+      else if ( result == `manual )
       {
 	  auto_mode = false;
 	  id = id + 1;
       }
-
-      if (result == `cancel)
+      else if (result == `again )
+	  continue;
+      else if (result == `cancel)
 	  break;
       else if (result == `next)
 	  id = id + 1;
