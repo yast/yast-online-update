@@ -27,7 +27,12 @@
   boolean test_mode    = lookup ( user_settings, "test_mode", false );
   
    // constant settings
-  map ftp_server_map = SCR(`Read(.target.yast2, "update/ftp_server.ycp"));
+  include "suseservers.ycp";
+
+  // ftp_server_map = $[ "server" : [ "path", "type" ], ... ]
+
+  map ftp_server_map = read_suseservers ();
+
   string rootpath = "/";
   string yastpath = "/var/lib/YaST";
   string patchpath = "/var/lib/YaST/patches";
