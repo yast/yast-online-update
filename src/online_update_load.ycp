@@ -315,9 +315,9 @@ loaded patches or abort update completely." ), _("Warning"), _("&Install"), _("&
   map new_patches = $[];
   boolean go_on = true;
   boolean success = true;
-  
 
-  UI(`ChangeWidget(`id(`log), `LastLine, "Starting download of patch descriptions from ftp server.\n" ));
+  string connect_string = "Starting download of patch descriptions from " + ftp_server + ".\n";
+  UI(`ChangeWidget(`id(`log), `LastLine, connect_string ));
 
   // connect
   result_map = PKGINFO(`ftpConnect());
@@ -337,10 +337,14 @@ loaded patches or abort update completely." ), _("Warning"), _("&Install"), _("&
 	  y2debug("ONLINE:  PKGINFO(`ftpGetPatchList()): %1", result_map );
 
 	  go_on = lookup (result_map, "continue", false );
-	      
-	  UI(`ChangeWidget(`id(`log), `LastLine, lookup (result_map, "message", "" )+"\n" ));
-	  if (go_on)
-	      ShowProgress( lookup (result_map, "progress", 0 ) );
+
+	  string message = lookup (result_map, "message", "" );
+	  if ( message != "" )
+	  {
+	      UI(`ChangeWidget(`id(`log), `LastLine, message +"\n" ));
+	  }
+
+	  ShowProgress( lookup (result_map, "progress", 0 ) );
       }
 	  
       success = lookup( result_map, "ok", false );
@@ -368,14 +372,16 @@ Please try to get patches from another SuSE ftp server.")));
 
   // disconnect 
   map disconnect_map = PKGINFO(`ftpDisconnect());
+
   y2debug( "ONLINE:  PKGINFO(`ftpDisconnect(): %1",  disconnect_map );
   
   if ( lookup(disconnect_map, "ok", false ) )
   {
 	   UI(`ChangeWidget(`id(`status), `Value, _("closed")) );
   }
-  UI(`ChangeWidget(`id(`log), `LastLine, lookup (disconnect_map, "message", "" )+"\n" ));
 
+  string disconnect_message = lookup (disconnect_map, "message", "" );
+  UI(`ChangeWidget(`id(`log), `LastLine, disconnect_message +"\n" ));
   
   if ( auto_mode )
   {
