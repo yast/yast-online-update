@@ -10,3 +10,11 @@ stamp-h*
 libtool
 config.log
 aclocal.m4
+config.guess
+autom4te.cache
+config.sub
+ltmain.sh
+install-sh
+mkinstalldirs
+missing
+depcomp
