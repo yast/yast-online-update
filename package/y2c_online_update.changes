@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Jan 18 19:52:02 MET 2001 - schubi@suse.de
+
+- Button "not install" to "Do not install" changed
+- default installation mode to manuell changed
+
+-------------------------------------------------------------------
 Tue Jan 16 17:30:55 MET 2001 - schubi@suse.de
 
 - insert new ftp-mirrows
