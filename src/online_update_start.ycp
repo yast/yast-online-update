@@ -12,7 +12,6 @@
 
   textdomain "online-update";
 
-  import "Language";
   import "Arch";
   import "Mode";
   import "OnlineUpdate";
@@ -33,46 +32,6 @@
 
   map last_status = $[];
 
-  // Evaluate correct language
-  map lang2yast1 =       $[
-        "en_GB"         : "english",
-        "en_US"         : "english",
-        "en"            : "english",
-        "de_DE"         : "german",
-        "de_CH"         : "german",
-        "de"            : "german",
-        "fr"            : "french",
-        "br_FR"         : "french",
-        "fr_FR"         : "french",
-        "fr_CH"         : "french",
-        "it"            : "italian",
-        "it_IT"         : "italian",
-        "es"            : "spanish",
-        "es_ES"         : "spanish",
-        "nl"            : "dutch",
-        "nl_NL"         : "dutch",
-        "pt"            : "portuguese",
-        "pt_PT"         : "portuguese",
-        "pt_BR"         : "brazilian",
-        "hu"            : "hungarian",
-        "hu_HU"         : "hungarian",
-        "pl"            : "polish",
-        "pl_PL"         : "polish",
-        "el_GR"         : "greek",
-        "tr_TR"         : "turkish",
-        "tr"            : "turkish",
-        "ru"            : "russian",
-        "ru_RU"         : "russian",
-        "ru_RU.KOI8-R"  : "russian",
-        "cs"            : "czech",
-        "cs_CZ"         : "czech",
-        "ja"            : "japanese",
-        "ja_JP"         : "japanese",
-        "ko"            : "korean",
-        "ko_KR"         : "korean"
-  ];
-  string language = lookup(lang2yast1,  Language::language, "english");
-
   boolean cd_update 	= OnlineUpdate::cd_update;
 
   list you_server_list = [];
@@ -80,6 +39,8 @@
   string you_url = OnlineUpdate::you_url;
 
   y2milestone( "you_url: %1", you_url );
+
+  UI::OpenDialog(`opt(`decorated ),`Label(_("Initializing for FTP/HTTP update. One moment please...")));
 
   if ( size( you_url ) != 0 ) {
     you_server_list = add( you_server_list, you_url );
@@ -103,8 +64,6 @@
 
   if ( 0 ) {
     // initialize You Agent
-    UI::OpenDialog(`opt(`decorated ),`Label(_("Initializing for FTP/HTTP update. One moment please...")));
-
     any retval = SCR::Execute(.you.setEnvironment, $[ "language":language,
 						    "rootpath":rootpath,
 						    "architecture":Arch::architecture,
@@ -233,9 +192,11 @@
     string last_update = sformat( _("Last update was executed\n %1 day ago.", "Last update was executed\n %1 days ago.", num), num );
   }
 
-  Pkg::TargetInit("/",false);
+//  Pkg::TargetInit("/",false);
 
   map statusmap = Pkg::YouStatus();
+
+  UI::CloseDialog();
 
   y2debug("status map: %1", statusmap );
 
