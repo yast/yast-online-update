@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Thu Jul  1 15:07:06 CEST 2004 - lnussel@suse.de
+
+- merge 9.1 branch
+- turn online_update_dialogs.ycp into module OnlineUpdateDialogs to avoid
+  using different versions of that file in clients and modules
+- 2.10.0
+
+-------------------------------------------------------------------
 Fri Apr 16 13:43:59 CEST 2004 - cschum@suse.de
 
 - Ask for "Username" instead of "Code" as the registration code

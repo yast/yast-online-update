@@ -10,7 +10,8 @@
 
     textdomain "online-update";
 
-    include "online_update_dialogs.ycp";
+    import "OnlineUpdateDialogs";
+    import "Popup";
 
     /**
       Callback for YOU progress widget.
@@ -58,7 +59,7 @@
 //        y2internal( "ErrorCallback %1", text );
 
         if ( type == "skip" ) {
-          symbol proceed = YouSkipPopup( text, details );
+          symbol proceed = OnlineUpdateDialogs::SkipPopup( text, details );
           
           if ( proceed == `abort ) return "abort";
           else if ( proceed == `tryagain ) return "retry";
@@ -67,7 +68,7 @@
           else if ( proceed == `ok ) return "";
           else return "error";
         } else if ( type == "abort" ) {
-          if ( ConfirmAbortUpdate( `painless ) ) return "abort";
+          if ( OnlineUpdateDialogs::ConfirmAbortUpdate( `painless ) ) return "abort";
           else return ""; 
         } else {
           string msg = text;
@@ -84,11 +85,11 @@
 //        y2internal( "MessageCallback %1", type );
 
         if ( type == "preinfo" ) {
-          boolean install = YouMessagePopup( patches, true );
+          boolean install = OnlineUpdateDialogs::MessagePopup( patches, true );
           if ( install ) return "";
           else return "skip";
         } else if ( type == "postinfo" ) {
-          YouMessagePopup( patches, false );
+          OnlineUpdateDialogs::MessagePopup( patches, false );
           return "";
         } else {
           y2error( "Wrong message type: %1", type );

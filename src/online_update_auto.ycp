@@ -29,7 +29,7 @@ y2milestone("online_update auto started");
 import "AutoOnlineUpdate";
 import "Mode";
 import "Wizard";
-include "online_update_dialogs.ycp";
+import "OnlineUpdateDialogs";
 
 any ret = nil;
 string func = "";
@@ -56,7 +56,7 @@ else if (func == "Reset") {
 }
 /* Change configuration (run AutoSequence) */
 else if (func == "Change") {
-    ret = SetupAutomatic();
+    ret = OnlineUpdateDialogs::SetupAutomatic();
 }
 /* Import configuration */
 else if (func == "Import") {

@@ -4,6 +4,7 @@
 */
 
 {
+  module "OnlineUpdateDialogs";
 
   textdomain "online-update";
 
@@ -13,7 +14,7 @@
   import "Mode";
   import "Wizard";
 
-  define symbol SetupAutomatic() ``{
+  global define symbol SetupAutomatic() ``{
 
     string heading = _("YOU Automatic Mode Setup");
 
@@ -149,7 +150,7 @@ the update takes place.");
   }
 
 
-  define any YouErrorPopupGeneric( string message, string details,
+  define any ErrorPopupGeneric( string message, string details,
                                    symbol type )
   ``{
 
@@ -234,28 +235,28 @@ the update takes place.");
     }
   }
 
-  define symbol YouIgnoreWarningPopup( string message, string details )
+  global define symbol IgnoreWarningPopup( string message, string details )
   ``{
-    return (symbol)YouErrorPopupGeneric( message, details, `ignorewarning );
+    return (symbol)ErrorPopupGeneric( message, details, `ignorewarning );
   }
 
-  define symbol YouIgnorePopup( string message, string details )
+  global define symbol IgnorePopup( string message, string details )
   ``{
-    return (symbol)YouErrorPopupGeneric( message, details, `ignore );
+    return (symbol)ErrorPopupGeneric( message, details, `ignore );
   }
 
-  define symbol YouSkipPopup( string message, string details )
+  global define symbol SkipPopup( string message, string details )
   ``{
-    return (symbol)YouErrorPopupGeneric( message, details, `skip );
+    return (symbol)ErrorPopupGeneric( message, details, `skip );
   }
 
-  define symbol YouErrorPopup( string message, string details )
+  global define symbol ErrorPopup( string message, string details )
   ``{
-    return (symbol)YouErrorPopupGeneric( message, details, `plain );
+    return (symbol)ErrorPopupGeneric( message, details, `plain );
   }
 
   //  ConfirmAbortUpdate has same layout as/but different text than ConfirmAbort
-  define boolean ConfirmAbortUpdate( symbol how_to )
+  global define boolean ConfirmAbortUpdate( symbol how_to )
   ``{
           string what_will_happen = "";
 
@@ -329,7 +330,7 @@ some of them might not work as expected.");
           return (ret == `really_abort);
   };
 
-  define boolean DisplayMsgYou( string message, string header, string yes_button, string no_button )
+  global define boolean DisplayMsgYou( string message, string header, string yes_button, string no_button )
   ``{
           UI::OpenDialog(
                      `opt(`decorated),
@@ -352,7 +353,7 @@ some of them might not work as expected.");
   };
 
 
-  define boolean DisplayMsgYouOk( string message, string header, string ok_button )
+  global define boolean DisplayMsgYouOk( string message, string header, string ok_button )
   ``{
           UI::OpenDialog(
                      `opt(`decorated),
@@ -373,7 +374,7 @@ some of them might not work as expected.");
           return (ret == `ok);
   };
 
-  define boolean YouMessagePopup( list<map> patches, boolean pre )
+  global define boolean MessagePopup( list<map> patches, boolean pre )
   ``{
       string message = "";
       string details = "";

@@ -17,14 +17,14 @@
   import "Popup";
   import "Wizard";
   import "AutoOnlineUpdate";
+  import "OnlineUpdateDialogs";
 
   include "inst_source_dialogs.ycp";
-  include "online_update_dialogs.ycp";
 
   map server = $[ "url": "" ];
 
    // Request username/password from user
-   global define map DisplayLoginPopup( string username, string password,
+   define map DisplayLoginPopup( string username, string password,
 				        string headline, string message ) ``{
        map ret_map = $[];
 
@@ -96,7 +96,7 @@
    };
 
 
-  global define string GetPatches() ``{
+  define string GetPatches() ``{
 
     UI::OpenDialog( `opt( `decorated ),
       `VBox(
@@ -190,17 +190,17 @@ sources will be available.
 Possible solution:
 Check network connection.
 ");
-          result = YouIgnoreWarningPopup( text,
+          result = OnlineUpdateDialogs::IgnoreWarningPopup( text,
                                           sformat( _("URL: %1"), mirrorListServer ) + "<br>" +
                                           Pkg::LastErrorDetails() );
         } else if ( err == "read" ) {
-          result = YouIgnorePopup( _("Unable to read server list from disk."),
+          result = OnlineUpdateDialogs::IgnorePopup( _("Unable to read server list from disk."),
                                    Pkg::LastErrorDetails() );
         } else if ( err == "write" ) {
-          result = YouIgnorePopup( _("Could not write server list to disk."),
+          result = OnlineUpdateDialogs::IgnorePopup( _("Could not write server list to disk."),
                                    Pkg::LastErrorDetails() );
         } else {
-          result = YouIgnorePopup( _("Error getting servers."),
+          result = OnlineUpdateDialogs::IgnorePopup( _("Error getting servers."),
                                    Pkg::LastErrorDetails() );        
         }
         if ( result == `abort )
@@ -408,8 +408,8 @@ without the need of user interaction.</p>
             UI::ChangeWidget( `id(`server), `Value, 0 );
           }
       } else if ( ret == `automatic ) {
-          SetupAutomatic();
-      } else if ( ret == `abort && ConfirmAbortUpdate(`painless) ) {
+          OnlineUpdateDialogs::SetupAutomatic();
+      } else if ( ret == `abort && OnlineUpdateDialogs::ConfirmAbortUpdate(`painless) ) {
           return  `abort;
       } else if (ret == `next) {
           if ( serverId == 0 ) {
@@ -459,7 +459,7 @@ Cannot load patch information.
                   details = err + "\n" + details;
               }
 
-              YouErrorPopup( msg, details );
+              OnlineUpdateDialogs::ErrorPopup( msg, details );
             }
           } else {
             Pkg::YouSelectPatches();

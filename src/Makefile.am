@@ -2,8 +2,6 @@
 # Makefile.am for online-update/src
 #
 
-ynclude_DATA = online_update_dialogs.ycp
-
 client_DATA =				\
 	online_update_start.ycp		\
 	online_update_auto.ycp		\
@@ -15,6 +13,7 @@ client_DATA =				\
 module_DATA =				\
 	OnlineUpdate.ycp		\
 	AutoOnlineUpdate.ycp		\
+	OnlineUpdateDialogs.ycp		\
 	OnlineUpdateCallbacks.ycp
 
 desktop_DATA =				\

@@ -11,8 +11,7 @@
   import "OnlineUpdate";
   import "Popup";
   import "Wizard";
-
-  include "online_update_dialogs.ycp";
+  import "OnlineUpdateDialogs";
 
   boolean auto_mode_install = OnlineUpdate::you_auto_install;
 
@@ -76,7 +75,7 @@ data is no longer needed. To delete this data, activate
   
   if ( !success ) {
     string details = Pkg::LastError() + "\n" + Pkg::LastErrorDetails();
-    YouErrorPopup( _("Patch processing failed."), details );
+    OnlineUpdateDialogs::ErrorPopup( _("Patch processing failed."), details );
   }
 
   Wizard::EnableBackButton();
@@ -112,7 +111,7 @@ data is no longer needed. To delete this data, activate
     if ( ret == `cancel && !installedPackages ) ret = `abort;
 
     if ( ret == `abort ) {
-        if ( !ConfirmAbortUpdate( `suseconfig ) ) ret = `this;
+        if ( !OnlineUpdateDialogs::ConfirmAbortUpdate( `suseconfig ) ) ret = `this;
     }
 
     if ( !installedPackages &&
