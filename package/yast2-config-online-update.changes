@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Apr 26 17:50:12 MEST 2001 - gs@suse.de
+
+- special icon for CD update
+- delete patches with status .new or .error before download of new path descriptions 
+
+-------------------------------------------------------------------
 Tue Apr 24 11:24:58 MEST 2001 - gs@suse.de
 
 - helptext and popup text (bug 6796) changed 
