@@ -29,7 +29,6 @@ Summary:    	YaST2 online update
 @scrconfdir@/*.scr
 @clientdir@/online*.ycp
 @clientdir@/inst_you.ycp
-@yncludedir@/online_update*.ycp
 @moduledir@/OnlineUpdate*.ycp
 @moduledir@/OnlineUpdate*.ybc
 @moduledir@/AutoOnlineUpdate*.ycp
