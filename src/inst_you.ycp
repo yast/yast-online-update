@@ -10,9 +10,12 @@
     import "Mode";
     import "Internet";
     import "Wizard";
+    import "GetInstArgs";
 
-    if (WFM::Args (2) == true)	// called backwards
-        return `auto;
+    /* Called backwards */
+    if(GetInstArgs::going_back())
+            return `auto;
+
 
     if (!Internet::do_you)	// nothing to do
 	return `auto;
