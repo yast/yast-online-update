@@ -293,9 +293,9 @@ Check network connection.
                       `HBox(`HSpacing(0.8),
                           `Left( `Label( sformat( _("Version: %1"), status_version ) ) )
                       ),
-                      `HBox(`HSpacing(0.8),
-                          `Left( `Label( sformat( _("Base Architecture: %1"), status_basearch ) ) )
-                      ),
+//                      `HBox(`HSpacing(0.8),
+//                          `Left( `Label( sformat( _("Base Architecture: %1"), status_basearch ) ) )
+//                      ),
                       `VSpacing(0.3)
                   )
               )

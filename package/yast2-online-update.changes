@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Wed Sep 29 11:48:16 CEST 2004 - jsrain@suse.cz
+
+- do not show wrong base architecture (#46319)
+
+-------------------------------------------------------------------
 Mon Sep 27 15:59:12 CEST 2004 - jsrain@suse.cz
  
 - don't access the FTP server anonymously if username and password
