@@ -129,7 +129,7 @@ Mode \"recommended\" means you should install the patch.
 <b>X</b>: Patches concerning your installation are preselected.
 They will be downloaded and installed on your system.
 If you don't want a certain patch, double
-click on line to deselect it (or selcect line and use Crtl A).
+click on line to deselect it (or select line and use Crtl A).
 </p>"));
     string help_part3 =  UI(_("<p>
 <b>G</b>: patch is available but not relevant for your installation
@@ -138,7 +138,7 @@ You can download the patch but it will not be installed.
 </p>
 <p>
 <b>_</b>: you have deselected this patch, it will neither
-downloaded nor installed.
+be downloaded nor installed.
 </p>"));
 
     help_text = help_part1 + help_part2 + help_part3;

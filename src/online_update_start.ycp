@@ -165,8 +165,8 @@ fetch the files and install the patches.</p>"));
     string help_part2 =  UI(_("<p>
 <b>Manual Update</b> will display all available patches
 and you can choose which patches should be installed.<br>
-Informations about the last update will be shown
-if you click on button <b>Details</b>.
+Information about the last update will be shown
+if you click on the <b>Details</b> button.
 </p>"));
 
     string help_part3 =  UI(_("<p>

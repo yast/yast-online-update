@@ -74,14 +74,14 @@
     term contents =
 	// main dialog: 
 	`VBox(
-	      `Left(`Label(_("Last update informations"))),
+	      `Left(`Label(_("Last update information"))),
 	      `VWeight( 3,`Table(`id(`info_table),`opt(`hvstretch), 
 				 `header( _("Description"), _("Data") ),
 				 info_input
 				 )
 			),
 	      `VSpacing(0.2),
-	      `Left(`Label(_("Informations about all installed patches"))),
+	      `Left(`Label(_("Information about all installed patches"))),
 	      `VWeight( 4,`Table(`id(`patch_table),`opt(`hvstretch), 
 				 `header( _("YYYY.MM.DD"), _("Patch"), _("Status"), _("Description") ),
 				 patch_input
@@ -95,20 +95,20 @@
 
     // helptext  "main dialog online_update" 
     string help_part1 =  UI(_("<p>
-This dialog shows detailed informations about the
+This dialog shows detailed information about the
 last package update and about all patches
 installed on your system.
 </p>"));
     string help_part2 =  UI(_("<p>
-More detailed informations about a special patch can
-be obtained. Select first the patch in list and then
-click on button <b>Show Patch Info</b>.
+More detailed information about a special patch can
+be obtained. First select the patch from the list and then
+click on the <b>Show Patch Info</b> button.
 </p>"));
 
     help_text = help_part1 + help_part2;
     
      // using SetWizardContents (define in online_update.ycp)
-     UI(`SetWizardContents("Detailed Informations ", contents, help_text, Args(0), Args(1) ));
+     UI(`SetWizardContents("Detailed Information ", contents, help_text, Args(0), Args(1) ));
 
       
    /////////////////////////////////////////////////////////////////////////////////////////

@@ -92,9 +92,9 @@
 YaST2 will download all available patches.
 This could take some time. Several details are shown.</p>"));
   string help_part2 =  UI(_("<p>
-Fields above show informations about the connection and
+The fields above show information about the connection and
 time of data transfer.
-Box below displays data from ftp logfile. If something
+The box below displays data from ftp logfile. If something
 goes wrong, please check this source of information. 
 </p>"));
   string help_part3 =  UI(_("<p>
@@ -218,8 +218,8 @@ The ftp connection will be closed.
 	      string msg_str = sformat(UI(_("Can't get patch \"%1\" from
 server \"%2\".
 You may try to download remaining patches or
-go on with installation of already got ones.
-In manual mode click on Next to procced.")),
+go on with installing of already got ones.
+In manual mode click on Next to proceed.")),
 				       select(patch_list, index), ftp_server );
 	      
 	      any ret = UI(`DisplayMsgFtp( msg_str, _("Notify"), _("&Download"), _("&Install") ));
