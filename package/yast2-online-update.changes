@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Sep  5 11:46:01 CEST 2003 - cschum@suse.de
+
+- Merged proofreading results.
+- 2.8.7
+
+-------------------------------------------------------------------
 Tue Sep  2 14:46:52 CEST 2003 - cschum@suse.de
 
 - Fix warning dialog, which appears when suseservers list can't be
