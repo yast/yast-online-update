@@ -17,7 +17,7 @@ X-SuSE-YaST-SortKey=10
 X-SuSE-YaST-AutoInstResource=
 X-SuSE-YaST-AutoInst=all
 
-Icon=online_update
+Icon=yast-online_update
 Exec=/sbin/yast2 online_update 
 
 Name=Online Update
