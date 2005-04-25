@@ -183,6 +183,7 @@ global define boolean Import (map settings)
     hour = settings["update_time", "hour"]:-1;
     day = settings["update_time", "day"]:-1;
     minute = settings["update_time", "minute"]:-1;
+    timing = (settings["update_time", "timing"]:"" == "weekly")?`weekly:`daily;
     autoget = settings["autoget"]:false;
     skipPre = settings["skipPre"]:false;
     enabled = settings["enable_autoupdate"]:false;
@@ -209,6 +210,7 @@ global define map Export ()
     update_time["minute"] = minute;
     update_time["day"] = day;
     update_time["random_time"] = random_time;
+    update_time["timing"] = (timing == `weekly)? "weekly":"daily";
     settings["update_time"] = update_time;
     settings["autoget"] = autoget;
     settings["skipPre"] = skipPre;

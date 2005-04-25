@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Apr 25 12:17:13 CEST 2005 - nashif@suse.de
+
+- Fixed bug scheduling onlineupdate in autoyast, weekly updates were
+  not possible (#77147)
+
+-------------------------------------------------------------------
 Wed Feb 23 13:31:29 CET 2005 - mir@suse.de
 
 - automatic online update setup (cronjob): "skip patches with
