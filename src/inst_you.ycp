@@ -11,6 +11,7 @@
     import "Internet";
     import "Wizard";
     import "GetInstArgs";
+    import "Popup";
 
     /* Called backwards */
     if(GetInstArgs::going_back())
@@ -55,8 +56,52 @@
 	}
     }
 
+    symbol ret = `auto;
+
+    // do snapshot of YaST and kernel packages
+    list<string> packages = Pkg::GetPackages (`installed, false);
+    list<string> kernel_packages = filter (string p, packages, {
+	return substring (p, 0, 6) == "kernel";
+    });
+    list<string> yast2_packages = filter (string p, packages, {
+	return substring (p, 0, 5) == "yast2";
+    });
+
     // online_update returns integer values, 0 for success, !=0 for failure
     WFM::CallFunction ("online_update");
+
+    // check whether there are changes in the list
+    packages = Pkg::GetPackages (`installed, false);
+    list<string> new_yast2_packages = filter (string p, packages, {
+	return substring (p, 0, 5) == "yast2";
+    });
+    // check removed YaST packages, eventually added don't cause problem
+    // of course it covers updated (one removed, another added)
+    foreach (string p, yast2_packages, {
+	if (! contains (new_yast2_packages, p))
+	    ret = `restart_yast;
+    });
+    list<string> new_kernel_packages = filter (string p, packages, {
+	return substring (p, 0, 6) == "kernel";
+    });
+    // check for added kernels, covers updates
+    foreach (string p, new_kernel_packages, {
+	if (! contains (kernel_packages, p))
+	    ret = `reboot;
+    });
+    // FIXME: In future, use the attribute from metadata
+    if (ret == `reboot)
+    {
+	// message popup
+	Popup::Message (_("The kernel has been updated. The system will
+reboot now and then continue the installation."));
+    }
+    else if (ret == `restart_yast)
+    {
+	// message popup
+	Popup::Message (_("During online update, YaST has been updated.
+YaST will finish and start again now."));
+    }
 
     if (!already_up)
     {
@@ -68,5 +113,5 @@
 	}
     }
 
-    return `auto;
+    return ret;
 }
