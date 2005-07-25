@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Jul 25 17:00:21 CEST 2005 - mir@suse.de
+
+- added libxml2 to neededforbuild
+- 2.12.1
+
+-------------------------------------------------------------------
 Tue Jul 19 18:08:20 CEST 2005 - jsrain@suse.cz
 
 - reboot if kernel was updated during installation, restart YaST
