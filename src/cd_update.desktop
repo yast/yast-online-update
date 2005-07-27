@@ -20,7 +20,7 @@ Icon=yast-cd_update
 Exec=/sbin/yast2 online_update .cd_default
 
 Name=Patch CD Update
-GenericName=Install patches from CD to correct and improve your existing installation.
+GenericName=Install patches from CD to correct and improve your existing installation
 Name[cs]=Aktualizace programu z CD
 GenericName[cs]=Nainstalování novinek z CD k aktualizaci vaší instalace.
 Name[de]=Patch CD-Update
