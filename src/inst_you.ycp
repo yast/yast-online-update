@@ -94,13 +94,14 @@
     {
 	// message popup
 	Popup::Message (_("The kernel has been updated. The system will
-reboot now and then continue the installation."));
+reboot now then continue the installation.
+"));
     }
     else if (ret == `restart_yast)
     {
 	// message popup
-	Popup::Message (_("During online update, YaST has been updated.
-YaST will finish and start again now."));
+	Popup::Message (_("During online update, YaST was updated.
+Finishing and restarting now."));
     }
 
     if (!already_up)
