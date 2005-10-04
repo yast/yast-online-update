@@ -439,7 +439,7 @@ without the need of user interaction.</p>
             url = URL::Build(parsed_url);
           }
 
-          url = editUrl( url );
+          url = editUrl2( url, true );
           if ( size( url ) > 0 ) {
             /* We need to remove user/password from url (#96204)
                instead, save it to auth */

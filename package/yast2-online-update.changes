@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Tue Oct  4 15:11:44 CEST 2005 - mir@suse.de
+
+- bugfix: "Edit Server" failed with an https-URL. This
+  fix needs the getUrl2 and editUrl2 from yast2-packager-2.13.1
+  or later. (Bug #118781) (from 2.9.20)
+- 2.13.1
+
+-------------------------------------------------------------------
 Tue Oct  4 11:17:04 CEST 2005 - mir@suse.de
 
 - changed authentication logic in online_update_start.ycp
