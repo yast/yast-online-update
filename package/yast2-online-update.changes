@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Tue Oct  4 11:17:04 CEST 2005 - mir@suse.de
+
+- changed authentication logic in online_update_start.ycp
+  so that authentication data is not displayed in the url
+  after "edit server" (bug #96204) (from 2.9.19)
+- 2.13.0
+
+-------------------------------------------------------------------
 Mon Sep  5 14:47:24 CEST 2005 - jsrain@suse.cz
 
 - fixed rebooting after kernel update during installation (#115287)

@@ -94,8 +94,12 @@
        return ret_map;
    };
 
+   /* set YOU server and fetch patches
+    * server: server map as returned by YouGetServers
+    * auth: authentication map (fields "username","password","persistent")
+    */
 
-  define string GetPatches() ``{
+   define string GetPatches(map server, map usermap) ``{
 
     UI::OpenDialog( `opt( `decorated ),
       `VBox(
@@ -112,9 +116,12 @@
     string url = server["url"]:"";
     map parsed_url = URL::Parse (url);
     string protocol = parsed_url["scheme"]:"";
-    boolean auth_set = false;
-    map usermap = $[];
-    if (protocol == "ftp" || protocol == "http" || protocol == "smb")
+    boolean auth_set = size(usermap["username"]:"") > 0;
+    if (auth_set) {
+      y2debug("Authentication passed in.");
+      Pkg::YouSetUserPassword(usermap["username"]:"", usermap["password"]:"", false);
+    }
+    if ( (! auth_set) && (protocol == "ftp" || protocol == "http" || protocol == "smb") )
     {
 	string username = parsed_url["user"]:"";
 	string password = parsed_url["pass"]:"";
@@ -179,6 +186,8 @@
   list you_server_list = [ $[ "url": "", "name": _("User-Defined Location") ] ];
 
   string you_url = OnlineUpdate::you_url;
+
+  map auth = $[];  /* keeps authentication data for most recent custom server */
 
   y2milestone( "you_url: %1", you_url );
 
@@ -424,12 +433,25 @@ without the need of user interaction.</p>
       } else if ( ret == `newserver || ret == `editserver ) {
           string url = "";
           if ( ret == `editserver ) {
-            url = (string)UI::QueryWidget( `id(`url), `Value );
+            map parsed_url = URL::Parse( (string)UI::QueryWidget( `id(`url), `Value ) );
+            parsed_url["user"] = auth["username"]:"";
+            parsed_url["pass"] = auth["password"]:"";
+            url = URL::Build(parsed_url);
           }
+
           url = editUrl( url );
           if ( size( url ) > 0 ) {
+            /* We need to remove user/password from url (#96204)
+               instead, save it to auth */
+            map parsed_url = URL::Parse (url);
+            auth["username"] = parsed_url["user"]:"";
+            auth["password"] = parsed_url["pass"]:"";
+            parsed_url["user"]="";
+            parsed_url["pass"]="";
+            url = URL::Build(parsed_url);
             UI::ChangeWidget( `id(`url), `Value, url );
             UI::ChangeWidget( `id(`server), `Value, 0 );
+            auth["url"] = url;
           }
       } else if ( ret == `automatic ) {
           OnlineUpdateDialogs::SetupAutomatic();
@@ -444,8 +466,17 @@ without the need of user interaction.</p>
 	    server[ "type" ] = "custom";
             you_server_list[ 0 ] = server;
           }
+          string err="";
 	  // Pkg::SetServer( server ) is called in GetPatches()
-          string err = GetPatches();
+          if ( server["url"]:"" == auth["url"]:"" ) {
+            y2debug("Using authentication from auth");
+            err = GetPatches(server, auth);
+          }
+          else {
+            /* auth is for a different server, don't use it. */
+            y2debug("Authentication from different server");
+            err = GetPatches(server, $[]);
+          }
 
           if ( size( err ) != 0 ) {
             y2error( "GetPatches err: %1", err );
