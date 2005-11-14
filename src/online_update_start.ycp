@@ -224,7 +224,7 @@ Possible solution:
 Check network connection.
 ");
           result = OnlineUpdateDialogs::IgnoreWarningPopup( text,
-                                          sformat( _("URL: %1"), mirrorListServer ) + "<br>" +
+                                          sformat( _("URL: %1"), mirrorListServer ) + "\n" +
                                           Pkg::LastErrorDetails() );
         } else if ( err == "read" ) {
           result = OnlineUpdateDialogs::IgnorePopup( _("Unable to read server list from disk."),
@@ -234,7 +234,7 @@ Check network connection.
                                    Pkg::LastErrorDetails() );
         } else {
           result = OnlineUpdateDialogs::IgnorePopup( _("Error getting servers."),
-                                   Pkg::LastErrorDetails() );        
+                                   Pkg::LastErrorDetails() );
         }
         if ( result == `abort )
 	{
@@ -253,7 +253,7 @@ Check network connection.
   integer status_lastupdate = lookup( statusmap, "lastupdate", -1 );
 
   string lastupdateLabel = "";
-  
+
   if ( status_lastupdate == -1 ) {
     lastupdateLabel = _("There was no update executed up to now.");
   } else if ( status_lastupdate == 0 ) {
@@ -278,7 +278,7 @@ Check network connection.
   }
 
   boolean manualSelection = true;
-  if ( OnlineUpdate::you_auto || 
+  if ( OnlineUpdate::you_auto ||
        SCR::Read( .sysconfig.onlineupdate.YOU_MANUAL_SELECTION ) == "no") {
     manualSelection = false;
   }
@@ -508,8 +508,8 @@ another SuSE FTP/HTTP server.
 Cannot load patch information.
 ");
                   ret = `this;
-              
-                  UI::ChangeWidget( `id( `reload ), `Value, true );              
+
+                  UI::ChangeWidget( `id( `reload ), `Value, true );
               } else if ( err == "url" ) {
                   msg = _("URL is invalid.");
               } else {
