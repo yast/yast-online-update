@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Nov 14 17:21:12 CET 2005 - ma@suse.de
+
+- Strip '<br>' from YOU error message (#132517)
+- 2.13.2
+
+-------------------------------------------------------------------
 Tue Oct  4 15:11:44 CEST 2005 - mir@suse.de
 
 - bugfix: "Edit Server" failed with an https-URL. This
@@ -82,15 +88,15 @@ Wed Jan 12 15:05:32 CET 2005 - mir@suse.de
 
 - bugfix: checkbox "enable automatic update" remained checked
   even after switching off (#46341)
-- bugfix: weekly setting in automatic update was not obeyed 
+- bugfix: weekly setting in automatic update was not obeyed
   (resulting in daily mode) (no bugzilla entry)
 - 2.11.5
 
 -------------------------------------------------------------------
 Mon Jan 10 19:06:20 CET 2005 - mir@suse.de
 
-- bugfix: aborting the installation displayed a misleading error 
-  message ("no packagage installed" instead of "incomplete") 
+- bugfix: aborting the installation displayed a misleading error
+  message ("no packagage installed" instead of "incomplete")
   (#47869)
 - 2.11.4
 
@@ -126,7 +132,7 @@ Wed Sep 29 11:48:16 CEST 2004 - jsrain@suse.cz
 
 -------------------------------------------------------------------
 Mon Sep 27 15:59:12 CEST 2004 - jsrain@suse.cz
- 
+
 - don't access the FTP server anonymously if username and password
   was given (#43731)
 - 2.10.2
