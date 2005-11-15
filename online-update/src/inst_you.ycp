@@ -1,0 +1,127 @@
+/**
+ * Package:	online-update
+ * Summary:	Call YOU during installation
+ * Authors:	Arvin Schnell <arvin@suse.de>
+ */
+{
+
+    textdomain "online-update";
+
+    import "Mode";
+    import "Internet";
+    import "Wizard";
+    import "GetInstArgs";
+    import "Popup";
+
+    /* Called backwards */
+    if(GetInstArgs::going_back())
+            return `auto;
+
+
+    if (!Internet::do_you)	// nothing to do
+	return `auto;
+
+    boolean already_up = false;
+    if (!Mode::test())
+        already_up = Internet::Status ();
+
+    boolean i_set_demand = false;
+
+    if (!already_up)
+    {
+	Wizard::SetContents (_("YaST2\nInitializing ..."), `Empty (), "", true, true);
+
+	if (!Internet::demand)
+	{
+	    Internet::SetDemand (true);
+	    i_set_demand = true;
+	}
+
+	Internet::Start ("");
+
+	integer i = 150;
+	while (i > 0)
+	{
+	    if (!Internet::Status ())
+		break;
+
+	    if (Internet::Connected ())
+		break;
+
+	    // ping anything (www.suse.com) to trigger dod connections
+	    SCR::Execute (.target.bash_background,
+			  "/bin/ping -c 1 -w 1 213.95.15.200");
+
+	    sleep (1000);
+	}
+    }
+
+    symbol ret = `auto;
+
+    // do snapshot of YaST and kernel packages
+    list<string> packages = Pkg::GetPackages (`installed, false);
+    list<string> kernel_packages = filter (string p, packages, {
+	return substring (p, 0, 6) == "kernel";
+    });
+    list<string> yast2_packages = filter (string p, packages, {
+	return substring (p, 0, 5) == "yast2";
+    });
+    y2milestone ("Kernel packages before YOU: %1", kernel_packages);
+    y2milestone ("YaST packages before YOU: %1", yast2_packages);
+
+    // online_update returns integer values, 0 for success, !=0 for failure
+    WFM::CallFunction ("online_update");
+
+    // reinitialize the target, in order to determine correctly kernel/yast
+    // packages change
+    Pkg::TargetFinish ();
+    Pkg::TargetInit ("/", false);
+    // check whether there are changes in the list
+    packages = Pkg::GetPackages (`installed, false);
+    list<string> new_yast2_packages = filter (string p, packages, {
+	return substring (p, 0, 5) == "yast2";
+    });
+    y2milestone ("YaST packages after YOU: %1", new_yast2_packages);
+    // check removed YaST packages, eventually added don't cause problem
+    // of course it covers updated (one removed, another added)
+    foreach (string p, yast2_packages, {
+	if (! contains (new_yast2_packages, p))
+	    ret = `restart_yast;
+    });
+    list<string> new_kernel_packages = filter (string p, packages, {
+	return substring (p, 0, 6) == "kernel";
+    });
+    y2milestone ("Kernel packages after YOU: %1", kernel_packages);
+    // check for added kernels, covers updates
+    foreach (string p, new_kernel_packages, {
+	if (! contains (kernel_packages, p))
+	    ret = `reboot;
+    });
+    y2milestone ("Checking result: %1", ret);
+    // FIXME: In future, use the attribute from metadata
+    if (ret == `reboot)
+    {
+	// message popup
+	Popup::Message (_("The kernel has been updated. The system will
+reboot now then continue the installation.
+"));
+    }
+    else if (ret == `restart_yast)
+    {
+	// message popup
+	Popup::Message (_("During online update, YaST was updated.
+Finishing and restarting now."));
+    }
+
+    if (!already_up)
+    {
+	Internet::Stop ("");
+
+	if (i_set_demand)
+	{
+	    Internet::SetDemand (false);
+	}
+    }
+
+    return ret;
+}

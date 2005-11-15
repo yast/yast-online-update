@@ -1,0 +1,60 @@
+[Desktop Entry]
+Type=Application
+Categories=Qt;X-SuSE-YaST;X-SuSE-YaST-Software;
+
+X-KDE-ModuleType=Library
+X-KDE-RootOnly=true
+X-KDE-HasReadOnlyMode=true
+X-KDE-Library=yast2
+X-SuSE-YaST-Call=online_update
+
+X-SuSE-YaST-Group=Software
+X-SuSE-YaST-Argument=
+X-SuSE-YaST-RootOnly=true
+X-SuSE-YaST-AutoInst=
+X-SuSE-YaST-Geometry=
+X-SuSE-YaST-SortKey=10
+X-SuSE-YaST-AutoInstResource=
+X-SuSE-YaST-AutoInst=all
+
+Icon=yast-online_update
+Exec=/sbin/yast2 online_update 
+
+Name=Online Update
+GenericName=Get patches to correct and improve your existing installation
+Name[cs]=Aktualizace programu online
+GenericName[cs]=Získat novinky, které zlepší nebo opraví vaši současnou instalaci.
+Name[de]=Online-Update
+GenericName[de]=Patches holen, um die bestehende Installation zu berichtigen oder zu verbessern.
+Name[es]=Actualización en línea
+GenericName[es]=Obtenga los parches para corregir o mejorar la instalación existente
+Name[hu]=Online frissítés
+GenericName[hu]=Frissítőcsomagok letöltése a meglévő rendszer bővítéséhez és javításához
+Name[it]=Aggiornamento in linea
+GenericName[it]=Scarica le patch per correggere e migliorare il Vostro sistema
+Name[ko]=온라인 업데이트
+GenericName[ko]=현재 시스템의 교정과 개선을 위하여 패치를 가져옵니다.
+Name[nl]=Online update
+GenericName[nl]=Gebruik patches om uw bestaande installatie te corrigeren en te verbeteren
+Name[pt]=Atualização Online
+GenericName[pt]=Obter patches para corrigir e melhorar sua instalação existente
+Name[sk]=On-line aktualizácia
+GenericName[sk]=Získať opravy, ktoré zlepšia alebo opravia vašu inštaláciu
+Name[sv]=Online-uppdatering
+GenericName[sv]=Hämta programfixar för att korrigera och förbättra befintligt system
+Name[da]=Online opdatering
+GenericName[da]=Hent rettelser for at rette og forbedre din eksisterende installation
+Name[el]=Online Ενημέρωση
+GenericName[el]=Παραλαβή διορθώσεων για διόρθωση και βελτίωση της υπάρχουσας εγκατάστασης
+Name[fr]=Mise à jour en ligne
+GenericName[fr]=Utilisez les patches pour corriger ou améliorer votre installation
+Name[ja]=オンライン・アップデート
+GenericName[ja]=あなたのシステムを修正するために、パッチをダウンロードして下さい。
+Name[lt]=Atnaujinimas internetu
+GenericName[lt]=Gauti pataisas norint pakoreguoti ir ištaisyti jūsų egzistuojančią sistemą
+Name[ru]=Онлайн-обновление
+Name[sl]=Spletna Posodobitev
+GenericName[sl]=Pridobite popravke za popravilo in izboljšanje vaše obstoječe namestitve.
+Name[tr]=Çevrimiçi güncelleme
+GenericName[tr]=Mevcut kurulumu düzeltmek ve güncellemek için çevrimiçi yama edinme
+X-KDE-SubstituteUID=true
