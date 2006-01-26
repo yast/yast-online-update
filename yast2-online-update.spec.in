@@ -1,7 +1,7 @@
 @HEADER-COMMENT@
-# neededforbuild yast2-devel-packages gpp libgpp libxcrypt libxcrypt-devel yast2-installation yast2-storage yast2-country yast2-bootloader yast2-packager libxml2
 
 @HEADER@
+BuildRequires:	gcc-c++ libxcrypt-devel yast2-devel-packages yast2-packager yast2-bootloader
 Requires:	yast2
 
 Provides:	y2c_online_update yast2-config-online-update
