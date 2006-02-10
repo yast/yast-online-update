@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Feb 10 11:26:19 CET 2006 - jsuchome@suse.cz
+
+- online_update.ycp is just a wrapper for calling web-updater
+- 2.13.3
+
+-------------------------------------------------------------------
 Mon Nov 14 17:21:12 CET 2005 - ma@suse.de
 
 - Strip '<br>' from YOU error message (#132517)
