@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Feb 13 14:15:38 CET 2006 - ug@suse.de
+
+- fix #140081 (disable of online update not possible with UI)
+- initialize random number generator
+
+-------------------------------------------------------------------
 Fri Feb 10 11:26:19 CET 2006 - jsuchome@suse.cz
 
 - online_update.ycp is just a wrapper for calling web-updater
