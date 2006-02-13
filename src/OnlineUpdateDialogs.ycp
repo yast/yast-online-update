@@ -237,6 +237,7 @@ the update takes place.");
 		}
 		else
 		{
+                    AutoOnlineUpdate::enabled = false;
 		    SCR::Execute( .target.remove, AutoOnlineUpdate::cronfile );
 		}
 	    }
