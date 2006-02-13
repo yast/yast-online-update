@@ -2,7 +2,7 @@
 
 @HEADER@
 BuildRequires:	gcc-c++ libxcrypt-devel yast2-devel-packages yast2-packager yast2-bootloader
-Requires:	yast2
+Requires:	yast2 web-updater rug
 
 Provides:	y2c_online_update yast2-config-online-update
 Obsoletes:	y2c_online_update yast2-config-online-update
@@ -25,6 +25,7 @@ Summary:    	YaST2 online update
 %files
 %defattr(-,root,root)
 @desktopdir@/online_update.desktop
+@desktopdir@/online_update_setup.desktop
 @desktopdir@/cd_update.desktop
 @scrconfdir@/*.scr
 @clientdir@/online*.ycp

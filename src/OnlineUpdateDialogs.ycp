@@ -16,8 +16,10 @@
 
     global define symbol SetupAutomatic()
     {
-	string heading = _("YOU Automatic Mode Setup");
+	// dialog header
+	string heading = _("Automatic Online Update Setup");
 
+	// help text
 	string txt = _("Automatic update is executed by a daily cronjob. 
 A network connection must be available when
 the update takes place.");
@@ -39,7 +41,7 @@ the update takes place.");
         boolean skipPre = AutoOnlineUpdate::skipPre;
 	integer minute = AutoOnlineUpdate::minute;
 	integer hour = AutoOnlineUpdate::hour;
-    integer day = AutoOnlineUpdate::day;
+	integer day = AutoOnlineUpdate::day;
 
 	symbol timing = AutoOnlineUpdate::timing;
         boolean random_time = AutoOnlineUpdate::random_time;
@@ -66,100 +68,97 @@ the update takes place.");
             random_dialog = `Empty();
         }
 
-	term content =
-	    `VBox(
-		  `HBox(
-			`HSpacing( 0.8 ),
-			`Left(
-			      `CheckBox( `id( `enable ), `opt( `notify ), _("Enable Automatic Update"), enabled )
-			      )
+	term content = `VBox(
+	    `HBox(
+		`HSpacing( 0.8 ),
+		`Left(
+		     `CheckBox( `id( `enable ), `opt( `notify ),
+			// checkbox label
+			_("Enable Automatic Update"), enabled )
+		)
+	    ),
+	    `VSpacing( 0.2 ),
+	    `HBox(
+		`HSpacing( 0.8 ),
+		`Left(
+		    `Frame( `id( `settings ), "", `VBox(
+			`HBox(
+			    `HSpacing( 0.8 ),
+			    `Left(`Label( `id( `crontime ),
+				// label text
+				_("Time when update is performed:") )
+			    ),
+			    `HSpacing( 0.8 )
 			),
-		  `VSpacing( 0.2 ),
-		  `HBox(
-			`HSpacing( 0.8 ),
-			`Left(
-			      `Frame( `id( `settings ), "",
-				      `VBox(
-					    `HBox(
-						  `HSpacing( 0.8 ),
-						  `Left(
-							`Label( `id( `crontime ), _("Time when update is performed:") )
-							),
-						  `HSpacing( 0.8 )
-						  ),
-					    `HBox(
-						  `HStretch(),
-						  `IntField( `id( `hour ), _("Hour"), 0, 23, hour ),
-						  `IntField( `id( `minute ), _("Minute"), 0, 59, minute ),
-						  `ComboBox(`id(`day),
-							    _("Day:"),
-                                                            days_as_items
-							    ),
-						  `HStretch()
-						  ),
-                                                  random_dialog,
-					    `VSpacing( 0.2 ),
-					    `RadioButtonGroup(`id(`timing),
-							      `VBox(
-								    `HBox(
-									  `HSpacing( 0.8 ),
-									  `Left(
-										`RadioButton(`id(`daily),
-											     `opt(`notify), _("Daily"),
-											     timing == `daily)
-										),
-									  `HSpacing( 0.8 )
-									  ),
-								    `HBox(
-									  `HSpacing( 0.8 ),
-									  `Left(
-										`RadioButton(`id(`weekly),
-											     `opt(`notify),
-											     _("Weekly"),
-											     timing == `weekly)
-										),
-									  `HSpacing( 0.8 )
-									  )
-								    )
-							      ),
-					    `VSpacing( 0.2 ),
-                                            `VBox(`HBox(`HSpacing( 0.8 ),
-						        `Left(`CheckBox( `id( `autoget ), _("Only Download Patches"), autoget )),
-        						`HSpacing( 0.8 )),
-                                                  `HBox(`HSpacing( 0.8 ),
-                                                        `Left(`CheckBox( `id( `skipPre), _("Skip Patches with Preinstall Information"), skipPre)),
-						        `HSpacing( 0.8 ))
-						  ),
-					    `VSpacing( 0.5 )
-					    )
-				      )
-			      ),
-			`HSpacing( 0.8 )
+			`HBox(
+			    `HStretch(),
+			    // IntField label
+			    `IntField( `id( `hour ), _("Hour"), 0, 23, hour ),
+			    // IntField label
+			    `IntField(`id(`minute),_("Minute"), 0, 59, minute ),
+			    // combobox label
+			    `ComboBox(`id(`day), _("Day:"), days_as_items),
+			    `HStretch()
 			),
-
-		  `VSpacing( 0.2 )
-		  );
+                        random_dialog,
+			`VSpacing( 0.2 ),
+			`RadioButtonGroup(`id(`timing), `VBox(
+			    `HBox(
+				`HSpacing( 0.8 ),
+				`Left(`RadioButton(`id(`daily), `opt(`notify),
+				    // radibutton label
+				    _("Daily"), timing == `daily)
+				),
+				`HSpacing( 0.8 )
+			    ),
+			    `HBox(
+				`HSpacing( 0.8 ),
+				`Left(`RadioButton(`id(`weekly),`opt(`notify),
+				    // radibutton label
+				    _("Weekly"), timing == `weekly)
+				),
+				`HSpacing( 0.8 )
+			    )
+			)),
+			`VSpacing( 0.2 ),
+                        `VBox(
+			    `HBox(
+				`HSpacing( 0.8 ),
+				`Left(`CheckBox( `id( `autoget ),
+				    // checkbox label
+				    _("Only Download Patches"), autoget )
+				),
+				`HSpacing( 0.8 )
+			    ),
+                            `HBox(
+				`HSpacing( 0.8 ),
+				`Left (`CheckBox( `id( `skipPre),
+				    // checkbox label
+				  _("Skip Patches with Preinstall Information"),
+				    skipPre)
+				),
+				`HSpacing( 0.8 )
+			    )
+			),
+			`VSpacing( 0.5 )
+		    ))
+		),
+		`HSpacing( 0.8 )
+	    ),
+	    `VSpacing( 0.2 )
+	);
 
 	term buttons =  `HBox(
 			      `PushButton( `id( `next ), Label::OKButton() ),
 			      `PushButton( `id( `abort ), Label::CancelButton() )
 			      );
 
-	if (Mode::config())
-	{
-	    term dlg_contents = `Top( content);
-	    Wizard::CreateDialog();
-	    Wizard::SetDesktopIcon("online_update");
-	    Wizard::SetContentsButtons(heading, dlg_contents, txt,
-				       Label::BackButton(), Label::FinishButton());
+	term dlg_contents = `HVCenter( content);
+	Wizard::CreateDialog();
+	Wizard::SetDesktopIcon("online_update");
+	Wizard::SetContentsButtons(heading, dlg_contents, txt,
+	    Label::BackButton(), Label::FinishButton());
 
-	}
-	else
-	{
-
-	    term all = `VBox(head, content, buttons);
-	    UI::OpenDialog( `opt( `decorated ), all);
-	}
 
 	UI::ChangeWidget( `id( `autoget ), `Enabled, enabled );
         UI::ChangeWidget( `id( `skipPre ), `Enabled, enabled );
@@ -190,16 +189,18 @@ the update takes place.");
 		UI::ChangeWidget( `id( `minute ), `Enabled, enabled &&
                         !AutoOnlineUpdate::random_time);
 		UI::ChangeWidget( `id( `day ), `Enabled, enabled && enable_days);
-        UI::ChangeWidget( `id( `day ), `Value, day );
+		if (day != -1)
+		    UI::ChangeWidget( `id( `day ), `Value, day );
                 if (UI::WidgetExists(`id(`random)))
 		    UI::ChangeWidget( `id( `random ), `Enabled, enabled );
 	    }
 
 	    ret = (symbol)UI::UserInput();
 
-            boolean enable_random = (boolean)UI::QueryWidget( `id( `random ), `Value );
 	    if (ret == `random)
             {
+		boolean enable_random =
+		    (boolean)UI::QueryWidget( `id( `random ), `Value );
                 UI::ChangeWidget( `id( `hour ), `Enabled, !enable_random );
                 UI::ChangeWidget( `id( `minute ), `Enabled, !enable_random );
             }
@@ -581,6 +582,6 @@ some of them might not work as expected.");
 
 	if ( ret ==  `ok ) return true;
 	else return false;
-    }    
+    }
 
 }

@@ -1,0 +1,12 @@
+/**
+ * Package:	Online update
+ * Summary:	Open a dialog for configuarion of automatic update
+ * Authors:	Jiri Suchomel <jsuchome@suse.cz>
+ *
+ * $Id$
+ */
+{
+  import "OnlineUpdateDialogs";
+
+  OnlineUpdateDialogs::SetupAutomatic();
+}
