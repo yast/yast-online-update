@@ -142,6 +142,7 @@ global define boolean Read()
     else
     {
         enabled = false;
+        srandom();
         if ( hour == -1 ) hour = random( 24 );
         if ( minute == -1 ) minute = random( 60 );
     }
@@ -191,6 +192,7 @@ global define boolean Import (map settings)
 
     if (random_time && Mode::autoinst())
     {
+        srandom();
         hour = random( 24 );
         minute = random( 60 );
     }
