@@ -1,8 +1,8 @@
 @HEADER-COMMENT@
 
 @HEADER@
-BuildRequires:	gcc-c++ libxcrypt-devel yast2-devel-packages yast2-packager yast2-bootloader
-Requires:	yast2 web-updater rug
+BuildRequires:	gcc-c++ libxcrypt-devel perl-XML-Writer update-desktop-files pkg-config yast2-devtools autoyast2 
+Requires:	yast2 web-updater rug autoyast2
 
 Provides:	y2c_online_update yast2-config-online-update
 Obsoletes:	y2c_online_update yast2-config-online-update
@@ -32,6 +32,4 @@ Summary:    	YaST2 online update
 @clientdir@/inst_you.ycp
 @moduledir@/OnlineUpdate*.ycp
 @moduledir@/OnlineUpdate*.ybc
-@moduledir@/AutoOnlineUpdate*.ycp
-@moduledir@/AutoOnlineUpdate*.ybc
 %doc @docdir@

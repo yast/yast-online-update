@@ -10,9 +10,6 @@
 module "OnlineUpdate";
 textdomain "online-update";
 
-import "Installation";
-import "Mode";
-
 /**
  * flag: do we do an update from CD?
  */
