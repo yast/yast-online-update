@@ -12,6 +12,7 @@
     import "Wizard";
     import "GetInstArgs";
     import "Popup";
+    import "PackageCallbacksInit";
 
     /* Called backwards */
     if(GetInstArgs::going_back())
@@ -20,6 +21,7 @@
 
     if (!Internet::do_you)	// nothing to do
 	return `auto;
+
 
     boolean already_up = false;
     if (!Mode::test())
@@ -69,13 +71,26 @@
     y2milestone ("Kernel packages before YOU: %1", kernel_packages);
     y2milestone ("YaST packages before YOU: %1", yast2_packages);
 
-    // online_update returns integer values, 0 for success, !=0 for failure
-    WFM::CallFunction ("online_update");
 
-    // reinitialize the target, in order to determine correctly kernel/yast
-    // packages change
-    Pkg::TargetFinish ();
+    // reinitalize ZYpp
+    Pkg::SourceFinishAll();
+    Pkg::TargetFinish();
+
+    // initalize package callbacks
+    PackageCallbacksInit::InitPackageCallbacks();
+
+    Pkg::SourceStartManager(true);
     Pkg::TargetInit ("/", false);
+
+    // select all available patches for installation
+    Pkg::ResolvableInstall("", `patch);
+
+    y2milestone("All available patches: %1", Pkg::ResolvableProperties("", `patch, ""));
+
+    // install the patches
+    Pkg::PkgCommit(0);
+
+
     // check whether there are changes in the list
     packages = Pkg::GetPackages (`installed, false);
     list<string> new_yast2_packages = filter (string p, packages, {

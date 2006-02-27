@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Feb 27 18:00:57 CET 2006 - lslezak@suse.cz
+
+- install all available patches
+- 2.13.6
+
+-------------------------------------------------------------------
 Fri Feb 17 10:39:30 CET 2006 - jsuchome@suse.cz
 
 - files used by autoyast moved to autoyast module (#151213)
