@@ -2,7 +2,7 @@
 
 @HEADER@
 BuildRequires:	gcc-c++ libxcrypt-devel perl-XML-Writer update-desktop-files pkg-config yast2-devtools autoyast2 
-Requires:	yast2 web-updater rug autoyast2
+Requires:	yast2 rug autoyast2
 
 Provides:	y2c_online_update yast2-config-online-update
 Obsoletes:	y2c_online_update yast2-config-online-update

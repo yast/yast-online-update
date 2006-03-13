@@ -1,22 +1,197 @@
 /**
- * Summary:	Wrapper for web-updater call
- * Author:	Jiri Suchomel <jsuchome@suse.cz>
+ * Summary:	Main file
+ * Authors:	Gabriele Strattner <gs@suse.de>
+ *		Stefan Schubert <schubi@suse.de>
+ *              Cornelius Schumacher <cschum@suse.de>
  */
 
 {
 
   textdomain "online-update";
 
-  map display_info    = UI::GetDisplayInfo ();
+  import "Directory";
+  import "Label";
+  import "Mode";
+  import "OnlineUpdate";
+  import "OnlineUpdateCallbacks";
+  import "Version";
+  import "Wizard";
+  import "GetInstArgs";
 
-  import "Popup";
+  string version = Version::yast2;
 
-  if (display_info["TextMode"]:false)
-  {
-	// popup message; 'rug' is name of command-line tool
-	Popup::Message (_("To install patches for your system in text mode, use the rug command."));
-	return;
+  // dummy message, which will be used in the future, but have to be
+  // translated into other languages.
+  string d1 = _("Dialing....");
+  string d2 = _("Hang up....");
+  string d3 = _("Could not dial to the Internet. Check your settings.");
+  string d4 = _("Could not dial to the Internet. Connect manually.");
+  string d5 = _("Error occured while closing the connection to the Internet.");
+
+  string d8 = _("Do not show this message again.");
+  string d7 = _("Skip");
+  string d11 = _("Continue");
+  string d9 = _("Install");
+  string d10 = sformat(_("The package \"%1\" is not a SuSE package.
+Install anyway?
+"), d9 );
+  string d12 = _("There is no connection to the Internet. Trying to connect.");
+
+  string gpg_warning = _("Cannot check the packages because no GPG configuration
+or key has been found. SuSE cannot guarantee that the
+packages were created by SuSE.
+");
+
+
+  //
+  // Mode::test will be set, if menu is called with arg .test ( y2base menu '(.test)' qt )
+  // or online_update is called directly ( /sbin/yast2 online_update '(.test)' )
+  // test mode means: get the patches, but do not install (inst_rpmcopy runs with test mode)
+
+  integer arg_n = 0;
+  integer arg_max = size( WFM::Args() );
+
+  while (arg_n < arg_max ) {
+      any arg = WFM::Args( arg_n );
+
+      if ( arg == .test || arg == ".test" )
+      {
+	  Mode::SetTest ("test");
+      }
+      else if ( arg == .cd_default || arg == ".cd_default" )
+      {
+//	  Mode::youInstallMap["you_server"]	= "CD";		// text for output field
+//	  Mode::youInstallMap["you_serverkind"] = "cd";
+	  OnlineUpdate::cd_update	=  true;
+      }
+      else if ( arg == .auto.get || arg == ".auto.get" )
+      {
+	  OnlineUpdate::you_auto_get	= true;
+	  OnlineUpdate::you_auto	= true;
+      }
+      else if ( arg == .auto.install || arg == ".auto.install" )
+      {
+	  OnlineUpdate::you_auto_install = true;
+	  OnlineUpdate::you_auto	 = true;
+      }
+      else if ( arg == .nosigcheck || arg == ".nosigcheck" )
+      {
+	  OnlineUpdate::signature_check = false;
+      }
+      else if ( arg == .url || arg == ".url" )
+      {
+          if ( arg_n + 1 < arg_max ) {
+              OnlineUpdate::you_url = (string)WFM::Args( arg_n + 1 );
+          }
+          arg_n = arg_n + 1;
+      }
+      else
+      {
+	  // batch kind like security,.....
+	  OnlineUpdate::you_auto_batchkind = sformat("%1", WFM::Args(arg_n) );
+	  y2milestone( "Getting patches for kind %1 only",  WFM::Args(arg_n) );
+      }
+
+      arg_n = arg_n + 1;
   }
-  SCR::Execute (.target.bash, "/usr/sbin/web-updater-starter");
-  return;
+
+  // FIXME - use rug for this...
+  if ( OnlineUpdate::you_auto ) {
+    string command = "online_update";
+    if ( size( OnlineUpdate::you_url ) != 0 ) {
+      command = command + " -u " + OnlineUpdate::you_url;
+    }
+    if ( !OnlineUpdate::signature_check ) {
+      command = command + " -n";
+    }
+    if ( OnlineUpdate::you_auto_get ) {
+      command = command + " -g";
+    }
+    if ( OnlineUpdate::you_auto_install ) {
+      command = command + " -i";
+    }
+    command = command + " " + OnlineUpdate::you_auto_batchkind;
+
+    y2debug( "COMMAND: %1", command );
+
+    integer result = (integer)SCR::Execute( .target.bash, command );
+
+    return result;
+  }
+
+  y2debug("ONLINE: Testmode %1", Mode::test() );
+
+  Wizard::CreateDialog();
+  Wizard::SetDesktopIcon("online_update");
+
+  /*
+   * Main dialog cycle
+   *
+   */
+
+  list dialog = [
+//    [ "online_update_start", [ false, true ], `always ], TODO do we need any "configuration" here, when the sources were already configured?
+    [ "online_update_select", [ false, true ], `manual ],
+    [ "online_update_install", [ false, true ], `always ],
+    [ "inst_suseconfig", [GetInstArgs::Buttons(false,false) ], `always ]
+  ];
+
+  integer id = 0;
+  any result = `next;
+
+  while ( ( id >= 0 ) && ( id < size( dialog ) ) ) {
+
+      list page = dialog[ id ]:[];
+
+      string module_name = page[ 0 ]:"";
+      list module_args = page[ 1 ]:[];
+      symbol module_mode = page[ 2 ]:`none;
+
+      y2debug( "ONLINE: Module: %1 Args: %2 Mode: %3", module_name,
+               module_args, module_mode );
+
+      if ( id == size( dialog ) - 1 ) {
+          Wizard::SetNextButton(`next, Label::FinishButton() );
+      }
+
+      if ( !OnlineUpdate::you_auto )
+      {
+	  result = WFM::CallFunction( module_name, module_args );
+      }
+      else if ( module_mode == `always )
+      {
+	  result = WFM::CallFunction( module_name, module_args );
+      }
+      
+      if ( result == `nil ) return 1;
+
+      if (result == `again )
+	  continue;
+      else if (result == `cancel || result == `abort)
+	  break;
+      else if (result == `next || result == `auto )	// SuSEConfig returns `auto
+	  id = id + 1;
+      else if (result == `back)
+	  id = id - 1;
+      else if ( result == `finish )
+          if ( !Mode::installation() && !Mode::update() )
+	  { 
+	      id = size(dialog)-1;		// call last module
+          }
+	  else
+	  {
+              result = `next;
+              break;
+          }
+
+  }
+
+  UI::CloseDialog();
+
+//this is a no-op
+//
+// this file returns integer values, 0 for success, !=0 for failure
+//  if ( result == `abort ) result = `auto; 
+
+  return 0;
 }
