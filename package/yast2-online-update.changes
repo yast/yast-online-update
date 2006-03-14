@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Mar 14 10:19:26 CET 2006 - jsuchome@suse.cz
+
+- use PkgCommit to install patches 
+- 2.13.8
+
+-------------------------------------------------------------------
 Mon Mar 13 17:18:29 CET 2006 - jsuchome@suse.cz
 
 - back to PackageSelector
