@@ -80,9 +80,9 @@ data is no longer needed. To delete this data, activate
   Wizard::DisableBackButton();
   Wizard::DisableNextButton();
 
-  boolean success = Pkg::YouProcessPatches();
-  
-  if ( !success ) {
+  list commit = Pkg::PkgCommit (0);
+
+  if ( commit[1]:[] != [] ) {
     string details = Pkg::LastError() + "\n" + Pkg::LastErrorDetails();
     OnlineUpdateDialogs::ErrorPopup( _("Patch processing failed."), details );
   }
@@ -91,10 +91,7 @@ data is no longer needed. To delete this data, activate
   Wizard::EnableNextButton();
   Wizard::SetFocusToNextButton();
 
-  map status = Pkg::YouStatus();
-  integer installedPatches = status[ "installedpatches" ]:0;
-  
-  boolean installedPackages = installedPatches != 0;
+  boolean installedPackages = commit[0]:0 != 0;
 
   if ( !installedPackages ) {
     Wizard::DisableAbortButton();
