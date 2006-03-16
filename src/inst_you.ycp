@@ -25,7 +25,7 @@
     // I have a feeling that we may need a lot of hacks here
     // to make things work
     boolean Hack (string what) {
-	boolean hack = (SCR::Read (.target.size, "/tmp/hack-" + class) != -1);
+	boolean hack = (SCR::Read (.target.size, "/tmp/hack-" + what) != -1);
 	if (hack)
 	    y2milestone ("HACK: %1", what);
 	return hack;
@@ -101,10 +101,12 @@
 
     y2milestone("All available patches: %1", Pkg::ResolvableProperties("", `patch, ""));
 
-    boolean ok = Pkg::PkgSolve ();
+    boolean ok = Pkg::PkgSolve (false);
     if (!ok || Hack ("ui"))
     {
-	// FIXME call UI if there are problems
+	UI::OpenDialog(`opt(`defaultsize), `PackageSelector(`id(`selector), `opt(`youMode)) );
+	symbol ret = (symbol)UI::RunPkgSelection(`id(`selector) );
+	UI::CloseDialog();
     }
 
     // install the patches
