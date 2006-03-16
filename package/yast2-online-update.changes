@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Mar 16 18:04:13 CET 2006 - mvidner@suse.cz
+
+- inst_you: use Pkg::PkgEstablish and Pkg::ResolvablePreselectPatches
+
+-------------------------------------------------------------------
 Tue Mar 14 10:19:26 CET 2006 - jsuchome@suse.cz
 
 - use PkgCommit to install patches 

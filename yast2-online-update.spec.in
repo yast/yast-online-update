@@ -3,6 +3,8 @@
 @HEADER@
 BuildRequires:	gcc-c++ libxcrypt-devel perl-XML-Writer update-desktop-files pkg-config yast2-devtools autoyast2 
 Requires:	yast2 autoyast2
+# Pkg::ResolvablePreselectPatches
+Requires:	yast2-pkg-bindings >= 2.13.29
 
 Provides:	y2c_online_update yast2-config-online-update
 Obsoletes:	y2c_online_update yast2-config-online-update

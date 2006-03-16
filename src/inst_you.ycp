@@ -22,6 +22,14 @@
     if (!Internet::do_you)	// nothing to do
 	return `auto;
 
+    // I have a feeling that we may need a lot of hacks here
+    // to make things work
+    boolean Hack (string what) {
+	boolean hack = (SCR::Read (.target.size, "/tmp/hack-" + class) != -1);
+	if (hack)
+	    y2milestone ("HACK: %1", what);
+	return hack;
+    }
 
     boolean already_up = false;
     if (!Mode::test())
@@ -72,20 +80,32 @@
     y2milestone ("YaST packages before YOU: %1", yast2_packages);
 
 
-    // reinitalize ZYpp
-    Pkg::SourceFinishAll();
-    Pkg::TargetFinish();
+    if (Hack ("reinit")) {
+	// reinitalize ZYpp
+	Pkg::SourceFinishAll();
+	Pkg::TargetFinish();
+    }
 
     // initalize package callbacks
     PackageCallbacksInit::InitPackageCallbacks();
 
-    Pkg::SourceStartManager(true);
-    Pkg::TargetInit ("/", false);
+    if (Hack ("reinit")) {
+	Pkg::SourceStartManager(true);
+	Pkg::TargetInit ("/", false);
+    }
 
-    // select all available patches for installation
-    Pkg::ResolvableInstall("", `patch);
+    // compute ResStatus::EstablishField
+    Pkg::PkgEstablish ();
+    // select all Needed patches for installation
+    Pkg::ResolvablePreselectPatches ();
 
     y2milestone("All available patches: %1", Pkg::ResolvableProperties("", `patch, ""));
+
+    boolean ok = Pkg::PkgSolve ();
+    if (!ok || Hack ("ui"))
+    {
+	// FIXME call UI if there are problems
+    }
 
     // install the patches
     Pkg::PkgCommit(0);
