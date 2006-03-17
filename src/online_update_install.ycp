@@ -80,6 +80,7 @@ data is no longer needed. To delete this data, activate
   Wizard::DisableBackButton();
   Wizard::DisableNextButton();
 
+  Pkg::PkgSolve (true);
   list commit = Pkg::PkgCommit (0);
 
   if ( commit[1]:[] != [] ) {
