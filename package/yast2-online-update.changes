@@ -1,7 +1,14 @@
 -------------------------------------------------------------------
+Mon Mar 20 16:33:27 CET 2006 - mvidner@suse.cz
+
+- online_update_install: PkgSolve before PkgCommit (jsuchome)
+- 2.13.9
+
+-------------------------------------------------------------------
 Thu Mar 16 18:04:13 CET 2006 - mvidner@suse.cz
 
-- inst_you: use Pkg::PkgEstablish and Pkg::ResolvablePreselectPatches
+- inst_you: use Pkg::PkgEstablish and Pkg::ResolvablePreselectPatches, 
+  call UI when solving fails
 
 -------------------------------------------------------------------
 Tue Mar 14 10:19:26 CET 2006 - jsuchome@suse.cz
