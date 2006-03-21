@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Mar 21 12:41:36 CET 2006 - mvidner@suse.cz
+
+- Moved online update code back from autoyast2 to
+  yast2-online-update (#151213).
+- 2.13.11
+
+-------------------------------------------------------------------
 Tue Mar 21 08:46:48 CET 2006 - jsuchome@suse.cz
 
 - desktop files moved to yast2-online-update-frontend package
