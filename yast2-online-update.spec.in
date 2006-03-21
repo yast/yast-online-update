@@ -3,13 +3,12 @@
 @HEADER@
 BuildRequires:	gcc-c++ libxcrypt-devel perl-XML-Writer update-desktop-files pkg-config yast2-devtools autoyast2 
 Requires:	yast2 autoyast2
-# Pkg::ResolvablePreselectPatches
-Requires:	yast2-pkg-bindings >= 2.13.29
 
 Provides:	y2c_online_update yast2-config-online-update
 Obsoletes:	y2c_online_update yast2-config-online-update
 Provides:	yast2-trans-online-update y2t_online_update
 Obsoletes:	yast2-trans-online-update y2t_online_update
+BuildArchitectures:     noarch
 
 Summary:    	YaST2 online update
 
@@ -26,12 +25,23 @@ Summary:    	YaST2 online update
 
 %files
 %defattr(-,root,root)
-@desktopdir@/online_update.desktop
 @desktopdir@/online_update_setup.desktop
-@desktopdir@/cd_update.desktop
 @scrconfdir@/*.scr
 @clientdir@/online*.ycp
 @clientdir@/inst_you.ycp
 @moduledir@/OnlineUpdate*.ycp
 @moduledir@/OnlineUpdate*.ybc
 %doc @docdir@
+
+%package frontend
+Summary:	Desktop files for YaST2 online update
+Requires:	yast2-online-update
+Group:          System/YaST
+
+%description frontend
+-
+
+%files frontend
+%defattr(-,root,root)
+@desktopdir@/online_update.desktop
+@desktopdir@/cd_update.desktop

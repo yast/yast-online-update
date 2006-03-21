@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Mar 21 08:46:48 CET 2006 - jsuchome@suse.cz
+
+- desktop files moved to yast2-online-update-frontend package
+- 2.13.10 
+
+-------------------------------------------------------------------
 Mon Mar 20 16:33:27 CET 2006 - mvidner@suse.cz
 
 - online_update_install: PkgSolve before PkgCommit (jsuchome)
