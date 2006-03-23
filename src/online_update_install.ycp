@@ -83,6 +83,10 @@ data is no longer needed. To delete this data, activate
   Pkg::PkgSolve (true);
   list commit = Pkg::PkgCommit (0);
 
+  import "OnlineUpdateCallbacks";
+
+  OnlineUpdateCallbacks::LogCallback( _("Installation finished.\n") );
+
   if ( commit[1]:[] != [] ) {
     string details = Pkg::LastError() + "\n" + Pkg::LastErrorDetails();
     OnlineUpdateDialogs::ErrorPopup( _("Patch processing failed."), details );

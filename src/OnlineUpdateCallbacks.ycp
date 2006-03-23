@@ -11,6 +11,7 @@
     textdomain "online-update";
 
     import "OnlineUpdateDialogs";
+    import "PackageCallbacks";
     import "Popup";
 
     /**
@@ -36,9 +37,9 @@
     /**
       Callback for YOU patch progress widget.
     */
-    global define boolean PatchProgressCallback( integer num, string pkg )
+    global define boolean PatchProgressCallback( integer num /*, string pkg */ )
     ``{
-//        y2milestone("PatchProgressCallback %1", num);
+        y2milestone("PatchProgressCallback %1", num);
 
         if ( UI::WidgetExists( `id( `progress ) ) ) {
           UI::ChangeWidget( `id( `patchprogress ), `Value, num );
@@ -134,16 +135,56 @@
         return true;
     }
 
+ 
+    /**
+      Callback for starting download of a package.
+     */
+    global boolean StartProvide(string name, integer archivesize, boolean remote)
+    {
+	LogCallback( sformat( _("Retrieving %1..."), name ) );
+	return true;
+    }
+
+     /**
+      Callback for starting installation of a package.
+     */
+    global boolean StartPackage(string name, string summary, integer
+                                        installsize, boolean is_delete)
+    {
+	LogCallback( sformat( _("Installing %1: \"%2\" "), name, summary ) );
+	return true;
+    }
+
+   
+     /**
+      Callback for finishing an action in the log
+     */
+    global boolean FinishLine()
+    {
+	LogCallback( _("OK") + "\n" );
+	return true;
+    }
+
+
     /**
       Constructor
     */
-    global define void OnlineUpdateCallbacks()
+    global define void RegisterOnlineUpdateCallbacks()
     ``{
-//	y2milestone ( "OnlineUpdateCallbacks constructor" );
+	y2milestone ( "OnlineUpdateCallbacks constructor" );
 
 	Pkg::CallbackYouProgress ("OnlineUpdateCallbacks::ProgressCallback");
 	Pkg::CallbackYouPatchProgress ("OnlineUpdateCallbacks::PatchProgressCallback");
 	Pkg::CallbackYouError ("OnlineUpdateCallbacks::ErrorCallback");
+
+	Pkg::CallbackStartProvide( "OnlineUpdateCallbacks::StartProvide" );
+	Pkg::CallbackProgressProvide( "OnlineUpdateCallbacks::PatchProgressCallback" );
+	Pkg::CallbackDoneProvide( "OnlineUpdateCallbacks::FinishLine" );
+
+	Pkg::CallbackStartPackage( "OnlineUpdateCallbacks::StartPackage" );
+	Pkg::CallbackProgressPackage ("OnlineUpdateCallbacks::PatchProgressCallback");
+	Pkg::CallbackDonePackage( "OnlineUpdateCallbacks::FinishLine" );
+
 	Pkg::CallbackYouMessage ("OnlineUpdateCallbacks::MessageCallback");
 	Pkg::CallbackYouLog ("OnlineUpdateCallbacks::LogCallback");
 	Pkg::CallbackYouExecuteYcpScript ("OnlineUpdateCallbacks::ExecuteYcpScriptCallback");

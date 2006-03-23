@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Mar 23 16:39:33 CET 2006 - visnov@suse.cz
+
+- First support for patch callbacks
+
+-------------------------------------------------------------------
 Tue Mar 21 12:41:36 CET 2006 - mvidner@suse.cz
 
 - Moved online update code back from autoyast2 to
