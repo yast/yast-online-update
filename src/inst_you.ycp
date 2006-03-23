@@ -31,6 +31,38 @@
 	return hack;
     }
 
+    /**
+     * parse-metadata, the helper called by rug that actually adds the source,
+     * runs asynchronously. So we wait for it to tell us "go" by creating
+     * a file.
+     */
+    void WaitForSources () {
+	// The name must be same in:
+	// inst_you.ycp
+	// inst_suse_register.ycp
+	// svn/zypp/trunk/backend/src/parse-metadata.cc
+	string flag_file = "/var/lib/zypp/zmd_updated_the_sources";
+	integer a_second = 1000;
+	integer count = 0;
+	while (true)
+	{
+	    if (Hack ("nowait"))
+		break;
+	    if (SCR::Read (.target.size, flag_file) != -1)
+		break;
+	    // half an hour must be enough, prevents infinite loop
+	    if (count >= 1800) {
+		y2milestone ("Giving up.");
+		break;
+	    }
+	    if (count % 30 == 0)
+		y2milestone ("Waiting for %1 to appear.", flag_file);
+	    sleep (a_second);
+	    count = count + 1;
+	}
+	SCR::Execute (.target.remove, flag_file);
+    }
+
     boolean already_up = false;
     if (!Mode::test())
         already_up = Internet::Status ();
@@ -79,20 +111,20 @@
     y2milestone ("Kernel packages before YOU: %1", kernel_packages);
     y2milestone ("YaST packages before YOU: %1", yast2_packages);
 
+    // Pkg::Init cannot be called by inst_suse_register because the
+    // user could go Back Back Back and try funky stuff without zypp
+    // being awake
 
-    if (Hack ("reinit")) {
-	// reinitalize ZYpp
-	Pkg::SourceFinishAll();
-	Pkg::TargetFinish();
-    }
+    // reinitalize ZYpp while rug is adding the source for us
+    Pkg::Init ();
 
     // initalize package callbacks
     PackageCallbacksInit::InitPackageCallbacks();
 
-    if (Hack ("reinit")) {
-	Pkg::SourceStartManager(true);
-	Pkg::TargetInit ("/", false);
-    }
+    WaitForSources ();
+    // restore
+    Pkg::SourceStartManager(true);
+    Pkg::TargetInit ("/", false);
 
     // compute ResStatus::EstablishField
     Pkg::PkgEstablish ();

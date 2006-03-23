@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Mar 23 17:08:55 CET 2006 - mvidner@suse.cz
+
+- Rug can now add the source for YaST. Wait for it and read it
+  (#156139).
+- 2.13.12
+
+-------------------------------------------------------------------
 Thu Mar 23 16:39:33 CET 2006 - visnov@suse.cz
 
 - First support for patch callbacks
