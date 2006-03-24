@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Mar 24 15:40:09 CET 2006 - visnov@suse.cz
+
+- Show progress bars when installing patches at installation time
+- 2.13.13 
+
+-------------------------------------------------------------------
 Thu Mar 23 17:08:55 CET 2006 - mvidner@suse.cz
 
 - Rug can now add the source for YaST. Wait for it and read it
