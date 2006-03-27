@@ -14,6 +14,8 @@
     import "PackageCallbacks";
     import "Popup";
 
+    integer total_progress	= 0;
+
     /**
       Callback for YOU progress widget.
     */
@@ -41,7 +43,7 @@
     ``{
         y2milestone("PatchProgressCallback %1", num);
 
-        if ( UI::WidgetExists( `id( `progress ) ) ) {
+        if ( UI::WidgetExists( `id( `patchprogress ) ) ) {
           UI::ChangeWidget( `id( `patchprogress ), `Value, num );
         }
 
@@ -167,6 +169,44 @@
 
 
     /**
+     * callback for 'package installed' action
+     *
+     *  return "" for ignore
+     *  return "R" for retry
+     *  return "C" for abort (not implemented !)
+     */
+    global string DonePackage (integer error, string reason) {
+	string ret = PackageCallbacks::DonePackage (error, reason);
+	if (ret == "")
+	{
+	    FinishLine ();
+	    total_progress  = total_progress + 1;
+	    if (!ProgressCallback (total_progress))
+		ret = (ErrorCallback ("abort", "", "") == "abort") ? "C" : "";
+	}
+	return ret;
+    }
+
+    /**
+     * callback for 'package provided' action
+     *
+     *  return "" for ignore
+     *  return "R" for retry
+     *  return "C" for abort (not implemented !)
+     */
+    global string DoneProvide (integer error, string reason, string name) {
+	string ret = PackageCallbacks::DoneProvide (error, reason, name);
+	if (ret == "")
+	{
+	    FinishLine ();
+	    total_progress  = total_progress + 1;
+	    if (!ProgressCallback (total_progress))
+		ret = (ErrorCallback ("abort", "", "") == "abort") ? "C" : "";
+	}
+	return ret;
+    }
+
+    /**
       Constructor
     */
     global define void RegisterOnlineUpdateCallbacks()
@@ -179,11 +219,11 @@
 
 	Pkg::CallbackStartProvide( "OnlineUpdateCallbacks::StartProvide" );
 	Pkg::CallbackProgressProvide( "OnlineUpdateCallbacks::PatchProgressCallback" );
-	Pkg::CallbackDoneProvide( "OnlineUpdateCallbacks::FinishLine" );
+	Pkg::CallbackDoneProvide( "OnlineUpdateCallbacks::DoneProvide" );
 
 	Pkg::CallbackStartPackage( "OnlineUpdateCallbacks::StartPackage" );
 	Pkg::CallbackProgressPackage ("OnlineUpdateCallbacks::PatchProgressCallback");
-	Pkg::CallbackDonePackage( "OnlineUpdateCallbacks::FinishLine" );
+	Pkg::CallbackDonePackage( "OnlineUpdateCallbacks::DonePackage" );
 
 	Pkg::CallbackYouMessage ("OnlineUpdateCallbacks::MessageCallback");
 	Pkg::CallbackYouLog ("OnlineUpdateCallbacks::LogCallback");

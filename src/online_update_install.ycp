@@ -45,7 +45,9 @@
 	    `VSpacing( 0.5 ),
             `ProgressBar( `id( `patchprogress ), _("Patch Progress") ),
             `VSpacing( 0.2 ),
-            `ProgressBar( `id( `progress ), _("Total Progress") ),
+	    `ReplacePoint (`id(`rpprogress),
+		`ProgressBar( `id( `progress ), _("Total Progress") )
+	    ),
 	    `VSpacing( 0.5 ),
 	    `Left( `CheckBox( `id(`remove_packages), _("&Remove Source Packages after Update"),
                               removeSourcePackages ) ),
@@ -81,6 +83,12 @@ data is no longer needed. To delete this data, activate
   Wizard::DisableNextButton();
 
   Pkg::PkgSolve (true);
+  integer total_progress = size (Pkg::GetPackages (`selected, true)) * 2;
+
+  UI::ReplaceWidget (`id(`rpprogress),
+    `ProgressBar( `id( `progress ), _("Total Progress"), total_progress)
+  );
+
   list commit = Pkg::PkgCommit (0);
 
   import "OnlineUpdateCallbacks";
@@ -102,7 +110,7 @@ data is no longer needed. To delete this data, activate
     Wizard::DisableAbortButton();
     Wizard::SetNextButton(`next, Label::CloseButton() );
     UI::ChangeWidget( `id( `patchprogress ), `Value, 100 );
-    UI::ChangeWidget( `id( `progress ), `Value, 100 );
+    UI::ChangeWidget( `id( `progress ), `Value, total_progress);
   }
 
   /////////////////////////////////////////////////////////////////////////////////////////

@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Mar 27 15:12:43 CEST 2006 - jsuchome@suse.cz
+
+- adapt the cron rule (online_update -> rug) after update
+- "Total Progress" now shows the progress of the whole update process
+- 2.13.14
+
+-------------------------------------------------------------------
 Fri Mar 24 15:40:09 CET 2006 - visnov@suse.cz
 
 - Show progress bars when installing patches at installation time
