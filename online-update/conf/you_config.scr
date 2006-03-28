@@ -1,0 +1,23 @@
+/**
+ * File:
+ *   you_config.scr
+ * Summary:
+ *   SCR Agent for reading/writing /var/lib/YaST2/you/config
+ *   using the sysconfig-agent
+ * Access:
+ *   read/write
+ * Authors:
+ *   Cornelius Schumacher <cschum@suse.de>
+ *
+ * Example:
+ *
+ *   Read(.you.password.ServerLastSync)
+ *
+ * Read/Sets the values defined in <tt>/var/lib/YaST2/you/config</tt>
+ * in an easy manner.
+ */
+.you.config
+
+`ag_ini(
+  `SysConfigFile("/var/lib/YaST2/you/config")
+)

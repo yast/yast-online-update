@@ -1,0 +1,152 @@
+/**
+ * File:	clients/online_update_install.ycp
+ * Package:	Configuration of online_update
+ * Summary: YOU installation page
+ * Authors: Cornelius Schumacher <cschum@suse.de>
+ *
+ * $Id$
+ *
+ * This is a client for autoinstallation.
+ * It displays the dialog for the actual installation,
+ * executes actual installation and removes sources when 
+ * requested.
+ */
+
+{
+
+  textdomain "online-update";
+
+  import "Label";
+  import "OnlineUpdate";
+  import "Popup";
+  import "Wizard";
+  import "OnlineUpdateDialogs";
+
+  boolean auto_mode_install = OnlineUpdate::you_auto_install;
+
+  //////////////////////////////////////////////////////////////////////////////////////
+  //                                  P O P U P S                                     //
+  //////////////////////////////////////////////////////////////////////////////////////
+
+  //////////////////////////////////////////////////////////////////////////////////////
+  // MAIN:
+  ///////////////////////////////////////////////////////////////////////////////////////
+
+  boolean removeSourcePackages = false;
+  if ( SCR::Read( .sysconfig.onlineupdate.YOU_REMOVE_SOURCE_PACKAGES ) == "yes" ) {
+    removeSourcePackages = true;
+  }
+
+  term contents =
+      // main dialog: 
+      `VBox(
+	    `VSpacing( 0.2 ),
+            `LogView(`id(`log), _("Progress Log"), 5, 0 ),
+	    `VSpacing( 0.5 ),
+            `ProgressBar( `id( `patchprogress ), _("Patch Progress") ),
+            `VSpacing( 0.2 ),
+	    `ReplacePoint (`id(`rpprogress),
+		`ProgressBar( `id( `progress ), _("Total Progress") )
+	    ),
+	    `VSpacing( 0.5 ),
+	    `Left( `CheckBox( `id(`remove_packages), _("&Remove Source Packages after Update"),
+                              removeSourcePackages ) ),
+            `VSpacing( 0.2 )
+            );
+    
+  string help_text = "";
+
+  string help_part1 =  _("<p>After connecting to the SuSE update server,
+YaST2 will download all selected patches.
+This could take some time. Download details are shown in the log window.</p>");
+
+  string help_part2 =  _("<p>When the download has finished successfully, the
+patches will be installed. The progress is shown in the log window. If there
+are special messages associated with patches, they will be shown in an
+extra dialog when the patch is being installed.</p>
+");
+
+  string help_part3 = _("<p>After patches are installed, the downloaded
+data is no longer needed. To delete this data, activate 
+<b>Remove Source Packages after Update</b>.</p>
+");
+ 
+  help_text = help_part1 + help_part2 + help_part3;
+    
+  // using SetContents (define in online_update.ycp)
+  Wizard::SetContents( _("Patch Download and Installation"), contents,
+                       help_text, true, true );
+
+
+  Wizard::SetNextButton(`next, Label::FinishButton() );
+  Wizard::DisableBackButton();
+  Wizard::DisableNextButton();
+
+  Pkg::PkgSolve (true);
+  integer total_progress = size (Pkg::GetPackages (`selected, true)) * 2;
+
+  UI::ReplaceWidget (`id(`rpprogress),
+    `ProgressBar( `id( `progress ), _("Total Progress"), total_progress)
+  );
+
+  list commit = Pkg::PkgCommit (0);
+
+  import "OnlineUpdateCallbacks";
+
+  OnlineUpdateCallbacks::LogCallback( _("Installation finished.\n") );
+
+  if ( commit[1]:[] != [] ) {
+    string details = Pkg::LastError() + "\n" + Pkg::LastErrorDetails();
+    OnlineUpdateDialogs::ErrorPopup( _("Patch processing failed."), details );
+  }
+
+  Wizard::EnableBackButton();
+  Wizard::EnableNextButton();
+  Wizard::SetFocusToNextButton();
+
+  boolean installedPackages = commit[0]:0 != 0;
+
+  if ( !installedPackages ) {
+    Wizard::DisableAbortButton();
+    Wizard::SetNextButton(`next, Label::CloseButton() );
+    UI::ChangeWidget( `id( `patchprogress ), `Value, 100 );
+    UI::ChangeWidget( `id( `progress ), `Value, total_progress);
+  }
+
+  /////////////////////////////////////////////////////////////////////////////////////////
+  ////  Loop for User Input ....
+  /////////////////////////////////////////////////////////////////////////////////////////
+  symbol ret = `next;
+
+  repeat {
+    ret = (symbol)UI::UserInput();
+
+    if ( ret == `next && (boolean)UI::QueryWidget(`id(`remove_packages),`Value ) )
+    {
+        y2debug( "Removing old rpm-packages" );
+        Pkg::YouRemovePackages();
+    }
+
+    if ( ret == `next )
+    {
+        if (! SCR::Write( .sysconfig.onlineupdate.YOU_REMOVE_SOURCE_PACKAGES,
+                          (boolean)UI::QueryWidget(`id(`remove_packages), `Value) ? "yes" : "no"))
+        {
+            y2warning("Failed to write .sysconfig.onlineupdate.YOU_REMOVE_SOURCE_PACKAGES");
+        }
+    }
+
+    if ( ret == `cancel && !installedPackages ) ret = `abort;
+
+    if ( ret == `abort ) {
+        if ( !OnlineUpdateDialogs::ConfirmAbortUpdate( `suseconfig ) ) ret = `this;
+    }
+
+    if ( !installedPackages &&
+         ( ret == `next || ret == `cancel ) ) ret = `abort;
+
+  } until ( ret == `next || ret == `back || ret == `abort || ret == `again ||
+            ret == `cancel );
+
+  return ret;
+}

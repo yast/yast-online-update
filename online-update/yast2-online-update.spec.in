@@ -1,0 +1,64 @@
+@HEADER-COMMENT@
+
+@HEADER@
+BuildRequires:	gcc-c++ libxcrypt-devel perl-XML-Writer update-desktop-files pkg-config yast2-devtools yast2-packager yast2-bootloader
+PreReq:		grep sed
+Requires:	yast2
+
+Provides:	y2c_online_update yast2-config-online-update
+Obsoletes:	y2c_online_update yast2-config-online-update
+Provides:	yast2-trans-online-update y2t_online_update
+Obsoletes:	yast2-trans-online-update y2t_online_update
+BuildArchitectures:     noarch
+
+Summary:    	YaST2 online update
+
+%description
+-
+
+@PREP@
+
+@BUILD@
+
+@INSTALL@
+
+@CLEAN@
+
+%post
+if [ -f /etc/cron.d/yast2-online-update ] ; then
+    cronjob=`grep "online_update" /etc/cron.d/yast2-online-update 2>/dev/null`
+    if [ -n "$cronjob"  ] ; then
+	sed -e "s/online_update/rug up -t patch/" -i.bak /etc/cron.d/yast2-online-update
+	if [ "`echo "$cronjob" | grep -c " -g" 2>/dev/null`" -gt 0 ] ; then
+	    sed -e "s/ -g/ -d/" -i /etc/cron.d/yast2-online-update
+	fi
+	if [ "`echo "$cronjob" | grep -c " -P" 2>/dev/null`" -gt 0 ] ; then
+	    sed -e "s/ -P/ --skip-interactive/" -i /etc/cron.d/yast2-online-update
+	fi
+    fi
+fi
+
+%files
+%defattr(-,root,root)
+@desktopdir@/online_update_setup.desktop
+@scrconfdir@/*.scr
+@clientdir@/online*.ycp
+@clientdir@/inst_you.ycp
+@moduledir@/OnlineUpdate*.ycp
+@moduledir@/OnlineUpdate*.ybc
+@moduledir@/AutoOnlineUpdate*.ycp
+@moduledir@/AutoOnlineUpdate*.ybc
+%doc @docdir@
+
+%package frontend
+Summary:	Desktop files for YaST2 online update
+Requires:	yast2-online-update
+Group:          System/YaST
+
+%description frontend
+-
+
+%files frontend
+%defattr(-,root,root)
+@desktopdir@/online_update.desktop
+@desktopdir@/cd_update.desktop
