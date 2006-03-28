@@ -124,6 +124,7 @@ packages were created by SuSE.
   Wizard::CreateDialog();
   Wizard::SetDesktopIcon("online_update");
 
+  OnlineUpdateCallbacks::RefreshAllSources();
   OnlineUpdateCallbacks::RegisterOnlineUpdateCallbacks();
 
   /*

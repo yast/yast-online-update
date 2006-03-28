@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Mar 28 09:53:04 CEST 2006 - locilka@suse.cz
+
+- Refreshing all sources (with autorefresh enabled) before the
+  online is started (#154990).
+- 2.13.15
+
+-------------------------------------------------------------------
 Mon Mar 27 15:12:43 CEST 2006 - jsuchome@suse.cz
 
 - adapt the cron rule (online_update -> rug) after update
