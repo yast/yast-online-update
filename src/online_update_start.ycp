@@ -194,7 +194,7 @@
   map statusmap = Pkg::YouStatus();
   y2debug("status map: %1", statusmap );
 
-  string mirrorListServer = lookup( statusmap, "mirrorurl", "www.suse.de" );
+  string mirrorListServer = statusmap["mirrorurl"]:"www.suse.de";
 
   string initMessage = "";
   if ( cd_update ) {
@@ -247,10 +247,10 @@ Check network connection.
 
   UI::CloseDialog();
 
-  string status_product = lookup( statusmap, "product", "unknown" );
-  string status_version = lookup( statusmap, "version", "unknown" );
-  string status_basearch = lookup( statusmap, "basearch", "unknown" );
-  integer status_lastupdate = lookup( statusmap, "lastupdate", -1 );
+  string status_product = statusmap["product"]:"unknown";
+  string status_version = statusmap["version"]:"unknown";
+  string status_basearch = statusmap["basearch"]:"unknown";
+  integer status_lastupdate = statusmap["lastupdate"]:-1;
 
   string lastupdateLabel = "";
 
