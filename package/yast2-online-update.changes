@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Wed Mar 29 17:19:51 CEST 2006 - visnov@suse.cz
+
+- fix patch message callback
+- call PkgEstablish and preselect patches before
+  starting patch selector
+- 2.13.16
+
+-------------------------------------------------------------------
 Wed Mar 29 09:17:34 CEST 2006 - jsuchome@suse.cz
 
 - do not check user input in DoneProvide and DonePackage callbacks

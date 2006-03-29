@@ -14,6 +14,10 @@
   Pkg::SourceStartManager (true);
   Pkg::TargetInit ("/",false);
 
+  Pkg::PkgEstablish();
+
+  Pkg::ResolvablePreselectPatches();
+
   UI::OpenDialog(`opt(`defaultsize), `PackageSelector(`id(`selector), `opt(`youMode)) );
   symbol ret = (symbol)UI::RunPkgSelection(`id(`selector) );
   UI::CloseDialog();

@@ -502,19 +502,22 @@ some of them might not work as expected.");
 
 	    message = message + header;
 	    message = message + "<pre>" + info + "</pre>";
-
-	    details = details + header;
-
+	    
 	    list<string> packages = patch[ "packages" ]:[];
 
-	    details = details + _("<b>Packages:</b>");
+	    if( size( packages ) > 0 )
+	    {
+		details = details + header;
 
-	    details = details + "<ul>";
+		details = details + _("<b>Packages:</b>");
 
-	    foreach( string p, packages, ``{ details = details + "<li>" + p + "</li>"; } );
+		details = details + "<ul>";
 
-	    details = details + "</ul>";
+		foreach( string p, packages, ``{ details = details + "<li>" + p + "</li>"; } );
 
+		details = details + "</ul>";
+	    }
+	    
 	    i = i + 1;
 	}
 
@@ -532,13 +535,13 @@ some of them might not work as expected.");
 	term buttons = nil;
 	if ( pre ) {
 	    buttons = `HBox(
-			    detailsButton,
+			    details == "" ? `Empty : detailsButton,
 			    `PushButton( `id( `ok ), _("Install Patch") ),
 			    `PushButton( `id( `skip ), _("Skip Patch") )
 			    );
 	} else {
 	    buttons = `HBox(
-			    detailsButton,
+			    details == "" ? `Empty : detailsButton,
 			    `PushButton( `id( `ok ), Label::OKButton() )
 			    );
 	}

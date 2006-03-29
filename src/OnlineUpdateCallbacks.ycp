@@ -83,23 +83,18 @@
 	return "";
     }
 
-    global define string MessageCallback( string type, list<map> patches )
-    ``{
-//        y2internal( "MessageCallback %1", type );
+    global void MessageCallback( string patchname, string patchsummary, string message )
+    {
+	// handle all messages as post (OK only)
+        list<map> patches = [
+	    $[
+		"name" : patchname,
+		"summary" : patchsummary,
+		"postinformation": message,
+	    ]
+	];
 
-        if ( type == "preinfo" ) {
-          boolean install = OnlineUpdateDialogs::MessagePopup( patches, true );
-          if ( install ) return "";
-          else return "skip";
-        } else if ( type == "postinfo" ) {
-          OnlineUpdateDialogs::MessagePopup( patches, false );
-          return "";
-        } else {
-          y2error( "Wrong message type: %1", type );
-          return "error";
-        }
-
-	return "";
+        OnlineUpdateDialogs::MessagePopup( patches, false );
     }
 
     global define void LogCallback( string text )
@@ -215,10 +210,6 @@
     ``{
 	y2milestone ( "OnlineUpdateCallbacks constructor" );
 
-	Pkg::CallbackYouProgress ("OnlineUpdateCallbacks::ProgressCallback");
-	Pkg::CallbackYouPatchProgress ("OnlineUpdateCallbacks::PatchProgressCallback");
-	Pkg::CallbackYouError ("OnlineUpdateCallbacks::ErrorCallback");
-
 	Pkg::CallbackStartProvide( "OnlineUpdateCallbacks::StartProvide" );
 	Pkg::CallbackProgressProvide( "OnlineUpdateCallbacks::PatchProgressCallback" );
 	Pkg::CallbackDoneProvide( "OnlineUpdateCallbacks::DoneProvide" );
@@ -227,7 +218,11 @@
 	Pkg::CallbackProgressPackage ("OnlineUpdateCallbacks::PatchProgressCallback");
 	Pkg::CallbackDonePackage( "OnlineUpdateCallbacks::DonePackage" );
 
-	Pkg::CallbackYouMessage ("OnlineUpdateCallbacks::MessageCallback");
+	Pkg::CallbackResolvableReport ("OnlineUpdateCallbacks::MessageCallback");
+
+	Pkg::CallbackYouProgress ("OnlineUpdateCallbacks::ProgressCallback");
+	Pkg::CallbackYouPatchProgress ("OnlineUpdateCallbacks::PatchProgressCallback");
+	Pkg::CallbackYouError ("OnlineUpdateCallbacks::ErrorCallback");
 	Pkg::CallbackYouLog ("OnlineUpdateCallbacks::LogCallback");
 	Pkg::CallbackYouExecuteYcpScript ("OnlineUpdateCallbacks::ExecuteYcpScriptCallback");
         Pkg::CallbackYouScriptProgress ("OnlineUpdateCallbacks::ScriptProgressCallback");
