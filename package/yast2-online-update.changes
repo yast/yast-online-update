@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Mar 29 09:17:34 CEST 2006 - jsuchome@suse.cz
+
+- do not check user input in DoneProvide and DonePackage callbacks
+  (#160966)
+
+-------------------------------------------------------------------
 Tue Mar 28 09:53:04 CEST 2006 - locilka@suse.cz
 
 - Refreshing all sources (with autorefresh enabled) before the
