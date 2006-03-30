@@ -9,11 +9,13 @@
 
   textdomain "online-update";
 
+  import "Confirm";
   import "Directory";
   import "Label";
   import "Mode";
   import "OnlineUpdate";
   import "OnlineUpdateCallbacks";
+  import "PackageLock";
   import "Version";
   import "Wizard";
   import "GetInstArgs";
@@ -124,6 +126,15 @@ packages were created by SuSE.
   Wizard::CreateDialog();
   Wizard::SetDesktopIcon("online_update");
 
+
+  // check whether running as root
+  // and having the packager for ourselves
+  if (! Confirm::MustBeRoot () || ! PackageLock::Check ())
+  {
+      UI::CloseDialog ();
+      return 1;
+  }
+  
   OnlineUpdateCallbacks::RefreshAllSources();
   OnlineUpdateCallbacks::RegisterOnlineUpdateCallbacks();
 

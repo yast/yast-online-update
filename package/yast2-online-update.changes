@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Mar 30 15:03:50 CEST 2006 - mvidner@suse.cz
+
+- Don't run the module if another process has the zypp lock (#160319).
+
+-------------------------------------------------------------------
 Wed Mar 29 17:19:51 CEST 2006 - visnov@suse.cz
 
 - fix patch message callback
