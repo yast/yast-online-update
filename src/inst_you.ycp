@@ -101,6 +101,14 @@
 
     symbol ret = `auto;
 
+    // initalize package callbacks
+    PackageCallbacksInit::InitPackageCallbacks();
+
+    WaitForSources ();
+    // restore after inst_suse_register shut zypp down by Pkg::Init
+    Pkg::SourceStartManager(true);
+    Pkg::TargetInit ("/", false);
+
     // do snapshot of YaST and kernel packages
     list<string> packages = Pkg::GetPackages (`installed, false);
     list<string> kernel_packages = filter (string p, packages, {
@@ -111,21 +119,6 @@
     });
     y2milestone ("Kernel packages before YOU: %1", kernel_packages);
     y2milestone ("YaST packages before YOU: %1", yast2_packages);
-
-    // Pkg::Init cannot be called by inst_suse_register because the
-    // user could go Back Back Back and try funky stuff without zypp
-    // being awake
-
-    // reinitalize ZYpp while rug is adding the source for us
-    Pkg::Init ();
-
-    // initalize package callbacks
-    PackageCallbacksInit::InitPackageCallbacks();
-
-    WaitForSources ();
-    // restore
-    Pkg::SourceStartManager(true);
-    Pkg::TargetInit ("/", false);
 
     // compute ResStatus::EstablishField
     Pkg::PkgEstablish ();

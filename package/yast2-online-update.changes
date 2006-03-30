@@ -1,7 +1,10 @@
 -------------------------------------------------------------------
-Thu Mar 30 15:03:50 CEST 2006 - mvidner@suse.cz
+Thu Mar 30 15:10:12 CEST 2006 - mvidner@suse.cz
 
+- inst_you: Do not call Pkg::Init, inst_suse_register did it
+  already; get package list only after zypp comes back up.
 - Don't run the module if another process has the zypp lock (#160319).
+- 2.13.17
 
 -------------------------------------------------------------------
 Wed Mar 29 17:19:51 CEST 2006 - visnov@suse.cz
