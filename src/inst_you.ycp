@@ -104,10 +104,13 @@
     // initalize package callbacks
     PackageCallbacksInit::InitPackageCallbacks();
 
-    WaitForSources ();
-    // restore after inst_suse_register shut zypp down by Pkg::Init
-    Pkg::SourceStartManager(true);
-    Pkg::TargetInit ("/", false);
+    if (Hack ("start"))		// not needed after all
+    {
+	WaitForSources ();
+	// restore after inst_suse_register shut zypp down by Pkg::Init
+	Pkg::SourceStartManager(true);
+	Pkg::TargetInit ("/", false);
+    }
 
     // do snapshot of YaST and kernel packages
     list<string> packages = Pkg::GetPackages (`installed, false);
