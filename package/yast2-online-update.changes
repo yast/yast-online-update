@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Mar 31 15:13:51 CEST 2006 - jsuchome@suse.cz
+
+- online_update_install: full progress when no patch was installed,
+  do not change button labels during installation
+- 2.13.18 
+
+-------------------------------------------------------------------
 Thu Mar 30 15:10:12 CEST 2006 - mvidner@suse.cz
 
 - inst_you: Do not call Pkg::Init, inst_suse_register did it
