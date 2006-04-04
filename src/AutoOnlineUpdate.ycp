@@ -136,9 +136,12 @@ global define boolean Read()
         if (d != "*")
             day = tointeger( d );
         else
+	{
             day = -1;
-        if ( regexpmatch( cronjob, "--skip-interactive" ) ) skipPre = true;
-        if ( regexpmatch( cronjob, "-d" ) ) autoget = true;
+	    timing = `daily;
+	}
+        skipPre = regexpmatch( cronjob, "--skip-interactive");
+        autoget = regexpmatch( cronjob, "-d");
     }
     else
     {

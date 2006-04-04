@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Apr  4 13:19:34 CEST 2006 - jsuchome@suse.cz
+
+- fixed reading the cron rule (#161253)
+- 2.13.20
+
+-------------------------------------------------------------------
 Fri Mar 31 17:58:51 CEST 2006 - mvidner@suse.cz
 
 - No unlocking after all, so no need to reinitialize (#160319).
