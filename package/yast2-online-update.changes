@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Apr  5 16:51:25 CEST 2006 - jsuchome@suse.cz
+
+- changed label for "Skipping interactive patches"
+- 2.13.21
+
+-------------------------------------------------------------------
 Tue Apr  4 13:19:34 CEST 2006 - jsuchome@suse.cz
 
 - fixed reading the cron rule (#161253)

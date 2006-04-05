@@ -135,6 +135,7 @@ the update takes place.");
 				`HSpacing( 0.8 ),
 				`Left (`CheckBox( `id( `skipPre),
 				    // checkbox label
+				  true ? _("Skip Interactive Patches") :
 				  _("Skip Patches with Preinstall Information"),
 				    skipPre)
 				),
