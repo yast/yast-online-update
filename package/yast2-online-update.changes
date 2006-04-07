@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Fri Apr  7 11:28:18 CEST 2006 - jsuchome@suse.cz
+
+- ask for aborting update
+- return false for all progress callbacks after abort
+  (workaround for #160966)
+- 2.13.22 
+
+-------------------------------------------------------------------
 Wed Apr  5 16:51:25 CEST 2006 - jsuchome@suse.cz
 
 - changed label for "Skipping interactive patches"

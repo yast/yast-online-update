@@ -16,6 +16,9 @@
 
     integer total_progress	= 0;
 
+    // if user aborted the installation
+    boolean aborted	= false;
+
     /**
       Callback for YOU progress widget.
     */
@@ -26,11 +29,14 @@
         if ( UI::WidgetExists( `id( `progress ) ) ) {
           UI::ChangeWidget( `id( `progress ), `Value, num );
         }
+	if (aborted) return false;
 
         symbol ret = (symbol)UI::PollInput();
 
-        if ( ret == `abort || ret == `cancel ) {
-            return false;
+        if ((ret == `abort || ret == `cancel) &&
+	    OnlineUpdateDialogs::ConfirmAbortUpdate (`incomplete)) {
+            aborted	= true;
+	    return false;
         }
 
 	return true;
@@ -47,10 +53,14 @@
           UI::ChangeWidget( `id( `patchprogress ), `Value, num );
         }
 
+	if (aborted) return false;
+
         symbol ret =(symbol) UI::PollInput();
 
-        if ( ret == `abort || ret == `cancel ) {
-            return false;
+        if ((ret == `abort || ret == `cancel) &&
+	    OnlineUpdateDialogs::ConfirmAbortUpdate (`incomplete)) {
+	    aborted	= true;
+	    return false;
         }
 
 	return true;

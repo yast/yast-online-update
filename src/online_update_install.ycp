@@ -108,15 +108,16 @@ data is no longer needed. To delete this data, activate
   Wizard::EnableNextButton();
   Wizard::SetFocusToNextButton();
 
-  boolean installedPackages = commit[0]:0 != 0;
+  boolean installedPackages = commit[0]:0 > 0;
 
   if ( !installedPackages ) {
     Wizard::DisableAbortButton();
     if (!Stage::cont ())
 	Wizard::SetNextButton(`next, Label::CloseButton() );
-    UI::ChangeWidget( `id( `patchprogress ), `Value, 100 );
-    UI::ChangeWidget( `id( `progress ), `Value, total_progress);
   }
+
+  UI::ChangeWidget( `id( `patchprogress ), `Value, 100 );
+  UI::ChangeWidget( `id( `progress ), `Value, total_progress);
 
   /////////////////////////////////////////////////////////////////////////////////////////
   ////  Loop for User Input ....
