@@ -13,6 +13,7 @@
     import "GetInstArgs";
     import "Popup";
     import "PackageCallbacksInit";
+    import "ProductFeatures";
     import "OnlineUpdateCallbacks";
 
     /* Called backwards */
@@ -131,7 +132,7 @@
     y2milestone("All available patches: %1", Pkg::ResolvableProperties("", `patch, ""));
 
     boolean ok = Pkg::PkgSolve (false);
-    if (!ok || Hack ("ui"))
+    if (!ok || ProductFeatures::GetBooleanFeature ("globals", "manual_online_update") || Hack ("ui"))
     {
 	UI::OpenDialog(`opt(`defaultsize), `PackageSelector(`id(`selector), `opt(`youMode)) );
 	symbol ret = (symbol)UI::RunPkgSelection(`id(`selector) );

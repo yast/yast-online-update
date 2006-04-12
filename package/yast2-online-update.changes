@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Apr 12 11:34:00 CEST 2006 - jsuchome@suse.cz
+
+- run online update in manual mode if requested in control file (#165503)
+- 2.13.23
+
+-------------------------------------------------------------------
 Fri Apr  7 11:28:18 CEST 2006 - jsuchome@suse.cz
 
 - ask for aborting update
