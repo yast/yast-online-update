@@ -126,21 +126,63 @@
 
     // compute ResStatus::EstablishField
     Pkg::PkgEstablish ();
-    // select all Needed patches for installation
-    Pkg::ResolvablePreselectPatches ();
 
-    y2milestone("All available patches: %1", Pkg::ResolvableProperties("", `patch, ""));
+    string saved_path	= Directory::vardir + "/selected_patches.ycp";
+    integer selected	= 0;
+    if (FileUtils::Exists (saved_path))
+    {
+	list<string> selected = SCR::Read (.target.ycp, saved_path);
+    // FIXME select them
+    }
+
+    // first, select the patches affecting pkg management
+    selected = Pkg::ResolvablePreselectPatches (`affects_pkg_manager);
+    y2milestone ("Preselected patches for pkg management: %1", selected);
+
+    if (selected < 1)
+    {
+	selected = Pkg::ResolvablePreselectPatches (`all);
+	y2milestone ("All preselected patches: %1", selected);
+    }
+
+    list<string> normal_patches		= [];
+    foreach (map patch, Pkg::ResolvableProperties("", `patch, ""), {
+	y2milestone ("available patch: %1", patch);
+	if (patch["status"]:`none == `selected)
+	{
+	    if (patch["affects_pkg_manager"]:false)
+		ret = `restart_yast;
+	    else
+		normal_patches = add (normal_patches, patch["name"]:"");
+	}
+    });
+
+    // unselect non-affects_pkg_manager patches and save them to file
+    // for FIXME later usage
+    if (ret == `restart_yast && size (normal_patches) > 0)
+    {
+	foreach (string pname, normal_patches, {
+	    Pkg::ResolvableNeutral (pname, `patch);
+	});
+	SCR::Write (.target.ycp, saved_path, normal_patches);
+    }
+
+    // nothing to install -> skip
+    if (ret != `restart_yast && size (normal_patches) == 0)
+	return `next;
 
     boolean ok = Pkg::PkgSolve (false);
     if (!ok || ProductFeatures::GetBooleanFeature ("globals", "manual_online_update") || Hack ("ui"))
     {
 	UI::OpenDialog(`opt(`defaultsize), `PackageSelector(`id(`selector), `opt(`youMode)) );
-	symbol ret = (symbol)UI::RunPkgSelection(`id(`selector) );
+	symbol ret_sel = (symbol)UI::RunPkgSelection(`id(`selector) );
 	UI::CloseDialog();
+	if (ret_sel == `cancel)
+	    return `next;
     }
 
     // install the patches
-    OnlineUpdateCallbacks::RegisterOnlineUpdateCallbacks();    
+    OnlineUpdateCallbacks::RegisterOnlineUpdateCallbacks();
     WFM::call( "online_update_install" );
 
 
@@ -166,7 +208,6 @@
 	    ret = `reboot;
     });
     y2milestone ("Checking result: %1", ret);
-    // FIXME: In future, use the attribute from metadata
     if (ret == `reboot)
     {
 	// message popup

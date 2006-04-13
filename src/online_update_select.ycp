@@ -16,7 +16,7 @@
 
   Pkg::PkgEstablish();
 
-  Pkg::ResolvablePreselectPatches();
+  Pkg::ResolvablePreselectPatches(`all);
 
   UI::OpenDialog(`opt(`defaultsize), `PackageSelector(`id(`selector), `opt(`youMode)) );
   symbol ret = (symbol)UI::RunPkgSelection(`id(`selector) );
