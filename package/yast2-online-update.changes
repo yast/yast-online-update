@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Apr 14 13:14:12 CEST 2006 - visnov@suse.cz
+
+- initialize target before sources (#165849)
+- 2.13.24 
+
+-------------------------------------------------------------------
 Wed Apr 12 11:34:00 CEST 2006 - jsuchome@suse.cz
 
 - run online update in manual mode if requested in control file (#165503)

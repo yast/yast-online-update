@@ -134,6 +134,9 @@ packages were created by SuSE.
       UI::CloseDialog ();
       return 1;
   }
+
+  // initialize target to import all trusted keys (#165849)
+  Pkg::TargetInit( "/", false );
   
   OnlineUpdateCallbacks::RefreshAllSources();
   OnlineUpdateCallbacks::RegisterOnlineUpdateCallbacks();

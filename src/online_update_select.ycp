@@ -12,7 +12,7 @@
   import "Wizard";
 
   Pkg::SourceStartManager (true);
-  Pkg::TargetInit ("/",false);
+  // target already initialized in online_update.ycp
 
   Pkg::PkgEstablish();
 
