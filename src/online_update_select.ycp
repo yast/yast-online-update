@@ -9,6 +9,8 @@
 
   textdomain "online-update";
 
+  import "Directory";
+  import "FileUtils";
   import "Wizard";
 
   Pkg::SourceStartManager (true);
@@ -16,7 +18,36 @@
 
   Pkg::PkgEstablish();
 
-  Pkg::ResolvablePreselectPatches(`all);
+  integer selected	= 0;
+  string saved_path	= Directory::vardir + "/selected_patches.ycp";
+
+  // check if there exists saved selection of patches to be installed
+  if (FileUtils::Exists (saved_path))
+  {
+    list<string> patches = (list<string>) SCR::Read(.target.ycp,saved_path);
+    if (patches == nil)
+	patches = [];
+    foreach (string pname, patches, {
+	if (Pkg::ResolvableInstall (pname, `patch))
+	selected	= selected + 1;
+    });
+    SCR::Execute (.target.remove, saved_path);
+    y2milestone ("Previously selected patches: %1", selected);
+  }
+  // if not, select the patches affecting pkg management
+  else
+  {
+    selected = Pkg::ResolvablePreselectPatches (`affects_pkg_manager);
+    y2milestone ("Preselected patches for pkg management: %1", selected);
+  }
+
+  // if no patch is selected, pre-select all security and recommended
+  if (selected < 1)
+  {
+    selected = Pkg::ResolvablePreselectPatches (`all);
+    y2milestone ("All preselected patches: %1", selected);
+  }
+
 
   UI::OpenDialog(`opt(`defaultsize), `PackageSelector(`id(`selector), `opt(`youMode)) );
   symbol ret = (symbol)UI::RunPkgSelection(`id(`selector) );
@@ -25,6 +56,33 @@
   Wizard::ClearContents();
 
   y2debug( "RunPkgSelection returned '%1'", ret );
+
+  boolean restart_yast	= false;
+  list<string> normal_patches		= [];
+  foreach (map patch, Pkg::ResolvableProperties("", `patch, ""), {
+    if (patch["status"]:`none == `selected)
+    {
+	if (patch["affects_pkg_manager"]:false)
+	    restart_yast = true;
+        else
+	    normal_patches = add (normal_patches, patch["name"]:"");
+    }
+  });
+
+  // unselect non-affects_pkg_manager patches and save them to file
+  // for later usage
+  if (restart_yast && size (normal_patches) > 0)
+  {
+      foreach (string pname, normal_patches, {
+          Pkg::ResolvableNeutral (pname, `patch);
+      });
+      SCR::Write (.target.ycp, saved_path, normal_patches);
+  }
+  // no patch selected
+  if (!restart_yast && normal_patches == [])
+  {
+      ret = `cancel;
+  }
 
   if ( ret == `cancel ) return `abort;
   else return `next;

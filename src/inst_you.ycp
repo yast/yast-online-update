@@ -7,14 +7,16 @@
 
     textdomain "online-update";
 
-    import "Mode";
-    import "Internet";
-    import "Wizard";
+    import "Directory";
+    import "FileUtils";
     import "GetInstArgs";
-    import "Popup";
-    import "PackageCallbacksInit";
-    import "ProductFeatures";
+    import "Internet";
+    import "Mode";
     import "OnlineUpdateCallbacks";
+    import "PackageCallbacksInit";
+    import "Popup";
+    import "ProductFeatures";
+    import "Wizard";
 
     /* Called backwards */
     if(GetInstArgs::going_back())
@@ -129,50 +131,38 @@
 
     string saved_path	= Directory::vardir + "/selected_patches.ycp";
     integer selected	= 0;
+
+    // check if there exists saved selection of patches to be installed
     if (FileUtils::Exists (saved_path))
     {
-	list<string> selected = SCR::Read (.target.ycp, saved_path);
-    // FIXME select them
+	list<string> patches = (list<string>) SCR::Read(.target.ycp,saved_path);
+	if (patches == nil)
+	    patches = [];
+	foreach (string pname, patches, {
+	    if (Pkg::ResolvableInstall (pname, `patch))
+		selected	= selected + 1;
+	});
+	SCR::Execute (.target.remove, saved_path);
+	y2milestone ("Previously selected patches: %1", selected);
+    }
+    // if not, select the patches affecting pkg management
+    else
+    {
+	selected = Pkg::ResolvablePreselectPatches (`affects_pkg_manager);
+	y2milestone ("Preselected patches for pkg management: %1", selected);
     }
 
-    // first, select the patches affecting pkg management
-    selected = Pkg::ResolvablePreselectPatches (`affects_pkg_manager);
-    y2milestone ("Preselected patches for pkg management: %1", selected);
-
+    // if no patch is selected, pre-select all security and recommended
     if (selected < 1)
     {
 	selected = Pkg::ResolvablePreselectPatches (`all);
 	y2milestone ("All preselected patches: %1", selected);
     }
 
-    list<string> normal_patches		= [];
-    foreach (map patch, Pkg::ResolvableProperties("", `patch, ""), {
-	y2milestone ("available patch: %1", patch);
-	if (patch["status"]:`none == `selected)
-	{
-	    if (patch["affects_pkg_manager"]:false)
-		ret = `restart_yast;
-	    else
-		normal_patches = add (normal_patches, patch["name"]:"");
-	}
-    });
-
-    // unselect non-affects_pkg_manager patches and save them to file
-    // for FIXME later usage
-    if (ret == `restart_yast && size (normal_patches) > 0)
-    {
-	foreach (string pname, normal_patches, {
-	    Pkg::ResolvableNeutral (pname, `patch);
-	});
-	SCR::Write (.target.ycp, saved_path, normal_patches);
-    }
-
-    // nothing to install -> skip
-    if (ret != `restart_yast && size (normal_patches) == 0)
-	return `next;
-
-    boolean ok = Pkg::PkgSolve (false);
-    if (!ok || ProductFeatures::GetBooleanFeature ("globals", "manual_online_update") || Hack ("ui"))
+    // run package selector to allow user interaction
+    if (!Pkg::PkgSolve (false) ||
+	ProductFeatures::GetBooleanFeature("globals", "manual_online_update") ||
+	Hack ("ui"))
     {
 	UI::OpenDialog(`opt(`defaultsize), `PackageSelector(`id(`selector), `opt(`youMode)) );
 	symbol ret_sel = (symbol)UI::RunPkgSelection(`id(`selector) );
@@ -180,6 +170,51 @@
 	if (ret_sel == `cancel)
 	    return `next;
     }
+
+    list<string> normal_patches		= [];
+    boolean reboot_needed		= false;
+    foreach (map patch, Pkg::ResolvableProperties("", `patch, ""), {
+	if (patch["status"]:`none == `selected)
+	{
+	    y2milestone ("selected patch: %1", patch);
+	    if (patch["affects_pkg_manager"]:false)
+	    {
+		if (patch["reboot_needed"]:false)
+		    ret	= `reboot;
+		else if (ret != `reboot)
+		    ret	= `restart_yast;
+	    }
+	    else
+	    {
+		normal_patches = add (normal_patches, patch["name"]:"");
+		// for this patch reboot would be needed, but still it is not
+		// clear if the patch will be installed in this run -> save info
+		if (patch["reboot_needed"]:false)
+		    reboot_needed	= true;
+	    }
+	}
+    });
+
+    // unselect non-affects_pkg_manager patches and save them to file
+    // for later usage
+    if (ret != `auto && size (normal_patches) > 0)
+    {
+	foreach (string pname, normal_patches, {
+	    Pkg::ResolvableNeutral (pname, `patch);
+	});
+	SCR::Write (.target.ycp, saved_path, normal_patches);
+    }
+    // no packagemanager patch selected ...
+    if (ret == `auto)
+    {
+	// ... but there is a patch with "reboot_needed" flag (=probably kernel)
+	if (reboot_needed)
+	    ret     = `reboot;
+	// ... and nothing to install -> skip the installation at all
+	else if (normal_patches == [])
+	    return `next;
+    }
+
 
     // install the patches
     OnlineUpdateCallbacks::RegisterOnlineUpdateCallbacks();
@@ -196,7 +231,8 @@
     // of course it covers updated (one removed, another added)
     foreach (string p, yast2_packages, {
 	if (! contains (new_yast2_packages, p))
-	    ret = `restart_yast;
+//	    ret = `restart_yast;
+	    y2internal ("yast package updated, current ret is %1", ret);
     });
     list<string> new_kernel_packages = filter (string p, packages, {
 	return substring (p, 0, 6) == "kernel";
@@ -205,7 +241,8 @@
     // check for added kernels, covers updates
     foreach (string p, new_kernel_packages, {
 	if (! contains (kernel_packages, p))
-	    ret = `reboot;
+//	    ret = `reboot;
+	    y2internal ("kernel updated, current ret is %1", ret);
     });
     y2milestone ("Checking result: %1", ret);
     if (ret == `reboot)
