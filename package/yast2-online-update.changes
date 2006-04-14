@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Fri Apr 14 14:21:24 CEST 2006 - jsuchome@suse.cz
+
+- install packagemanager related patches first, than restart yast
+  (#165540)
+- skipped installation if no patch is selected (#163253)
+- 2.13.25
+
+-------------------------------------------------------------------
 Fri Apr 14 13:14:12 CEST 2006 - visnov@suse.cz
 
 - initialize target before sources (#165849)
