@@ -65,5 +65,8 @@ global boolean signature_check = true;
 */  
 global boolean reload = true;
 
+// if yast should be restarted after installation of patches
+global boolean restart_yast	= false;
+
 /* EOF */
 }

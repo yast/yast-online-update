@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Apr 18 15:11:45 CEST 2006 - jsuchome@suse.cz
+
+- return negative value when yast should be restarted so ncurses
+  menu can exit
+- 2.13.26 
+
+-------------------------------------------------------------------
 Fri Apr 14 14:21:24 CEST 2006 - jsuchome@suse.cz
 
 - install packagemanager related patches first, than restart yast

@@ -62,8 +62,6 @@ packages were created by SuSE.
       }
       else if ( arg == .cd_default || arg == ".cd_default" )
       {
-//	  Mode::youInstallMap["you_server"]	= "CD";		// text for output field
-//	  Mode::youInstallMap["you_serverkind"] = "cd";
 	  OnlineUpdate::cd_update	=  true;
       }
       else if ( arg == .auto.get || arg == ".auto.get" )
@@ -205,10 +203,10 @@ packages were created by SuSE.
 
   UI::CloseDialog();
 
-//this is a no-op
-//
-// this file returns integer values, 0 for success, !=0 for failure
-//  if ( result == `abort ) result = `auto; 
-
+  if (OnlineUpdate::restart_yast)
+  {
+      OnlineUpdate::restart_yast	= false;
+      return -42;
+  }
   return 0;
 }

@@ -11,6 +11,7 @@
 
   import "Directory";
   import "FileUtils";
+  import "OnlineUpdate";
   import "Wizard";
 
   Pkg::SourceStartManager (true);
@@ -83,6 +84,7 @@
   {
       ret = `cancel;
   }
+  OnlineUpdate::restart_yast	= restart_yast;
 
   if ( ret == `cancel ) return `abort;
   else return `next;
