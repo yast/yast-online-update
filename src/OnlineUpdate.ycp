@@ -15,15 +15,13 @@ textdomain "online-update";
  */
 global boolean cd_update = false;
 
+// no. of temporary source
+global integer cd_source = -1;
+
 /**
  * flag: YOU automatic get mode?
  */
 global boolean you_auto_get = false;
-
-/**
- * flag: YOU automatic install mode?
- */
-global boolean you_auto_install = false;
 
 /**
  * flag: Automatic Update
@@ -36,16 +34,6 @@ global boolean you_auto	= false;
 global boolean you_continue = false;
 
 /**
- * batch kind like security,.....
- */
-global string you_auto_batchkind = "all";
-
-/**
- * flag: YOU ok?
- */
-global boolean you_ok	= true;
-
-/**
  * reloading serverlist form www.suse.de
  */
 global string reloadServer = "yes";
@@ -54,11 +42,6 @@ global string reloadServer = "yes";
  * Url where patches are looked for.
  */
 global string you_url = "";
-
-/**
- * should signatures be checked?
- */
-global boolean signature_check = true;
 
 /**
   Force reload of all patches?

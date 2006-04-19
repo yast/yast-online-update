@@ -69,53 +69,17 @@ packages were created by SuSE.
 	  OnlineUpdate::you_auto_get	= true;
 	  OnlineUpdate::you_auto	= true;
       }
-      else if ( arg == .auto.install || arg == ".auto.install" )
-      {
-	  OnlineUpdate::you_auto_install = true;
-	  OnlineUpdate::you_auto	 = true;
-      }
-      else if ( arg == .nosigcheck || arg == ".nosigcheck" )
-      {
-	  OnlineUpdate::signature_check = false;
-      }
-      else if ( arg == .url || arg == ".url" )
-      {
-          if ( arg_n + 1 < arg_max ) {
-              OnlineUpdate::you_url = (string)WFM::Args( arg_n + 1 );
-          }
-          arg_n = arg_n + 1;
-      }
-      else
-      {
-	  // batch kind like security,.....
-	  OnlineUpdate::you_auto_batchkind = sformat("%1", WFM::Args(arg_n) );
-	  y2milestone( "Getting patches for kind %1 only",  WFM::Args(arg_n) );
-      }
-
       arg_n = arg_n + 1;
   }
 
-  // FIXME - use rug for this...
   if ( OnlineUpdate::you_auto ) {
-    string command = "online_update";
-    if ( size( OnlineUpdate::you_url ) != 0 ) {
-      command = command + " -u " + OnlineUpdate::you_url;
-    }
-    if ( !OnlineUpdate::signature_check ) {
-      command = command + " -n";
-    }
+    y2warning ("This usage of online_update.ycp is OBSOLETE, use rug instead");
+    string command = "rug up -t patch";
     if ( OnlineUpdate::you_auto_get ) {
-      command = command + " -g";
+      command = command + " -d";
     }
-    if ( OnlineUpdate::you_auto_install ) {
-      command = command + " -i";
-    }
-    command = command + " " + OnlineUpdate::you_auto_batchkind;
-
-    y2debug( "COMMAND: %1", command );
-
+    y2milestone ("command: %1", command );
     integer result = (integer)SCR::Execute( .target.bash, command );
-
     return result;
   }
 
@@ -135,7 +99,7 @@ packages were created by SuSE.
 
   // initialize target to import all trusted keys (#165849)
   Pkg::TargetInit( "/", false );
-  
+
   OnlineUpdateCallbacks::RefreshAllSources();
   OnlineUpdateCallbacks::RegisterOnlineUpdateCallbacks();
 
@@ -145,7 +109,6 @@ packages were created by SuSE.
    */
 
   list dialog = [
-//    [ "online_update_start", [ false, true ], `always ], TODO do we need any "configuration" here, when the sources were already configured?
     [ "online_update_select", [ false, true ], `manual ],
     [ "online_update_install", [ false, true ], `always ],
     [ "inst_suseconfig", [GetInstArgs::Buttons(false,false) ], `always ]
@@ -202,6 +165,11 @@ packages were created by SuSE.
   }
 
   UI::CloseDialog();
+
+  if (OnlineUpdate::cd_update && OnlineUpdate::cd_source > -1)
+  {
+	Pkg::SourceDelete (OnlineUpdate::cd_source);
+  }
 
   if (OnlineUpdate::restart_yast)
   {

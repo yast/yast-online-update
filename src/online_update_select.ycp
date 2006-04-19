@@ -17,6 +17,15 @@
   Pkg::SourceStartManager (true);
   // target already initialized in online_update.ycp
 
+  if (OnlineUpdate::cd_update)
+  {
+	string initMessage = _("Initializing for CD update...");
+	UI::OpenDialog(`opt(`decorated ),`Label( initMessage ));
+	OnlineUpdate::cd_source = Pkg::SourceCreate ("cd:///", "");
+	UI::CloseDialog();
+  }
+
+
   Pkg::PkgEstablish();
 
   integer selected	= 0;

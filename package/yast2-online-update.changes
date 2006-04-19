@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Apr 19 14:07:56 CEST 2006 - jsuchome@suse.cz
+
+- create temporary CD source for 'Patch CD Update'
+- 2.13.27
+
+-------------------------------------------------------------------
 Tue Apr 18 15:11:45 CEST 2006 - jsuchome@suse.cz
 
 - return negative value when yast should be restarted so ncurses
