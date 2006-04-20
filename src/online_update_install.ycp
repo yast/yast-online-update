@@ -17,13 +17,10 @@
   textdomain "online-update";
 
   import "Label";
-  import "OnlineUpdate";
   import "Popup";
   import "Stage";
   import "Wizard";
   import "OnlineUpdateDialogs";
-
-  boolean auto_mode_install = OnlineUpdate::you_auto_install;
 
   //////////////////////////////////////////////////////////////////////////////////////
   //                                  P O P U P S                                     //

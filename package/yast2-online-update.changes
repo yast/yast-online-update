@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Apr 20 11:27:11 CEST 2006 - jsuchome@suse.cz
+
+- removed obsolete usage of you_auto_install parameters
+- 2.13.28 
+
+-------------------------------------------------------------------
 Wed Apr 19 14:07:56 CEST 2006 - jsuchome@suse.cz
 
 - create temporary CD source for 'Patch CD Update'

@@ -44,6 +44,11 @@ global string reloadServer = "yes";
 global string you_url = "";
 
 /**
+ * should signatures be checked? FIXME obsolete
+ */
+global boolean signature_check = true;
+
+/**
   Force reload of all patches?
 */  
 global boolean reload = true;
