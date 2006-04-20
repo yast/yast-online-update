@@ -15,15 +15,36 @@
     import "OnlineUpdateCallbacks";
     import "PackageCallbacksInit";
     import "Popup";
+    import "ProductControl";
     import "ProductFeatures";
+    import "Stage";
     import "Wizard";
+
+    string saved_path		= Directory::vardir + "/selected_patches.ycp";
+    string restart_data_file	= Directory::vardir + "/continue_installation";
 
     /* Called backwards */
     if(GetInstArgs::going_back())
             return `auto;
 
+    boolean after_restart	= false;
+    if (FileUtils::Exists (restart_data_file))
+    {
+	string contents = (string)SCR::Read (.target.string, restart_data_file);
+	integer step	= tointeger (contents);
+	integer no	= 1;
+	foreach (map mod,
+	    ProductControl::getModules (Stage::stage(), Mode::mode(), `enabled),
+	{
+		y2internal ("module: %1", mod);
+		after_restart	= true; //FIXME
+		if (no == step && name == "you")
+		    after_restart	= true;
+		no = no + 1;
+	});
+    }
 
-    if (!Internet::do_you)	// nothing to do
+    if (!Internet::do_you && !after_restart)	// nothing to do
 	return `auto;
 
     // I have a feeling that we may need a lot of hacks here
@@ -111,8 +132,13 @@
     {
 	WaitForSources ();
 	// restore after inst_suse_register shut zypp down by Pkg::Init
-	Pkg::SourceStartManager(true);
 	Pkg::TargetInit ("/", false);
+	Pkg::SourceStartManager(true);
+    }
+    else if (after_restart)
+    {
+	Pkg::TargetInit ("/", false);
+	Pkg::SourceStartManager(true);
     }
 
     // do snapshot of YaST and kernel packages
@@ -129,7 +155,6 @@
     // compute ResStatus::EstablishField
     Pkg::PkgEstablish ();
 
-    string saved_path	= Directory::vardir + "/selected_patches.ycp";
     integer selected	= 0;
 
     // check if there exists saved selection of patches to be installed
@@ -182,7 +207,7 @@
 		if (patch["reboot_needed"]:false)
 		    ret	= `reboot;
 		else if (ret != `reboot)
-		    ret	= `restart_yast;
+		    ret	= `restart_same_step;
 	    }
 	    else
 	    {
@@ -231,7 +256,6 @@
     // of course it covers updated (one removed, another added)
     foreach (string p, yast2_packages, {
 	if (! contains (new_yast2_packages, p))
-//	    ret = `restart_yast;
 	    y2internal ("yast package updated, current ret is %1", ret);
     });
     list<string> new_kernel_packages = filter (string p, packages, {
@@ -241,7 +265,6 @@
     // check for added kernels, covers updates
     foreach (string p, new_kernel_packages, {
 	if (! contains (kernel_packages, p))
-//	    ret = `reboot;
 	    y2internal ("kernel updated, current ret is %1", ret);
     });
     y2milestone ("Checking result: %1", ret);
@@ -252,7 +275,7 @@
 reboot now then continue the installation.
 "));
     }
-    else if (ret == `restart_yast)
+    else if (ret == `restart_same_step)
     {
 	// message popup
 	Popup::Message (_("During online update, YaST was updated.
