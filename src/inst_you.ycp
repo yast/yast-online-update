@@ -38,8 +38,10 @@
 	{
 		y2internal ("module: %1", mod);
 		after_restart	= true; //FIXME
-		if (no == step && name == "you")
+		/*
+		if (no == step && mod["name"]:"" == "you")
 		    after_restart	= true;
+		*/
 		no = no + 1;
 	});
     }

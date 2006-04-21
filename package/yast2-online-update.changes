@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Apr 21 12:43:19 CEST 2006 - jsuchome@suse.cz
+
+- removed part breaking inst_you (#168286)
+- 2.13.31
+
+-------------------------------------------------------------------
 Fri Apr 21 11:32:00 CEST 2006 - jsuchome@suse.cz
 
 - force unselecting packages with ResolvableNeutral (#168278)
