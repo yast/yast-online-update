@@ -84,7 +84,7 @@
   if (restart_yast && size (normal_patches) > 0)
   {
       foreach (string pname, normal_patches, {
-          Pkg::ResolvableNeutral (pname, `patch);
+          Pkg::ResolvableNeutral (pname, `patch, true);
       });
       SCR::Write (.target.ycp, saved_path, normal_patches);
   }

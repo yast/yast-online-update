@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Apr 21 11:32:00 CEST 2006 - jsuchome@suse.cz
+
+- force unselecting packages with ResolvableNeutral (#168278)
+- 2.13.30
+
+-------------------------------------------------------------------
 Thu Apr 20 17:04:52 CEST 2006 - jsuchome@suse.cz
 
 - inst_you: use `restart_same_step instead of `restart_yast to get
