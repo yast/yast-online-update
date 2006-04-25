@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Apr 25 15:55:46 CEST 2006 - jsuchome@suse.cz
+
+- 'Patch CD Update': save CD source at the end
+- 2.13.33
+
+-------------------------------------------------------------------
 Mon Apr 24 23:18:27 CEST 2006 - jsrain@suse.de
 
 - removed SortKey from online_update_setup.desktop (#168768)

@@ -168,7 +168,7 @@ packages were created by SuSE.
 
   if (OnlineUpdate::cd_update && OnlineUpdate::cd_source > -1)
   {
-	Pkg::SourceDelete (OnlineUpdate::cd_source);
+	Pkg::SourceFinishAll ();
   }
 
   if (OnlineUpdate::restart_yast)
