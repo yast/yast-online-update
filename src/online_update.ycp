@@ -11,11 +11,13 @@
 
   import "Confirm";
   import "Directory";
+  import "FileUtils";
   import "Label";
   import "Mode";
   import "OnlineUpdate";
   import "OnlineUpdateCallbacks";
   import "PackageLock";
+  import "Popup";
   import "Version";
   import "Wizard";
   import "GetInstArgs";
@@ -168,13 +170,19 @@ packages were created by SuSE.
 
   if (OnlineUpdate::cd_update && OnlineUpdate::cd_source > -1)
   {
-	Pkg::SourceFinishAll ();
+    Pkg::SourceFinishAll ();
   }
 
   if (OnlineUpdate::restart_yast)
   {
-      OnlineUpdate::restart_yast	= false;
-      return -42;
+    if (FileUtils::Exists (Directory::vardir + "/selected_patches.ycp"))
+    {
+	// message popup
+	Popup::Message (_("During online update, YaST was updated.
+Finishing and restarting now."));
+    }
+    OnlineUpdate::restart_yast	= false;
+    return -42; // restart menu.ycp even if there are no other patches selected
   }
   return 0;
 }

@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Apr 27 16:03:24 CEST 2006 - jsuchome@suse.cz
+
+- show the popup for restarting yast also on installed system
+- 2.13.35 
+
+-------------------------------------------------------------------
 Thu Apr 27 15:58:37 CEST 2006 - visnov@suse.cz
 
 - fix the dialog term for patch messages (#170155)
