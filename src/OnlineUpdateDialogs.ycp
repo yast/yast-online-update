@@ -66,7 +66,7 @@ the update takes place.");
                  );
         if (!Mode::config())
 	{
-            random_dialog = `Empty();
+            random_dialog = `HBox(`Empty);
         }
 
 	term content = `VBox(
@@ -305,7 +305,7 @@ the update takes place.");
 			      `HBox( `HSpacing( 0.5 ), `Left( `Heading( heading ) ) ),
 			      `VSpacing( 0.2 ),
 			      `Label( message ),
-			      `ReplacePoint( `id( `rp ), `Empty() ),
+			      `ReplacePoint( `id( `rp ), `HBox(`Empty) ),
 			      buttons
 			      )
 			);
@@ -536,13 +536,13 @@ some of them might not work as expected.");
 	term buttons = nil;
 	if ( pre ) {
 	    buttons = `HBox(
-			    details == "" ? `Empty : detailsButton,
+			    details == "" ? `VSpacing(0) : detailsButton,
 			    `PushButton( `id( `ok ), _("Install Patch") ),
 			    `PushButton( `id( `skip ), _("Skip Patch") )
 			    );
 	} else {
 	    buttons = `HBox(
-			    details == "" ? `Empty : detailsButton,
+			    details == "" ? `VSpacing(0) : detailsButton,
 			    `PushButton( `id( `ok ), Label::OKButton() )
 			    );
 	}
@@ -554,6 +554,8 @@ some of them might not work as expected.");
 	    w = 60;
 	    h = 15;
 	}
+
+	y2milestone( "Going to open the message dialog" );
 
 	UI::OpenDialog( `opt( `decorated ),
 			`VBox(
@@ -568,6 +570,8 @@ some of them might not work as expected.");
 			      )
 			);
 
+	y2milestone( "Dialog opened");
+
 	symbol ret = nil;
 	boolean showDetails = false;
 
@@ -576,7 +580,7 @@ some of them might not work as expected.");
 
 	    if ( ret == `details ) {
 		if ( showDetails ) {
-		    UI::ReplaceWidget( `id( `rp ), `Empty() );
+		    UI::ReplaceWidget( `id( `rp ), `HSpacing(0) );
 		    UI::ChangeWidget( `id( `details ), `Label, detailsStringOff );
 		} else {
 		    UI::ReplaceWidget( `id( `rp ), `HBox( `HSpacing( 0.5 ),
