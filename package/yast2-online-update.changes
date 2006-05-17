@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri May  5 15:30:41 CEST 2006 - jsuchome@suse.cz
+
+- fixed broken dialog in online_update_setup (#172668)
+- 2.13.36
+
+-------------------------------------------------------------------
 Thu Apr 27 16:03:24 CEST 2006 - jsuchome@suse.cz
 
 - show the popup for restarting yast also on installed system

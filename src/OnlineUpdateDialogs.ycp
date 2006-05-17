@@ -66,7 +66,7 @@ the update takes place.");
                  );
         if (!Mode::config())
 	{
-            random_dialog = `HBox(`Empty);
+            random_dialog = `HBox(`HSpacing (0));
         }
 
 	term content = `VBox(
@@ -305,7 +305,7 @@ the update takes place.");
 			      `HBox( `HSpacing( 0.5 ), `Left( `Heading( heading ) ) ),
 			      `VSpacing( 0.2 ),
 			      `Label( message ),
-			      `ReplacePoint( `id( `rp ), `HBox(`Empty) ),
+			      `ReplacePoint( `id( `rp ), `HBox(`HSpacing(0)) ),
 			      buttons
 			      )
 			);
@@ -319,7 +319,7 @@ the update takes place.");
 
 	    if ( ret == `details ) {
 		if ( showDetails ) {
-		    UI::ReplaceWidget( `id( `rp ), `Empty() );
+		    UI::ReplaceWidget( `id( `rp ), `VSpacing(0) );
 		    UI::ChangeWidget( `id( `details ), `Label, detailsStringOff );
 		} else {
 		    UI::ReplaceWidget( `id( `rp ), `HBox( `HSpacing( 0.5 ),
@@ -565,7 +565,7 @@ some of them might not work as expected.");
 				    `VSpacing( h ),
 				    `RichText( message )
 				    ),
-			      `ReplacePoint( `id( `rp ), `Empty() ),
+			      `ReplacePoint( `id( `rp ), `VSpacing(0) ),
 			      buttons
 			      )
 			);
