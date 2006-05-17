@@ -37,6 +37,13 @@ if [ -f /etc/cron.d/yast2-online-update ] ; then
 	fi
     fi
 fi
+to_remove="/usr/share/YaST2/clients/product_post.ycp"
+if [ -f $to_remove ] ; then
+    eval "echo '2ee660f33bb8468654661bcf2a564fd4  $to_remove' | md5sum --status -c 2>/dev/null"
+    if [ "$?" == 0 ] ; then
+	rm -f $to_remove
+    fi
+fi
 
 %files
 %defattr(-,root,root)

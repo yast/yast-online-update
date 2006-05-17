@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri May 12 11:47:42 CEST 2006 - jsuchome@suse.cz
+
+- remove product_post.ycp if present (#174812)
+- 2.13.37
+
+-------------------------------------------------------------------
 Fri May  5 15:30:41 CEST 2006 - jsuchome@suse.cz
 
 - fixed broken dialog in online_update_setup (#172668)
