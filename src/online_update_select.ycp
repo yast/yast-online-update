@@ -91,7 +91,8 @@
     SCR::Write (.target.ycp, saved_path, normal_patches);
   }
   // no patch selected
-  if (!restart_yast && normal_patches == [])
+  if (!restart_yast && normal_patches == [] && !Pkg::PkgAnyToInstall () &&
+      !Pkg::PkgAnyToDelete ())
   {
       ret = `cancel;
   }

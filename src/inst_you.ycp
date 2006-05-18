@@ -238,7 +238,8 @@
 	if (reboot_needed)
 	    ret     = `reboot;
 	// ... and nothing to install -> skip the installation at all
-	else if (normal_patches == [])
+	else if (normal_patches == [] && !Pkg::PkgAnyToInstall () &&
+	    !Pkg::PkgAnyToDelete ())
 	    return `next;
     }
 

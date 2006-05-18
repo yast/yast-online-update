@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu May 18 09:09:25 CEST 2006 - jsuchome@suse.cz
+
+- do not exit when only packages (and no patches) are selected for
+  installation or deletion (#175668)
+- 2.13.38
+
+-------------------------------------------------------------------
 Fri May 12 11:47:42 CEST 2006 - jsuchome@suse.cz
 
 - remove product_post.ycp if present (#174812)
