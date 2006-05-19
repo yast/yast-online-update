@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu May 18 09:27:59 CEST 2006 - jsuchome@suse.cz
+
+- better check for restarted yast during installation (#167561)
+- 2.13.39
+
+-------------------------------------------------------------------
 Thu May 18 09:09:25 CEST 2006 - jsuchome@suse.cz
 
 - do not exit when only packages (and no patches) are selected for
