@@ -28,7 +28,7 @@ Summary:    	YaST2 online update
 if [ -f /etc/cron.d/yast2-online-update ] ; then
     cronjob=`grep "online_update" /etc/cron.d/yast2-online-update 2>/dev/null`
     if [ -n "$cronjob"  ] ; then
-	sed -e "s/online_update/rug up -t patch/" -i.bak /etc/cron.d/yast2-online-update
+	sed -e "s/online_update/rug up -t patch/" -i /etc/cron.d/yast2-online-update
 	if [ "`echo "$cronjob" | grep -c " -g" 2>/dev/null`" -gt 0 ] ; then
 	    sed -e "s/ -g/ -d/" -i /etc/cron.d/yast2-online-update
 	fi
@@ -36,6 +36,7 @@ if [ -f /etc/cron.d/yast2-online-update ] ; then
 	    sed -e "s/ -P/ --skip-interactive/" -i /etc/cron.d/yast2-online-update
 	fi
     fi
+    rm -f /etc/cron.d/yast2-online-update.bak
 fi
 to_remove="/usr/share/YaST2/clients/product_post.ycp"
 if [ -f $to_remove ] ; then
