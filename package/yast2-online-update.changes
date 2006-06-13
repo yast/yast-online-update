@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Jun  9 16:31:37 CEST 2006 - jsuchome@suse.cz
+
+- report error when Patch CD not entered (#182802)
+- 2.13.41
+
+-------------------------------------------------------------------
 Mon May 22 12:47:48 CEST 2006 - jsuchome@suse.cz
 
 - fixed updating of cron rule, remove .bak file (#176734)
