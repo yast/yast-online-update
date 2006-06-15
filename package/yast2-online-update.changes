@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Jun 14 09:53:01 CEST 2006 - jsuchome@suse.cz
+
+- fix of restarting inst_you after libzypp update (#184452)
+- 2.13.42
+
+-------------------------------------------------------------------
 Fri Jun  9 16:31:37 CEST 2006 - jsuchome@suse.cz
 
 - report error when Patch CD not entered (#182802)

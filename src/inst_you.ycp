@@ -31,7 +31,9 @@
     if (FileUtils::Exists (restart_data_file))
     {
 	map restarting_step	= ProductControl::RestartingStep ();
-	if (restarting_step["name"]:"" == "you")
+	y2milestone ("restarting_step: %1", restarting_step);
+	if (restarting_step == nil || // 'fix' for bug #184452
+	    restarting_step["name"]:"" == "you")
 	{
 	    y2milestone ("installation restarted from YOU");
 	    after_restart	= true;
