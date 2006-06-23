@@ -11,7 +11,9 @@
 
   import "Directory";
   import "FileUtils";
+  import "Label";
   import "OnlineUpdate";
+  import "Popup";
   import "Wizard";
 
   Pkg::SourceStartManager (true);
@@ -19,10 +21,27 @@
 
   if (OnlineUpdate::cd_update)
   {
+    boolean canceled	= false;
+    do
+    {
 	string initMessage = _("Initializing for CD update...");
 	UI::OpenDialog(`opt(`decorated ),`Label( initMessage ));
 	OnlineUpdate::cd_source = Pkg::SourceCreate ("cd:///", "");
 	UI::CloseDialog();
+
+	if (OnlineUpdate::cd_source == -1)
+	{
+	    canceled = !Popup::AnyQuestion ("",
+		// error popup: cancel/retry buttons follow
+		_("Initialization failed. Check that
+you have inserted the correct CD.
+"),
+		Label::RetryButton (), Label::CancelButton (), `focus_yes);
+	}
+    } while (OnlineUpdate::cd_source == -1 && !canceled);
+
+    if (canceled)
+	return `abort;
   }
 
 
@@ -91,7 +110,8 @@
     SCR::Write (.target.ycp, saved_path, normal_patches);
   }
   // no patch selected
-  if (!restart_yast && normal_patches == [])
+  if (!restart_yast && normal_patches == [] && !Pkg::PkgAnyToInstall () &&
+      !Pkg::PkgAnyToDelete ())
   {
       ret = `cancel;
   }

@@ -1,4 +1,41 @@
 -------------------------------------------------------------------
+Wed Jun 14 09:53:01 CEST 2006 - jsuchome@suse.cz
+
+- fix of restarting inst_you after libzypp update (#184452)
+- 2.13.42
+
+-------------------------------------------------------------------
+Fri Jun  9 16:31:37 CEST 2006 - jsuchome@suse.cz
+
+- report error when Patch CD not entered (#182802)
+- 2.13.41
+
+-------------------------------------------------------------------
+Mon May 22 12:47:48 CEST 2006 - jsuchome@suse.cz
+
+- fixed updating of cron rule, remove .bak file (#176734)
+- 2.13.40 
+
+-------------------------------------------------------------------
+Thu May 18 09:27:59 CEST 2006 - jsuchome@suse.cz
+
+- better check for restarted yast during installation (#167561)
+- 2.13.39
+
+-------------------------------------------------------------------
+Thu May 18 09:09:25 CEST 2006 - jsuchome@suse.cz
+
+- do not exit when only packages (and no patches) are selected for
+  installation or deletion (#175668)
+- 2.13.38
+
+-------------------------------------------------------------------
+Fri May 12 11:47:42 CEST 2006 - jsuchome@suse.cz
+
+- remove product_post.ycp if present (#174812)
+- 2.13.37
+
+-------------------------------------------------------------------
 Fri May  5 15:30:41 CEST 2006 - jsuchome@suse.cz
 
 - fixed broken dialog in online_update_setup (#172668)

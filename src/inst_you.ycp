@@ -30,20 +30,14 @@
     boolean after_restart	= false;
     if (FileUtils::Exists (restart_data_file))
     {
-	string contents = (string)SCR::Read (.target.string, restart_data_file);
-	integer step	= tointeger (contents);
-	integer no	= 1;
-	foreach (map mod,
-	    ProductControl::getModules (Stage::stage(), Mode::mode(), `enabled),
+	map restarting_step	= ProductControl::RestartingStep ();
+	y2milestone ("restarting_step: %1", restarting_step);
+	if (restarting_step == nil || // 'fix' for bug #184452
+	    restarting_step["name"]:"" == "you")
 	{
-		y2internal ("module: %1", mod);
-		after_restart	= true; //FIXME
-		/*
-		if (no == step && mod["name"]:"" == "you")
-		    after_restart	= true;
-		*/
-		no = no + 1;
-	});
+	    y2milestone ("installation restarted from YOU");
+	    after_restart	= true;
+	}
     }
 
     if (!Internet::do_you && !after_restart)	// nothing to do
@@ -238,7 +232,8 @@
 	if (reboot_needed)
 	    ret     = `reboot;
 	// ... and nothing to install -> skip the installation at all
-	else if (normal_patches == [])
+	else if (normal_patches == [] && !Pkg::PkgAnyToInstall () &&
+	    !Pkg::PkgAnyToDelete ())
 	    return `next;
     }
 
