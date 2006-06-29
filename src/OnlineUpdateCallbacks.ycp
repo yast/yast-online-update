@@ -245,6 +245,9 @@
      * This function is a temporary solution for bug #154990
      */
     global define void RefreshAllSources () {
+	// Busy message popup
+	UI::OpenDialog(`Label(_("Please wait...")));
+
 	y2milestone("Refreshing all sources...");
 	Pkg::SourceStartManager(true);
 	list <map<string,any> > all_sources = Pkg::SourceEditGet();
@@ -252,11 +255,10 @@
 	// There are no sources, nothing to refresh
 	if (all_sources == nil || size(all_sources)<1) {
 	    y2warning("No sources defined, nothing to refresh...");
+	    UI::CloseDialog();
 	    return;
 	}
 	
-	// Busy message popup
-	UI::OpenDialog(`Label(_("Please wait...")));
 	foreach (map<string,any> one_source, all_sources, {
 	    integer source_id          = (integer) one_source["SrcId"]:nil;
 	    boolean source_autorefresh = (boolean) one_source["autorefresh"]:true;
