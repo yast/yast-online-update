@@ -90,6 +90,7 @@ you have inserted the correct CD.
 
   boolean restart_yast	= false;
   list<string> normal_patches		= [];
+  boolean more_patches_needed		= false;
   foreach (map patch, Pkg::ResolvableProperties("", `patch, ""), {
     if (patch["status"]:`none == `selected)
     {
@@ -98,11 +99,16 @@ you have inserted the correct CD.
         else
 	    normal_patches = add (normal_patches, patch["name"]:"");
     }
+    else if (patch["is_needed"]:false) // patch not selected: bug #188541
+    {
+	y2debug ("patch needed but not selected: %1", patch);
+	more_patches_needed	= true;
+    }
   });
 
   // unselect non-affects_pkg_manager patches and save them to file
   // for later usage
-  if (restart_yast && size (normal_patches) > 0)
+  if (restart_yast && (size (normal_patches) > 0 || more_patches_needed))
   {
     foreach (string pname, normal_patches, {
 	Pkg::ResolvableNeutral (pname, `patch, true);
