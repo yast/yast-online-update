@@ -99,9 +99,12 @@ packages were created by SuSE.
       return 1;
   }
 
+  // Busy message popup
+  UI::OpenDialog(`Label(_("Please wait...")));
+
   // initialize target to import all trusted keys (#165849)
   Pkg::TargetInit( "/", false );
-
+  UI::CloseDialog ();
   OnlineUpdateCallbacks::RefreshAllSources();
   OnlineUpdateCallbacks::RegisterOnlineUpdateCallbacks();
 
