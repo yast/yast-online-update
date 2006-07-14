@@ -29,16 +29,6 @@ global boolean you_auto_get = false;
 global boolean you_auto	= false;
 
 /**
- * flag: Continue mode?
- */
-global boolean you_continue = false;
-
-/**
- * reloading serverlist form www.suse.de
- */
-global string reloadServer = "yes";
-
-/**
  * Url where patches are looked for.
  */
 global string you_url = "";
@@ -55,6 +45,10 @@ global boolean reload = true;
 
 // if yast should be restarted after installation of patches
 global boolean restart_yast	= false;
+
+// popup message
+global string restart_message =_("Packages for package management were updated.
+Finishing and restarting now.");
 
 /* EOF */
 }

@@ -1,4 +1,14 @@
 -------------------------------------------------------------------
+Wed Jul 12 08:30:43 CEST 2006 - jsuchome@suse.cz
+
+- fixed restart message after patching package management (#171546)
+- changed name in desktop file for automatic update config (#157871)
+- added more progress information during initialization (#191270)
+- support for checking patches before inst_you is run
+- code cleanup 
+- 2.13.44
+
+-------------------------------------------------------------------
 Wed Jun 28 14:15:47 CEST 2006 - jsuchome@suse.cz
 
 - shown one more "Please wait" popup during start (#188172)

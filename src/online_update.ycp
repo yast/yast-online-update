@@ -18,39 +18,9 @@
   import "OnlineUpdateCallbacks";
   import "PackageLock";
   import "Popup";
-  import "Version";
+  import "Progress";
   import "Wizard";
   import "GetInstArgs";
-
-  string version = Version::yast2;
-
-  // dummy message, which will be used in the future, but have to be
-  // translated into other languages.
-  string d1 = _("Dialing....");
-  string d2 = _("Hang up....");
-  string d3 = _("Could not dial to the Internet. Check your settings.");
-  string d4 = _("Could not dial to the Internet. Connect manually.");
-  string d5 = _("Error occured while closing the connection to the Internet.");
-
-  string d8 = _("Do not show this message again.");
-  string d7 = _("Skip");
-  string d11 = _("Continue");
-  string d9 = _("Install");
-  string d10 = sformat(_("The package \"%1\" is not a SuSE package.
-Install anyway?
-"), d9 );
-  string d12 = _("There is no connection to the Internet. Trying to connect.");
-
-  string gpg_warning = _("Cannot check the packages because no GPG configuration
-or key has been found. SuSE cannot guarantee that the
-packages were created by SuSE.
-");
-
-
-  //
-  // Mode::test will be set, if menu is called with arg .test ( y2base menu '(.test)' qt )
-  // or online_update is called directly ( /sbin/yast2 online_update '(.test)' )
-  // test mode means: get the patches, but do not install (inst_rpmcopy runs with test mode)
 
   integer arg_n = 0;
   integer arg_max = size( WFM::Args() );
@@ -58,11 +28,8 @@ packages were created by SuSE.
   while (arg_n < arg_max ) {
       any arg = WFM::Args( arg_n );
 
-      if ( arg == .test || arg == ".test" )
-      {
-	  Mode::SetTest ("test");
-      }
-      else if ( arg == .cd_default || arg == ".cd_default" )
+      // start the 'Patch CD Update': add CD as installation source
+      if ( arg == .cd_default || arg == ".cd_default" )
       {
 	  OnlineUpdate::cd_update	=  true;
       }
@@ -74,6 +41,7 @@ packages were created by SuSE.
       arg_n = arg_n + 1;
   }
 
+  // only download the patches - OBSOLETE
   if ( OnlineUpdate::you_auto ) {
     y2warning ("This usage of online_update.ycp is OBSOLETE, use rug instead");
     string command = "rug up -t patch";
@@ -85,28 +53,48 @@ packages were created by SuSE.
     return result;
   }
 
-  y2debug("ONLINE: Testmode %1", Mode::test() );
-
   Wizard::CreateDialog();
   Wizard::SetDesktopIcon("online_update");
+  // help text for online-update initialization
+  Wizard::RestoreHelp ("<p>The system is initializing the installation and update sources. Installation and update sources can be altered in the <b>Installation Source</b> module.</p>");
 
+  list<string> stages =  [
+	    // progress stage label
+	    _("Initialize the target system"),
+	    // progress stage label
+	    _("Refresh update sources"),
+  ];
+  list steps = [
+	    // progress step label
+	    _("Initializing the target system..."),
+	    // progress step label
+	    _("Refreshing update sources ..."),
+	    // final progress step label
+	    _("Finished")
+  ];
+
+  // dialog caption
+  Progress::New(_("Initializing Online Update"), " ", 2, stages, steps, "");
 
   // check whether running as root
   // and having the packager for ourselves
   if (! Confirm::MustBeRoot () || ! PackageLock::Check ())
   {
-      UI::CloseDialog ();
+      Wizard::CloseDialog ();
       return 1;
   }
 
-  // Busy message popup
-  UI::OpenDialog(`Label(_("Please wait...")));
+  Progress::NextStage();
 
   // initialize target to import all trusted keys (#165849)
   Pkg::TargetInit( "/", false );
-  UI::CloseDialog ();
+
+  Progress::NextStage ();
+
   OnlineUpdateCallbacks::RefreshAllSources();
   OnlineUpdateCallbacks::RegisterOnlineUpdateCallbacks();
+
+  Progress::Finish();
 
   /*
    * Main dialog cycle
@@ -114,9 +102,9 @@ packages were created by SuSE.
    */
 
   list dialog = [
-    [ "online_update_select", [ false, true ], `manual ],
-    [ "online_update_install", [ false, true ], `always ],
-    [ "inst_suseconfig", [GetInstArgs::Buttons(false,false) ], `always ]
+    [ "online_update_select",	[ GetInstArgs::Buttons(false, true) ] ],
+    [ "online_update_install",	[ GetInstArgs::Buttons(false, true) ] ],
+    [ "inst_suseconfig",	[ GetInstArgs::Buttons(false,false) ] ]
   ];
 
   integer id = 0;
@@ -125,40 +113,30 @@ packages were created by SuSE.
   while ( ( id >= 0 ) && ( id < size( dialog ) ) ) {
 
       list page = dialog[ id ]:[];
-
       string module_name = page[ 0 ]:"";
       list module_args = page[ 1 ]:[];
-      symbol module_mode = page[ 2 ]:`none;
 
-      y2debug( "ONLINE: Module: %1 Args: %2 Mode: %3", module_name,
-               module_args, module_mode );
+      y2debug( "ONLINE: Module: %1 Args: %2", module_name, module_args);
 
-      if ( id == size( dialog ) - 1 ) {
+      if ( id == (size( dialog ) - 1)) {
           Wizard::SetNextButton(`next, Label::FinishButton() );
       }
 
-      if ( !OnlineUpdate::you_auto )
-      {
-	  result = WFM::CallFunction( module_name, module_args );
-      }
-      else if ( module_mode == `always )
-      {
-	  result = WFM::CallFunction( module_name, module_args );
-      }
-      
+      result = WFM::CallFunction( module_name, module_args );
+
       if ( result == `nil ) return 1;
 
       if (result == `again )
 	  continue;
       else if (result == `cancel || result == `abort)
 	  break;
-      else if (result == `next || result == `auto )	// SuSEConfig returns `auto
+      else if (result == `next || result == `auto )// SuSEConfig returns `auto
 	  id = id + 1;
       else if (result == `back)
 	  id = id - 1;
       else if ( result == `finish )
           if ( !Mode::installation() && !Mode::update() )
-	  { 
+	  {
 	      id = size(dialog)-1;		// call last module
           }
 	  else
@@ -166,10 +144,9 @@ packages were created by SuSE.
               result = `next;
               break;
           }
-
   }
 
-  UI::CloseDialog();
+  Wizard::CloseDialog();
 
   if (OnlineUpdate::cd_update && OnlineUpdate::cd_source > -1)
   {
@@ -180,9 +157,7 @@ packages were created by SuSE.
   {
     if (FileUtils::Exists (Directory::vardir + "/selected_patches.ycp"))
     {
-	// message popup
-	Popup::Message (_("During online update, YaST was updated.
-Finishing and restarting now."));
+	Popup::Message (OnlineUpdate::restart_message);
     }
     OnlineUpdate::restart_yast	= false;
     return -42; // restart menu.ycp even if there are no other patches selected
