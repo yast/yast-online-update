@@ -6,10 +6,9 @@
  *
  * $Id$
  *
- * This is a client for autoinstallation.
- * It displays the dialog for the actual installation,
- * executes actual installation and removes sources when 
- * requested.
+ * This is a client for installation.
+ * It displays the dialog with a progress of the actual installation and
+ * executes the installation.
  */
 
 {
@@ -17,69 +16,46 @@
   textdomain "online-update";
 
   import "Label";
-  import "Popup";
   import "Stage";
   import "Wizard";
   import "OnlineUpdateDialogs";
 
-  //////////////////////////////////////////////////////////////////////////////////////
-  //                                  P O P U P S                                     //
-  //////////////////////////////////////////////////////////////////////////////////////
 
-  //////////////////////////////////////////////////////////////////////////////////////
-  // MAIN:
-  ///////////////////////////////////////////////////////////////////////////////////////
-
-  boolean removeSourcePackages = false;
-  if ( SCR::Read( .sysconfig.onlineupdate.YOU_REMOVE_SOURCE_PACKAGES ) == "yes" ) {
-    removeSourcePackages = true;
-  }
-
-  term contents =
-      // main dialog: 
-      `VBox(
+  term contents = `VBox(
 	    `VSpacing( 0.2 ),
+	    // progress window label
             `LogView(`id(`log), _("Progress Log"), 5, 0 ),
 	    `VSpacing( 0.5 ),
+	    // progress bar label
             `ProgressBar( `id( `patchprogress ), _("Patch Progress") ),
             `VSpacing( 0.2 ),
 	    `ReplacePoint (`id(`rpprogress),
+		// progress bar label
 		`ProgressBar( `id( `progress ), _("Total Progress") )
 	    ),
 	    `VSpacing( 0.5 ),
-	    `Left( `CheckBox( `id(`remove_packages), _("&Remove Source Packages after Update"),
-                              removeSourcePackages ) ),
             `VSpacing( 0.2 )
-            );
-    
-  string help_text = "";
-
-  string help_part1 =  _("<p>After connecting to the SuSE update server,
+  );
+  // help text for online update
+  string help_part1 =  _("<p>After connecting to the update server,
 YaST2 will download all selected patches.
 This could take some time. Download details are shown in the log window.</p>");
 
+  // help text for online update
   string help_part2 =  _("<p>When the download has finished successfully, the
 patches will be installed. The progress is shown in the log window. If there
 are special messages associated with patches, they will be shown in an
 extra dialog when the patch is being installed.</p>
 ");
 
-  string help_part3 = _("<p>After patches are installed, the downloaded
-data is no longer needed. To delete this data, activate 
-<b>Remove Source Packages after Update</b>.</p>
-");
- 
-  help_text = help_part1 + help_part2 + help_part3;
-    
+  string help_text = help_part1 + help_part2;
+
   // using SetContents (define in online_update.ycp)
   Wizard::SetContents( _("Patch Download and Installation"), contents,
-                       help_text, true, true );
-
+                       help_text, false, false);
 
   if (!Stage::cont ())
     Wizard::SetNextButton(`next, Label::FinishButton() );
-  Wizard::DisableBackButton();
-  Wizard::DisableNextButton();
 
   Pkg::PkgSolve (true);
   integer total_progress = size (Pkg::GetPackages (`selected, true)) * 2;
@@ -87,17 +63,23 @@ data is no longer needed. To delete this data, activate
       total_progress	= 100;
 
   UI::ReplaceWidget (`id(`rpprogress),
+    // progress bar label
     `ProgressBar( `id( `progress ), _("Total Progress"), total_progress)
   );
+
+  // FIXME no chance to get this after Commit (bug 188556)
+  boolean changed_packages	= Pkg::PkgAnyToDelete ();
 
   list commit = Pkg::PkgCommit (0);
 
   import "OnlineUpdateCallbacks";
 
+  // progress information
   OnlineUpdateCallbacks::LogCallback( _("Installation finished.\n") );
 
   if ( commit[1]:[] != [] ) {
     string details = Pkg::LastError() + "\n" + Pkg::LastErrorDetails();
+    // error message
     OnlineUpdateDialogs::ErrorPopup( _("Patch processing failed."), details );
   }
 
@@ -105,48 +87,27 @@ data is no longer needed. To delete this data, activate
   Wizard::EnableNextButton();
   Wizard::SetFocusToNextButton();
 
-  boolean installedPackages = commit[0]:0 > 0;
-
-  if ( !installedPackages ) {
-    Wizard::DisableAbortButton();
-    if (!Stage::cont ())
-	Wizard::SetNextButton(`next, Label::CloseButton() );
-  }
+  changed_packages = changed_packages || commit[0]:0 > 0;
+  if (!Stage::cont ())
+    Wizard::SetNextButton(`next, Label::CloseButton() );
 
   UI::ChangeWidget( `id( `patchprogress ), `Value, 100 );
   UI::ChangeWidget( `id( `progress ), `Value, total_progress);
 
-  /////////////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////
   ////  Loop for User Input ....
-  /////////////////////////////////////////////////////////////////////////////////////////
   symbol ret = `next;
 
   repeat {
     ret = (symbol)UI::UserInput();
 
-    if ( ret == `next && (boolean)UI::QueryWidget(`id(`remove_packages),`Value ) )
-    {
-        y2debug( "Removing old rpm-packages" );
-        Pkg::YouRemovePackages();
-    }
+    if (ret == `cancel && !changed_packages) ret = `abort;
 
-    if ( ret == `next )
-    {
-        if (! SCR::Write( .sysconfig.onlineupdate.YOU_REMOVE_SOURCE_PACKAGES,
-                          (boolean)UI::QueryWidget(`id(`remove_packages), `Value) ? "yes" : "no"))
-        {
-            y2warning("Failed to write .sysconfig.onlineupdate.YOU_REMOVE_SOURCE_PACKAGES");
-        }
-    }
+    if (ret == `abort && !OnlineUpdateDialogs::ConfirmAbortUpdate(`suseconfig))
+	ret = `this;
 
-    if ( ret == `cancel && !installedPackages ) ret = `abort;
-
-    if ( ret == `abort ) {
-        if ( !OnlineUpdateDialogs::ConfirmAbortUpdate( `suseconfig ) ) ret = `this;
-    }
-
-    if ( !installedPackages &&
-         ( ret == `next || ret == `cancel ) ) ret = `abort;
+    if (!changed_packages && ( ret == `next || ret == `cancel ))
+	ret = `abort;
 
   } until ( ret == `next || ret == `back || ret == `abort || ret == `again ||
             ret == `cancel );

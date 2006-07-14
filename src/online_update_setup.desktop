@@ -20,6 +20,6 @@ X-SuSE-YaST-AutoInst=
 Icon=yast-online_update
 Exec=/sbin/yast2 online_update_setup 
 
-Name=Online Update Setup
+Name=Automatic Online Update
 GenericName=Set up automatic online update
 X-KDE-SubstituteUID=true

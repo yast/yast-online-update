@@ -12,6 +12,7 @@
     import "GetInstArgs";
     import "Internet";
     import "Mode";
+    import "OnlineUpdate";
     import "OnlineUpdateCallbacks";
     import "PackageCallbacksInit";
     import "Popup";
@@ -25,7 +26,10 @@
 
     /* Called backwards */
     if(GetInstArgs::going_back())
-            return `auto;
+    {
+	y2milestone ("going_back -> returning `auto");
+        return `auto;
+    }
 
     boolean after_restart	= false;
     if (FileUtils::Exists (restart_data_file))
@@ -41,7 +45,10 @@
     }
 
     if (!Internet::do_you && !after_restart)	// nothing to do
+    {
+	y2milestone ("Internet::do_you is false -> `auto");
 	return `auto;
+    }
 
     // I have a feeling that we may need a lot of hacks here
     // to make things work
@@ -50,38 +57,6 @@
 	if (hack)
 	    y2milestone ("HACK: %1", what);
 	return hack;
-    }
-
-    /**
-     * parse-metadata, the helper called by rug that actually adds the source,
-     * runs asynchronously. So we wait for it to tell us "go" by creating
-     * a file.
-     */
-    void WaitForSources () {
-	// The name must be same in:
-	// inst_you.ycp
-	// inst_suse_register.ycp
-	// svn/zypp/trunk/backend/src/parse-metadata.cc
-	string flag_file = "/var/lib/zypp/zmd_updated_the_sources";
-	integer a_second = 1000;
-	integer count = 0;
-	while (true)
-	{
-	    if (Hack ("nowait"))
-		break;
-	    if (SCR::Read (.target.size, flag_file) != -1)
-		break;
-	    // half an hour must be enough, prevents infinite loop
-	    if (count >= 1800) {
-		y2milestone ("Giving up.");
-		break;
-	    }
-	    if (count % 30 == 0)
-		y2milestone ("Waiting for %1 to appear.", flag_file);
-	    sleep (a_second);
-	    count = count + 1;
-	}
-	SCR::Execute (.target.remove, flag_file);
     }
 
     boolean already_up = false;
@@ -124,32 +99,14 @@
     // initalize package callbacks
     PackageCallbacksInit::InitPackageCallbacks();
 
-    if (Hack ("start"))		// not needed after all
-    {
-	WaitForSources ();
-	// restore after inst_suse_register shut zypp down by Pkg::Init
-	Pkg::TargetInit ("/", false);
-	Pkg::SourceStartManager(true);
-    }
-    else if (after_restart)
+    if (after_restart || Hack ("init-target-and-sources"))
     {
 	Pkg::TargetInit ("/", false);
 	Pkg::SourceStartManager(true);
+	// compute ResStatus::EstablishField (only after restart,
+	// otherwise it was already done in inst_ask_online_update.ycp)
+	Pkg::PkgEstablish ();
     }
-
-    // do snapshot of YaST and kernel packages
-    list<string> packages = Pkg::GetPackages (`installed, false);
-    list<string> kernel_packages = filter (string p, packages, {
-	return substring (p, 0, 6) == "kernel";
-    });
-    list<string> yast2_packages = filter (string p, packages, {
-	return substring (p, 0, 5) == "yast2";
-    });
-    y2milestone ("Kernel packages before YOU: %1", kernel_packages);
-    y2milestone ("YaST packages before YOU: %1", yast2_packages);
-
-    // compute ResStatus::EstablishField
-    Pkg::PkgEstablish ();
 
     integer selected	= 0;
 
@@ -189,7 +146,10 @@
 	symbol ret_sel = (symbol)UI::RunPkgSelection(`id(`selector) );
 	UI::CloseDialog();
 	if (ret_sel == `cancel)
+	{
+	    y2milestone ("package selector canceled -> `next");
 	    return `next;
+	}
     }
 
     list<string> normal_patches		= [];
@@ -234,7 +194,10 @@
 	// ... and nothing to install -> skip the installation at all
 	else if (normal_patches == [] && !Pkg::PkgAnyToInstall () &&
 	    !Pkg::PkgAnyToDelete ())
+	{
+	    y2milestone ("no patch selected after all -> `next");
 	    return `next;
+	}
     }
 
 
@@ -242,29 +205,6 @@
     OnlineUpdateCallbacks::RegisterOnlineUpdateCallbacks();
     WFM::call( "online_update_install" );
 
-
-    // check whether there are changes in the list
-    packages = Pkg::GetPackages (`installed, false);
-    list<string> new_yast2_packages = filter (string p, packages, {
-	return substring (p, 0, 5) == "yast2";
-    });
-    y2milestone ("YaST packages after YOU: %1", new_yast2_packages);
-    // check removed YaST packages, eventually added don't cause problem
-    // of course it covers updated (one removed, another added)
-    foreach (string p, yast2_packages, {
-	if (! contains (new_yast2_packages, p))
-	    y2internal ("yast package updated, current ret is %1", ret);
-    });
-    list<string> new_kernel_packages = filter (string p, packages, {
-	return substring (p, 0, 6) == "kernel";
-    });
-    y2milestone ("Kernel packages after YOU: %1", kernel_packages);
-    // check for added kernels, covers updates
-    foreach (string p, new_kernel_packages, {
-	if (! contains (kernel_packages, p))
-	    y2internal ("kernel updated, current ret is %1", ret);
-    });
-    y2milestone ("Checking result: %1", ret);
     if (ret == `reboot)
     {
 	// message popup
@@ -274,9 +214,7 @@ reboot now then continue the installation.
     }
     else if (ret == `restart_same_step)
     {
-	// message popup
-	Popup::Message (_("During online update, YaST was updated.
-Finishing and restarting now."));
+	Popup::Message (OnlineUpdate::restart_message);
     }
 
     if (!already_up)
@@ -288,6 +226,6 @@ Finishing and restarting now."));
 	    Internet::SetDemand (false);
 	}
     }
-
+    y2milestone ("result of inst_you: %1", ret);
     return ret;
 }
