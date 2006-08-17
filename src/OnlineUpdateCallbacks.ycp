@@ -19,37 +19,20 @@
     // if user aborted the installation
     boolean aborted	= false;
 
-    // it might be useful to remember if download started...
-    boolean downloading_delta	= false;
+    // last callback called
+    string last_callback	= "";
+
+    // indentation of subtasks progress reports
+    string indent		= "  ";
 
     /**
-      Callback for YOU progress widget.
-    */
-    global define boolean ProgressCallback( integer num )
-    ``{
-        y2debug("ProgressCallback %1", num);
+     * Callback for patch (resp. delta rpm) progress widget.
+     * @param num position of progress widget (0 to 100)
+     */
+    global define boolean PatchProgressCallback (integer num) {
 
-        if ( UI::WidgetExists( `id( `progress ) ) ) {
-          UI::ChangeWidget( `id( `progress ), `Value, num );
-        }
-	if (aborted) return false;
+	last_callback	= "PatchProgressCallback";
 
-        symbol ret = (symbol)UI::PollInput();
-
-        if ((ret == `abort || ret == `cancel) &&
-	    OnlineUpdateDialogs::ConfirmAbortUpdate (`incomplete)) {
-            aborted	= true;
-	    return false;
-        }
-
-	return true;
-    }
-
-    /**
-      Callback for YOU patch progress widget.
-    */
-    global define boolean PatchProgressCallback (integer num)
-    ``{
         y2debug("PatchProgressCallback %1", num);
 
         if ( UI::WidgetExists( `id( `patchprogress ) ) ) {
@@ -65,38 +48,13 @@
 	    aborted	= true;
 	    return false;
         }
-
 	return true;
-    }
-
-    global define string ErrorCallback( string type, string text,
-                                        string details )
-    ``{
-        y2milestone ("ErrorCallback %1, type: %2", text, type);
-
-        if ( type == "skip" ) {
-          symbol proceed = OnlineUpdateDialogs::SkipPopup( text, details );
-          if ( proceed == `abort ) return "abort";
-          else if ( proceed == `tryagain ) return "retry";
-          else if ( proceed == `skip ) return "skip";
-          else if ( proceed == `all ) return "skipall";
-          else if ( proceed == `ok ) return "";
-          else return "error";
-        } else if ( type == "abort" ) {
-          if ( OnlineUpdateDialogs::ConfirmAbortUpdate( `incomplete ) ) return "abort";
-          else return "";
-        } else {
-          string msg = text;
-          if ( size( details ) > 0 ) msg = msg + "\n" + details;
-          Popup::Error( msg );
-          return "error";
-        }
-
-	return "";
     }
 
     global void MessageCallback( string patchname, string patchsummary, string message )
     {
+	last_callback	= "MessageCallback";
+
 	// handle all messages as post (OK only)
         list<map> patches = [
 	    $[
@@ -109,9 +67,11 @@
         OnlineUpdateDialogs::MessagePopup( patches, false );
     }
 
-    global define void LogCallback( string text )
-    ``{
-        y2milestone( "LogCallback %1", text );
+    /**
+     * add a text to the installation progress log
+     */
+    global define void ProgressLog (string text) {
+        y2debug ("ProgressLog %1", text);
 
         if ( UI::WidgetExists( `id( `log ) ) ) {
           UI::ChangeWidget( `id( `log ), `LastLine, text );
@@ -123,6 +83,7 @@
     */
     global define boolean ExecuteYcpScriptCallback( string script )
     ``{
+	last_callback	= "ExecuteYcpScriptCallback";
         y2milestone("ExecuteYcpScriptCallback");
         return (boolean)WFM::call( script, [] );
     }
@@ -132,13 +93,13 @@
     */
     global define boolean ScriptProgressCallback( integer percent )
     ``{
+	last_callback	= "ScriptProgressCallback";
         y2milestone("ScriptProgressCallback");
         symbol ret = (symbol)UI::PollInput();
 
         if ( ret == `abort || ret == `cancel ) {
             return false;
         }
-
         return true;
     }
 
@@ -148,14 +109,15 @@
     global boolean StartProvide(string name, integer archivesize,boolean remote)
     {
 	// progress log item (%1 is name of package)
-	LogCallback( sformat( _("Retrieving %1..."), name ) );
+	ProgressLog (sformat (_("Retrieving %1..."), name));
         if (UI::WidgetExists (`id (`patchprogress)))
 	{
 	    UI::ChangeWidget (`id (`patchprogress), `Label,
 		// progress bar label
-		_("Package Progress"));
+		_("Package Download Progress"));
 	    UI::ChangeWidget (`id (`patchprogress), `Value, 0);
 	}
+	last_callback	= "StartProvide";
 	return true;
     }
 
@@ -166,24 +128,26 @@
                                         installsize, boolean is_delete)
     {
 	// progress log item (%1 is name of package, %2 is summary)
-	LogCallback( sformat( _("Installing %1: \"%2\" "), name, summary ) );
+	ProgressLog( sformat( _("Installing %1: \"%2\" "), name, summary ) );
         if (UI::WidgetExists (`id (`patchprogress)))
 	{
 	    UI::ChangeWidget (`id (`patchprogress), `Label,
 		// progress bar label
-		_("Package Progress"));
+		_("Package Installation Progress"));
 	    UI::ChangeWidget (`id (`patchprogress), `Value, 0);
 	}
+	last_callback	= "StartPackage";
 	return true;
     }
 
-     /**
-      Callback for finishing an action in the log
+    /**
+     * Callback for finishing an action in the log
+     * @param line true if we are adding to the end of line
      */
-    global boolean FinishLine()
+    global boolean FinishLine (boolean line)
     {
 	// progress log item (=previous action finished correctly)
-	LogCallback( _("OK") + "\n" );
+	ProgressLog ((line ? indent : "") + _("OK") + "\n" );
 	return true;
     }
 
@@ -199,12 +163,13 @@
 	string ret = PackageCallbacks::DonePackage (error, reason);
 	if (ret == "")
 	{
-	    FinishLine ();
+	    FinishLine (true);
 	    total_progress  = total_progress + 1;
 	    if ( UI::WidgetExists( `id( `progress ) ) ) {
 		UI::ChangeWidget( `id( `progress ), `Value, total_progress);
 	    }
 	}
+	last_callback	= "DonePackage";
 	return ret;
     }
 
@@ -219,12 +184,14 @@
 	string ret = PackageCallbacks::DoneProvide (error, reason, name);
 	if (ret == "")
 	{
-	    FinishLine ();
+	    if (last_callback == "StartProvide")
+		FinishLine (false);
 	    total_progress  = total_progress + 1;
 	    if ( UI::WidgetExists( `id( `progress ) ) ) {
 		UI::ChangeWidget( `id( `progress ), `Value, total_progress);
 	    }
 	}
+	last_callback	= "DoneProvide";
 	return ret;
     }
 
@@ -233,16 +200,18 @@
      */
     global void StartDeltaDownload (string name, integer download_size) {
 
-	downloading_delta	= true;
 	// progress log item (%1 is name of delta RPM
-	LogCallback (sformat(_("Downloading delta RPM %1"), name));
+	if (last_callback == "StartProvide")
+	    ProgressLog ("\n" + indent);
+	ProgressLog (sformat(_("Downloading delta RPM %1"), name));
         if (UI::WidgetExists (`id (`patchprogress)))
 	{
 	    UI::ChangeWidget (`id (`patchprogress), `Label,
 		// progress bar label
-		_("Delta RPM Progress"));
+		_("Delta RPM Download Progress"));
 	    UI::ChangeWidget (`id (`patchprogress), `Value, 0);
 	}
+	last_callback	= "StartDeltaDownload";
     }
 
     /**
@@ -251,43 +220,40 @@
      */
     global boolean ProgressDeltaDownload (integer num) {
 
-        y2internal ("ProgressDeltaDownload %1", num);
-	return PatchProgressCallback (num);
+        y2debug ("ProgressDeltaDownload %1", num);
+	boolean ret = PatchProgressCallback (num);
+	last_callback	= "ProgressDeltaDownload";
+	return ret;
     }
 
     /**
      * callback for problem during downloading delta
      */
     global void ProblemDeltaDownload (string description) {
-	y2internal ("ProblemDeltaDownload: %1", description);
-	LogCallback (
-	    "\n" +
+	y2debug ("ProblemDeltaDownload: %1", description);
+	ProgressLog (
+	    "\n" + indent +
 	    // progress log item (previous action failed(%1 is reason)
 	    sformat(_("Failed to download delta RPM: %1"), description) +
 	    "\n"
 	);
+	last_callback	= "ProblemDeltaDownload";
     }
 
     /*
      * callback for start of applying delta rpm
      */
     global void StartDeltaApply (string name) {
-
 	// progress log item (%1 is name of delta RPM)
-	LogCallback (sformat(_("Applying delta RPM: %1"), name));
+	ProgressLog (indent + sformat(_("Applying delta RPM: %1"), name));
         if (UI::WidgetExists (`id (`patchprogress)))
 	{
 	    UI::ChangeWidget (`id (`patchprogress), `Label,
 		// progress bar label
-		_("Delta RPM Progress"));
-	}
-        if (UI::WidgetExists (`id (`patchprogress)))
-	{
-	    UI::ChangeWidget (`id (`patchprogress), `Label,
-		// progress bar label
-		_("Delta RPM Progress"));
+		_("Delta RPM Application Progress"));
 	    UI::ChangeWidget (`id (`patchprogress), `Value, 0);
 	}
+	last_callback   = "StartDeltaApply";
     }
 
     /**
@@ -295,24 +261,25 @@
      * (cannot be aborted)
      */
     global void ProgressDeltaApply (integer num) {
-	y2internal ("ProgressDeltaApply: %1", num);
-
-        if ( UI::WidgetExists( `id( `patchprogress ) ) ) {
-          UI::ChangeWidget( `id( `patchprogress ), `Value, num );
+	y2debug ("ProgressDeltaApply: %1", num);
+        if (UI::WidgetExists (`id (`patchprogress))) {
+          UI::ChangeWidget (`id (`patchprogress), `Value, num);
         }
+	last_callback   = "ProgressDeltaApply";
     }
 
     /**
      * callback for problem during aplying delta
      */
     global void ProblemDeltaApply (string description) {
-	y2internal ("ProblemDeltaAply: %1", description);
-	LogCallback (
-	    "\n" +
+	y2debug ("ProblemDeltaAply: %1", description);
+	ProgressLog (
+	    "\n" + indent +
 	    // progress log item (previous action failed(%1 is reason)
 	    sformat(_("Failed to apply delta RPM: %1"), description) +
 	    "\n"
 	);
+	last_callback   = "ProblemDeltaApply";
     }
 
     /**
@@ -321,37 +288,37 @@
     global void StartPatchDownload (string name, integer download_size) {
 
 	// progress log item (%1 is name of delta RPM)
-	LogCallback (sformat(_("Downloading patch RPM %1"), name));
+	if (last_callback == "StartProvide")
+	    ProgressLog ("\n" + indent);
+	ProgressLog (sformat(_("Downloading patch RPM %1"), name));
         if (UI::WidgetExists (`id (`patchprogress)))
 	{
 	    UI::ChangeWidget (`id (`patchprogress), `Label,
 		// progress bar label
-		_("Patch RPM progress"));
+		_("Patch RPM Download Progress"));
 	    UI::ChangeWidget (`id (`patchprogress), `Value, 0);
 	}
+	last_callback   = "StartPatchDownload";
     }
 
     /**
      * callback for problem during aplying delta
      */
     global void ProblemPatchDownload (string description) {
-	y2internal ("ProblemPatchDownload: %1", description);
-	LogCallback (
-	    "\n" +
+	y2debug ("ProblemPatchDownload: %1", description);
+	ProgressLog (
+	    "\n" + indent +
 	    // progress log item (previous action failed(%1 is reason)
 	    sformat(_("Failed to download patch RPM: %1"), description) +
 	    "\n"
 	);
+	last_callback   = "ProblemPatchDownload";
     }
 
     // finish of download/application of delta or patch download
     global void FinishPatchDeltaProvide () {
-	FinishLine ();
-	total_progress  = total_progress + 1;
-	if (UI::WidgetExists (`id (`progress)))
-	{
-	    UI::ChangeWidget (`id (`progress), `Value, total_progress);
-	}
+	FinishLine (true);
+	last_callback   = "FinishPatchDeltaProvide";
     }
 
     /**
@@ -370,13 +337,6 @@
 	Pkg::CallbackDonePackage( "OnlineUpdateCallbacks::DonePackage" );
 
 	Pkg::CallbackResolvableReport ("OnlineUpdateCallbacks::MessageCallback");
-
-	Pkg::CallbackYouProgress ("OnlineUpdateCallbacks::ProgressCallback");
-	Pkg::CallbackYouPatchProgress ("OnlineUpdateCallbacks::PatchProgressCallback");
-	Pkg::CallbackYouError ("OnlineUpdateCallbacks::ErrorCallback");
-	Pkg::CallbackYouLog ("OnlineUpdateCallbacks::LogCallback");
-	Pkg::CallbackYouExecuteYcpScript ("OnlineUpdateCallbacks::ExecuteYcpScriptCallback");
-        Pkg::CallbackYouScriptProgress ("OnlineUpdateCallbacks::ScriptProgressCallback");
 
         Pkg::CallbackMediaChange ("PackageCallbacks::MediaChange");
 
@@ -397,6 +357,10 @@
 	Pkg::CallbackProgressPatchDownload ("OnlineUpdateCallbacks::ProgressPatchDownload");
 	Pkg::CallbackProblemPatchDownload ("OnlineUpdateCallbacks::ProblemPatchDownload");
 	Pkg::CallbackFinishPatchDownload ("OnlineUpdateCallbacks::FinishPatchDeltaProvide");
+
+	// obsoleted callbacks
+	Pkg::CallbackYouExecuteYcpScript ("OnlineUpdateCallbacks::ExecuteYcpScriptCallback");
+        Pkg::CallbackYouScriptProgress ("OnlineUpdateCallbacks::ScriptProgressCallback");
     }
 
     /*
@@ -415,6 +379,23 @@
 	    return;
 	}
 	foreach (map<string,any> one_source, all_sources, {
+	    integer source_id          = (integer) one_source["SrcId"]:nil;
+	    boolean source_autorefresh = (boolean) one_source["autorefresh"]:true;
+	    boolean source_enabled     = (boolean) one_source["enabled"]:true;
+	    if (source_id != nil && source_autorefresh == true && source_enabled == true) {
+		y2milestone("Refreshing source: %1", source_id);
+		Pkg::SourceRefreshNow(source_id);
+	    }
+	});
+	y2milestone ("... refreshing done");
+    }
+
+    /**
+     * Refresh sources given by argument
+     */
+    global define void RefreshSources (list<map> sources) {
+	y2milestone("Refreshing sources...");
+	foreach (map one_source, sources, {
 	    integer source_id          = (integer) one_source["SrcId"]:nil;
 	    boolean source_autorefresh = (boolean) one_source["autorefresh"]:true;
 	    boolean source_enabled     = (boolean) one_source["enabled"]:true;

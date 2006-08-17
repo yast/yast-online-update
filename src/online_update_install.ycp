@@ -76,7 +76,7 @@ extra dialog when the patch is being installed.</p>
   import "OnlineUpdateCallbacks";
 
   // progress information
-  OnlineUpdateCallbacks::LogCallback( _("Installation finished.\n") );
+  OnlineUpdateCallbacks::ProgressLog (_("Installation finished.\n"));
 
   if ( commit[1]:[] != [] ) {
     string details = Pkg::LastError() + "\n" + Pkg::LastErrorDetails();

@@ -1,7 +1,9 @@
 -------------------------------------------------------------------
-Fri Aug 11 11:17:59 CEST 2006 - jsuchome@suse.cz
+Thu Aug 17 12:50:39 CEST 2006 - jsuchome@suse.cz
 
-- new callbacks for Patch and Delta RPMs 
+- new callbacks for Patch and Delta RPMs (#168844)
+- fixed generation of cron job: don't ask for confirmation (#194424)
+- 2.13.45
 
 -------------------------------------------------------------------
 Wed Jul 12 08:30:43 CEST 2006 - jsuchome@suse.cz
