@@ -3,7 +3,8 @@
 @HEADER@
 BuildRequires:	gcc-c++ libxcrypt-devel perl-XML-Writer update-desktop-files pkg-config yast2-devtools yast2-packager yast2-bootloader
 PreReq:		grep sed
-Requires:	yast2 yast2-pkg-bindings >= 2.13.88
+# progress callbacks for delta rpms
+Requires:	yast2 yast2-pkg-bindings >= 2.13.88.1
 
 Provides:	y2c_online_update yast2-config-online-update
 Obsoletes:	y2c_online_update yast2-config-online-update
