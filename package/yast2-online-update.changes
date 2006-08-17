@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Aug 16 12:31:33 CEST 2006 - jsuchome@suse.cz
+
+- fixed generation of cron job: don't ask for confirmation (#194424)
+- 2.13.43.0
+
+-------------------------------------------------------------------
 Wed Jun 28 14:15:47 CEST 2006 - jsuchome@suse.cz
 
 - shown one more "Please wait" popup during start (#188172)
