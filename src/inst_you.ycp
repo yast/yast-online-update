@@ -142,6 +142,7 @@
 	ProductFeatures::GetBooleanFeature("globals", "manual_online_update") ||
 	Hack ("ui"))
     {
+	Pkg::TargetInitDU([]); // init DiskUsage counter (#197497)
 	UI::OpenDialog(`opt(`defaultsize), `PackageSelector(`id(`selector), `opt(`youMode)) );
 	symbol ret_sel = (symbol)UI::RunPkgSelection(`id(`selector) );
 	UI::CloseDialog();
