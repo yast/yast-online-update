@@ -16,8 +16,7 @@
   import "Popup";
   import "Wizard";
 
-  Pkg::SourceStartManager (true);
-  // target already initialized in online_update.ycp
+  // target and source already initialized in online_update.ycp
 
   if (OnlineUpdate::cd_update)
   {

@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Aug 22 15:35:42 CEST 2006 - jsuchome@suse.cz
+
+- initialize DiskUsage counter during installation (#197497)
+- 2.13.46
+
+-------------------------------------------------------------------
 Thu Aug 17 12:50:39 CEST 2006 - jsuchome@suse.cz
 
 - new callbacks for Patch and Delta RPMs (#168844)
