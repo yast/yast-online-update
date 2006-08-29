@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Aug 29 14:52:43 CEST 2006 - lslezak@suse.cz
+
+- added missing ProgressPatchDownload() callback handler (#202357)
+- 2.13.43.2
+
+-------------------------------------------------------------------
 Thu Aug 17 14:28:37 CEST 2006 - jsuchome@suse.cz
 
 - new callbacks for Patch and Delta RPMs (#168844) 

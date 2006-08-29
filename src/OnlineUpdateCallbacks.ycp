@@ -302,6 +302,18 @@
     }
 
     /**
+     * callback for path download progress
+     * @return boolean abort the download?
+     */
+    global boolean ProgressPatchDownload (integer num) {
+        y2debug ("ProgressPatchDownload %1", num);
+	boolean ret = PatchProgressCallback (num);
+	last_callback	= "ProgressPatchDownload";
+	return ret;
+    }
+
+
+    /**
      * callback for problem during aplying delta
      */
     global void ProblemPatchDownload (string description) {
