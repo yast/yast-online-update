@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Aug 29 14:54:29 CEST 2006 - lslezak@suse.cz
+
+- added missing ProgressPatchDownload() callback handler (#202357)
+- 2.13.47
+
+-------------------------------------------------------------------
 Tue Aug 22 15:35:42 CEST 2006 - jsuchome@suse.cz
 
 - initialize DiskUsage counter during installation (#197497)
