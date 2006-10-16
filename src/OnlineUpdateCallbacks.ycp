@@ -333,6 +333,105 @@
 	last_callback   = "FinishPatchDeltaProvide";
     }
 
+
+// Script callbacks
+
+    // a script has been started
+    global void ScriptStart(string patch_name, string patch_version, string patch_arch, string script_path, boolean installation)
+    {
+	y2milestone("ScriptStart: patch_name:%1, patch_version:%2, patch_arch:%3, script:%4, installation:%5", patch_name, patch_version, patch_arch, script_path, installation);
+	string patch_full_name = PackageCallbacks::FormatPatchName(patch_name, patch_version, patch_arch);
+
+        if (UI::WidgetExists(`id(`patchprogress)))
+	{
+	    UI::ChangeWidget(`id(`patchprogress), `Label,
+		// progress bar label
+		_("Script Execution Progress"));
+	    UI::ChangeWidget(`id(`patchprogress), `Value, 0);
+	}
+
+	// log entry, %1 is name of the patch which contains the script
+	string log_line = sformat(_("Starting script %1"), patch_full_name);
+
+	ProgressLog("\n" + log_line);
+	last_callback = "ScriptStart";
+    }
+
+    // print output of the script
+    global boolean ScriptProgress(boolean ping, string output)
+    {
+	y2milestone("ScriptProgress: ping:%1, output: %2", ping, output);
+
+	if (output != nil && output != "")
+	{
+	    // add the output to the log widget
+	    ProgressLog(output);
+	}
+
+	last_callback = "ScriptProgress";
+
+	any input = UI::PollInput();
+
+	if (input == `abort || input == `close)
+	{
+	    y2milestone("Aborting the script (input: %1)", input);
+	    return false;
+	}
+	else
+	{
+	    return true;
+	}
+    }
+
+    // an error has occurred
+    global void ScriptProblem(string description)
+    {
+	y2milestone("ScriptProblem: %1", description);
+
+	// FIXME: use rather LongError here?
+	Popup::Error(description);
+	last_callback = "ScriptProblem";
+    }
+
+    // the script has finished
+    global void ScriptFinish()
+    {
+	y2milestone("ScriptFinish");
+
+        if (UI::WidgetExists(`id(`patchprogress)))
+	{
+	    UI::ChangeWidget(`id(`patchprogress), `Value, 100);
+	}
+
+	FinishLine(true);
+	total_progress  = total_progress + 1;
+	if (UI::WidgetExists(`id( `progress )))
+	{
+	    UI::ChangeWidget(`id(`progress), `Value, total_progress);
+	}
+
+	last_callback = "ScriptFinish";
+    }
+
+    // display a message
+    global void Message(string patch_name, string patch_version, string patch_arch, string message)
+    {
+	string patch_full_name = PackageCallbacks::FormatPatchName(patch_name, patch_version, patch_arch);
+	y2milestone("Message (%1): %2", patch_full_name, message);
+
+	if (patch_full_name != "")
+	{
+	    // label, %1 is patch name with version and architecture
+	    patch_full_name = sformat(_("Patch %1\n\n"), patch_full_name);
+	}
+
+	// use richtext, the message might be too long for standard popup
+	Popup::LongMessage(patch_full_name + message);
+	last_callback = "Message";
+    }
+
+
+
     /**
       Constructor
     */
@@ -373,6 +472,14 @@
 	// obsoleted callbacks
 	Pkg::CallbackYouExecuteYcpScript ("OnlineUpdateCallbacks::ExecuteYcpScriptCallback");
         Pkg::CallbackYouScriptProgress ("OnlineUpdateCallbacks::ScriptProgressCallback");
+
+	// script callbacks
+	Pkg::CallbackScriptStart("OnlineUpdateCallbacks::ScriptStart");
+	Pkg::CallbackScriptProgress("OnlineUpdateCallbacks::ScriptProgress");
+	Pkg::CallbackScriptProblem("OnlineUpdateCallbacks::ScriptProblem");
+	Pkg::CallbackScriptFinish("OnlineUpdateCallbacks::ScriptFinish");
+
+	Pkg::CallbackMessage("OnlineUpdateCallbacks::Message");
     }
 
     /*

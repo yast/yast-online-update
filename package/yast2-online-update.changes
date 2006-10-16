@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Oct 16 16:38:07 CEST 2006 - lslezak@suse.cz
+
+- script callbacks (feature #100233)
+- 2.13.48
+
+-------------------------------------------------------------------
 Tue Aug 29 14:54:29 CEST 2006 - lslezak@suse.cz
 
 - added missing ProgressPatchDownload() callback handler (#202357)
