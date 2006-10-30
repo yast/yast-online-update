@@ -6,7 +6,7 @@ PreReq:		grep sed
 # script callbacks
 Requires:	yast2 yast2-pkg-bindings >= 2.13.99
 # PackageCallbacks::FormatPatchName
-Requires:	yast2-packager >= 2.13.153
+Requires:	yast2-packager >= 2.13.159
 
 Provides:	y2c_online_update yast2-config-online-update
 Obsoletes:	y2c_online_update yast2-config-online-update

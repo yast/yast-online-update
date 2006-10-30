@@ -18,7 +18,7 @@
   import "AutoOnlineUpdate";
   import "OnlineUpdateDialogs";
 
-  include "inst_source_dialogs.ycp";
+  include "packager/inst_source_dialogs.ycp";
 
   map server = $[ "url": "" ];
 
