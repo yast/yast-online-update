@@ -221,11 +221,27 @@ the update takes place.");
 	    if (  ret == `next) {
 		if ( enabled )
 		{
-		    if (!Package::Install ("rug"))
+		    if (!Package::Installed (AutoOnlineUpdate::updater))
 		    {
-			ret	= `enable;
-			UI::ChangeWidget( `id( `enable ), `Value, false);
-			continue;
+			string to_install	= "";
+			if (Package::Installed ("zypper"))
+			    AutoOnlineUpdate::updater	= "zypper";
+			else if (Package::Installed ("zmd"))
+			    // rug is default if zmd is present
+			    to_install	= "rug";
+			else
+			    to_install	= "zypper";
+			if (to_install != "")
+			{
+			    if (Package::Install (to_install))
+				AutoOnlineUpdate::updater	= to_install;
+			    else // installation failed/canceled
+			    {
+				ret	= `enable;
+				UI::ChangeWidget( `id( `enable ), `Value, false);
+				continue;
+			    }
+			}
 		    }
 		    AutoOnlineUpdate::minute = (integer)UI::QueryWidget( `id( `minute ), `Value );
 		    AutoOnlineUpdate::hour = (integer)UI::QueryWidget( `id( `hour ), `Value );

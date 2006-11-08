@@ -79,6 +79,8 @@ global string cronfile = "/etc/cron.d/yast2-online-update";
 /* default value of settings modified */
 global boolean modified = false;
 
+// the application that does the update (rug/zypper)
+global string updater	= "rug";
 
 /**
  * Function sets internal variable, which indicates, that any
@@ -128,6 +130,12 @@ global define boolean Read()
 
     if ( size( cronjob ) > 0 ) {
         enabled = true;
+
+	if (issubstring (cronjob, "rug up"))
+	    updater	= "rug";
+	else if (issubstring (cronjob, "zypper up"))
+	    updater	= "zypper";
+
         string h  = regexpsub( cronjob, "[0-9]+ ([0-9]+) ", "\\1" );
         string m = regexpsub( cronjob, "([0-9]+) ([0-9]+) ", "\\1" );
         string d = regexpsub( cronjob, "[0-9*]+ [0-9*]+ [0-9*]+ [0-9*]+ ([0-9*]+)", "\\1" );
@@ -163,12 +171,21 @@ global define boolean Write()
 {
 
     string cronjob = "";
-    if (timing == `weekly && day >= 0 && day <= 7) {
-        cronjob = sformat( "%1 %2 * * %3 root rug up -y -t patch %4", minute, hour,
-                day, options );
-    } else {
-        cronjob = sformat( "%1 %2 * * * root rug up -y -t patch %3", minute, hour,
-                options );
+    if (updater != "rug" && updater != "zypper")
+    {
+	y2warning ("invalid updater application defined (%1)", updater);
+	return false;
+    }
+
+    if (timing == `weekly && day >= 0 && day <= 7)
+    {
+        cronjob = sformat( "%1 %2 * * %3 root %4 up -y -t patch %5",
+	    minute, hour, day, updater, options);
+    }
+    else
+    {
+        cronjob = sformat ("%1 %2 * * * root %3 up -y -t patch %4",
+	    minute, hour, updater, options);
     }
     if ( autoget ) cronjob = cronjob + " -d";
     if ( skipPre ) cronjob = cronjob + " --skip-interactive";
