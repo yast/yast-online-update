@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Nov  8 16:22:46 CET 2006 - jsuchome@suse.cz
+
+- fixed autoyast schema file (#215249)
+- 2.13.51 
+
+-------------------------------------------------------------------
 Wed Nov  8 16:11:19 CET 2006 - jsuchome@suse.cz
 
 - schema file moved from autoyast package (#215249)
