@@ -57,6 +57,7 @@ fi
 %files
 %defattr(-,root,root)
 @desktopdir@/online_update_setup.desktop
+@schemadir@/autoyast/rnc/online_update.rnc
 @scrconfdir@/*.scr
 @clientdir@/online*.ycp
 @clientdir@/inst_you.ycp

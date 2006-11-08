@@ -16,6 +16,7 @@ X-SuSE-YaST-Geometry=
 X-SuSE-YaST-SortKey=
 X-SuSE-YaST-AutoInstResource=
 X-SuSE-YaST-AutoInst=
+X-SuSE-YaST-AutoInstSchema=online_update.rnc
 
 Icon=yast-online_update
 Exec=/sbin/yast2 online_update_setup 

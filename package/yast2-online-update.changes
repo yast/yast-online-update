@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Nov  8 16:11:19 CET 2006 - jsuchome@suse.cz
+
+- schema file moved from autoyast package (#215249)
+- 2.13.50 
+
+-------------------------------------------------------------------
 Mon Oct 30 16:23:23 CET 2006 - locilka@suse.cz
 
 - Fixed packager include path.

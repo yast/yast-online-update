@@ -1,6 +1,7 @@
 #
 # Makefile.am for online-update/src
 #
+rncdir =  $(schemadir)/autoyast/rnc
 
 client_DATA =				\
 	online_update_start.ycp		\
@@ -22,6 +23,8 @@ desktop_DATA =				\
 	online_update_setup.desktop	\
 	cd_update.desktop
 
-EXTRA_DIST = $(client_DATA) $(module_DATA) $(desktop_DATA)
+rnc_DATA = online_update.rnc
+
+EXTRA_DIST = $(client_DATA) $(module_DATA) $(desktop_DATA) $(rnc_DATA)
 
 include $(top_srcdir)/Makefile.am.common
