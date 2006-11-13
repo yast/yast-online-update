@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Nov 13 16:37:01 CET 2006 - jsuchome@suse.cz
+
+- prevent infinite loop in inst_you (#220218)
+- 2.13.52 
+
+-------------------------------------------------------------------
 Wed Nov  8 16:22:46 CET 2006 - jsuchome@suse.cz
 
 - fixed autoyast schema file (#215249)

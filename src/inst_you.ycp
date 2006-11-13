@@ -91,6 +91,11 @@
 			  "/bin/ping -c 1 -w 1 213.95.15.200");
 
 	    sleep (1000);
+	    i	= i - 1;
+	}
+	if (i < 1)
+	{
+	    y2warning ("Internet::Status timed out, no connection available?");
 	}
     }
 
