@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Dec 14 13:27:02 CET 2006 - jsuchome@suse.cz
+
+- added write progress
+- 2.15.0 
+
+-------------------------------------------------------------------
 Mon Nov 13 16:33:24 CET 2006 - jsuchome@suse.cz
 
 - prevent infinite loop in inst_you (#220218)

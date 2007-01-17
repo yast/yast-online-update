@@ -257,7 +257,11 @@ the update takes place.");
 		    AutoOnlineUpdate::modified = true;
 		    if (!Mode::config())
 		    {
+			// busy popup text
+			Popup::ShowFeedback ("", _("Writing settings..."));
 			AutoOnlineUpdate::Write();
+			sleep (2000);
+			Popup::ClearFeedback ();
 		    }
 		}
 		else
