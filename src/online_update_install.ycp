@@ -95,10 +95,16 @@ extra dialog when the patch is being installed.</p>
   UI::ChangeWidget( `id( `patchprogress ), `Value, 100 );
   UI::ChangeWidget( `id( `progress ), `Value, total_progress);
 
+  symbol ret = `next;
+  if (!Stage::cont ())
+  {
+    if (!changed_packages)
+	ret = `abort;
+    return ret;
+  }
+
   ////////////////////////////////////////////////////////////////////////
   ////  Loop for User Input ....
-  symbol ret = `next;
-
   repeat {
     ret = (symbol)UI::UserInput();
 
