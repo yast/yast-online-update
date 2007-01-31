@@ -15,6 +15,7 @@
 module "AutoOnlineUpdate";
 textdomain "online-update";
 
+import "Package";
 import "Report";
 import "Summary";
 import "Mode";
@@ -81,6 +82,9 @@ global boolean modified = false;
 
 // the application that does the update (rug/zypper)
 global string updater	= "rug";
+
+// packages required for installation (for autoYaST)
+list required_packages = [];
 
 /**
  * Function sets internal variable, which indicates, that any
@@ -217,6 +221,26 @@ global define boolean Import (map settings)
         hour = random( 24 );
         minute = random( 60 );
     }
+
+    if (enabled && Mode::autoinst ())
+    {
+	if (!Package::Installed (updater))
+	{
+	    string to_install	= "";
+	    if (Package::Installed ("zypper"))
+		updater	= "zypper";
+	    else if (Package::Installed ("zmd"))
+		// rug is default if zmd is present
+		to_install	= "rug";
+	    else
+		to_install	= "zypper";
+	    if (to_install != "")
+	    {
+		updater	= to_install;
+		required_packages	= union (required_packages, [to_install]);
+	    }
+	}
+    }
     return true;
 }
 
@@ -296,7 +320,7 @@ global define string Summary()
  */
 global define map AutoPackages()
 {
-    return $[ "install":[], "remove":[] ];
+    return $[ "install": required_packages , "remove":[] ];
 }
 
 /* EOF */

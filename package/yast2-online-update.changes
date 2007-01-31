@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Jan 31 14:43:52 CET 2007 - jsuchome@suse.cz
+
+- check for updater application during autoinstallation (#236928)
+- 2.15.2 
+
+-------------------------------------------------------------------
 Fri Jan 19 13:12:05 CET 2007 - jsuchome@suse.cz
 
 - do not wait for user input after installation of patches (#228535)
