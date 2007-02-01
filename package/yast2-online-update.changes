@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Feb  1 10:03:59 CET 2007 - jsuchome@suse.cz
+
+- check "close window" event in the UI (#241012)
+- 2.15.3 
+
+-------------------------------------------------------------------
 Wed Jan 31 14:43:52 CET 2007 - jsuchome@suse.cz
 
 - check for updater application during autoinstallation (#236928)
