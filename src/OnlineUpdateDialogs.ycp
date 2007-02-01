@@ -250,7 +250,7 @@ the update takes place.");
 		    SCR::Execute( .target.remove, AutoOnlineUpdate::cronfile );
 		}
 	    }
-	} until ( ret == `next || ret == `abort  || ret == `back );
+	} until ( ret == `next || ret == `abort  || ret == `back || ret == `cancel);
 
 	UI::CloseDialog();
 	return ret;

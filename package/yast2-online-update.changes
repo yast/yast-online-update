@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Feb  1 10:02:51 CET 2007 - jsuchome@suse.cz
+
+- check "close window" event in the UI (#241012)
+- 2.13.53 
+
+-------------------------------------------------------------------
 Mon Nov 13 16:37:01 CET 2006 - jsuchome@suse.cz
 
 - prevent infinite loop in inst_you (#220218)
