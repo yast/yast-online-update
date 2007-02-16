@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Feb 15 10:56:31 CET 2007 - jsuchome@suse.cz
+
+- changed source prefix for Patch CD (#244983)
+- 2.13.54 
+
+-------------------------------------------------------------------
 Thu Feb  1 10:02:51 CET 2007 - jsuchome@suse.cz
 
 - check "close window" event in the UI (#241012)

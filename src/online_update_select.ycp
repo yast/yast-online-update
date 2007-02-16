@@ -25,7 +25,7 @@
     {
 	string initMessage = _("Initializing for CD update...");
 	UI::OpenDialog(`opt(`decorated ),`Label( initMessage ));
-	OnlineUpdate::cd_source = Pkg::SourceCreate ("cd:///", "");
+	OnlineUpdate::cd_source = Pkg::SourceCreate ("cd:///", "patches");
 	UI::CloseDialog();
 
 	if (OnlineUpdate::cd_source == -1)
