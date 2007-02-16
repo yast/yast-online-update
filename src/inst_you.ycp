@@ -112,6 +112,12 @@
 	// otherwise it was already done in inst_ask_online_update.ycp)
 	Pkg::PkgEstablish ();
     }
+    else // reinitialize target after release notes were read (#232247)
+    {
+	Pkg::TargetFinish ();
+	Pkg::TargetInitialize ("/");
+	Pkg::TargetLoad ();
+    }
 
     integer selected	= 0;
 
