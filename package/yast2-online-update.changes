@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Feb 19 11:00:12 CET 2007 - jsuchome@suse.cz
+
+- do not install Patch CD desktop file on s390 (#241507)
+- 2.13.55 
+
+-------------------------------------------------------------------
 Thu Feb 15 10:56:31 CET 2007 - jsuchome@suse.cz
 
 - changed source prefix for Patch CD (#244983)
