@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Feb 20 14:21:45 CET 2007 - jsuchome@suse.cz
+
+- do not change Finish button label (#246497)
+- 2.15.6 
+
+-------------------------------------------------------------------
 Mon Feb 19 10:58:57 CET 2007 - jsuchome@suse.cz
 
 - do not install Patch CD desktop file on s390 (#241507)

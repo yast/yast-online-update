@@ -89,8 +89,6 @@ extra dialog when the patch is being installed.</p>
   Wizard::SetFocusToNextButton();
 
   changed_packages = changed_packages || commit[0]:0 > 0;
-  if (!Stage::cont ())
-    Wizard::SetNextButton(`next, Label::CloseButton() );
 
   UI::ChangeWidget( `id( `patchprogress ), `Value, 100 );
   UI::ChangeWidget( `id( `progress ), `Value, total_progress);
