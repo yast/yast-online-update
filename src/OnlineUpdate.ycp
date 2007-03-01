@@ -18,31 +18,6 @@ global boolean cd_update = false;
 // no. of temporary source
 global integer cd_source = -1;
 
-/**
- * flag: YOU automatic get mode?
- */
-global boolean you_auto_get = false;
-
-/**
- * flag: Automatic Update
- */
-global boolean you_auto	= false;
-
-/**
- * Url where patches are looked for.
- */
-global string you_url = "";
-
-/**
- * should signatures be checked? FIXME obsolete
- */
-global boolean signature_check = true;
-
-/**
-  Force reload of all patches?
-*/  
-global boolean reload = true;
-
 // if yast should be restarted after installation of patches
 global boolean restart_yast	= false;
 

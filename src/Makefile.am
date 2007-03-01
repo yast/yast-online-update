@@ -4,12 +4,12 @@
 rncdir =  $(schemadir)/autoyast/rnc
 
 client_DATA =				\
-	online_update_start.ycp		\
 	online_update_auto.ycp		\
 	online_update_select.ycp 	\
 	online_update_install.ycp       \
 	online_update.ycp		\
 	online_update_setup.ycp		\
+	cd_update.ycp			\
 	inst_you.ycp
 
 module_DATA =				\

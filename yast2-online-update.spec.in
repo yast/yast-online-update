@@ -62,6 +62,7 @@ fi
 @schemadir@/autoyast/rnc/online_update.rnc
 @scrconfdir@/*.scr
 @clientdir@/online*.ycp
+@clientdir@/cd_update.ycp
 @clientdir@/inst_you.ycp
 @moduledir@/OnlineUpdate*.ycp
 @moduledir@/OnlineUpdate*.ybc
