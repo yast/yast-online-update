@@ -10,6 +10,7 @@
   textdomain "online-update";
 
   import "Confirm";
+  import "CommandLine";
   import "Directory";
   import "FileUtils";
   import "Label";
@@ -24,7 +25,7 @@
 
   integer arg_n = 0;
   integer arg_max = size( WFM::Args() );
-
+  boolean run_cmdline	= false;
   while (arg_n < arg_max ) {
       any arg = WFM::Args( arg_n );
 
@@ -38,7 +39,15 @@
 	  OnlineUpdate::you_auto_get	= true;
 	  OnlineUpdate::you_auto	= true;
       }
+      else
+	  run_cmdline	= true;
       arg_n = arg_n + 1;
+  }
+  // this is only to show the generic message that CLI is not available (#249306, comment 5)
+  if (run_cmdline)
+  {
+      CommandLine::Run ($["id" : "online_update"]);
+      return 1;
   }
 
   // only download the patches - OBSOLETE
