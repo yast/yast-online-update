@@ -90,9 +90,12 @@ you have inserted the correct CD.
   boolean restart_yast	= false;
   list<string> normal_patches		= [];
   boolean more_patches_needed		= false;
+  boolean reboot_needed			= false;
   foreach (map patch, Pkg::ResolvableProperties("", `patch, ""), {
     if (patch["status"]:`none == `selected)
     {
+	if (patch["reboot_needed"]:false)
+	    reboot_needed	= true;
 	if (patch["affects_pkg_manager"]:false)
 	    restart_yast = true;
         else
@@ -113,6 +116,8 @@ you have inserted the correct CD.
 	Pkg::ResolvableNeutral (pname, `patch, true);
     });
     SCR::Write (.target.ycp, saved_path, normal_patches);
+    // show reboot popup only when yast is not going to restart itself automatically
+    reboot_needed	= false;
   }
   // no patch selected
   if (!restart_yast && normal_patches == [] && !Pkg::PkgAnyToInstall () &&
@@ -121,6 +126,7 @@ you have inserted the correct CD.
       ret = `cancel;
   }
   OnlineUpdate::restart_yast	= restart_yast;
+  OnlineUpdate::reboot_needed	= reboot_needed;
 
   if ( ret == `cancel ) return `abort;
   else return `next;

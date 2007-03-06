@@ -25,5 +25,12 @@ global boolean restart_yast	= false;
 global string restart_message =_("Packages for package management were updated.
 Finishing and restarting now.");
 
+// if patch with reboot flag was installed
+global boolean reboot_needed	= false;
+
+// popup message
+global string reboot_message	= _("At least one of the updates installed requires a system reboot to function
+properly. Reboot the system.");
+
 /* EOF */
 }

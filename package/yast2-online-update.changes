@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Mar  6 15:35:18 CET 2007 - jsuchome@suse.cz
+
+- show 'reboot now' popup also on installed system (#250606)
+- 2.15.8 
+
+-------------------------------------------------------------------
 Thu Mar  1 14:07:15 CET 2007 - jsuchome@suse.cz
 
 - added basic command line support (#249306)

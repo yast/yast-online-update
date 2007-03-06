@@ -34,7 +34,7 @@ define symbol OnlineUpdateSequence () {
   Wizard::CreateDialog();
   Wizard::SetDesktopIcon("online_update");
   // help text for online-update initialization
-  Wizard::RestoreHelp ("<p>The system is initializing the installation and update sources. Installation and update sources can be altered in the <b>Installation Source</b> module.</p>");
+  Wizard::RestoreHelp (_("<p>The system is initializing the installation and update sources. Installation and update sources can be altered in the <b>Installation Source</b> module.</p>"));
 
   list<string> stages =  [
 	    // progress stage label
@@ -140,6 +140,10 @@ define symbol OnlineUpdateSequence () {
     }
     OnlineUpdate::restart_yast	= false;
     retval	= -42;// restart menu.ycp even if there are no other patches selected
+  }
+  else if (OnlineUpdate::reboot_needed)
+  {
+    Popup::Message (OnlineUpdate::reboot_message);
   }
   return `next;
 }
