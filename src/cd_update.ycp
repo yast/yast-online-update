@@ -1,0 +1,6 @@
+/**
+ * Summary:	Client for calling CD update
+ */
+{
+    return WFM::CallFunction ("online_update", prepend (WFM::Args (), "cd_update"));
+}
