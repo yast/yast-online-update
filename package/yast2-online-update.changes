@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Apr  2 10:50:31 CEST 2007 - jsuchome@suse.cz
+
+- synchronize the new sources with ZMD (#259285)
+- do not save the sources when module was aborted (#259293)
+- 2.13.58 
+
+-------------------------------------------------------------------
 Tue Mar  6 13:07:51 CET 2007 - jsuchome@suse.cz
 
 - show 'reboot now' popup also on installed system (#250606)
