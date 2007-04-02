@@ -20,6 +20,7 @@
   import "PackageLock";
   import "Popup";
   import "Progress";
+  import "SourceManager";
   import "Wizard";
   import "GetInstArgs";
 
@@ -126,8 +127,12 @@ define symbol OnlineUpdateSequence () {
 
   Wizard::CloseDialog();
 
+  // `back is strange, user can go back after installation...
+  if (result == `abort || result == `cancel) return `abort;
+
   if (OnlineUpdate::cd_update && OnlineUpdate::cd_source > -1)
   {
+    SourceManager::SyncYaSTInstSourceWithZMD ();
     Pkg::SourceFinishAll ();
   }
 

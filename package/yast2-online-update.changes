@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Apr  2 14:25:20 CEST 2007 - jsuchome@suse.cz
+
+- synchronize the new sources with ZMD (#259285)
+- do not save the sources when module was aborted (#259293)
+- 2.15.10 
+
+-------------------------------------------------------------------
 Wed Mar 21 16:04:43 CET 2007 - jsuchome@suse.cz
 
 - added missing cd_update.ycp file
