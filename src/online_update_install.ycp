@@ -42,11 +42,8 @@ YaST2 will download all selected patches.
 This could take some time. Download details are shown in the log window.</p>");
 
   // help text for online update
-  string help_part2 =  _("<p>When the download has finished successfully, the
-patches will be installed. The progress is shown in the log window. If there
-are special messages associated with patches, they will be shown in an
-extra dialog when the patch is being installed.</p>
-");
+  string help_part2 =  _("<p>If there are special messages associated with patches,
+they will be shown in an extra dialog when the patch is being installed.</p>");
 
   string help_text = help_part1 + help_part2;
 

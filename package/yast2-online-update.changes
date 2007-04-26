@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Apr 26 15:28:39 CEST 2007 - jsuchome@suse.cz
+
+- fixed obsolete help text (#267960)
+- 2.15.11 
+
+-------------------------------------------------------------------
 Mon Apr  2 14:25:20 CEST 2007 - jsuchome@suse.cz
 
 - synchronize the new sources with ZMD (#259285)
