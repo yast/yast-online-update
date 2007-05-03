@@ -173,6 +173,11 @@ global define boolean Read()
  */
 global define boolean Write()
 {
+    if (!enabled)
+    {
+	SCR::Execute( .target.remove, cronfile );
+	return true;
+    }
 
     string cronjob = "";
     if (updater != "rug" && updater != "zypper")

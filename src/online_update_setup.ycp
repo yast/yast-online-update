@@ -1,12 +1,113 @@
 /**
  * Package:	Online update
- * Summary:	Open a dialog for configuarion of automatic update
+ * Summary:	Configuarion of automatic update
  * Authors:	Jiri Suchomel <jsuchome@suse.cz>
  *
  * $Id$
  */
 {
-  import "OnlineUpdateDialogs";
+  textdomain "online-update";
 
-  OnlineUpdateDialogs::SetupAutomatic();
+  import "AutoOnlineUpdate";
+  import "CommandLine";
+  import "Mode";
+  import "OnlineUpdateDialogs";
+  import "Popup";
+
+  /**
+   * command line handler for modifications
+   */
+  define boolean ModifyHandler (map options) {
+    if ((options["skip"]:"" == "yes" && !AutoOnlineUpdate::skipPre) ||
+	(options["skip"]:"" == "no"  && AutoOnlineUpdate::skipPre))
+    {
+	AutoOnlineUpdate::skipPre	= options["skip"]:"" == "yes";
+	AutoOnlineUpdate::modified	= true;
+    }
+    return AutoOnlineUpdate::modified;
+  }
+
+  /**
+   * command line handler for enabling
+   */
+  define boolean EnableHandler (map options ) {
+    if (!AutoOnlineUpdate::enabled)
+	AutoOnlineUpdate::modified = true;
+    AutoOnlineUpdate::enabled = true;
+    ModifyHandler (options);
+    return AutoOnlineUpdate::modified;
+  }
+
+  /**
+   * command line handler for disabling
+   */
+  define boolean DisableHandler (map options ) {
+    if (AutoOnlineUpdate::enabled)
+	AutoOnlineUpdate::modified = true;
+    AutoOnlineUpdate::enabled = false;
+    return AutoOnlineUpdate::modified;
+  }
+
+  /**
+   * command line handler for summary
+   */
+  define boolean SummaryHandler (map options) {
+
+    CommandLine::Print (
+	// summary item
+	AutoOnlineUpdate::enabled ? _("Automatic Online Update is enabled.") :
+	// summary item
+				    _("Automatic Online Update is disabled."));
+    if (AutoOnlineUpdate::skipPre)
+	CommandLine::Print (_("Interactive patches will be skipped."));
+
+    return false;
+  }
+
+  // the command line description map
+  map cmdline = $[
+    "id"		: "online_update_setup",
+    // translators: command line help text
+    "help"		: _("Setup Automatic Online Update"),
+    "initialize"	: AutoOnlineUpdate::Read,
+    "finish"		: AutoOnlineUpdate::Write,
+    "guihandler"	: OnlineUpdateDialogs::SetupAutomatic,
+    "actions"		: $[
+	"enable" :$[
+	    "handler"	: EnableHandler,
+	    // translators: command line help text for enable action
+	    "help"	: _("Enable Automatic Online Update")
+	],
+	"disable" :$[
+	    "handler"	: DisableHandler,
+	    // translators: command line help text for disable action
+	    "help"	: _("Disable Automatic Online Update")
+	],
+	"summary" : $[
+	    "handler"   : SummaryHandler,
+	    // translators: command line help text summary action
+	    "help"	: _("Configuration summary"),
+	],
+	"modify"	: $[
+	    "handler"	: ModifyHandler,
+	    // translators: command line help text for modify action
+	    "help"	: _("Modify current configuration"),
+	],
+    ],
+    "options"		: $[
+	"skip"	:	$[
+	    // help for command line 'skip' option
+	    "help"	: _("Skip interactive patches"),
+	    "type"      : "enum",
+	    "typespec"  : [ "yes", "no" ],
+	],
+    ],
+    "mappings"		: $[
+	"enable"	: [ "skip" ],
+	"modify"	: [ "skip" ],
+	"disable"	: [],
+    ]
+  ];
+
+  return CommandLine::Run (cmdline);
 }

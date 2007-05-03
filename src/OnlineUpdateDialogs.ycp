@@ -260,7 +260,7 @@ the update takes place.");
 			// busy popup text
 			Popup::ShowFeedback ("", _("Writing settings..."));
 			AutoOnlineUpdate::Write();
-			sleep (2000);
+			sleep (1500);
 			Popup::ClearFeedback ();
 		    }
 		}
