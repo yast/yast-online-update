@@ -18,11 +18,72 @@
    * command line handler for modifications
    */
   define boolean ModifyHandler (map options) {
+
+    if (!AutoOnlineUpdate::enabled)
+	return false;
+
     if ((options["skip"]:"" == "yes" && !AutoOnlineUpdate::skipPre) ||
 	(options["skip"]:"" == "no"  && AutoOnlineUpdate::skipPre))
     {
 	AutoOnlineUpdate::skipPre	= options["skip"]:"" == "yes";
 	AutoOnlineUpdate::modified	= true;
+    }
+    if (haskey (options, "daily") && AutoOnlineUpdate::timing != `daily)
+    {
+	AutoOnlineUpdate::timing	= `daily;
+	AutoOnlineUpdate::modified	= true;
+    }
+    if (haskey (options, "weekly") && AutoOnlineUpdate::timing != `weekly)
+    {
+	AutoOnlineUpdate::timing	= `weekly;
+	AutoOnlineUpdate::modified	= true;
+	if (AutoOnlineUpdate::day < 0)
+	    AutoOnlineUpdate::day	= 0;
+    }
+    if (haskey (options, "day"))
+    {
+	integer day	= options["day"]:0;
+	if (day < 0 || day > 7)
+	{
+	    // command line error message
+	    CommandLine::Print (_("The value of 'day' must be between 0 and 7."));
+	    return false;
+	}
+	if (AutoOnlineUpdate::timing != `daily && day != AutoOnlineUpdate::day)
+	{
+	    AutoOnlineUpdate::day	= day;
+	    AutoOnlineUpdate::modified	= true;
+	}
+    }
+    if (haskey (options, "hour"))
+    {
+	integer hour	= options["hour"]:0;
+	if (hour < 0 || hour > 23)
+	{
+	    // command line error message
+	    CommandLine::Print (_("The value of 'hour' must be between 0 and 23."));
+	    return false;
+	}
+	if (hour != AutoOnlineUpdate::hour)
+	{
+	    AutoOnlineUpdate::hour	= hour;
+	    AutoOnlineUpdate::modified	= true;
+	}
+    }
+    if (haskey (options, "minute"))
+    {
+	integer minute	= options["minute"]:0;
+	if (minute < 0 || minute > 59)
+	{
+	    // command line error message
+	    CommandLine::Print (_("The value of 'minute' must be between 0 and 59."));
+	    return false;
+	}
+	if (minute != AutoOnlineUpdate::minute)
+	{
+	    AutoOnlineUpdate::minute	= minute;
+	    AutoOnlineUpdate::modified	= true;
+	}
     }
     return AutoOnlineUpdate::modified;
   }
@@ -58,9 +119,40 @@
 	AutoOnlineUpdate::enabled ? _("Automatic Online Update is enabled.") :
 	// summary item
 				    _("Automatic Online Update is disabled."));
+    if (!AutoOnlineUpdate::enabled)
+	return false;
     if (AutoOnlineUpdate::skipPre)
+	// summary item
 	CommandLine::Print (_("Interactive patches will be skipped."));
 
+    integer hour	= AutoOnlineUpdate::hour;
+    integer minute	= AutoOnlineUpdate::minute;
+    string hour_str = (hour>9) ? sformat("%1", hour) : sformat("0%1", hour);
+    string minute_str = (minute>9) ? sformat("%1", minute) : sformat("0%1", minute);
+    // time string (when the update is run) %1 is hour, %2 minute
+    string time_str = sformat (_("at %1.%2"), hour_str, minute_str);
+    if (AutoOnlineUpdate::random_time)
+	// alternative time string (when the update is run)
+        time_str = _("at a random time");
+    if (AutoOnlineUpdate::timing == `weekly)
+    {
+	// summary item, %1 is day in the week, %2 is time string
+	CommandLine::Print (sformat (_("Update is scheduled on %1, %2."),
+	    AutoOnlineUpdate::days[AutoOnlineUpdate::day]:"", time_str));
+    }
+    else
+	// summary item, %1 is time
+	CommandLine::Print (sformat (_("Update is scheduled daily %1."), time_str));
+    return false;
+  }
+
+  /**
+   * command line handler for writing
+   */
+  boolean WriteHandler () {
+
+    if (AutoOnlineUpdate::InstallUpdater ())
+	return AutoOnlineUpdate::Write ();
     return false;
   }
 
@@ -70,18 +162,18 @@
     // translators: command line help text
     "help"		: _("Setup Automatic Online Update"),
     "initialize"	: AutoOnlineUpdate::Read,
-    "finish"		: AutoOnlineUpdate::Write,
+    "finish"		: WriteHandler,
     "guihandler"	: OnlineUpdateDialogs::SetupAutomatic,
     "actions"		: $[
 	"enable" :$[
 	    "handler"	: EnableHandler,
 	    // translators: command line help text for enable action
-	    "help"	: _("Enable Automatic Online Update")
+	    "help"	: _("Enable automatic online update")
 	],
 	"disable" :$[
 	    "handler"	: DisableHandler,
 	    // translators: command line help text for disable action
-	    "help"	: _("Disable Automatic Online Update")
+	    "help"	: _("Disable automatic online update")
 	],
 	"summary" : $[
 	    "handler"   : SummaryHandler,
@@ -101,10 +193,33 @@
 	    "type"      : "enum",
 	    "typespec"  : [ "yes", "no" ],
 	],
+	"daily"	:	$[
+	    // help for command line 'daily' option
+	    "help"	: _("Set update to be done daily"),
+	],
+	"weekly"	:	$[
+	    // help for command line 'weekly' option
+	    "help"	: _("Set update to be done weekly"),
+	],
+	"day"	:	$[
+	    // help for command line 'day' option
+	    "help"	: _("Day in a week to do the weekly update (0-7)"),
+	    "type"	: "integer",
+	],
+	"hour"	:	$[
+	    // help for command line 'hour' option
+	    "help"	: _("Hour to do the update (0-23)"),
+	    "type"	: "integer",
+	],
+	"minute"	:	$[
+	    // help for command line 'minute' option
+	    "help"	: _("Minute to do the update (0-59)"),
+	    "type"	: "integer",
+	],
     ],
     "mappings"		: $[
-	"enable"	: [ "skip" ],
-	"modify"	: [ "skip" ],
+	"enable"	: [ "skip", "daily", "weekly", "day", "hour", "minute" ],
+	"modify"	: [ "skip", "daily", "weekly", "day", "hour", "minute" ],
 	"disable"	: [],
     ]
   ];

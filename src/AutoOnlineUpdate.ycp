@@ -112,7 +112,8 @@ global list<string> days =
     _("Wednesday"),
     _("Thursday"),
     _("Friday"),
-    _("Saturday")
+    _("Saturday"),
+    _("Sunday")
         ];
 
 /**
@@ -161,6 +162,7 @@ global define boolean Read()
         srandom();
         if ( hour == -1 ) hour = random( 24 );
         if ( minute == -1 ) minute = random( 60 );
+	random_time = true;
     }
     y2milestone("hour: %1, minutes: %2", hour, minute );
     return true;
@@ -326,6 +328,33 @@ global define string Summary()
 global define map AutoPackages()
 {
     return $[ "install": required_packages , "remove":[] ];
+}
+
+/**
+ * Check if update application (zypper/rug) is installed and install it if it is not
+ * @return false if application was not installed
+ */
+global boolean InstallUpdater () {
+
+    if (Package::Installed (updater))
+	return true;
+
+    string to_install	= "";
+    if (Package::Installed ("zypper"))
+	updater	= "zypper";
+    else if (Package::Installed ("zmd"))
+	// rug is default if zmd is present
+	to_install	= "rug";
+    else
+	to_install	= "zypper";
+    if (to_install != "")
+    {
+	if (Package::Install (to_install))
+	    updater	= to_install;
+	else // installation failed/canceled
+	    return false;
+    }
+    return true;
 }
 
 /* EOF */

@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri May  4 10:47:39 CEST 2007 - jsuchome@suse.cz
+
+- added command line support for Automatic Online Update (#269901)
+- 2.15.12 
+
+-------------------------------------------------------------------
 Thu Apr 26 15:28:39 CEST 2007 - jsuchome@suse.cz
 
 - fixed obsolete help text (#267960)
