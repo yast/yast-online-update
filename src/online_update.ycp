@@ -40,6 +40,10 @@
 	  OnlineUpdate::you_auto_get	= true;
 	  OnlineUpdate::you_auto	= true;
       }
+      else if ( arg == .simple_mode || arg == ".simple_mode" || arg == "simple_mode")
+      {
+	  OnlineUpdate::simple_mode	=  true;
+      }
       else
 	  run_cmdline	= true;
       arg_n = arg_n + 1;

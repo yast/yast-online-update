@@ -76,15 +76,37 @@ you have inserted the correct CD.
     y2milestone ("All preselected patches: %1", selected);
   }
 
+  boolean simple_mode = OnlineUpdate::simple_mode && (UI::HasSpecialWidget(`SimplePatchSelector) == true);
+  if (simple_mode)
+  {
+    UI::OpenDialog (`opt(`defaultsize), `SimplePatchSelector(`id(`selector)));
+  }
+  else
+    UI::OpenDialog (`opt(`defaultsize), `PackageSelector(`id(`selector), `opt(`youMode)));
 
-  UI::OpenDialog(`opt(`defaultsize), `PackageSelector(`id(`selector), `opt(`youMode)) );
-  symbol ret = (symbol)UI::RunPkgSelection(`id(`selector) );
-  UI::CloseDialog();
+  symbol ret		= nil;
+  string current	= "simple";
+  repeat
+  {
+    ret = (symbol) UI::RunPkgSelection (`id(`selector));
+    y2milestone ("RunPkgSelection returned %1", ret);
+    UI::CloseDialog();
+    if (ret == `details)
+    {
+	UI::OpenDialog (`opt(`defaultsize), `PackageSelector(`id(`selector), `opt(`youMode)));
+	current	= "rich";
+    }
+    if (ret == `cancel && simple_mode && current == "rich")
+    {
+	UI::OpenDialog (`opt(`defaultsize), `SimplePatchSelector(`id(`selector)));
+	current	= "simple";
+	ret	= nil;
+    }
+  } until ( ret == `cancel || ret == `accept );
 
   Wizard::ClearContents();
 
-  y2debug( "RunPkgSelection returned '%1'", ret );
-
+  y2milestone ("RunPkgSelection finally returned '%1'", ret);
   if ( ret == `cancel ) return `abort;
 
   boolean restart_yast	= false;

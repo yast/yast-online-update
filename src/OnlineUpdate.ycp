@@ -57,5 +57,10 @@ global boolean reboot_needed	= false;
 global string reboot_message	= _("At least one of the updates installed requires a system reboot to function
 properly. Reboot the system.");
 
+/**
+ * If simple Package selector should be opened
+ */
+global boolean simple_mode	= false;
+
 /* EOF */
 }

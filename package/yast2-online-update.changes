@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri May 11 12:21:00 CEST 2007 - jsuchome@suse.cz
+
+- added support for simplified UI (#273619)
+- 2.13.59
+
+-------------------------------------------------------------------
 Mon Apr  2 10:50:31 CEST 2007 - jsuchome@suse.cz
 
 - synchronize the new sources with ZMD (#259285)
