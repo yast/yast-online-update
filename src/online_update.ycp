@@ -162,6 +162,15 @@ define symbol OnlineUpdateSequence () {
     return true;
   }
 
+  /**
+   * command line handler for "Simple Mode": simple package selector
+   */
+  define boolean SimpleModeHandler (map options ) {
+    OnlineUpdate::simple_mode	= true;
+    OnlineUpdateSequence ();
+    return true;
+  }
+
   // the command line description map
   map cmdline = $[
     "id"		: "online_update",
@@ -171,12 +180,18 @@ define symbol OnlineUpdateSequence () {
     "actions"		: $[
 	"cd_update" :$[
 	    "handler"	: CDUpdateHandler,
-	    // translators: command line help text for pam action
+	    // translators: command line help text for cd_update action
 	    "help"	: _("Start Patch CD Update")
+	],
+	"simple_mode"	: $[
+	    "handler"	: SimpleModeHandler,
+	    // translators: command line help text for simple_mode action
+	    "help"	: _("Use simple Package Selector")
 	],
     ],
     "mappings"		: $[
-	"cd_update"	: []
+	"cd_update"	: [],
+	"simple_mode"	: [],
     ]
   ];
 
@@ -189,13 +204,17 @@ define symbol OnlineUpdateSequence () {
 	y2warning (".cd_default parameter is OBSOLETE, use cd_update instead.");
 	OnlineUpdate::cd_update	= true;
     }
+    else if ( arg == .simple_mode || arg == ".simple_mode" )
+    {
+	OnlineUpdate::simple_mode	= true;
+    }
     else if ( arg == .auto.get || arg == ".auto.get" )
     {
 	y2warning (".auto.get parameter for online_update is OBSOLETE, use zypper or rug instead.");
     }
     arg_n = arg_n + 1;
   }
-  if (OnlineUpdate::cd_update) // obsolete .cd_default argument was used
+  if (OnlineUpdate::cd_update || OnlineUpdate::simple_mode) // obsolete .cd_default argument was used
     OnlineUpdateSequence ();
   else
     CommandLine::Run (cmdline);
