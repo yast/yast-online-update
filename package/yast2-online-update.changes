@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri May 25 16:12:47 CEST 2007 - jsuchome@suse.cz
+
+- DonePackage and DoneProvide callbacks return "I" (#277351)
+- 2.15.14
+
+-------------------------------------------------------------------
 Fri May 25 13:30:04 CEST 2007 - jsrain@suse.cz
 
 - removed outdated translations from .desktop-files (#271209)

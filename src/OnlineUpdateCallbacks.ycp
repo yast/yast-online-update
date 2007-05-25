@@ -31,7 +31,8 @@
      */
     global define boolean PatchProgressCallback (integer num) {
 
-	last_callback	= "PatchProgressCallback";
+	// do not save this one - we need to store Start/Done pairs
+	// last_callback	= "PatchProgressCallback";
 
         y2debug("PatchProgressCallback %1", num);
 
@@ -161,7 +162,7 @@
      */
     global string DonePackage (integer error, string reason) {
 	string ret = PackageCallbacks::DonePackage (error, reason);
-	if (ret == "")
+	if (ret == "I")
 	{
 	    FinishLine (true);
 	    total_progress  = total_progress + 1;
@@ -182,7 +183,7 @@
      */
     global string DoneProvide (integer error, string reason, string name) {
 	string ret = PackageCallbacks::DoneProvide (error, reason, name);
-	if (ret == "")
+	if (ret == "I")
 	{
 	    if (last_callback == "StartProvide")
 		FinishLine (false);
