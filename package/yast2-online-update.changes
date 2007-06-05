@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Jun  5 09:08:58 CEST 2007 - jsuchome@suse.cz
+
+- when the package selector is skipped, check if there are not
+  licenses to show (#279491)
+- 2.15.16
+
+-------------------------------------------------------------------
 Tue May 29 13:39:38 CEST 2007 - jsuchome@suse.cz
 
 - use zypper intseatd of rug for automatic online update (#273133)
