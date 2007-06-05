@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu May 31 21:03:08 CEST 2007 - jsuchome@suse.cz
+
+- when the package selector is skipped, check if there are not
+  licenses to show (#279491)
+- 2.13.60 
+
+-------------------------------------------------------------------
 Fri May 11 12:21:00 CEST 2007 - jsuchome@suse.cz
 
 - added support for simplified UI (#273619)
