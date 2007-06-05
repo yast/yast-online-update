@@ -81,7 +81,7 @@ global string cronfile = "/etc/cron.d/yast2-online-update";
 global boolean modified = false;
 
 // the application that does the update (rug/zypper)
-global string updater	= "rug";
+global string updater	= "zypper";
 
 // packages required for installation (for autoYaST)
 list required_packages = [];
@@ -237,7 +237,7 @@ global define boolean Import (map settings)
 	    if (Package::Installed ("zypper"))
 		updater	= "zypper";
 	    else if (Package::Installed ("zmd"))
-		// rug is default if zmd is present
+		// rug is default only if zmd is present
 		to_install	= "rug";
 	    else
 		to_install	= "zypper";

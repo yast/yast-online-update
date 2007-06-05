@@ -47,6 +47,10 @@ if [ -f /etc/cron.d/yast2-online-update ] ; then
 	fi
     fi
     rm -f /etc/cron.d/yast2-online-update.bak
+    # now we have zypper instead of rug (bug #273133)
+    if [ "`grep -c rug /etc/cron.d/yast2-online-update 2>/dev/null`" -gt 0 ]; then
+	sed -e "s/rug/zypper/g" -i /etc/cron.d/yast2-online-update
+    fi
 fi
 to_remove="/usr/share/YaST2/clients/product_post.ycp"
 if [ -f $to_remove ] ; then

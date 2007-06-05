@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue May 29 13:39:38 CEST 2007 - jsuchome@suse.cz
+
+- use zypper intseatd of rug for automatic online update (#273133)
+- 2.15.15
+
+-------------------------------------------------------------------
 Fri May 25 16:12:47 CEST 2007 - jsuchome@suse.cz
 
 - DonePackage and DoneProvide callbacks return "I" (#277351)
