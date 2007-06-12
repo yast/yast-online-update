@@ -1,4 +1,13 @@
 -------------------------------------------------------------------
+Fri Jun  8 09:05:04 CEST 2007 - jsuchome@suse.cz
+
+- use PkgTaboo instead of ResolvableNeutral if the package with
+  declined license should not be installed (#279491)
+- run PkgSolve after those PkgTaboo and open package selector for
+  user interaction if Solver fails (#279491)
+- 2.13.61
+
+-------------------------------------------------------------------
 Thu May 31 21:03:08 CEST 2007 - jsuchome@suse.cz
 
 - when the package selector is skipped, check if there are not

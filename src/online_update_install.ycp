@@ -55,9 +55,10 @@ extra dialog when the patch is being installed.</p>
                        help_text, false, false);
 
   if (!Stage::cont ())
+  {
     Wizard::SetNextButton(`next, Label::FinishButton() );
-
-  Pkg::PkgSolve (true);
+    Pkg::PkgSolve (true);
+  }
 
   integer total_progress = size (Pkg::GetPackages (`selected, true)) * 2;
   if (total_progress == 0)
