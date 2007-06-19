@@ -198,7 +198,7 @@ global define boolean Write()
         cronjob = sformat ("%1 %2 * * * root %3 up -y -t patch %4",
 	    minute, hour, updater, options);
     }
-    if ( autoget ) cronjob = cronjob + " -d";
+//    if ( autoget ) cronjob = cronjob + " -d";
     if ( skipPre ) cronjob = cronjob + " --skip-interactive";
     cronjob = cronjob + "\n";
     SCR::Write( .target.string, cronfile, cronjob );
@@ -266,7 +266,7 @@ global define map Export ()
     update_time["random_time"] = random_time;
     update_time["timing"] = (timing == `weekly)? "weekly":"daily";
     settings["update_time"] = update_time;
-    settings["autoget"] = autoget;
+//    settings["autoget"] = autoget;
     settings["skipPre"] = skipPre;
     settings["enable_autoupdate"] = enabled;
 
@@ -283,6 +283,7 @@ global define string Summary()
     string summary = "";
 
     string nc = Summary::NotConfigured ();
+    // summary header (yes/no follows)
     summary = Summary::AddHeader(summary, _("Scheduled Online Update Enabled"));
     summary = Summary::AddLine(summary, enabled ? _("Yes") : _("No") );
 
@@ -306,12 +307,17 @@ global define string Summary()
         timestr = sformat(_("%1 at a Random Time"), when);
     }
 
+    // summary header
     summary = Summary::AddHeader(summary, _("Time of Scheduled Online Update"));
     summary = Summary::AddLine(summary, ( (hour!=-1 && minute!= -1 && enabled) ||
                 random_time ) ? timestr  : nc );
 
+    /*
+    // summary header
     summary = Summary::AddHeader(summary, _("Only Download Patches"));
     summary = Summary::AddLine(summary, autoget ? _("Yes") : _("No") );
+    */
+    // summary header
     summary = Summary::AddHeader(summary, _("Skip packages with preinstall information?"));
     summary = Summary::AddLine(summary, skipPre ? _("Yes") : _("No") );
 

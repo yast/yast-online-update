@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Jun 18 14:57:58 CEST 2007 - jsuchome@suse.cz
+
+- Automatic Online Update: remove option for "only downloading"
+  patches (missing support in zypper, F302159)
+- 2.15.17
+
+-------------------------------------------------------------------
 Tue Jun  5 09:08:58 CEST 2007 - jsuchome@suse.cz
 
 - when the package selector is skipped, check if there are not
