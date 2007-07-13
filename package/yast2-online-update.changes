@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Jul 13 12:39:33 CEST 2007 - jsuchome@suse.cz
+
+- fixed restarting during installation (#291361)
+- 2.15.19
+
+-------------------------------------------------------------------
 Fri Jul 13 08:57:21 CEST 2007 - jsuchome@suse.cz
 
 - removed duplicated entries from desktop files

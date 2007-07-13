@@ -23,7 +23,7 @@
     import "Wizard";
 
     string saved_path		= Directory::vardir + "/selected_patches.ycp";
-    string restart_data_file	= Directory::vardir + "/continue_installation";
+    string restarted_path	= Directory::vardir + "/continue_you";
 
     /* Called backwards */
     if(GetInstArgs::going_back())
@@ -33,16 +33,11 @@
     }
 
     boolean after_restart	= false;
-    if (FileUtils::Exists (restart_data_file))
+    if (FileUtils::Exists (restarted_path))
     {
-	map restarting_step	= ProductControl::RestartingStep ();
-	y2milestone ("restarting_step: %1", restarting_step);
-	if (restarting_step == nil || // 'fix' for bug #184452
-	    restarting_step["name"]:"" == "you")
-	{
-	    y2milestone ("installation restarted from YOU");
-	    after_restart	= true;
-	}
+	y2milestone ("installation restarted from YOU");
+	SCR::Execute (.target.remove, restarted_path);
+	after_restart	= true;
     }
 
     if (!Internet::do_you && !after_restart)	// nothing to do
@@ -280,6 +275,7 @@ reboot now then continue the installation.
     else if (ret == `restart_same_step)
     {
 	Popup::Message (OnlineUpdate::restart_message);
+	SCR::Write (.target.ycp, restarted_path, 1);
     }
 
     if (!already_up)
