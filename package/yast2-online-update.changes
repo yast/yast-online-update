@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Jul 13 08:57:21 CEST 2007 - jsuchome@suse.cz
+
+- removed duplicated entries from desktop files
+- 2.15.18 
+
+-------------------------------------------------------------------
 Mon Jun 18 14:57:58 CEST 2007 - jsuchome@suse.cz
 
 - Automatic Online Update: remove option for "only downloading"
