@@ -42,12 +42,16 @@ define symbol OnlineUpdateSequence () {
 	    _("Initialize the target system"),
 	    // progress stage label
 	    _("Refresh update sources"),
+	    // progress stage label
+	    _("Check for available updates"),
   ];
   list steps = [
 	    // progress step label
 	    _("Initializing the target system..."),
 	    // progress step label
 	    _("Refreshing update sources ..."),
+	    // progress step label
+	    _("Checking for available updates..."),
 	    // final progress step label
 	    _("Finished")
   ];
@@ -71,6 +75,29 @@ define symbol OnlineUpdateSequence () {
   Progress::NextStage ();
 
   OnlineUpdateCallbacks::RefreshAllSources();
+
+  Progress::NextStage ();
+
+  if (!OnlineUpdate::cd_update) // for CD for cd update was not initialized yet
+  {
+    boolean is_available	= false;
+    // check if there is any patch for installation
+    foreach (map patch, Pkg::ResolvableProperties ("", `patch, ""), {
+	if (patch["status"]:`none == `available)
+	{
+	    is_available	= true;
+	    break;
+	}
+    });
+    // continue/cancel message
+    if (!is_available && Popup::YesNo (_("No active update source is available.
+Exit Online Update now?.")))
+    {
+	Wizard::CloseDialog();
+	return `abort;
+    }
+  }
+
   OnlineUpdateCallbacks::RegisterOnlineUpdateCallbacks();
 
   Progress::Finish();

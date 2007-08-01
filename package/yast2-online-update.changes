@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Aug  1 10:17:48 CEST 2007 - jsuchome@suse.cz
+
+- show warning if no update source is available (F300635)
+- removed unused testsuites
+- 2.15.20
+
+-------------------------------------------------------------------
 Fri Jul 13 12:39:33 CEST 2007 - jsuchome@suse.cz
 
 - fixed restarting during installation (#291361)
