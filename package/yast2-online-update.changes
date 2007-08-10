@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Aug 10 14:13:51 CEST 2007 - jsuchome@suse.cz
+
+- fixed typo
+
+-------------------------------------------------------------------
 Wed Aug  1 10:17:48 CEST 2007 - jsuchome@suse.cz
 
 - show warning if no update source is available (F300635)

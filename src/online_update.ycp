@@ -91,7 +91,7 @@ define symbol OnlineUpdateSequence () {
     });
     // continue/cancel message
     if (!is_available && Popup::YesNo (_("No active update source is available.
-Exit Online Update now?.")))
+Exit Online Update now?")))
     {
 	Wizard::CloseDialog();
 	return `abort;
