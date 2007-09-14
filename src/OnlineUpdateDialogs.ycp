@@ -45,7 +45,7 @@ the update takes place.");
 	integer day = AutoOnlineUpdate::day;
 
 	symbol timing = AutoOnlineUpdate::timing;
-        boolean random_time = AutoOnlineUpdate::random_time;
+        boolean random_time = AutoOnlineUpdate::random_time && Mode::config ();
 
 	term head = `VBox(
 			  `VSpacing( 0.2 ),
@@ -123,16 +123,6 @@ the update takes place.");
 			)),
 			`VSpacing( 0.2 ),
                         `VBox(
-			    /*
-			    `HBox(
-				`HSpacing( 0.8 ),
-				`Left(`CheckBox( `id( `autoget ),
-				    // checkbox label
-				    _("Only Download Patches"), autoget )
-				),
-				`HSpacing( 0.8 )
-			    ),
-			    */
                             `HBox(
 				`HSpacing( 0.8 ),
 				`Left (`CheckBox( `id( `skipPre),
@@ -164,7 +154,6 @@ the update takes place.");
 	    Label::BackButton(), Label::FinishButton());
 
 
-//	UI::ChangeWidget( `id( `autoget ), `Enabled, enabled );
         UI::ChangeWidget( `id( `skipPre ), `Enabled, enabled );
 	UI::ChangeWidget( `id( `timing ), `Enabled, enabled );
 	UI::ChangeWidget( `id( `day ), `Enabled, enabled );
@@ -179,8 +168,8 @@ the update takes place.");
 
 	repeat {
 	    enabled = (boolean)UI::QueryWidget( `id( `enable ), `Value );
-	    enable_days = UI::QueryWidget( `id( `timing
-                                                ), `CurrentButton ) == `weekly;
+	    enable_days =
+		UI::QueryWidget (`id(`timing),`CurrentButton ) == `weekly;
 
 	    if ( ret == `enable )
 	    {
@@ -189,9 +178,9 @@ the update takes place.");
 		UI::ChangeWidget( `id( `crontime ), `Enabled, enabled );
 		UI::ChangeWidget( `id( `timing ), `Enabled, enabled );
 		UI::ChangeWidget( `id( `hour ), `Enabled, enabled &&
-                        !AutoOnlineUpdate::random_time);
+                        !random_time);
 		UI::ChangeWidget( `id( `minute ), `Enabled, enabled &&
-                        !AutoOnlineUpdate::random_time);
+                        !random_time);
 		UI::ChangeWidget( `id( `day ), `Enabled, enabled && enable_days);
 		if (day != -1)
 		    UI::ChangeWidget( `id( `day ), `Value, day );

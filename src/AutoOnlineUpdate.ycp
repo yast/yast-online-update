@@ -15,10 +15,11 @@
 module "AutoOnlineUpdate";
 textdomain "online-update";
 
+import "FileUtils";
+import "Mode";
 import "Package";
 import "Report";
 import "Summary";
-import "Mode";
 
 
 /**
@@ -123,7 +124,8 @@ global list<string> days =
 global define boolean Read()
 {
 
-    options = (string)SCR::Read( .sysconfig.onlineupdate.CMDLINE_OPTIONS );
+    if (FileUtils::Exists ("/etc/sysconfig/onlineupdate"))
+	options = (string)SCR::Read( .sysconfig.onlineupdate.CMDLINE_OPTIONS );
 
     if (options == nil) options = "";
 
