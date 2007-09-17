@@ -35,9 +35,9 @@
 	// last_callback	= "PatchProgressCallback";
 
         y2debug("PatchProgressCallback %1", num);
-
-        if ( UI::WidgetExists( `id( `patchprogress ) ) ) {
-          UI::ChangeWidget( `id( `patchprogress ), `Value, num );
+Popup::Message (sformat ("PatchProgressCallback %1", num));
+        if ( UI::WidgetExists( `id( `you_patch_progress ) ) ) {
+          UI::ChangeWidget( `id( `you_patch_progress ), `Value, num );
         }
 
 	if (aborted) return false;
@@ -50,6 +50,12 @@
 	    return false;
         }
 	return true;
+    }
+
+    global boolean ProgressDownloadCallback (integer percent, integer expected_size)
+    {
+	y2debug ("ProgressDownloadCallback %1, %2", percent, expected_size);
+	return PatchProgressCallback (percent);
     }
 
     global void MessageCallback( string patchname, string patchsummary, string message )
@@ -111,16 +117,32 @@
     {
 	// progress log item (%1 is name of package)
 	ProgressLog (sformat (_("Retrieving %1..."), name));
-        if (UI::WidgetExists (`id (`patchprogress)))
+        if (UI::WidgetExists (`id (`you_patch_progress)))
 	{
-	    UI::ChangeWidget (`id (`patchprogress), `Label,
+	    UI::ChangeWidget (`id (`you_patch_progress), `Label,
 		// progress bar label
 		_("Package Download Progress"));
-	    UI::ChangeWidget (`id (`patchprogress), `Value, 0);
+	    UI::ChangeWidget (`id (`you_patch_progress), `Value, 0);
 	}
 	last_callback	= "StartProvide";
 	return true;
     }
+
+    global void StartDownload (string url, string localfile)
+    {
+	/*
+	// reformat the URL
+	string url_report = URL::FormatURL(URL::Parse(url), max_size);
+
+	FIXME new text to ProgressLog?
+	// progress log item (%1 is name of file)
+	string message = sformat (_("Downloading: %1"), url_report);
+	ProgressLog (message);
+	// + progress to 0?
+	*/
+	last_callback   = "StartDownload";
+    }
+
 
      /**
       Callback for starting installation of a package.
@@ -130,12 +152,12 @@
     {
 	// progress log item (%1 is name of package, %2 is summary)
 	ProgressLog( sformat( _("Installing %1: \"%2\" "), name, summary ) );
-        if (UI::WidgetExists (`id (`patchprogress)))
+        if (UI::WidgetExists (`id (`you_patch_progress)))
 	{
-	    UI::ChangeWidget (`id (`patchprogress), `Label,
+	    UI::ChangeWidget (`id (`you_patch_progress), `Label,
 		// progress bar label
 		_("Package Installation Progress"));
-	    UI::ChangeWidget (`id (`patchprogress), `Value, 0);
+	    UI::ChangeWidget (`id (`you_patch_progress), `Value, 0);
 	}
 	last_callback	= "StartPackage";
 	return true;
@@ -166,8 +188,8 @@
 	{
 	    FinishLine (true);
 	    total_progress  = total_progress + 1;
-	    if ( UI::WidgetExists( `id( `progress ) ) ) {
-		UI::ChangeWidget( `id( `progress ), `Value, total_progress);
+	    if ( UI::WidgetExists( `id( `you_total_progress ) ) ) {
+		UI::ChangeWidget( `id( `you_total_progress ), `Value, total_progress);
 	    }
 	}
 	last_callback	= "DonePackage";
@@ -188,12 +210,18 @@
 	    if (last_callback == "StartProvide")
 		FinishLine (false);
 	    total_progress  = total_progress + 1;
-	    if ( UI::WidgetExists( `id( `progress ) ) ) {
-		UI::ChangeWidget( `id( `progress ), `Value, total_progress);
+	    if ( UI::WidgetExists( `id( `you_total_progress ) ) ) {
+		UI::ChangeWidget( `id( `you_total_progress ), `Value, total_progress);
 	    }
 	}
 	last_callback	= "DoneProvide";
 	return ret;
+    }
+
+    global void DoneDownload (integer error_value, string error_text) {
+	PackageCallbacks::DoneDownload (error_value, error_text);			if (last_callback != "FinishPatchDeltaProvide")
+	    FinishLine (false);
+	last_callback   = "DoneDownload";
     }
 
     /**
@@ -202,15 +230,15 @@
     global void StartDeltaDownload (string name, integer download_size) {
 
 	// progress log item (%1 is name of delta RPM
-	if (last_callback == "StartProvide")
+	if (last_callback == "StartProvide" || last_callback == "StartDownload")
 	    ProgressLog ("\n" + indent);
 	ProgressLog (sformat(_("Downloading delta RPM %1"), name));
-        if (UI::WidgetExists (`id (`patchprogress)))
+        if (UI::WidgetExists (`id (`you_patch_progress)))
 	{
-	    UI::ChangeWidget (`id (`patchprogress), `Label,
+	    UI::ChangeWidget (`id (`you_patch_progress), `Label,
 		// progress bar label
 		_("Delta RPM Download Progress"));
-	    UI::ChangeWidget (`id (`patchprogress), `Value, 0);
+	    UI::ChangeWidget (`id (`you_patch_progress), `Value, 0);
 	}
 	last_callback	= "StartDeltaDownload";
     }
@@ -247,12 +275,12 @@
     global void StartDeltaApply (string name) {
 	// progress log item (%1 is name of delta RPM)
 	ProgressLog (indent + sformat(_("Applying delta RPM: %1"), name));
-        if (UI::WidgetExists (`id (`patchprogress)))
+        if (UI::WidgetExists (`id (`you_patch_progress)))
 	{
-	    UI::ChangeWidget (`id (`patchprogress), `Label,
+	    UI::ChangeWidget (`id (`you_patch_progress), `Label,
 		// progress bar label
 		_("Delta RPM Application Progress"));
-	    UI::ChangeWidget (`id (`patchprogress), `Value, 0);
+	    UI::ChangeWidget (`id (`you_patch_progress), `Value, 0);
 	}
 	last_callback   = "StartDeltaApply";
     }
@@ -263,8 +291,8 @@
      */
     global void ProgressDeltaApply (integer num) {
 	y2debug ("ProgressDeltaApply: %1", num);
-        if (UI::WidgetExists (`id (`patchprogress))) {
-          UI::ChangeWidget (`id (`patchprogress), `Value, num);
+        if (UI::WidgetExists (`id (`you_patch_progress))) {
+          UI::ChangeWidget (`id (`you_patch_progress), `Value, num);
         }
 	last_callback   = "ProgressDeltaApply";
     }
@@ -292,12 +320,12 @@
 	if (last_callback == "StartProvide")
 	    ProgressLog ("\n" + indent);
 	ProgressLog (sformat(_("Downloading patch RPM %1"), name));
-        if (UI::WidgetExists (`id (`patchprogress)))
+        if (UI::WidgetExists (`id (`you_patch_progress)))
 	{
-	    UI::ChangeWidget (`id (`patchprogress), `Label,
+	    UI::ChangeWidget (`id (`you_patch_progress), `Label,
 		// progress bar label
 		_("Patch RPM Download Progress"));
-	    UI::ChangeWidget (`id (`patchprogress), `Value, 0);
+	    UI::ChangeWidget (`id (`you_patch_progress), `Value, 0);
 	}
 	last_callback   = "StartPatchDownload";
     }
@@ -343,12 +371,12 @@
 	y2milestone("ScriptStart: patch_name:%1, patch_version:%2, patch_arch:%3, script:%4, installation:%5", patch_name, patch_version, patch_arch, script_path, installation);
 	string patch_full_name = PackageCallbacks::FormatPatchName(patch_name, patch_version, patch_arch);
 
-        if (UI::WidgetExists(`id(`patchprogress)))
+        if (UI::WidgetExists(`id(`you_patch_progress)))
 	{
-	    UI::ChangeWidget(`id(`patchprogress), `Label,
+	    UI::ChangeWidget(`id(`you_patch_progress), `Label,
 		// progress bar label
 		_("Script Execution Progress"));
-	    UI::ChangeWidget(`id(`patchprogress), `Value, 0);
+	    UI::ChangeWidget(`id(`you_patch_progress), `Value, 0);
 	}
 
 	// log entry, %1 is name of the patch which contains the script
@@ -399,16 +427,16 @@
     {
 	y2milestone("ScriptFinish");
 
-        if (UI::WidgetExists(`id(`patchprogress)))
+        if (UI::WidgetExists(`id(`you_patch_progress)))
 	{
-	    UI::ChangeWidget(`id(`patchprogress), `Value, 100);
+	    UI::ChangeWidget(`id(`you_patch_progress), `Value, 100);
 	}
 
 	FinishLine(true);
 	total_progress  = total_progress + 1;
-	if (UI::WidgetExists(`id( `progress )))
+	if (UI::WidgetExists(`id( `you_total_progress )))
 	{
-	    UI::ChangeWidget(`id(`progress), `Value, total_progress);
+	    UI::ChangeWidget(`id(`you_total_progress), `Value, total_progress);
 	}
 
 	last_callback = "ScriptFinish";
@@ -448,7 +476,11 @@
 	Pkg::CallbackProgressPackage ("OnlineUpdateCallbacks::PatchProgressCallback");
 	Pkg::CallbackDonePackage( "OnlineUpdateCallbacks::DonePackage" );
 
-	Pkg::CallbackResolvableReport ("OnlineUpdateCallbacks::MessageCallback");
+	Pkg::CallbackResolvableReport("OnlineUpdateCallbacks::MessageCallback");
+
+	Pkg::CallbackStartDownload( "OnlineUpdateCallbacks::StartDownload" );
+	Pkg::CallbackProgressDownload( "OnlineUpdateCallbacks::ProgressDownloadCallback" );
+	Pkg::CallbackDoneDownload ("OnlineUpdateCallbacks::DoneDownload");
 
         Pkg::CallbackMediaChange ("PackageCallbacks::MediaChange");
 

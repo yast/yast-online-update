@@ -27,11 +27,11 @@
             `LogView(`id(`log), _("Progress Log"), 5, 0 ),
 	    `VSpacing( 0.5 ),
 	    // progress bar label
-            `ProgressBar( `id( `patchprogress ), _("Package Progress") ),
+            `ProgressBar( `id( `you_patch_progress ), _("Package Progress") ),
             `VSpacing( 0.2 ),
 	    `ReplacePoint (`id(`rpprogress),
 		// progress bar label
-		`ProgressBar( `id( `progress ), _("Total Progress") )
+		`ProgressBar( `id( `you_total_progress ), _("Total Progress") )
 	    ),
 	    `VSpacing( 0.5 ),
             `VSpacing( 0.2 )
@@ -62,7 +62,7 @@ they will be shown in an extra dialog when the patch is being installed.</p>");
 
   UI::ReplaceWidget (`id(`rpprogress),
     // progress bar label
-    `ProgressBar( `id( `progress ), _("Total Progress"), total_progress)
+    `ProgressBar( `id( `you_total_progress ), _("Total Progress"), total_progress)
   );
 
   // FIXME no chance to get this after Commit (bug 188556)
@@ -87,8 +87,8 @@ they will be shown in an extra dialog when the patch is being installed.</p>");
 
   changed_packages = changed_packages || commit[0]:0 > 0;
 
-  UI::ChangeWidget( `id( `patchprogress ), `Value, 100 );
-  UI::ChangeWidget( `id( `progress ), `Value, total_progress);
+  UI::ChangeWidget( `id( `you_patch_progress ), `Value, 100 );
+  UI::ChangeWidget( `id( `you_total_progress ), `Value, total_progress);
 
   symbol ret = `next;
   if (!Stage::cont ())
