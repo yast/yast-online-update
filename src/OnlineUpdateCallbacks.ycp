@@ -35,7 +35,6 @@
 	// last_callback	= "PatchProgressCallback";
 
         y2debug("PatchProgressCallback %1", num);
-Popup::Message (sformat ("PatchProgressCallback %1", num));
         if ( UI::WidgetExists( `id( `you_patch_progress ) ) ) {
           UI::ChangeWidget( `id( `you_patch_progress ), `Value, num );
         }
