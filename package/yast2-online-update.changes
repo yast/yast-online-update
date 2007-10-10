@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Oct 10 14:37:12 CEST 2007 - jsuchome@suse.cz
+
+- do not log progress on DoneDownload callback (#331271)
+- 2.16.0
+
+-------------------------------------------------------------------
 Wed Sep 19 09:16:05 CEST 2007 - jsuchome@suse.cz
 
 - removed popup used for debugging (#326247)
