@@ -192,12 +192,12 @@ global define boolean Write()
 
     if (timing == `weekly && day >= 0 && day <= 7)
     {
-        cronjob = sformat( "%1 %2 * * %3 root %4 up -y -t patch %5",
+        cronjob = sformat( "%1 %2 * * %3 root %4 up -y --quiet -t patch %5",
 	    minute, hour, day, updater, options);
     }
     else
     {
-        cronjob = sformat ("%1 %2 * * * root %3 up -y -t patch %4",
+        cronjob = sformat ("%1 %2 * * * root %3 up -y --quiet -t patch %4",
 	    minute, hour, updater, options);
     }
 //    if ( autoget ) cronjob = cronjob + " -d";

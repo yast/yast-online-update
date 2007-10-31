@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Oct 31 09:23:13 CET 2007 - jsuchome@suse.cz
+
+- use --quiet option for zypper in cron job (#335305)
+- 2.16.1
+
+-------------------------------------------------------------------
 Wed Oct 10 14:37:12 CEST 2007 - jsuchome@suse.cz
 
 - do not log progress on DoneDownload callback (#331271)
