@@ -138,7 +138,7 @@
 
       result = WFM::CallFunction( module_name, module_args );
 
-      if ( result == `nil ) return 1;
+      if ( result == nil ) return 1;
 
       if (result == `again )
 	  continue;

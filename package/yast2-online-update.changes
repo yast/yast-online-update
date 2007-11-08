@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Nov  8 11:16:09 CET 2007 - jsuchome@suse.cz
+
+- fix check for nil return value of clients (#339749) 
+- 2.13.62
+
+-------------------------------------------------------------------
 Fri Jun  8 09:05:04 CEST 2007 - jsuchome@suse.cz
 
 - use PkgTaboo instead of ResolvableNeutral if the package with
