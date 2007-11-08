@@ -130,7 +130,7 @@ Exit Online Update now?")))
 
       result = WFM::CallFunction( module_name, module_args );
 
-      if ( result == `nil ) return `cancel;
+      if ( result == nil ) result = `cancel;
 
       if (result == `again )
 	  continue;

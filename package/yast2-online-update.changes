@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Nov  8 11:18:34 CET 2007 - jsuchome@suse.cz
+
+- fix check for nil return value of clients (#339749)
+- 2.15.24 
+
+-------------------------------------------------------------------
 Wed Sep 19 09:16:05 CEST 2007 - jsuchome@suse.cz
 
 - removed popup used for debugging (#326247)
