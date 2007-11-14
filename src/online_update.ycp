@@ -35,13 +35,13 @@ define symbol OnlineUpdateSequence () {
   Wizard::CreateDialog();
   Wizard::SetDesktopIcon("online_update");
   // help text for online-update initialization
-  Wizard::RestoreHelp (_("<p>The system is initializing the installation and update sources. Installation and update sources can be altered in the <b>Installation Source</b> module.</p>"));
+  Wizard::RestoreHelp (_("<p>The system is initializing the installation and update repositories. Software repositories can be altered in the <b>Installation Source</b> module.</p>"));
 
   list<string> stages =  [
 	    // progress stage label
 	    _("Initialize the target system"),
 	    // progress stage label
-	    _("Refresh update sources"),
+	    _("Refresh software repositories"),
 	    // progress stage label
 	    _("Check for available updates"),
   ];
@@ -49,7 +49,7 @@ define symbol OnlineUpdateSequence () {
 	    // progress step label
 	    _("Initializing the target system..."),
 	    // progress step label
-	    _("Refreshing update sources ..."),
+	    _("Refreshing software repositories..."),
 	    // progress step label
 	    _("Checking for available updates..."),
 	    // final progress step label
@@ -90,7 +90,7 @@ define symbol OnlineUpdateSequence () {
 	}
     });
     // continue/cancel message
-    if (!is_available && Popup::YesNo (_("No active update source is available.
+    if (!is_available && Popup::YesNo (_("No active update repository is available.
 Exit Online Update now?")))
     {
 	Wizard::CloseDialog();
