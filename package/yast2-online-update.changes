@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Nov 15 16:03:56 CET 2007 - jsuchome@suse.cz
+
+- report error of Pkg::SourceStartManager (#180172)
+- 2.16.4 
+
+-------------------------------------------------------------------
 Wed Nov 14 14:46:39 CET 2007 - jsuchome@suse.cz
 
 - sources are called repositories now (F302970)
