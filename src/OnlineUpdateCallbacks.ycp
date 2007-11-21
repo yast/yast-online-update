@@ -13,6 +13,7 @@
     import "OnlineUpdateDialogs";
     import "PackageCallbacks";
     import "Popup";
+    import "Report";
 
     integer total_progress	= 0;
 
@@ -489,7 +490,12 @@
     global define void RefreshAllSources () {
 
 	y2milestone("Refreshing all sources...");
-	Pkg::SourceStartManager(true);
+	boolean mgr_ok = Pkg::SourceStartManager(true);
+	if (!mgr_ok)
+	{
+	    // error popoup (detailed info follows)
+	    Report::LongWarning(_("There was an error in the repository initialization.") + "\n" + Pkg::LastError ());
+	}
 	list <map<string,any> > all_sources = Pkg::SourceEditGet();
 
 	// There are no sources, nothing to refresh
