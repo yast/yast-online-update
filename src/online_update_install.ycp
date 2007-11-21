@@ -26,8 +26,10 @@
 	    // progress window label
             `LogView(`id(`log), _("Progress Log"), 5, 0 ),
 	    `VSpacing( 0.5 ),
-	    // progress bar label
-            `ProgressBar( `id( `you_patch_progress ), _("Package Progress") ),
+	    `ReplacePoint (`id (`rppatch),
+		// progress bar label
+		`ProgressBar (`id (`you_patch_progress), _("Package Progress"))
+	    ),
             `VSpacing( 0.2 ),
 	    `ReplacePoint (`id(`rpprogress),
 		// progress bar label
@@ -54,7 +56,11 @@ they will be shown in an extra dialog when the patch is being installed.</p>");
   if (!Stage::cont ())
     Wizard::SetNextButton(`next, Label::FinishButton() );
 
-  Pkg::PkgSolve (true);
+  if (!Stage::cont ())
+  {
+    Wizard::SetNextButton(`next, Label::FinishButton() );
+    Pkg::PkgSolve (true);
+  }
 
   integer total_progress = size (Pkg::GetPackages (`selected, true)) * 2;
   if (total_progress == 0)
@@ -74,6 +80,17 @@ they will be shown in an extra dialog when the patch is being installed.</p>");
 
   // progress information
   OnlineUpdateCallbacks::ProgressLog (_("Installation finished.\n"));
+
+  if (Stage::cont ())
+  {
+    // one more finish message (#191400)
+    UI::ReplaceWidget (`id (`rppatch),
+	// label
+	`Left (`Label (`opt (`boldFont), _("Patch installation finished.")))
+    );
+    UI::ReplaceWidget (`id(`rpprogress), `Empty ());
+  }
+
 
   if ( commit[1]:[] != [] ) {
     string details = Pkg::LastError() + "\n" + Pkg::LastErrorDetails();

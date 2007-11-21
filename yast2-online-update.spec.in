@@ -89,7 +89,9 @@ if test "`uname -i`" = "s390" -o "`uname -i`" = "s390x"; then
     # remove the.desktop from the older unhacked package during update
     rm -f /usr/share/applications/YaST2/cd_update.desktop
 else
-    cp /var/lib/YaST2/cd_update.desktop /usr/share/applications/YaST2/
+    if [ -f /var/lib/YaST2/cd_update.desktop ] ; then
+	cp /var/lib/YaST2/cd_update.desktop /usr/share/applications/YaST2/
+    fi
 fi
 
 %files frontend

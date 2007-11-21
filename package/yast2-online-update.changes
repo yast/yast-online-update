@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Nov 19 16:14:51 CET 2007 - jsuchome@suse.cz
+
+- correct fix of #279491 merged from SP1 code
+- show visible label that patch installation was finished (#191400)
+- 2.16.5
+
+-------------------------------------------------------------------
 Thu Nov 15 16:03:56 CET 2007 - jsuchome@suse.cz
 
 - report error of Pkg::SourceStartManager (#180172)
