@@ -178,7 +178,7 @@
 	"summary" : $[
 	    "handler"   : SummaryHandler,
 	    // translators: command line help text summary action
-	    "help"	: _("Configuration summary"),
+	    "help"	: _("Configuration Summary"),
 	],
 	"modify"	: $[
 	    "handler"	: ModifyHandler,
