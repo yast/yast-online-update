@@ -18,6 +18,7 @@ textdomain "online-update";
 import "FileUtils";
 import "Mode";
 import "Package";
+import "PackageSystem";
 import "Report";
 import "Summary";
 
@@ -123,6 +124,8 @@ global list<string> days =
  */
 global define boolean Read()
 {
+    if (!PackageSystem::CheckAndInstallPackagesInteractive (["cron"]))
+	return false;
 
     if (FileUtils::Exists ("/etc/sysconfig/onlineupdate"))
 	options = (string)SCR::Read( .sysconfig.onlineupdate.CMDLINE_OPTIONS );
