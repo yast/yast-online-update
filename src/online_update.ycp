@@ -159,8 +159,38 @@ Exit Online Update now?")))
 
   if (OnlineUpdate::cd_update && OnlineUpdate::cd_source > -1)
   {
-    SourceManager::SyncYaSTInstSourceWithZMD ();
-    Pkg::SourceFinishAll ();
+    // map of the new source added on start
+    map new_source		= $[];
+    list<map> sources		= [];
+    foreach (map<string,any> one_source, Pkg::SourceEditGet (), {
+	integer srcid	= one_source["SrcId"]:-1;
+	map source_data	= union (Pkg::SourceGeneralData (srcid),
+	    Pkg::SourceProductData (srcid));
+	if (srcid == OnlineUpdate::cd_source)
+	    new_source	= source_data;
+	else
+	    sources	= add (sources, source_data);
+    });
+    boolean add_new_source	= true;
+    foreach (map source, sources, {
+	y2debug ("source to check %1", source);
+	// checking URL is not enough, typical url is cd:///
+	if (source["url"]:"" == new_source["url"]:"" &&
+	    source["product_dir"]:"" == new_source["product_dir"]:"" &&
+	    source["productname"]:"" == new_source["productname"]:"" &&
+	    source["productversion"]:"" == new_source["productversion"]:"")
+	{
+	    y2milestone ("Patch CD source already present, not adding again");
+	    add_new_source	= false;
+	    break;
+	}
+    });
+
+    if (add_new_source)
+    {
+	SourceManager::SyncYaSTInstSourceWithZMD ();
+	Pkg::SourceFinishAll ();
+    }
   }
 
   retval	= 0;

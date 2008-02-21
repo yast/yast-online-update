@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Feb 21 12:41:45 CET 2008 - jsuchome@suse.cz
+
+- do not add same source twice (#272666)
+- 2.16.7
+
+-------------------------------------------------------------------
 Mon Dec 17 13:02:29 CET 2007 - jsuchome@suse.cz
 
 - cron is needed for writing cron jobs (#348680)
