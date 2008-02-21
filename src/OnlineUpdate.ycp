@@ -62,5 +62,15 @@ properly. Reboot the system.");
  */
 global boolean simple_mode	= false;
 
+/**
+ * Default URL for Patch CD source
+ */
+global string cd_url		= "cd:///";
+
+/**
+ * Default Patch CD source directory
+ */
+global string cd_directory	= "patches";
+
 /* EOF */
 }
