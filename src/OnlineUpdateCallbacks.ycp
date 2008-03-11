@@ -52,9 +52,9 @@
 	return true;
     }
 
-    global boolean ProgressDownloadCallback (integer percent, integer expected_size)
+    global boolean ProgressDownloadCallback (integer percent, integer bps_avg, integer bps_current)
     {
-	y2debug ("ProgressDownloadCallback %1, %2", percent, expected_size);
+	y2debug ("ProgressDownloadCallback %1%%", percent);
 	return PatchProgressCallback (percent);
     }
 
