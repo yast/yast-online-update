@@ -23,3 +23,4 @@ Exec=/sbin/yast2 online_update_setup
 Name=Automatic Online Update
 GenericName=Set up automatic online update
 X-KDE-SubstituteUID=true
+StartupNotify=true

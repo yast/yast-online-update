@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Mar 17 12:43:32 CET 2008 - jsrain@suse.cz
+
+- added 'StartupNotify=true' to the desktop file (bnc #304964)
+
+-------------------------------------------------------------------
 Tue Mar 11 13:33:52 CET 2008 - lslezak@suse.cz
 
 - adapted to the new ProvideProgress callback signature (#168935)

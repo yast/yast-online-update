@@ -22,3 +22,4 @@ Exec=/sbin/yast2 online_update cd_update
 Name=Patch CD Update
 GenericName=Install patches from CD to correct and improve your existing installation
 X-KDE-SubstituteUID=true
+StartupNotify=true
