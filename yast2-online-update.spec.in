@@ -3,8 +3,8 @@
 @HEADER@
 BuildRequires:	gcc-c++ libxcrypt-devel perl-XML-Writer update-desktop-files pkg-config yast2-devtools yast2-packager yast2-bootloader
 PreReq:		grep sed
-# download rate in ProgressProvide callback
-Requires:	yast2 yast2-pkg-bindings >= 2.16.17
+# new registration of callbacks
+Requires:	yast2 yast2-pkg-bindings >= 2.16.23
 # PackageCallbacks::FormatPatchName
 Requires:	yast2-packager >= 2.13.159
 

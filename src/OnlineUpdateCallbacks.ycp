@@ -86,34 +86,9 @@
     }
 
     /**
-      Callback for executing YCP scripts in YOU.
-    */
-    global define boolean ExecuteYcpScriptCallback( string script )
-    ``{
-	last_callback	= "ExecuteYcpScriptCallback";
-        y2milestone("ExecuteYcpScriptCallback");
-        return (boolean)WFM::call( script, [] );
-    }
-
-    /**
-      Callback for showing script execution progress in YOU.
-    */
-    global define boolean ScriptProgressCallback( integer percent )
-    ``{
-	last_callback	= "ScriptProgressCallback";
-        y2milestone("ScriptProgressCallback");
-        symbol ret = (symbol)UI::PollInput();
-
-        if ( ret == `abort || ret == `cancel ) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
       Callback for starting download of a package.
      */
-    global boolean StartProvide(string name, integer archivesize,boolean remote)
+    global void StartProvide(string name, integer archivesize,boolean remote)
     {
 	// progress log item (%1 is name of package)
 	ProgressLog (sformat (_("Retrieving %1..."), name));
@@ -125,7 +100,6 @@
 	    UI::ChangeWidget (`id (`you_patch_progress), `Value, 0);
 	}
 	last_callback	= "StartProvide";
-	return true;
     }
 
     global void StartDownload (string url, string localfile)
@@ -147,7 +121,7 @@
      /**
       Callback for starting installation of a package.
      */
-    global boolean StartPackage(string name, string summary, integer
+    global void StartPackage(string name, string summary, integer
                                         installsize, boolean is_delete)
     {
 	// progress log item (%1 is name of package, %2 is summary)
@@ -160,7 +134,6 @@
 	    UI::ChangeWidget (`id (`you_patch_progress), `Value, 0);
 	}
 	last_callback	= "StartPackage";
-	return true;
     }
 
     /**
@@ -473,51 +446,47 @@
     ``{
 	y2milestone ( "OnlineUpdateCallbacks constructor" );
 
-	Pkg::CallbackStartProvide( "OnlineUpdateCallbacks::StartProvide" );
-	Pkg::CallbackProgressProvide( "OnlineUpdateCallbacks::PatchProgressCallback" );
-	Pkg::CallbackDoneProvide( "OnlineUpdateCallbacks::DoneProvide" );
+	Pkg::CallbackStartProvide( OnlineUpdateCallbacks::StartProvide );
+	Pkg::CallbackProgressProvide( OnlineUpdateCallbacks::PatchProgressCallback );
+	Pkg::CallbackDoneProvide( OnlineUpdateCallbacks::DoneProvide );
 
-	Pkg::CallbackStartPackage( "OnlineUpdateCallbacks::StartPackage" );
-	Pkg::CallbackProgressPackage ("OnlineUpdateCallbacks::PatchProgressCallback");
-	Pkg::CallbackDonePackage( "OnlineUpdateCallbacks::DonePackage" );
+	Pkg::CallbackStartPackage( OnlineUpdateCallbacks::StartPackage );
+	Pkg::CallbackProgressPackage (OnlineUpdateCallbacks::PatchProgressCallback);
+	Pkg::CallbackDonePackage( OnlineUpdateCallbacks::DonePackage );
 
-	Pkg::CallbackResolvableReport("OnlineUpdateCallbacks::MessageCallback");
+	Pkg::CallbackResolvableReport(OnlineUpdateCallbacks::MessageCallback);
 
-	Pkg::CallbackStartDownload( "OnlineUpdateCallbacks::StartDownload" );
-	Pkg::CallbackProgressDownload( "OnlineUpdateCallbacks::ProgressDownloadCallback" );
-	Pkg::CallbackDoneDownload ("OnlineUpdateCallbacks::DoneDownload");
+	Pkg::CallbackStartDownload( OnlineUpdateCallbacks::StartDownload );
+	Pkg::CallbackProgressDownload( OnlineUpdateCallbacks::ProgressDownloadCallback );
+	Pkg::CallbackDoneDownload (OnlineUpdateCallbacks::DoneDownload);
 
-        Pkg::CallbackMediaChange ("PackageCallbacks::MediaChange");
+        Pkg::CallbackMediaChange (PackageCallbacks::MediaChange);
 
 	// delta download
-	Pkg::CallbackStartDeltaDownload ("OnlineUpdateCallbacks::StartDeltaDownload");
-	Pkg::CallbackProgressDeltaDownload ("OnlineUpdateCallbacks::ProgressDeltaDownload");
-	Pkg::CallbackProblemDeltaDownload ("OnlineUpdateCallbacks::ProblemDeltaDownload");
-	Pkg::CallbackFinishDeltaDownload ("OnlineUpdateCallbacks::FinishPatchDeltaProvide");
+	Pkg::CallbackStartDeltaDownload (OnlineUpdateCallbacks::StartDeltaDownload);
+	Pkg::CallbackProgressDeltaDownload (OnlineUpdateCallbacks::ProgressDeltaDownload);
+	Pkg::CallbackProblemDeltaDownload (OnlineUpdateCallbacks::ProblemDeltaDownload);
+	Pkg::CallbackFinishDeltaDownload (OnlineUpdateCallbacks::FinishPatchDeltaProvide);
 
 	// delta application
-	Pkg::CallbackStartDeltaApply ("OnlineUpdateCallbacks::StartDeltaApply");
-	Pkg::CallbackProgressDeltaApply ("OnlineUpdateCallbacks::ProgressDeltaApply");
-	Pkg::CallbackProblemDeltaApply ("OnlineUpdateCallbacks::ProblemDeltaApply");
-	Pkg::CallbackFinishDeltaApply ("OnlineUpdateCallbacks::FinishPatchDeltaProvide");
+	Pkg::CallbackStartDeltaApply (OnlineUpdateCallbacks::StartDeltaApply);
+	Pkg::CallbackProgressDeltaApply (OnlineUpdateCallbacks::ProgressDeltaApply);
+	Pkg::CallbackProblemDeltaApply (OnlineUpdateCallbacks::ProblemDeltaApply);
+	Pkg::CallbackFinishDeltaApply (OnlineUpdateCallbacks::FinishPatchDeltaProvide);
 
 	// patch download
-	Pkg::CallbackStartPatchDownload ("OnlineUpdateCallbacks::StartPatchDownload");
-	Pkg::CallbackProgressPatchDownload ("OnlineUpdateCallbacks::ProgressPatchDownload");
-	Pkg::CallbackProblemPatchDownload ("OnlineUpdateCallbacks::ProblemPatchDownload");
-	Pkg::CallbackFinishPatchDownload ("OnlineUpdateCallbacks::FinishPatchDeltaProvide");
-
-	// obsoleted callbacks
-	Pkg::CallbackYouExecuteYcpScript ("OnlineUpdateCallbacks::ExecuteYcpScriptCallback");
-        Pkg::CallbackYouScriptProgress ("OnlineUpdateCallbacks::ScriptProgressCallback");
+	Pkg::CallbackStartPatchDownload (OnlineUpdateCallbacks::StartPatchDownload);
+	Pkg::CallbackProgressPatchDownload (OnlineUpdateCallbacks::ProgressPatchDownload);
+	Pkg::CallbackProblemPatchDownload (OnlineUpdateCallbacks::ProblemPatchDownload);
+	Pkg::CallbackFinishPatchDownload (OnlineUpdateCallbacks::FinishPatchDeltaProvide);
 
 	// script callbacks
-	Pkg::CallbackScriptStart("OnlineUpdateCallbacks::ScriptStart");
-	Pkg::CallbackScriptProgress("OnlineUpdateCallbacks::ScriptProgress");
-	Pkg::CallbackScriptProblem("OnlineUpdateCallbacks::ScriptProblem");
-	Pkg::CallbackScriptFinish("OnlineUpdateCallbacks::ScriptFinish");
+	Pkg::CallbackScriptStart(OnlineUpdateCallbacks::ScriptStart);
+	Pkg::CallbackScriptProgress(OnlineUpdateCallbacks::ScriptProgress);
+	Pkg::CallbackScriptProblem(OnlineUpdateCallbacks::ScriptProblem);
+	Pkg::CallbackScriptFinish(OnlineUpdateCallbacks::ScriptFinish);
 
-	Pkg::CallbackMessage("OnlineUpdateCallbacks::Message");
+	Pkg::CallbackMessage(OnlineUpdateCallbacks::Message);
     }
 
     /*
