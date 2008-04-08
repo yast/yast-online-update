@@ -103,6 +103,9 @@
   // initialize target to import all trusted keys (#165849)
   Pkg::TargetInit( "/", false );
 
+  // use y2logRPM for logging rpm output
+  Pkg::TargetLogfile (Directory::logdir + "/y2logRPM");
+
   Progress::NextStage ();
 
   OnlineUpdateCallbacks::RefreshAllSources();

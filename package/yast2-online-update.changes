@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Apr  8 10:18:32 CEST 2008 - jsuchome@suse.cz
+
+- use y2logRPM for logging rpm output (bnc#372863)
+- 2.13.66 
+
+-------------------------------------------------------------------
 Thu Feb 21 11:35:08 CET 2008 - jsuchome@suse.cz
 
 - do not add same source twice (#272666)

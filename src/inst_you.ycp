@@ -10,6 +10,7 @@
     import "Directory";
     import "FileUtils";
     import "GetInstArgs";
+    import "Installation";
     import "Internet";
     import "Label";
     import "Mode";
@@ -114,6 +115,9 @@
 	Pkg::TargetInitialize ("/");
 	Pkg::TargetLoad ();
     }
+    // use y2logRPM for logging rpm output
+    // (may not be set if no package was installed in 2nd stage)
+    Pkg::TargetLogfile (Installation::destdir + Directory::logdir +"/y2logRPM");
 
     integer selected	= 0;
     boolean check_licenses	= false;
