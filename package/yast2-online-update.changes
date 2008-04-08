@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Apr  8 13:56:58 CEST 2008 - jsuchome@suse.cz
+
+- enable selecting CD URL for Patch CD (fate#303475)
+- 2.16.10
+
+-------------------------------------------------------------------
 Wed Apr  2 16:48:59 CEST 2008 - lslezak@suse.cz
 
 - adapted to the new callback registration scheme (fate#302296)

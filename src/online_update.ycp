@@ -215,6 +215,14 @@ Exit Online Update now?")))
    */
   define boolean CDUpdateHandler (map options ) {
     OnlineUpdate::cd_update	= true;
+    if (options["cd_url"]:"" != "")
+    {
+	OnlineUpdate::cd_url      = options["cd_url"]:"";
+    }
+    if (options["cd_directory"]:"" != "")
+    {
+	OnlineUpdate::cd_directory	= options["cd_directory"]:"";
+    }
     OnlineUpdateSequence ();
     return true;
   }
@@ -231,23 +239,36 @@ Exit Online Update now?")))
   // the command line description map
   map cmdline = $[
     "id"		: "online_update",
-    // translators: command line help text
+    // command line help text
     "help"		: _("Online Update module"),
     "guihandler"	: OnlineUpdateSequence,
     "actions"		: $[
 	"cd_update" :$[
 	    "handler"	: CDUpdateHandler,
-	    // translators: command line help text for cd_update action
+	    // command line help text for cd_update action
 	    "help"	: _("Start Patch CD Update")
 	],
 	"simple_mode"	: $[
 	    "handler"	: SimpleModeHandler,
-	    // translators: command line help text for simple_mode action
+	    // command line help text for simple_mode action
 	    "help"	: _("Use simple Package Selector")
 	],
     ],
+    "options"		: $[
+	"cd_url"	:$[
+	    // command line help text for cd_url option
+	    "help"	: sformat(_("URL for Patch CD (default value is '%1')"),
+	    OnlineUpdate::cd_url),
+	    "type"	: "string"
+	],
+	"cd_directory"	:$[
+	    // command line help text for cd_directory option
+	    "help"	: sformat(_("Directory for patch data on Patch CD (default value is '%1')"), OnlineUpdate::cd_directory),
+	    "type"	: "string"
+	],
+    ],
     "mappings"		: $[
-	"cd_update"	: [],
+	"cd_update"	: [ "cd_url", "cd_directory"],
 	"simple_mode"	: [],
     ]
   ];
