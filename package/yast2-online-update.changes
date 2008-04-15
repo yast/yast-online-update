@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Apr 15 14:01:30 CEST 2008 - jsuchome@suse.cz
+
+- merged texts from proofread 
+- 2.16.11
+
+-------------------------------------------------------------------
 Tue Apr  8 13:56:58 CEST 2008 - jsuchome@suse.cz
 
 - enable selecting CD URL for Patch CD (fate#303475)

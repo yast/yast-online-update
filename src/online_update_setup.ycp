@@ -116,9 +116,9 @@
 
     CommandLine::Print (
 	// summary item
-	AutoOnlineUpdate::enabled ? _("Automatic Online Update is enabled.") :
+	AutoOnlineUpdate::enabled ? _("Automatic online update is enabled.") :
 	// summary item
-				    _("Automatic Online Update is disabled."));
+				    _("Automatic online update is disabled."));
     if (!AutoOnlineUpdate::enabled)
 	return false;
     if (AutoOnlineUpdate::skipPre)
@@ -133,7 +133,7 @@
     string time_str = sformat (_("at %1.%2"), hour_str, minute_str);
     if (AutoOnlineUpdate::random_time)
 	// alternative time string (when the update is run)
-        time_str = _("at a random time");
+        time_str = _("At random time");
     if (AutoOnlineUpdate::timing == `weekly)
     {
 	// summary item, %1 is day in the week, %2 is time string
@@ -160,7 +160,7 @@
   map cmdline = $[
     "id"		: "online_update_setup",
     // translators: command line help text
-    "help"		: _("Setup Automatic Online Update"),
+    "help"		: _("Set up automatic online update"),
     "initialize"	: AutoOnlineUpdate::Read,
     "finish"		: WriteHandler,
     "guihandler"	: OnlineUpdateDialogs::SetupAutomatic,

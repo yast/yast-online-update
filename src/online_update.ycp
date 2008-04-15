@@ -90,8 +90,9 @@ define symbol OnlineUpdateSequence () {
 	}
     });
     // continue/cancel message
-    if (!is_available && Popup::YesNo (_("No active update repository is available.
-Exit Online Update now?")))
+    if (!is_available && Popup::YesNo (_("No active update repository available.
+Exit <b>Online Update</b> now?
+")))
     {
 	Wizard::CloseDialog();
 	return `abort;
@@ -251,7 +252,7 @@ Exit Online Update now?")))
 	"simple_mode"	: $[
 	    "handler"	: SimpleModeHandler,
 	    // command line help text for simple_mode action
-	    "help"	: _("Use simple Package Selector")
+	    "help"	: _("Use simple package selector")
 	],
     ],
     "options"		: $[
