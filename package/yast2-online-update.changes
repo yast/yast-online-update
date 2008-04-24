@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Apr 24 13:20:54 CEST 2008 - jsuchome@suse.cz
+
+- Patch CD: ensure first CD is in drive before synchronization with
+  ZMD (bnc#381594)
+- 2.13.67 
+
+-------------------------------------------------------------------
 Tue Apr  8 10:18:32 CEST 2008 - jsuchome@suse.cz
 
 - use y2logRPM for logging rpm output (bnc#372863)

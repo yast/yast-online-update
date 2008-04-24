@@ -21,6 +21,7 @@
   import "Popup";
   import "Progress";
   import "SourceManager";
+  import "URL";
   import "Wizard";
   import "GetInstArgs";
 
@@ -196,6 +197,18 @@
 	    break;
 	}
     });
+    if (add_new_source)
+    {
+	// now, ensure there's first CD in the drive (bnc#381594)
+	map parsed = URL::Parse (new_source["url"]:"");
+	if (parsed["scheme"]:"" == "cd")
+	{
+	    // SourceProvideFile should use a callback to ask user for 1st media
+	    if (Pkg::SourceProvideFile (
+		OnlineUpdate::cd_source, 1, "/media.1/media") == nil)
+		add_new_source	= false;
+	}
+    }
 
     if (add_new_source)
     {
