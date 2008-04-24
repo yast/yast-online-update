@@ -91,7 +91,7 @@ define symbol OnlineUpdateSequence () {
     });
     // continue/cancel message
     if (!is_available && Popup::YesNo (_("No active update repository available.
-Exit <b>Online Update</b> now?
+Exit Online Update now?
 ")))
     {
 	Wizard::CloseDialog();
@@ -202,9 +202,10 @@ Exit <b>Online Update</b> now?
 	Popup::Message (OnlineUpdate::restart_message);
     }
     OnlineUpdate::restart_yast	= false;
-    retval	= -42;// restart menu.ycp even if there are no other patches selected
+    // restart menu.ycp even if there are no other patches selected
+    retval	= -42;
   }
-  else if (OnlineUpdate::reboot_needed)
+  if (OnlineUpdate::reboot_needed)
   {
     Popup::Message (OnlineUpdate::reboot_message);
   }

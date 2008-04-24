@@ -56,12 +56,6 @@ This could take some time. Download details are shown in the log window.</p>");
   if (!Stage::cont ())
     Wizard::SetNextButton(`next, Label::FinishButton() );
 
-  if (!Stage::cont ())
-  {
-    Wizard::SetNextButton(`next, Label::FinishButton() );
-    Pkg::PkgSolve (true);
-  }
-
   integer total_progress = size (Pkg::GetPackages (`selected, true)) * 2;
   if (total_progress == 0)
       total_progress	= 100;

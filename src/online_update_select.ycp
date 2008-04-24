@@ -47,28 +47,26 @@ you have inserted the correct CD.
 
   Pkg::PkgEstablish();
 
+  boolean restart_yast	= false;
+  boolean reboot_needed	= false;
+  boolean normal_patches_selected	= false;
   integer selected	= 0;
   string saved_path	= Directory::vardir + "/selected_patches.ycp";
 
-  // check if there exists saved selection of patches to be installed
+  // check if YaST was restarted
   if (FileUtils::Exists (saved_path))
   {
-    list<string> patches = (list<string>) SCR::Read(.target.ycp,saved_path);
-    if (patches == nil)
-	patches = [];
-    foreach (string pname, patches, {
-	if (Pkg::ResolvableInstall (pname, `patch))
-	selected	= selected + 1;
-    });
+    string saved	= (string) SCR::Read (.target.ycp, saved_path);
+    // before restart, patch requiring reboot was installed:
+    // show the reboot popup now
+    if (saved != nil && is (saved, string) && saved == "reboot")
+	reboot_needed	= true;
     SCR::Execute (.target.remove, saved_path);
-    y2milestone ("Previously selected patches: %1", selected);
   }
+
   // if not, select the patches affecting pkg management
-  else
-  {
-    selected = Pkg::ResolvablePreselectPatches (`affects_pkg_manager);
-    y2milestone ("Preselected patches for pkg management: %1", selected);
-  }
+  selected = Pkg::ResolvablePreselectPatches (`affects_pkg_manager);
+  y2milestone ("Preselected patches for pkg management: %1", selected);
 
   // if no patch is selected, pre-select all security and recommended
   if (selected < 1)
@@ -76,6 +74,8 @@ you have inserted the correct CD.
     selected = Pkg::ResolvablePreselectPatches (`all);
     y2milestone ("All preselected patches: %1", selected);
   }
+
+  Wizard::ClearContents();// do not show the remnant of initial progress
 
   boolean simple_mode = OnlineUpdate::simple_mode && (UI::HasSpecialWidget(`SimplePatchSelector) == true);
   if (simple_mode)
@@ -103,6 +103,34 @@ you have inserted the correct CD.
 	current	= "simple";
 	ret	= nil;
     }
+    if (ret == `accept)
+    {
+	restart_yast		= false;
+	normal_patches_selected	= false;
+	foreach (map patch, Pkg::ResolvableProperties ("", `patch, ""), {
+	    if (patch["status"]:`none == `selected)
+	    {
+		if (patch["affects_pkg_manager"]:false)
+		    restart_yast		= true;
+		else
+		    normal_patches_selected	= true;
+	    }
+	});
+	if (restart_yast && normal_patches_selected)
+	{
+	    // continue/cancel popup
+	    if (!Popup::ContinueCancel (_("There are patches for package management available requiring restart of YaST.
+They should be installed first and all other patches after the restart.
+
+You selected some other patches to be installed now.
+
+Continue with installing your selection?")))
+	    {
+		ret	= nil;
+		UI::OpenDialog (`opt(`defaultsize), `PackageSelector(`id(`selector), `opt(`youMode)));
+	    }
+	}
+    }
   } until ( ret == `cancel || ret == `accept );
 
   Wizard::ClearContents();
@@ -110,41 +138,45 @@ you have inserted the correct CD.
   y2milestone ("RunPkgSelection finally returned '%1'", ret);
   if ( ret == `cancel ) return `abort;
 
-  boolean restart_yast	= false;
-  list<string> normal_patches		= [];
   boolean more_patches_needed		= false;
-  boolean reboot_needed			= false;
   foreach (map patch, Pkg::ResolvableProperties("", `patch, ""), {
     if (patch["status"]:`none == `selected)
     {
 	if (patch["reboot_needed"]:false)
 	    reboot_needed	= true;
 	if (patch["affects_pkg_manager"]:false)
-	    restart_yast = true;
+	    restart_yast	= true;
         else
-	    normal_patches = add (normal_patches, patch["name"]:"");
+	    normal_patches_selected	= true;
     }
-    else if (patch["is_needed"]:false) // patch not selected: bug #188541
+    // patch not selected: bug #188541 - touch saved_path to force the restart
+    else if (patch["is_needed"]:false)
     {
-	y2debug ("patch needed but not selected: %1", patch);
+	y2milestone ("patch needed but not selected: %1", patch);
 	more_patches_needed	= true;
     }
   });
 
-  // unselect non-affects_pkg_manager patches and save them to file
-  // for later usage
-  if (restart_yast && (size (normal_patches) > 0 || more_patches_needed))
+  // tell the caller (/sbin/yast2) to call online update again
+  if (restart_yast && more_patches_needed)
   {
-    foreach (string pname, normal_patches, {
-	Pkg::ResolvableNeutral (pname, `patch, true);
-    });
-    SCR::Write (.target.ycp, saved_path, normal_patches);
-    // show reboot popup only when yast is not going to restart itself automatically
+    // what if kernel (=reboot) and zypp (=restart) are installed together?
+    // => restart YaST and show reboot message after the second run
+    string save_message	= "restart";
+    if (reboot_needed)
+	save_message	= "reboot";
+    SCR::Write (.target.ycp, saved_path, save_message);
+    // show reboot popup only when yast is not going to restart now
     reboot_needed	= false;
   }
+  else
+  {
+      y2debug ("nothing left for the second run, no restart needed");
+  }
+
   // no patch selected
-  if (!restart_yast && normal_patches == [] && !Pkg::PkgAnyToInstall () &&
-      !Pkg::PkgAnyToDelete ())
+  if (!restart_yast && !normal_patches_selected &&
+      !Pkg::PkgAnyToInstall () && !Pkg::PkgAnyToDelete ())
   {
       ret = `cancel;
   }

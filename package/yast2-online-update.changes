@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Apr 24 13:06:59 CEST 2008 - jsuchome@suse.cz
+
+- warn user if there are selected patches not for package management,
+  do not run solver silently (bnc#367057)
+- 2.16.12
+
+-------------------------------------------------------------------
 Tue Apr 15 14:01:30 CEST 2008 - jsuchome@suse.cz
 
 - merged texts from proofread 
