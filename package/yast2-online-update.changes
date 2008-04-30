@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Apr 24 13:44:10 CEST 2008 - jsuchome@suse.cz
+
+- Patch CD: ensure first CD is in drive before synchronization with
+  ZMD (bnc#381594)
+- 2.16.13
+
+-------------------------------------------------------------------
 Thu Apr 24 13:06:59 CEST 2008 - jsuchome@suse.cz
 
 - warn user if there are selected patches not for package management,
