@@ -64,7 +64,9 @@ you have inserted the correct CD.
     SCR::Execute (.target.remove, saved_path);
   }
 
-  // if not, select the patches affecting pkg management
+  Pkg::PkgSolve(true);
+
+  // 1st, select the patches affecting pkg management
   selected = Pkg::ResolvablePreselectPatches (`affects_pkg_manager);
   y2milestone ("Preselected patches for pkg management: %1", selected);
 
@@ -118,13 +120,7 @@ you have inserted the correct CD.
 	});
 	if (restart_yast && normal_patches_selected)
 	{
-	    // continue/cancel popup
-	    if (!Popup::ContinueCancel (_("There are patches for package management available requiring restart of YaST.
-They should be installed first and all other patches after the restart.
-
-You selected some other patches to be installed now.
-
-Continue with installing your selection?")))
+	    if (!Popup::ContinueCancel (OnlineUpdate::more_selected_message))
 	    {
 		ret	= nil;
 		UI::OpenDialog (`opt(`defaultsize), `PackageSelector(`id(`selector), `opt(`youMode)));
@@ -169,7 +165,7 @@ Continue with installing your selection?")))
     // show reboot popup only when yast is not going to restart now
     reboot_needed	= false;
   }
-  else
+  else if (restart_yast)
   {
       y2debug ("nothing left for the second run, no restart needed");
   }

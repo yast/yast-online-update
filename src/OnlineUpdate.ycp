@@ -32,6 +32,14 @@ global boolean reboot_needed	= false;
 global string reboot_message	= _("At least one of the updates installed requires a system reboot to function
 properly. Reboot the system.");
 
+// continue/cancel popup text
+global string more_selected_message	= _("There are patches for package management available requiring restart of YaST.
+They should be installed first and all other patches after the restart.
+
+You selected some other patches to be installed now.
+
+Continue with installing your selection?");
+
 /**
  * If simple Package selector should be opened
  */

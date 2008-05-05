@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon May  5 15:46:48 CEST 2008 - jsuchome@suse.cz
+
+- added warning about the patch selection also to inst_you
+- solver needs to be run before preselecting patches (bnc#385216)
+- 2.16.14
+
+-------------------------------------------------------------------
 Thu Apr 24 13:44:10 CEST 2008 - jsuchome@suse.cz
 
 - Patch CD: ensure first CD is in drive before synchronization with

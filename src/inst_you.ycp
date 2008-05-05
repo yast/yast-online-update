@@ -84,7 +84,7 @@
 
 	    // ping anything (www.suse.com) to trigger dod connections
 	    SCR::Execute (.target.bash_background,
-			  "/bin/ping -c 1 -w 1 213.95.15.200");
+			  "/bin/ping -c 1 -w 1 195.135.220.3");
 
 	    sleep (1000);
 	    i	= i - 1;
@@ -117,26 +117,23 @@
 
     integer selected	= 0;
     boolean check_licenses	= false;
+    boolean reboot_needed	= false;
+    boolean normal_patches_selected	= false;
 
-    // check if there exists saved selection of patches to be installed
+    // check if YaST was restarted
     if (FileUtils::Exists (saved_path))
     {
-	list<string> patches = (list<string>) SCR::Read(.target.ycp,saved_path);
-	if (patches == nil)
-	    patches = [];
-	foreach (string pname, patches, {
-	    if (Pkg::ResolvableInstall (pname, `patch))
-		selected	= selected + 1;
-	});
+	string saved	= (string) SCR::Read (.target.ycp, saved_path);
+	// saved value actually is not needed during installation
+	y2milestone ("previous action of YOU: %1", saved);
 	SCR::Execute (.target.remove, saved_path);
-	y2milestone ("Previously selected patches: %1", selected);
     }
-    // if not, select the patches affecting pkg management
-    else
-    {
-	selected = Pkg::ResolvablePreselectPatches (`affects_pkg_manager);
-	y2milestone ("Preselected patches for pkg management: %1", selected);
-    }
+
+    boolean solved	= Pkg::PkgSolve (false);
+
+    // select the patches affecting pkg management
+    selected = Pkg::ResolvablePreselectPatches (`affects_pkg_manager);
+    y2milestone ("Preselected patches for pkg management: %1", selected);
 
     // if no patch is selected, pre-select all security and recommended
     if (selected < 1)
@@ -146,27 +143,52 @@
     }
 
     // run package selector to allow user interaction
-    if (!Pkg::PkgSolve (false) ||
+    if (!solved ||
 	ProductFeatures::GetBooleanFeature("globals", "manual_online_update") ||
 	Hack ("ui"))
     {
 	Pkg::TargetInitDU([]); // init DiskUsage counter (#197497)
-	UI::OpenDialog(`opt(`defaultsize), `PackageSelector(`id(`selector), `opt(`youMode)) );
-	symbol ret_sel = (symbol)UI::RunPkgSelection(`id(`selector) );
-	UI::CloseDialog();
-	if (ret_sel == `cancel)
+	symbol ret_sel		= nil;
+	repeat
 	{
-	    y2milestone ("package selector canceled -> `next");
-	    return `next;
-	}
+	    UI::OpenDialog(`opt(`defaultsize), `PackageSelector(`id(`selector), `opt(`youMode)) );
+	    ret_sel = (symbol)UI::RunPkgSelection(`id(`selector) );
+	    if (ret_sel == `cancel)
+	    {
+		y2milestone ("package selector canceled -> `next");
+		UI::CloseDialog();
+		return `next;
+	    }
+	    if (ret_sel == `accept)
+	    {
+		boolean restart_yast	= false;
+		normal_patches_selected	= false;
+		foreach (map patch, Pkg::ResolvableProperties ("", `patch, ""),
+		{
+		    if (patch["status"]:`none == `selected)
+		    {
+			if (patch["affects_pkg_manager"]:false)
+			    restart_yast		= true;
+			else
+			    normal_patches_selected	= true;
+		    }
+		});
+		if (restart_yast && normal_patches_selected &&
+		    !Popup::ContinueCancel(OnlineUpdate::more_selected_message))
+		{
+		    // user wants to re-examine the selection
+		    ret	= nil;
+		}
+	    }
+	    UI::CloseDialog();
+	} until (ret_sel == `cancel || ret_sel == `accept);
     }
     else if (selected > 0)
     {
 	check_licenses	= true;
     }
 
-    list<string> normal_patches		= [];
-    boolean reboot_needed		= false;
+    boolean more_patches_needed		= false;
     foreach (map patch, Pkg::ResolvableProperties("", `patch, ""), {
 	if (patch["status"]:`none == `selected)
 	{
@@ -178,34 +200,35 @@
 		else if (ret != `reboot)
 		    ret	= `restart_same_step;
 	    }
+	    else if (patch["reboot_needed"]:false)
+	    {
+		// patch requiring reboot should be installed in this run
+		ret = `reboot;
+	    }
 	    else
 	    {
-		normal_patches = add (normal_patches, patch["name"]:"");
-		// for this patch reboot would be needed, but still it is not
-		// clear if the patch will be installed in this run -> save info
-		if (patch["reboot_needed"]:false)
-		    reboot_needed	= true;
+		normal_patches_selected	= true;
 	    }
+	}
+	// patch not selected: touch saved_path to force the restart
+	else if (patch["is_needed"]:false)
+	{
+	    y2milestone ("patch needed but not selected: %1", patch);
+	    more_patches_needed	= true;
 	}
     });
 
-    // unselect non-affects_pkg_manager patches and save them to file
-    // for later usage
-    if (ret != `auto && size (normal_patches) > 0)
+    // tell the caller (/sbin/yast2) to call online update again
+    if (ret != `auto && more_patches_needed)
     {
-	foreach (string pname, normal_patches, {
-	    Pkg::ResolvableNeutral (pname, `patch, true);
-	});
-	SCR::Write (.target.ycp, saved_path, normal_patches);
+	string save_message	= (ret == `reboot) ? "reboot" : "restart";
+	SCR::Write (.target.ycp, saved_path, "inst_" + save_message);
     }
-    // no packagemanager patch selected ...
+    // no packagemanager/reboot patch selected ...
     if (ret == `auto)
     {
-	// ... but there is a patch with "reboot_needed" flag (=probably kernel)
-	if (reboot_needed)
-	    ret     = `reboot;
 	// ... and nothing to install -> skip the installation at all
-	else if (normal_patches == [] && !Pkg::PkgAnyToInstall () &&
+	if (!normal_patches_selected && !Pkg::PkgAnyToInstall () &&
 	    !Pkg::PkgAnyToDelete ())
 	{
 	    y2milestone ("no patch selected after all -> `next");
