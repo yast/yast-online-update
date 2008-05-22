@@ -21,6 +21,7 @@
   import "Popup";
   import "Progress";
   import "SourceManager";
+  import "URL";
   import "Wizard";
   import "GetInstArgs";
 
@@ -167,8 +168,29 @@
 
   if (OnlineUpdate::cd_update && OnlineUpdate::cd_source > -1)
   {
-    SourceManager::SyncYaSTInstSourceWithZMD ();
-    Pkg::SourceFinishAll ();
+    // map of the new source added on start
+    map new_source		= union (
+	Pkg::SourceGeneralData (OnlineUpdate::cd_source),
+        Pkg::SourceProductData (OnlineUpdate::cd_source)
+    );
+    boolean add_new_source	= true;
+    if (add_new_source)
+    {
+	// now, ensure there's first CD in the drive (bnc#381594)
+	map parsed = URL::Parse (new_source["url"]:"");
+	if (parsed["scheme"]:"" == "cd")
+	{
+	    // SourceProvideFile should use a callback to ask user for 1st media
+	    if (Pkg::SourceProvideFile (
+		OnlineUpdate::cd_source, 1, "/media.1/media") == nil)
+		add_new_source	= false;
+	}
+    }
+    if (add_new_source)
+    {
+	SourceManager::SyncYaSTInstSourceWithZMD ();
+	Pkg::SourceFinishAll ();
+    }
   }
 
   if (OnlineUpdate::restart_yast)

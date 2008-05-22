@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu May 15 12:54:53 CEST 2008 - jsuchome@suse.cz
+
+- Patch CD: ensure first CD is in drive before synchronization with
+  ZMD (bnc#381594)
+- 2.13.62.1
+
+-------------------------------------------------------------------
 Thu Nov  8 11:16:09 CET 2007 - jsuchome@suse.cz
 
 - fix check for nil return value of clients (#339749) 
