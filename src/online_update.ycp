@@ -203,7 +203,7 @@ Exit Online Update now?
     if (add_new_source)
     {
 	SourceManager::SyncYaSTInstSourceWithZMD ();
-	Pkg::SourceFinishAll ();
+	Pkg::SourceSaveAll ();
     }
   }
 

@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Jun 17 13:52:44 CEST 2008 - lslezak@suse.cz
+
+- use Pkg::SourceSaveAll() instead of Pkg::SourceFinishAll()
+  (bnc#395738)
+- 2.17.0
+
+-------------------------------------------------------------------
 Wed May 21 07:46:01 CEST 2008 - jsuchome@suse.cz
 
 - correct order of arguments for cronjob command (bnc#391144)
