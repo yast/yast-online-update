@@ -344,9 +344,9 @@
 // Script callbacks
 
     // a script has been started
-    global void ScriptStart(string patch_name, string patch_version, string patch_arch, string script_path, boolean installation)
+    global void ScriptStart(string patch_name, string patch_version, string patch_arch, string script_path)
     {
-	y2milestone("ScriptStart: patch_name:%1, patch_version:%2, patch_arch:%3, script:%4, installation:%5", patch_name, patch_version, patch_arch, script_path, installation);
+	y2milestone("ScriptStart: patch_name:%1, patch_version:%2, patch_arch:%3, script:%4", patch_name, patch_version, patch_arch, script_path);
 	string patch_full_name = PackageCallbacks::FormatPatchName(patch_name, patch_version, patch_arch);
 
         if (UI::WidgetExists(`id(`you_patch_progress)))
@@ -391,13 +391,15 @@
     }
 
     // an error has occurred
-    global void ScriptProblem(string description)
+    global string ScriptProblem(string description)
     {
 	y2milestone("ScriptProblem: %1", description);
 
 	// FIXME: use rather LongError here?
 	Popup::Error(description);
 	last_callback = "ScriptProblem";
+
+	return "A"; // = Abort, TODO: support also Ignore and Retry
     }
 
     // the script has finished
@@ -421,7 +423,7 @@
     }
 
     // display a message
-    global void Message(string patch_name, string patch_version, string patch_arch, string message)
+    global boolean Message(string patch_name, string patch_version, string patch_arch, string message)
     {
 	string patch_full_name = PackageCallbacks::FormatPatchName(patch_name, patch_version, patch_arch);
 	y2milestone("Message (%1): %2", patch_full_name, message);
@@ -435,6 +437,8 @@
 	// use richtext, the message might be too long for standard popup
 	Popup::LongMessage(patch_full_name + message);
 	last_callback = "Message";
+
+	return true; // = continue, TODO: use Continue/Cancel dialog
     }
 
 
