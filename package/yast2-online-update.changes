@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Jul  7 11:46:22 CEST 2008 - jsuchome@suse.cz
+
+- when deleting packages, show correct progress info (bnc#403280)
+- 2.17.2 
+
+-------------------------------------------------------------------
 Fri Jun 27 11:22:46 CEST 2008 - lslezak@suse.cz
 
 - adapted to the new patch messages and patch scripts callbacks
