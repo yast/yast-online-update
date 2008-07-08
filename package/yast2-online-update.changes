@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Jul  8 11:43:27 CEST 2008 - jsuchome@suse.cz
+
+- different progress caption for CD Update (bnc#385186) 
+
+-------------------------------------------------------------------
 Mon Jul  7 11:46:22 CEST 2008 - jsuchome@suse.cz
 
 - when deleting packages, show correct progress info (bnc#403280)
