@@ -71,6 +71,7 @@ fi
 @clientdir@/online*.ycp
 @clientdir@/cd_update.ycp
 @clientdir@/inst_you.ycp
+@clientdir@/do_online_update_auto.ycp
 @moduledir@/OnlineUpdate*.ycp
 @moduledir@/OnlineUpdate*.ybc
 @moduledir@/AutoOnlineUpdate*.ycp

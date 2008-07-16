@@ -1,0 +1,75 @@
+/**
+ * File:	clients/do_online_update_auto.ycp
+ * Package:	Configuration of online_update
+ * Summary:	Run online update during autoinstallation
+ * Authors:	Jiri Suchomel <jsuchome@suse.cz>
+ *
+ * $Id$
+ */
+
+{
+
+y2milestone("----------------------------------------");
+y2milestone("do_online_update auto started");
+
+
+any ret = nil;
+string func = "";
+map param = $[];
+
+/* Check arguments */
+if(size(WFM::Args()) > 0 && is(WFM::Args(0), string))
+{
+    func = (string)WFM::Args(0);
+    if(size(WFM::Args()) > 1 && is(WFM::Args(1), map))
+	param = (map) WFM::Args(1);
+}
+y2debug("func=%1", func);
+y2debug("param=%1", param);
+
+// Run the online update now: non-interactive version of
+// inst_you + online_update_install
+if (func == "Write") {
+
+    ret	= `auto;
+
+    Pkg::TargetInit ("/", false);
+    Pkg::SourceStartManager (true);
+    Pkg::PkgEstablish ();
+
+    integer selected = Pkg::ResolvablePreselectPatches (`all);
+    y2milestone ("All preselected patches: %1", selected);
+
+    if (selected > 0)
+    {
+	foreach (map patch, Pkg::ResolvableProperties("", `patch, ""), {
+	    if (patch["status"]:`none == `selected &&
+		patch["reboot_needed"]:false)
+	    {
+		// patch requiring reboot should be installed in this run
+		ret = `reboot;
+	    }
+	});
+	y2milestone ("PkgSolve result: %1", Pkg::PkgSolve (false));
+	list commit	= Pkg::PkgCommit (0);
+	y2milestone ("PkgCommit result: %1", commit);
+	if (commit[1]:[] != [])
+	{
+	    y2error ("Commit failed with %1 (%2).", Pkg::LastError (),
+		Pkg::LastErrorDetails ());
+	}
+    }
+}
+else {
+    y2error("Unknown function: %1", func);
+    ret = false;
+}
+
+y2debug("ret=%1", ret);
+y2milestone("do_online_update auto finished");
+y2milestone("----------------------------------------");
+
+return ret;
+
+/* EOF */
+}

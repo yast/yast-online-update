@@ -10,7 +10,8 @@ client_DATA =				\
 	online_update.ycp		\
 	online_update_setup.ycp		\
 	cd_update.ycp			\
-	inst_you.ycp
+	inst_you.ycp			\
+	do_online_update_auto.ycp
 
 module_DATA =				\
 	OnlineUpdate.ycp		\
