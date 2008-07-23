@@ -217,6 +217,8 @@
 	// progress log item (%1 is name of delta RPM
 	if (last_callback == "StartProvide" || last_callback == "StartDownload")
 	    ProgressLog ("\n" + indent);
+
+	// Progress log. Leave the space at the end, some other text may follow
 	ProgressLog (sformat(_("Downloading delta RPM %1 "), name));
         if (UI::WidgetExists (`id (`you_patch_progress)))
 	{
@@ -258,7 +260,8 @@
      * callback for start of applying delta rpm
      */
     global void StartDeltaApply (string name) {
-	// progress log item (%1 is name of delta RPM)
+	// Progress log item (%1 is name of delta RPM).
+	// Leave the space at the end, some other text may follow.
 	ProgressLog (indent + sformat(_("Applying delta RPM: %1 "), name));
         if (UI::WidgetExists (`id (`you_patch_progress)))
 	{
@@ -304,6 +307,7 @@
 	// progress log item (%1 is name of delta RPM)
 	if (last_callback == "StartProvide")
 	    ProgressLog ("\n" + indent);
+	// Progress log; lave the space at the end, some other text may follow.
 	ProgressLog (sformat(_("Downloading patch RPM %1 "), name));
         if (UI::WidgetExists (`id (`you_patch_progress)))
 	{
