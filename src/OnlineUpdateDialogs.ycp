@@ -71,7 +71,7 @@ the update takes place.");
 
 	term content = `VBox(
 	    `HBox(
-		`HSpacing( 0.8 ),
+		`HSpacing (),
 		`Left(
 		     `CheckBox( `id( `enable ), `opt( `notify ),
 			// checkbox label
@@ -80,7 +80,7 @@ the update takes place.");
 	    ),
 	    `VSpacing( 0.2 ),
 	    `HBox(
-		`HSpacing( 0.8 ),
+		`HSpacing (),
 		`Left(
 		    `Frame( `id( `settings ), "", `VBox(
 			`HBox(
@@ -148,10 +148,9 @@ the update takes place.");
 			      );
 
 	term dlg_contents = `HVCenter( content);
-	Wizard::CreateDialog();
+	Wizard::OpenOKDialog ();
 	Wizard::SetDesktopIcon("online_update");
-	Wizard::SetContentsButtons(heading, dlg_contents, txt,
-	    Label::BackButton(), Label::FinishButton());
+	Wizard::SetContents (heading, dlg_contents, txt, true, true);
 
 
         UI::ChangeWidget( `id( `skipPre ), `Enabled, enabled );
