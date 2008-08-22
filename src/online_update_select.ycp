@@ -49,6 +49,7 @@ you have inserted the correct CD.
 
   boolean restart_yast	= false;
   boolean reboot_needed	= false;
+  boolean relogin_needed= false;
   boolean normal_patches_selected	= false;
   integer selected	= 0;
   string saved_path	= Directory::vardir + "/selected_patches.ycp";
@@ -140,6 +141,8 @@ you have inserted the correct CD.
     {
 	if (patch["reboot_needed"]:false)
 	    reboot_needed	= true;
+	if (patch["relogin_needed"]:false)
+	    relogin_needed	= true;
 	if (patch["affects_pkg_manager"]:false)
 	    restart_yast	= true;
         else
@@ -178,6 +181,7 @@ you have inserted the correct CD.
   }
   OnlineUpdate::restart_yast	= restart_yast;
   OnlineUpdate::reboot_needed	= reboot_needed;
+  OnlineUpdate::relogin_needed	= relogin_needed;
 
   if ( ret == `cancel ) return `abort;
   else return `next;

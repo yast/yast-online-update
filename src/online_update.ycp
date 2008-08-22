@@ -226,6 +226,11 @@ Exit Online Update now?
   {
     Popup::Message (OnlineUpdate::reboot_message);
   }
+  else if (OnlineUpdate::relogin_needed)
+  {
+    Popup::Message (OnlineUpdate::relogin_message);
+  }
+
   return `next;
 }
 
