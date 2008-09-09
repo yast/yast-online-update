@@ -40,7 +40,7 @@ global string reboot_message	= _("At least one of the updates installed requires
 properly. Reboot the system.");
 
 // continue/cancel popup text
-global string more_selected_message	= _("There are patches for package management available requiring restart of YaST.
+global string more_selected_message	= _("There are patches for package management available that require a restart of YaST.
 They should be installed first and all other patches after the restart.
 
 You selected some other patches to be installed now.
