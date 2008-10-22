@@ -16,6 +16,8 @@ Provides:	yast2-trans-online-update y2t_online_update
 Obsoletes:	yast2-trans-online-update y2t_online_update
 BuildArchitectures:     noarch
 
+Conflicts:	yast2-wagon >= 2.17.3
+
 Summary:    	YaST2 online update
 
 %description
@@ -26,8 +28,6 @@ Summary:    	YaST2 online update
 @BUILD@
 
 @INSTALL@
-mkdir -p "$RPM_BUILD_ROOT"@vardir@
-cp $RPM_BUILD_ROOT/usr/share/applications/YaST2/cd_update.desktop $RPM_BUILD_ROOT/var/lib/YaST2/cd_update.desktop
 
 @CLEAN@
 
@@ -50,18 +50,6 @@ Group:          System/YaST
 %description frontend
 -
 
-%post frontend
-if test "`uname -i`" = "s390" -o "`uname -i`" = "s390x"; then
-    # remove the.desktop from the older unhacked package during update
-    rm -f /usr/share/applications/YaST2/cd_update.desktop
-else
-    if [ -f /var/lib/YaST2/cd_update.desktop ] ; then
-	cp /var/lib/YaST2/cd_update.desktop /usr/share/applications/YaST2/
-    fi
-fi
-
 %files frontend
 %defattr(-,root,root)
 @desktopdir@/online_update.desktop
-@vardir@/cd_update.desktop
-%ghost @desktopdir@/cd_update.desktop

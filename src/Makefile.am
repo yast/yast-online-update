@@ -17,8 +17,7 @@ module_DATA =				\
 	OnlineUpdateCallbacks.ycp
 
 desktop_DATA =				\
-	online_update.desktop		\
-	cd_update.desktop
+	online_update.desktop
 
 EXTRA_DIST = $(client_DATA) $(module_DATA) $(desktop_DATA)
 
