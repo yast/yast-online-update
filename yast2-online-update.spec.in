@@ -16,6 +16,7 @@ Provides:	yast2-trans-online-update y2t_online_update
 Obsoletes:	yast2-trans-online-update y2t_online_update
 BuildArchitectures:     noarch
 
+# PatchCD desktop file moved to yast2-wagon
 Conflicts:	yast2-wagon >= 2.17.3
 
 Summary:    	YaST2 online update
