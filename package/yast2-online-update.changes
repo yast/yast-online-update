@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Oct 21 16:35:54 CEST 2008 - jsuchome@suse.cz
+
+- show support status in package selection (bnc#435479)
+- 2.17.8
+
+-------------------------------------------------------------------
 Tue Sep 23 15:53:54 CEST 2008 - jsuchome@suse.cz
 
 - dropped automatic online update (bnc#428372), the functionality

@@ -16,6 +16,7 @@
     import "OnlineUpdate";
     import "OnlineUpdateCallbacks";
     import "PackageCallbacksInit";
+    import "PackagesUI";
     import "Popup";
     import "ProductControl";
     import "ProductFeatures";
@@ -151,12 +152,10 @@
 	symbol ret_sel		= nil;
 	repeat
 	{
-	    UI::OpenDialog(`opt(`defaultsize), `PackageSelector(`id(`selector), `opt(`youMode)) );
-	    ret_sel = (symbol)UI::RunPkgSelection(`id(`selector) );
+	    ret_sel = PackagesUI::RunPackageSelector ($[ "mode" : `youMode ]);
 	    if (ret_sel == `cancel)
 	    {
 		y2milestone ("package selector canceled -> `next");
-		UI::CloseDialog();
 		return `next;
 	    }
 	    if (ret_sel == `accept)
@@ -180,7 +179,6 @@
 		    ret	= nil;
 		}
 	    }
-	    UI::CloseDialog();
 	} until (ret_sel == `cancel || ret_sel == `accept);
     }
     else if (selected > 0)
@@ -266,9 +264,7 @@
 	// we must run solver again and offer manual intervention if it fails
 	if (rejected && !Pkg::PkgSolve (true))
 	{
-	    UI::OpenDialog (`opt (`defaultsize), `PackageSelector (`id(`selector), `opt(`youMode)));
-	    symbol ret_sel = (symbol)UI::RunPkgSelection (`id (`selector));
-	    UI::CloseDialog ();
+	    symbol ret_sel = PackagesUI::RunPackageSelector($["mode":`youMode]);
 	    if (ret_sel == `cancel)
 	    {
 		y2milestone ("package selector canceled -> `next");

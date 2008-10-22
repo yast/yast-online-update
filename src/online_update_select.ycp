@@ -14,6 +14,7 @@
   import "Label";
   import "OnlineUpdate";
   import "Popup";
+  import "ProductFeatures";
   import "Wizard";
 
   // target and source already initialized in online_update.ycp
@@ -80,13 +81,21 @@ you have inserted the correct CD.
 
   Wizard::ClearContents();// do not show the remnant of initial progress
 
+  boolean display_support_status = ProductFeatures::GetBooleanFeature
+    ("software", "display_support_status");
+  term widget_options = `opt (`youMode);
+  if (display_support_status == true)
+  {
+      widget_options	= add (widget_options, `confirmUnsupported);
+  }
+
   boolean simple_mode = OnlineUpdate::simple_mode && (UI::HasSpecialWidget(`SimplePatchSelector) == true);
   if (simple_mode)
   {
     UI::OpenDialog (`opt(`defaultsize), `SimplePatchSelector(`id(`selector)));
   }
   else
-    UI::OpenDialog (`opt(`defaultsize), `PackageSelector(`id(`selector), `opt(`youMode)));
+    UI::OpenDialog (`opt(`defaultsize), `PackageSelector(`id(`selector), widget_options));
 
   symbol ret		= nil;
   string current	= "simple";
@@ -97,7 +106,7 @@ you have inserted the correct CD.
     UI::CloseDialog();
     if (ret == `details)
     {
-	UI::OpenDialog (`opt(`defaultsize), `PackageSelector(`id(`selector), `opt(`youMode)));
+	UI::OpenDialog (`opt(`defaultsize), `PackageSelector(`id(`selector), widget_options));
 	current	= "rich";
     }
     if (ret == `cancel && simple_mode && current == "rich")
@@ -109,7 +118,6 @@ you have inserted the correct CD.
     if (ret == `online_update_configuration)
     {
 	WFM::CallFunction ("online_update_configuration", []);
-	// FIXME what now? fate 303458
     }
     if (ret == `accept)
     {
@@ -129,7 +137,7 @@ you have inserted the correct CD.
 	    if (!Popup::ContinueCancel (OnlineUpdate::more_selected_message))
 	    {
 		ret	= nil;
-		UI::OpenDialog (`opt(`defaultsize), `PackageSelector(`id(`selector), `opt(`youMode)));
+		UI::OpenDialog (`opt(`defaultsize), `PackageSelector(`id(`selector), widget_options));
 	    }
 	}
     }
