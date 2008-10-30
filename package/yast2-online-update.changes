@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Oct 30 13:50:48 CET 2008 - locilka@suse.cz
+
+- Fixed 'Conflicts with yast2-wagon' (bnc #439934).
+- 2.17.10
+
+-------------------------------------------------------------------
 Wed Oct 22 15:26:51 CEST 2008 - locilka@suse.cz
 
 - PatchCD control file moved to yast2-wagon.
