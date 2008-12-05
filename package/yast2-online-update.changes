@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Dec  5 15:47:52 CET 2008 - jsuchome@suse.cz
+
+- when there are patches for package management available, tell
+  solver to not bring recommended packages (bnc#450528)
+- 2.17.11 
+
+-------------------------------------------------------------------
 Thu Oct 30 13:50:48 CET 2008 - locilka@suse.cz
 
 - Fixed 'Conflicts with yast2-wagon' (bnc #439934).
