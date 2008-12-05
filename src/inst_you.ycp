@@ -130,7 +130,15 @@
 	SCR::Execute (.target.remove, saved_path);
     }
 
-    boolean solved	= Pkg::PkgSolve (false);
+    Pkg::PkgApplReset (); // ensure there are no transactions set accidentally
+    // save solver flags
+    map solver_flags_backup	= Pkg::GetSolverFlags ();
+    // ignore reccomends when we weant only pkg management patches
+    Pkg::SetSolverFlags ($[
+	"ignoreAlreadyRecommended"	: true,
+	"onlyRequires"			: true
+    ]);
+    boolean solved	= Pkg::PkgSolve (true);
 
     // select the patches affecting pkg management
     selected = Pkg::ResolvablePreselectPatches (`affects_pkg_manager);
@@ -139,6 +147,10 @@
     // if no patch is selected, pre-select all security and recommended
     if (selected < 1)
     {
+	// restore the original solver settings - enable recommends
+	Pkg::SetSolverFlags (solver_flags_backup);
+	// new solver run required to include recommends
+	Pkg::PkgSolve (true);
 	selected = Pkg::ResolvablePreselectPatches (`all);
 	y2milestone ("All preselected patches: %1", selected);
     }
@@ -156,6 +168,7 @@
 	    if (ret_sel == `cancel)
 	    {
 		y2milestone ("package selector canceled -> `next");
+		Pkg::SetSolverFlags (solver_flags_backup);
 		return `next;
 	    }
 	    if (ret_sel == `accept)
@@ -230,6 +243,7 @@
 	    !Pkg::PkgAnyToDelete ())
 	{
 	    y2milestone ("no patch selected after all -> `next");
+	    Pkg::SetSolverFlags (solver_flags_backup);
 	    return `next;
 	}
     }
@@ -268,6 +282,7 @@
 	    if (ret_sel == `cancel)
 	    {
 		y2milestone ("package selector canceled -> `next");
+		Pkg::SetSolverFlags (solver_flags_backup);
 		return `next;
 	    }
 	}
@@ -299,5 +314,6 @@ reboot now then continue the installation.
 	}
     }
     y2milestone ("result of inst_you: %1", ret);
+    Pkg::SetSolverFlags (solver_flags_backup);
     return ret;
 }

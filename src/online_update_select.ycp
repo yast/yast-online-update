@@ -66,7 +66,14 @@ you have inserted the correct CD.
     SCR::Execute (.target.remove, saved_path);
   }
 
-  Pkg::PkgSolve(true);
+  Pkg::PkgApplReset (); // ensure there are no transactions set accidentally
+  map solver_flags_backup	= Pkg::GetSolverFlags ();
+  // ignore reccomends when we weant only pkg management patches
+  Pkg::SetSolverFlags ($[
+	"ignoreAlreadyRecommended"	: true,
+	"onlyRequires"			: true
+  ]);
+  Pkg::PkgSolve (true);
 
   // 1st, select the patches affecting pkg management
   selected = Pkg::ResolvablePreselectPatches (`affects_pkg_manager);
@@ -75,6 +82,11 @@ you have inserted the correct CD.
   // if no patch is selected, pre-select all security and recommended
   if (selected < 1)
   {
+    // restore the original solver settings - enable recommends
+    Pkg::SetSolverFlags (solver_flags_backup);
+    // new solver run required to include recommends
+    Pkg::PkgSolve (true);
+
     selected = Pkg::ResolvablePreselectPatches (`all);
     y2milestone ("All preselected patches: %1", selected);
   }
@@ -146,12 +158,17 @@ you have inserted the correct CD.
   Wizard::ClearContents();
 
   y2milestone ("RunPkgSelection finally returned '%1'", ret);
+
+  // restore the original solver settings, just to be sure...
+  Pkg::SetSolverFlags (solver_flags_backup);
+
   if ( ret == `cancel ) return `abort;
 
   boolean more_patches_needed		= false;
   foreach (map patch, Pkg::ResolvableProperties("", `patch, ""), {
     if (patch["status"]:`none == `selected)
     {
+	y2milestone ("selected patch: %1", patch);
 	if (patch["reboot_needed"]:false)
 	    reboot_needed	= true;
 	if (patch["relogin_needed"]:false)
