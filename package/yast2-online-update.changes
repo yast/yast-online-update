@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Dec  8 15:34:46 CET 2008 - jsuchome@suse.cz
+
+- do not return integer value to let YOU restart itself (bnc#457167)
+- 2.17.13 
+
+-------------------------------------------------------------------
 Mon Dec  8 15:24:11 CET 2008 - lslezak@suse.cz
 
 - Fixed the data type for solver flags (bnc#457233)

@@ -25,9 +25,6 @@
   import "Wizard";
   import "GetInstArgs";
 
-  // return value is integer
-  integer retval	= 1;
-
 /**
  * Main sequence for Online Update
  */
@@ -211,7 +208,6 @@ Exit Online Update now?
     }
   }
 
-  retval	= 0;
   if (OnlineUpdate::restart_yast)
   {
     if (FileUtils::Exists (Directory::vardir + "/selected_patches.ycp"))
@@ -219,8 +215,6 @@ Exit Online Update now?
 	Popup::Message (OnlineUpdate::restart_message);
     }
     OnlineUpdate::restart_yast	= false;
-    // restart menu.ycp even if there are no other patches selected
-    retval	= -42;
   }
   if (OnlineUpdate::reboot_needed)
   {
@@ -316,9 +310,10 @@ Exit Online Update now?
     }
     arg_n = arg_n + 1;
   }
+  any ret	= `next;
   if (OnlineUpdate::cd_update || OnlineUpdate::simple_mode) // obsolete .cd_default argument was used
-    OnlineUpdateSequence ();
+    ret		= OnlineUpdateSequence ();
   else
-    CommandLine::Run (cmdline);
-  return retval;
+    ret		= CommandLine::Run (cmdline);
+  return ret;
 }
