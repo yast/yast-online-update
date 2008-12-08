@@ -132,7 +132,7 @@
 
     Pkg::PkgApplReset (); // ensure there are no transactions set accidentally
     // save solver flags
-    map solver_flags_backup	= Pkg::GetSolverFlags ();
+    map<string,any> solver_flags_backup	= Pkg::GetSolverFlags ();
     // ignore reccomends when we weant only pkg management patches
     Pkg::SetSolverFlags ($[
 	"ignoreAlreadyRecommended"	: true,
