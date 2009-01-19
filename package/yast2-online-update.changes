@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Jan 19 13:00:46 CET 2009 - jsuchome@suse.cz
+
+- added option to open Repository management and Online Update
+  Configuration from the package selector (bnc#459540, fate#303458)
+
+-------------------------------------------------------------------
 Fri Jan  9 11:37:25 CET 2009 - ug@suse.de
 
 - removed from autoyast UI (bnc#464789)

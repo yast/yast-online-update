@@ -100,6 +100,7 @@ you have inserted the correct CD.
   {
       widget_options	= add (widget_options, `confirmUnsupported);
   }
+  widget_options = add(widget_options, `repoMgr);
 
   boolean simple_mode = OnlineUpdate::simple_mode && (UI::HasSpecialWidget(`SimplePatchSelector) == true);
   if (simple_mode)
@@ -127,9 +128,35 @@ you have inserted the correct CD.
 	current	= "simple";
 	ret	= nil;
     }
-    if (ret == `online_update_configuration)
+    if (ret == `online_update_configuration || ret == `repo_mgr)
     {
-	WFM::CallFunction ("online_update_configuration", []);
+	any result	= nil;
+	if (ret == `online_update_configuration)
+	    result	= WFM::CallFunction ("online_update_configuration", []);
+	else
+	    result	= WFM::CallFunction ("repositories", [`sw_single_mode]);
+
+	if (result == `next || result == `finish)
+	{
+	    Pkg::SetSolverFlags ($[
+		"ignoreAlreadyRecommended"	: true,
+		"onlyRequires"			: true
+	    ]);
+	    Pkg::PkgSolve (true);
+	    // select the patches affecting pkg management
+	    selected = Pkg::ResolvablePreselectPatches (`affects_pkg_manager);
+	    y2milestone ("patches for pkg management: %1", selected);
+	    if (selected < 1)
+	    {
+		Pkg::SetSolverFlags (solver_flags_backup);
+		Pkg::PkgSolve (true);
+		selected = Pkg::ResolvablePreselectPatches (`all);
+		y2milestone ("preselected patches: %1", selected);
+	    }
+	}
+	// open the dialog with patch view again
+	UI::OpenDialog (`opt(`defaultsize),
+	    `PackageSelector(`id(`selector), widget_options));
     }
     if (ret == `accept)
     {
