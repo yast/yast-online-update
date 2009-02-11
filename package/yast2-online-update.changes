@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Feb 11 17:47:24 CET 2009 - locilka@suse.cz
+
+- Calling solver if some patches are selected during second stage
+  installation (bnc #474601).
+
+-------------------------------------------------------------------
 Wed Feb 11 15:02:14 CET 2009 - jsuchome@suse.cz
 
 - refresh the source data which were possibly cleared (bnc#474711)

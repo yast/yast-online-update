@@ -286,6 +286,21 @@
 	    }
 	}
     }
+
+    // BNC #474601, Solver run after selecting patches is required
+    if (! Pkg::PkgSolve (true))
+    {
+	y2warning ("Cannot solve automatically, user decision required");
+
+	symbol ret_sel = PackagesUI::RunPackageSelector($["mode":`youMode]);
+	if (ret_sel == `cancel)
+	{
+	    y2milestone ("package selector canceled -> `next");
+	    Pkg::SetSolverFlags (solver_flags_backup);
+	    return `next;
+	}
+    }
+
     // install the patches
     OnlineUpdateCallbacks::RegisterOnlineUpdateCallbacks();
     WFM::call( "online_update_install" );
