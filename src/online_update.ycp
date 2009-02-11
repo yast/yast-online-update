@@ -88,8 +88,12 @@
 	    _("Finished")
   ];
 
-  // dialog caption
-  Progress::New(_("Initializing Online Update"), " ", 2, stages, steps, "");
+  string caption	= OnlineUpdate::cd_update ?
+    // dialog caption
+    _("Initializing CD Update") :
+    // dialog caption
+    _("Initializing Online Update");
+  Progress::New (caption, " ", 2, stages, steps, "");
 
   // check whether running as root
   // and having the packager for ourselves
