@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Wed Feb 11 15:02:14 CET 2009 - jsuchome@suse.cz
+
+- refresh the source data which were possibly cleared (bnc#474711)
+
+-------------------------------------------------------------------
 Mon Jan 19 13:00:46 CET 2009 - jsuchome@suse.cz
 
 - added option to open Repository management and Online Update

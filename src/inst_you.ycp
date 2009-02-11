@@ -104,10 +104,6 @@
     if (after_restart || Hack ("init-target-and-sources"))
     {
 	Pkg::TargetInit ("/", false);
-	Pkg::SourceStartManager(true);
-	// compute ResStatus::EstablishField (only after restart,
-	// otherwise it was already done in inst_ask_online_update.ycp)
-	Pkg::PkgEstablish ();
     }
     else // reinitialize target after release notes were read (#232247)
     {
@@ -115,6 +111,9 @@
 	Pkg::TargetInitialize ("/");
 	Pkg::TargetLoad ();
     }
+    // source data are cleared in registration client, and
+    // inst_ask_online_update.ycp may not be called
+    Pkg::SourceStartManager (true);
 
     integer selected	= 0;
     boolean check_licenses	= false;
