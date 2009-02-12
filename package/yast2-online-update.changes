@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Feb 12 14:56:38 CET 2009 - jsuchome@suse.cz
+
+- solver should be called earlier (correct fix for bnc #474601)
+- 2.17.18
+
+-------------------------------------------------------------------
 Wed Feb 11 17:47:24 CET 2009 - locilka@suse.cz
 
 - Calling solver if some patches are selected during second stage
