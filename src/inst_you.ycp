@@ -137,7 +137,8 @@
 	"ignoreAlreadyRecommended"	: true,
 	"onlyRequires"			: true
     ]);
-    boolean solved	= Pkg::PkgSolve (true);
+    // first solver run, so preselecting works well
+    Pkg::PkgSolve (true);
 
     // select the patches affecting pkg management
     selected = Pkg::ResolvablePreselectPatches (`affects_pkg_manager);
@@ -153,6 +154,8 @@
 	selected = Pkg::ResolvablePreselectPatches (`all);
 	y2milestone ("All preselected patches: %1", selected);
     }
+    // solver must be run after preselction (bnc#474601)
+    boolean solved	= Pkg::PkgSolve (true);
 
     // run package selector to allow user interaction
     if (!solved ||
@@ -284,20 +287,6 @@
 		Pkg::SetSolverFlags (solver_flags_backup);
 		return `next;
 	    }
-	}
-    }
-
-    // BNC #474601, Solver run after selecting patches is required
-    if (! Pkg::PkgSolve (true))
-    {
-	y2warning ("Cannot solve automatically, user decision required");
-
-	symbol ret_sel = PackagesUI::RunPackageSelector($["mode":`youMode]);
-	if (ret_sel == `cancel)
-	{
-	    y2milestone ("package selector canceled -> `next");
-	    Pkg::SetSolverFlags (solver_flags_backup);
-	    return `next;
 	}
     }
 

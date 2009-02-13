@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Feb 13 15:59:20 CET 2009 - jsuchome@suse.cz
+
+- correct placing of solver call (bnc#474601) 
+
+-------------------------------------------------------------------
 Wed Feb 11 17:47:24 CET 2009 - locilka@suse.cz
 
 - Calling solver if some patches are selected during second stage
