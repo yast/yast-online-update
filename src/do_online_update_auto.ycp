@@ -35,7 +35,7 @@ if (func == "Write") {
 
     Pkg::TargetInit ("/", false);
     Pkg::SourceStartManager (true);
-    Pkg::PkgEstablish ();
+    Pkg::PkgSolve (true);
 
     integer selected = Pkg::ResolvablePreselectPatches (`all);
     y2milestone ("All preselected patches: %1", selected);
