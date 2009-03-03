@@ -297,9 +297,16 @@
     if (ret == `reboot)
     {
 	// message popup
-	Popup::Message (_("The kernel has been updated. The system will
+	Popup::Message (_("Some application requiring restart has been updated. The system will
 reboot now then continue the installation.
 "));
+	if (more_patches_needed)
+	{
+	    y2milestone ("there are more patches to install after reboot...");
+	    // after reboot, run the online update again
+	    ret	= `reboot_same_step;
+	    SCR::Write (.target.ycp, restarted_path, 1);
+	}
     }
     else if (ret == `restart_same_step)
     {

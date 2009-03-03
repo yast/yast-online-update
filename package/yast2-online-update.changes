@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Tue Mar  3 15:53:55 CET 2009 - jsuchome@suse.cz
+
+- inst_you: generic message for reboot (bnc#479835)
+- after reboot during installation, return `reboot_same_step, if
+  there are remaining patches (bnc#475650)
+- 2.18.0
+
+-------------------------------------------------------------------
 Tue Feb 17 15:47:08 CET 2009 - ug@suse.de
 
 - fixed autoyast client
