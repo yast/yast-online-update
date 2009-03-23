@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Mar 23 15:41:08 CET 2009 - jsuchome@suse.cz
+
+- do not reset the user locks (bnc#483648)
+- 2.18.1 
+
+-------------------------------------------------------------------
 Mon Mar 23 15:20:57 CET 2009 - lslezak@suse.cz
 
 - removed obsoleted SourceManager::SyncYaSTInstSourceWithZMD()

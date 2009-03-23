@@ -129,7 +129,6 @@
 	SCR::Execute (.target.remove, saved_path);
     }
 
-    Pkg::PkgApplReset (); // ensure there are no transactions set accidentally
     // save solver flags
     map<string,any> solver_flags_backup	= Pkg::GetSolverFlags ();
     // ignore reccomends when we weant only pkg management patches
