@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Mar 26 10:28:58 CET 2009 - jsuchome@suse.cz
+
+- Pkg::ResolvableProperties() can return `removed status for
+  items selected to delete: do not exit YOU (bnc#481101)
+- 2.13.69 
+
+-------------------------------------------------------------------
 Wed Feb 11 16:01:07 CET 2009 - jsuchome@suse.cz
 
 - different progress caption for CD Update (bnc#385186)

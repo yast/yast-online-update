@@ -114,6 +114,8 @@ you have inserted the correct CD.
   list<string> normal_patches		= [];
   boolean more_patches_needed		= false;
   boolean reboot_needed			= false;
+  boolean patches_for_removal		= false;
+
   foreach (map patch, Pkg::ResolvableProperties("", `patch, ""), {
     if (patch["status"]:`none == `selected)
     {
@@ -129,6 +131,11 @@ you have inserted the correct CD.
 	y2debug ("patch needed but not selected: %1", patch);
 	more_patches_needed	= true;
     }
+    if (patch["status"]:`none == `removed)
+    {
+	y2milestone ("patch for removal: %1", patch);
+	patches_for_removal	= true;
+    }
   });
 
   // unselect non-affects_pkg_manager patches and save them to file
@@ -143,8 +150,8 @@ you have inserted the correct CD.
     reboot_needed	= false;
   }
   // no patch selected
-  if (!restart_yast && normal_patches == [] && !Pkg::PkgAnyToInstall () &&
-      !Pkg::PkgAnyToDelete ())
+  if (!restart_yast && normal_patches == [] && !patches_for_removal &&
+      !Pkg::PkgAnyToInstall () && !Pkg::PkgAnyToDelete ())
   {
       ret = `cancel;
   }
