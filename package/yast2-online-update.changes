@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Apr 21 21:31:52 CEST 2009 - jsuchome@suse.cz
+
+- new check for online update source (bnc#459527)
+- offer registration if online update source not found (bnc#459527)
+- 2.18.2
+
+-------------------------------------------------------------------
 Mon Mar 23 15:41:08 CET 2009 - jsuchome@suse.cz
 
 - do not reset the user locks (bnc#483648)

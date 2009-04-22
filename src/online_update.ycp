@@ -80,24 +80,29 @@ define symbol OnlineUpdateSequence () {
 
   Progress::NextStage ();
 
-  if (!OnlineUpdate::cd_update) // for CD for cd update was not initialized yet
+  if (!OnlineUpdate::cd_update) // CD for cd update was not initialized yet
   {
     boolean is_available	= false;
-    // check if there is any patch for installation
-    foreach (map patch, Pkg::ResolvableProperties ("", `patch, ""), {
-	if (patch["status"]:`none == `available)
+    foreach (map source, Pkg::SourceEditGet (), {
+	integer srcid   = source["SrcId"]:-1;
+	map data        = Pkg::SourceGeneralData (srcid);
+	y2internal ("data source map: %1", data);
+	if (data["is_update_repo"]:false)
 	{
 	    is_available	= true;
 	    break;
 	}
     });
-    // continue/cancel message
-    if (!is_available && Popup::YesNo (_("No active update repository available.
-Exit Online Update now?
-")))
+    // yes/no message
+    if (!is_available && Popup::YesNo (_("No update repository
+configured yet. Run configuration workflow now?")))
     {
-	Wizard::CloseDialog();
-	return `abort;
+	any res	= WFM::CallFunction ("online_update_configuration", []);
+	if (res != `next && res != `finish)
+	{
+	    Wizard::CloseDialog();
+	    return `abort;
+	}
     }
   }
 
