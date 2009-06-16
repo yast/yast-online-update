@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Jun 16 14:27:46 CEST 2009 - mvidner@suse.cz
+
+- Using autodocs-ycp.ami, which contains a fix for automake 1.11.
+
+-------------------------------------------------------------------
 Tue Apr 21 21:31:52 CEST 2009 - jsuchome@suse.cz
 
 - new check for online update source (bnc#459527)
