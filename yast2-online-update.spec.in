@@ -16,7 +16,7 @@ Provides:	yast2-trans-online-update y2t_online_update
 Obsoletes:	yast2-trans-online-update y2t_online_update
 BuildArchitectures:     noarch
 
-Summary:    	YaST2 online update
+Summary:    	YaST2 - Online Update (YOU)
 
 %description
 -
@@ -41,7 +41,7 @@ Summary:    	YaST2 online update
 %doc @docdir@
 
 %package frontend
-Summary:	Desktop files for YaST2 online update
+Summary:	YaST2 - Online Update (YOU)
 Requires:	yast2-online-update
 Group:          System/YaST
 
