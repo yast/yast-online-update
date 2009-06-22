@@ -1,6 +1,7 @@
 @HEADER-COMMENT@
 
 @HEADER@
+Group:	System/YaST
 License: GPL v2 or later
 BuildRequires:	gcc-c++ libxcrypt-devel perl-XML-Writer update-desktop-files pkg-config yast2-devtools yast2-packager yast2-bootloader
 PreReq:		grep sed
