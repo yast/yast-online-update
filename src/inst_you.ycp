@@ -171,6 +171,7 @@
 
     list<string> normal_patches		= [];
     boolean reboot_needed		= false;
+    boolean patches_for_removal		= false;
     foreach (map patch, Pkg::ResolvableProperties("", `patch, ""), {
 	if (patch["status"]:`none == `selected)
 	{
@@ -191,6 +192,11 @@
 		    reboot_needed	= true;
 	    }
 	}
+	else if (patch["status"]:`none == `removed)
+	{
+	    y2milestone ("patch for removal: %1", patch);
+	    patches_for_removal	= true;
+	}
     });
 
     // unselect non-affects_pkg_manager patches and save them to file
@@ -208,9 +214,9 @@
 	// ... but there is a patch with "reboot_needed" flag (=probably kernel)
 	if (reboot_needed)
 	    ret     = `reboot;
-	// ... and nothing to install -> skip the installation at all
-	else if (normal_patches == [] && !Pkg::PkgAnyToInstall () &&
-	    !Pkg::PkgAnyToDelete ())
+	// ... and nothing to install/remove -> skip the installation at all
+	else if (normal_patches == [] && !patches_for_removal &&
+	    !Pkg::PkgAnyToInstall () && !Pkg::PkgAnyToDelete ())
 	{
 	    y2milestone ("no patch selected after all -> `next");
 	    return `next;

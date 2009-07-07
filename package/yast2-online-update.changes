@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Jul  7 20:45:36 CEST 2009 - jsuchome@suse.cz
+
+- Pkg::ResolvableProperties() can return `removed status for
+  items selected to delete: do not exit YOU (bnc#481101)
+- 2.13.67.1
+
+-------------------------------------------------------------------
 Thu Apr 24 13:20:54 CEST 2008 - jsuchome@suse.cz
 
 - Patch CD: ensure first CD is in drive before synchronization with
