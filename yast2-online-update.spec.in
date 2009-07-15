@@ -15,6 +15,7 @@ Obsoletes:	yast2-trans-online-update y2t_online_update
 BuildArchitectures:     noarch
 
 Summary:    	YaST2 online update
+Group:          System/YaST
 
 %description
 -

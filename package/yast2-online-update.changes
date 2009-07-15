@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Jul 15 14:41:47 CEST 2009 - jsuchome@suse.cz
+
+- added Group field to the main package spec file
+- 2.13.67.2 
+
+-------------------------------------------------------------------
 Tue Jul  7 20:45:36 CEST 2009 - jsuchome@suse.cz
 
 - Pkg::ResolvableProperties() can return `removed status for
