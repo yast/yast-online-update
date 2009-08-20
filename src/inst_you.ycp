@@ -64,7 +64,7 @@
 
     if (!already_up)
     {
-	Wizard::SetContents (_("YaST2\nInitializing ..."), `Empty (), "", true, true);
+	Wizard::SetContents (_("Initializing ..."), `Empty (), "", true, true);
 
 	if (!Internet::demand)
 	{

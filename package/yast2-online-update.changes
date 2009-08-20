@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Aug 20 16:41:01 CEST 2009 - jsuchome@suse.cz
+
+- fixed help texts: do not mention YaST2 (bnc#532518)
+- 2.18.3 
+
+-------------------------------------------------------------------
 Tue Jun 16 14:27:46 CEST 2009 - mvidner@suse.cz
 
 - Using autodocs-ycp.ami, which contains a fix for automake 1.11.

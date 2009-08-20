@@ -40,7 +40,7 @@
   );
   // help text for online update
   string help_part1 =  _("<p>After connecting to the update server,
-YaST2 will download all selected patches.
+YaST will download all selected patches.
 This could take some time. Download details are shown in the log window.</p>");
 
   // help text for online update
