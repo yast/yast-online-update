@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Thu Sep  3 14:36:03 CEST 2009 - jsuchome@suse.cz
+
+- added keywords to desktop file
+- removed online_update_setup, it was replaced by
+  online_update_configuration from registration module
+- 2.18.4
+
+-------------------------------------------------------------------
 Thu Aug 20 16:41:01 CEST 2009 - jsuchome@suse.cz
 
 - fixed help texts: do not mention YaST2 (bnc#532518)
