@@ -83,16 +83,27 @@ define symbol OnlineUpdateSequence () {
   if (!OnlineUpdate::cd_update) // CD for cd update was not initialized yet
   {
     boolean is_available	= false;
+    /* FIXME bnc#459527
+    current update repositories are still not tagged with is_update_repo
     foreach (map source, Pkg::SourceEditGet (), {
 	integer srcid   = source["SrcId"]:-1;
 	map data        = Pkg::SourceGeneralData (srcid);
-	y2internal ("data source map: %1", data);
 	if (data["is_update_repo"]:false)
 	{
 	    is_available	= true;
 	    break;
 	}
     });
+    */
+    // old way: check if there is any patch for installation
+    foreach (map patch, Pkg::ResolvableProperties ("", `patch, ""), {
+	if (patch["status"]:`none == `available)
+	{
+	    is_available        = true;
+	    break;
+	}
+    });
+
     // yes/no message
     if (!is_available && Popup::YesNo (_("No update repository
 configured yet. Run configuration workflow now?")))

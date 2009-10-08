@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Oct  8 13:45:25 CEST 2009 - jsuchome@suse.cz
+
+- reverted check for online update source, repositories not tagged
+  (bnc#459527)
+- 2.18.5
+
+-------------------------------------------------------------------
 Thu Sep  3 14:36:03 CEST 2009 - jsuchome@suse.cz
 
 - added keywords to desktop file
