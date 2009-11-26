@@ -63,7 +63,7 @@ define symbol OnlineUpdateSequence () {
 
   // check whether running as root
   // and having the packager for ourselves
-  if (! Confirm::MustBeRoot () || ! PackageLock::Check ())
+  if (! Confirm::MustBeRoot () || !PackageLock::Connect(false)["connected"]:false )
   {
       Wizard::CloseDialog ();
       return `cancel;

@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Nov 26 07:49:16 UTC 2009 - lslezak@suse.cz
+
+- don't show "Continue" button when the software management is
+  locked (bnc#558625)
+
+-------------------------------------------------------------------
 Thu Oct  8 13:45:25 CEST 2009 - jsuchome@suse.cz
 
 - reverted check for online update source, repositories not tagged
