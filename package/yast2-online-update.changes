@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Dec 16 13:22:57 CET 2009 - jsuchome@suse.cz
+
+- better message for telling user to reboot, show list of patches
+  that require a reboot (bnc#497217)
+- 2.19.0
+
+-------------------------------------------------------------------
 Thu Nov 26 07:49:16 UTC 2009 - lslezak@suse.cz
 
 - don't show "Continue" button when the software management is
