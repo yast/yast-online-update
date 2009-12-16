@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Dec 16 13:24:49 CET 2009 - jsuchome@suse.cz
+
+- better message for telling user to reboot, show list of patches
+  that require a reboot (bnc#497217)
+- 2.17.20
+
+-------------------------------------------------------------------
 Tue Feb 17 16:25:04 CET 2009 - jsuchome@suse.cz
 
 - AutoYaST: call solver before preselecting patches (bnc#476460)

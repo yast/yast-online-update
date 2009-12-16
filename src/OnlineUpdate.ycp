@@ -35,9 +35,19 @@ Finishing and restarting now.");
 // if patch with reboot flag was installed
 global boolean reboot_needed	= false;
 
+// packages that are requiring reboot
+global list<string> reboot_packages	= [];
+
 // popup message
 global string reboot_message	= _("At least one of the updates installed requires a system reboot to function
-properly. Reboot the system.");
+properly. Reboot the system as soon as possible.");
+
+// popup message
+global string reboot_message_list	= _("These updates require a system reboot to function properly:
+
+%1.
+
+Reboot the system as soon as possible.");
 
 // continue/cancel popup text
 global string more_selected_message	= _("There are patches for package management available that require a restart of YaST.

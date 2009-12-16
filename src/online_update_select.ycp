@@ -54,6 +54,7 @@ you have inserted the correct CD.
   boolean normal_patches_selected	= false;
   integer selected	= 0;
   string saved_path	= Directory::vardir + "/selected_patches.ycp";
+  list<string> reboot_packages	= [];
 
   // check if YaST was restarted
   if (FileUtils::Exists (saved_path))
@@ -197,7 +198,11 @@ you have inserted the correct CD.
     {
 	y2milestone ("selected patch: %1", patch);
 	if (patch["reboot_needed"]:false)
+	{
 	    reboot_needed	= true;
+	    reboot_packages	= (list<string>) union (
+		reboot_packages, [ patch["name"]:"" ]);
+	}
 	if (patch["relogin_needed"]:false)
 	    relogin_needed	= true;
 	if (patch["affects_pkg_manager"]:false)
@@ -238,6 +243,7 @@ you have inserted the correct CD.
   }
   OnlineUpdate::restart_yast	= restart_yast;
   OnlineUpdate::reboot_needed	= reboot_needed;
+  OnlineUpdate::reboot_packages	= reboot_packages;
   OnlineUpdate::relogin_needed	= relogin_needed;
 
   if ( ret == `cancel ) return `abort;

@@ -218,7 +218,10 @@ Exit Online Update now?
   }
   if (OnlineUpdate::reboot_needed)
   {
-    Popup::Message (OnlineUpdate::reboot_message);
+    if (size (OnlineUpdate::reboot_packages) > 0)
+	Popup::Message (sformat (OnlineUpdate::reboot_message_list, mergestring (OnlineUpdate::reboot_packages, "\n")));
+    else
+	Popup::Message (OnlineUpdate::reboot_message);
   }
   else if (OnlineUpdate::relogin_needed)
   {
