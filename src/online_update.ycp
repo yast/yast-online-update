@@ -91,13 +91,17 @@ define symbol OnlineUpdateSequence () {
 	    break;
 	}
     });
-    // continue/cancel message
-    if (!is_available && Popup::YesNo (_("No active update repository available.
-Exit Online Update now?
-")))
+    if (!is_available && Popup::YesNo (_("No update repository
+configured yet. Run configuration workflow now?")))
     {
-	Wizard::CloseDialog();
-	return `abort;
+	// inst_suse_register is still able to configure update repo,
+	// however this will change in future (see bnc#565094)
+	any res	= WFM::CallFunction ("inst_suse_register", []);
+	if (res != `next && res != `finish)
+	{
+	    Wizard::CloseDialog();
+	    return `abort;
+	}
     }
   }
 
