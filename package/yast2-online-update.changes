@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Jan 13 09:20:17 CET 2010 - jsuchome@suse.cz
+
+- inst_you: do not run again if there's no patch left (bnc#515138)
+- 2.19.2
+
+-------------------------------------------------------------------
 Wed Jan 13 08:33:11 CET 2010 - jsuchome@suse.cz
 
 - call inst_suse_register if no update repo is present (bnc#565094)

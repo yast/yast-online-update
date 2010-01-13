@@ -310,7 +310,16 @@ reboot now then continue the installation.
     else if (ret == `restart_same_step)
     {
 	Popup::Message (OnlineUpdate::restart_message);
-	SCR::Write (.target.ycp, restarted_path, 1);
+	if (more_patches_needed)
+	{
+	    y2milestone ("restarting YaST, expecting another patches in the next YOU run");
+	    SCR::Write (.target.ycp, restarted_path, 1);
+	}
+	else
+	{
+	    y2milestone ("restarting YaST, but there are no patches for the next YOU run");
+	    ret = `restart_yast;
+	}
     }
 
     if (!already_up)
