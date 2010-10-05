@@ -16,6 +16,8 @@
   import "Popup";
   import "ProductFeatures";
   import "Wizard";
+  import "PackageSystem";
+  import "Report";
 
   // target and source already initialized in online_update.ycp
 
@@ -132,7 +134,21 @@ you have inserted the correct CD.
     {
 	any result	= nil;
 	if (ret == `online_update_configuration)
-	    result	= WFM::CallFunction ("online_update_configuration", []);
+	{
+	    string required_package = "yast2-online-update-configuration";
+
+	    if (!PackageSystem::Installed( required_package ) && !PackageSystem::CheckAndInstallPackages([required_package]) )
+	    {
+		Report::Error( sformat(_("Cannot configure online update repository 
+without having package %1 installed"), required_package));
+	    }
+	    else
+	    {
+		y2milestone("starting online_update_configuration client");
+		symbol cfg_result = (symbol)WFM::CallFunction( "online_update_configuration", []);
+		y2milestone("online_update_configuration result: %1", cfg_result);
+	    }
+	}
 	else
 	    result	= WFM::CallFunction ("repositories", [`sw_single_mode]);
 

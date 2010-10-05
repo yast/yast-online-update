@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Oct  5 10:47:00 UTC 2010 - lslezak@suse.cz
+
+- install yast2-online-update-configuration package if needed
+  (bnc#609778)
+- 2.20.0
+
+-------------------------------------------------------------------
 Wed Jan 13 18:56:03 CET 2010 - kmachalkova@suse.cz
 
 - Adjusted .desktop file(s) to wrap /sbin/yast2/ calls in xdg-su
