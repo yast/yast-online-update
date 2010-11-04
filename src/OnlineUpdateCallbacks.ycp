@@ -121,7 +121,7 @@
      /**
       Callback for starting installation of a package.
      */
-    global void StartPackage(string name, string summary, integer
+    global void StartPackage(string pkg_name, string name, string summary, integer
                                         installsize, boolean is_delete)
     {
 	// progress log action (what is being done with the package)

@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Nov  2 14:52:22 UTC 2010 - lslezak@suse.cz
+
+- updated to match the changed StartPackage callback signature
+- 2.20.1
+
+-------------------------------------------------------------------
 Tue Oct  5 10:47:00 UTC 2010 - lslezak@suse.cz
 
 - install yast2-online-update-configuration package if needed
