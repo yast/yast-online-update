@@ -19,6 +19,7 @@
   import "OnlineUpdateCallbacks";
   import "PackageLock";
   import "Popup";
+  import "Product";
   import "Progress";
   import "SourceManager";
   import "URL";
@@ -108,9 +109,12 @@ define symbol OnlineUpdateSequence () {
     if (!is_available && Popup::YesNo (_("No update repository
 configured yet. Run configuration workflow now?")))
     {
-	// inst_suse_register is still able to configure update repo,
-	// however this will change in future (see bnc#565094)
-	any res	= WFM::CallFunction ("inst_suse_register", []);
+	// inst_suse_register is able to configure update repo for SLE,
+	// for openSUSE, let's use repository manager
+	string client	= "inst_suse_register";
+	if (Product::short_name == "openSUSE")
+	    client	= "repositories";
+	any res	= WFM::CallFunction (client, []);
 	if (res != `next && res != `finish)
 	{
 	    Wizard::CloseDialog();
