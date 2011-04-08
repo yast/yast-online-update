@@ -34,11 +34,14 @@
     }
 
     boolean after_restart	= false;
+    boolean after_reboot	= false;
     if (FileUtils::Exists (restarted_path))
     {
-	y2milestone ("installation restarted from YOU");
-	SCR::Execute (.target.remove, restarted_path);
+	string action	= (string) SCR::Read (.target.ycp, restarted_path);
+	y2milestone ("installation restarted from YOU (%1)", action);
 	after_restart	= true;
+	after_reboot	= (action == "reboot");
+	SCR::Execute (.target.remove, restarted_path);
     }
 
     if (!Internet::do_you && !after_restart)	// nothing to do
@@ -155,6 +158,12 @@
     }
     // solver must be run after preselction (bnc#474601)
     boolean solved	= Pkg::PkgSolve (true);
+
+    if (selected < 1 && after_reboot)
+    {
+	y2milestone ("no patch available after reboot, skiping inst_you");
+	return `auto;
+    }
 
     // run package selector to allow user interaction
     if (!solved ||
@@ -302,10 +311,11 @@ reboot now then continue the installation.
 	if (more_patches_needed)
 	{
 	    y2milestone ("there are more patches to install after reboot...");
-	    // after reboot, run the online update again
-	    ret	= `reboot_same_step;
-	    SCR::Write (.target.ycp, restarted_path, 1);
 	}
+	// after reboot, run the online update again
+	// (even if no patches remain, to init Pkg before going on (see bnc#672966)
+	ret	= `reboot_same_step;
+	SCR::Write (.target.ycp, restarted_path, "reboot");
     }
     else if (ret == `restart_same_step)
     {
@@ -313,7 +323,7 @@ reboot now then continue the installation.
 	if (more_patches_needed)
 	{
 	    y2milestone ("restarting YaST, expecting another patches in the next YOU run");
-	    SCR::Write (.target.ycp, restarted_path, 1);
+	    SCR::Write (.target.ycp, restarted_path, "restart");
 	}
 	else
 	{

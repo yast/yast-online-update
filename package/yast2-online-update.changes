@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Apr  8 12:54:35 CEST 2011 - jsuchome@suse.cz
+
+- initialize package management after reboot (bnc#672966)
+- 2.21.0 
+
+-------------------------------------------------------------------
 Thu Jan 20 14:43:08 CET 2011 - jsuchome@suse.cz
 
 - run repositories module for adding update source (bnc#658711)
