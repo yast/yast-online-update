@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Aug  5 12:34:29 CEST 2011 - tgoettlicher@suse.de
+
+- fixed .desktop file (bnc #681249)
+
+-------------------------------------------------------------------
 Fri Apr  8 12:54:35 CEST 2011 - jsuchome@suse.cz
 
 - initialize package management after reboot (bnc#672966)
