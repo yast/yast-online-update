@@ -3,6 +3,7 @@ Thu Sep 22 15:07:11 UTC 2011 - lslezak@suse.cz
 
 - removed obsoleted Pkg::PkgEstablish() call (does nothing, will
   be removed)
+- fixed package dependencies
 - 2.21.2
 
 -------------------------------------------------------------------
