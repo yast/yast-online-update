@@ -47,9 +47,6 @@ you have inserted the correct CD.
 	return `abort;
   }
 
-
-  Pkg::PkgEstablish();
-
   boolean restart_yast	= false;
   boolean reboot_needed	= false;
   boolean relogin_needed= false;

@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Sep 22 15:07:11 UTC 2011 - lslezak@suse.cz
+
+- removed obsoleted Pkg::PkgEstablish() call (does nothing, will
+  be removed)
+- 2.21.2
+
+-------------------------------------------------------------------
 Thu Sep 22 10:59:11 CEST 2011 - jsuchome@suse.cz
 
 - 2.21.1 
