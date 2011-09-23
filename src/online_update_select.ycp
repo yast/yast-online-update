@@ -249,7 +249,7 @@ without having package %1 installed"), required_package));
 
   // no patch selected
   if (!restart_yast && !normal_patches_selected &&
-      !Pkg::PkgAnyToInstall () && !Pkg::PkgAnyToDelete ())
+      !Pkg::IsAnyResolvable(`package, `to_install) && !Pkg::IsAnyResolvable(`package, `to_remove))
   {
       ret = `cancel;
   }

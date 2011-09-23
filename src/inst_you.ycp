@@ -249,8 +249,8 @@
     if (ret == `auto)
     {
 	// ... and nothing to install -> skip the installation at all
-	if (!normal_patches_selected && !Pkg::PkgAnyToInstall () &&
-	    !Pkg::PkgAnyToDelete ())
+	if (!normal_patches_selected && !Pkg::IsAnyResolvable(`package, `to_install) &&
+	    !Pkg::IsAnyResolvable(`package, `to_remove))
 	{
 	    y2milestone ("no patch selected after all -> `next");
 	    Pkg::SetSolverFlags (solver_flags_backup);
