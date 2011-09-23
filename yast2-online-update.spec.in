@@ -7,7 +7,8 @@ BuildRequires:	gcc-c++ update-desktop-files yast2-devtools yast2-packager
 # changed StartPackage callback signature
 Requires:	yast2-pkg-bindings >= 2.20.3
 # PackagesUI::RunPackageSelector
-Requires:	yast2 >= 2.17.40
+# Wizard::SetDesktopTitleAndIcon
+Requires:	yast2 >= 2.21.22
 # PackageCallbacks::FormatPatchName
 Requires:	yast2-packager >= 2.13.159
 

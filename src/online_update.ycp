@@ -32,7 +32,7 @@
 define symbol OnlineUpdateSequence () {
 
   Wizard::CreateDialog();
-  Wizard::SetDesktopIcon("online_update");
+  Wizard::SetDesktopTitleAndIcon("online_update");
   // help text for online-update initialization
   Wizard::RestoreHelp (_("<p>The system is initializing the installation and update repositories. Software repositories can be altered in the <b>Installation Source</b> module.</p>"));
 

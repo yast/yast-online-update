@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Sep 23 09:23:09 CEST 2011 - visnov@suse.cz
+
+- added dialog title
+- 2.21.3 
+
+-------------------------------------------------------------------
 Thu Sep 22 15:07:11 UTC 2011 - lslezak@suse.cz
 
 - removed obsoleted Pkg::PkgEstablish() call (does nothing, will
