@@ -2,7 +2,7 @@
 
 @HEADER@
 Group:	System/YaST
-License: GPL v2 or later
+License: GPL-2.0+
 BuildRequires:	gcc-c++ update-desktop-files yast2-devtools yast2-packager
 # changed StartPackage callback signature
 Requires:	yast2-pkg-bindings >= 2.20.3
