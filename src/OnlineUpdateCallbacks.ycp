@@ -124,14 +124,15 @@
     global void StartPackage(string pkg_name, string name, string summary, integer
                                         installsize, boolean is_delete)
     {
+	string p_name	= name != "" ? name : pkg_name;
 	// progress log action (what is being done with the package)
 	string action	= is_delete ? _("Removing") : _("Installing");
 	// progress log item: %1 is action ("Removing" ot "Installing"),
 	//  %2 is name of package, %3 is summary
-	string text	= sformat ("%1 %2: \"%3\"", action, name, summary);
+	string text	= sformat ("%1 %2: \"%3\"", action, p_name, summary);
 	if (summary == "")
 	    // alternative progress log item: only action and package name
-	    text	= sformat ("%1 %2", action, name);
+	    text	= sformat ("%1 %2", action, p_name);
 
 	ProgressLog (text);
         if (UI::WidgetExists (`id (`you_patch_progress)))

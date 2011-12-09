@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Dec  9 15:42:10 CET 2011 - jsuchome@suse.cz
+
+- show package name in progress log when removing it (bnc#731485)
+- 2.21.5 
+
+-------------------------------------------------------------------
 Fri Nov 25 12:23:01 UTC 2011 - coolo@suse.com
 
 - add libtool as buildrequire to avoid implicit dependency
