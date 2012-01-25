@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Jan 25 08:42:18 CET 2012 - jsuchome@suse.cz
+
+- confirmed license
+- 2.22.0 
+
+-------------------------------------------------------------------
 Fri Dec  9 15:42:10 CET 2011 - jsuchome@suse.cz
 
 - show package name in progress log when removing it (bnc#731485)
