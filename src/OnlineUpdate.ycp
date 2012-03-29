@@ -46,7 +46,8 @@ global boolean relogin_needed	= false;
 
 // popup message
 global string relogin_message =_("At least one of the updates installed requires restart of the session.
-Relogin into your system as soon as possible.");
+Log out and in again as soon as possible.
+");
 
 // popup message
 global string restart_message =_("Packages for package management were updated.

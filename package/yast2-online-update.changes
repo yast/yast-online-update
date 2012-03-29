@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Mar 29 15:36:01 CEST 2012 - jsuchome@suse.cz
+
+- merged proofread texts
+- 2.22.2
+
+-------------------------------------------------------------------
 Thu Mar 29 12:18:57 CEST 2012 - jsuchome@suse.cz
 
 - corectly handle the output of installation's ContinueCancel popup
