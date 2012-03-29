@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Mar 29 12:18:57 CEST 2012 - jsuchome@suse.cz
+
+- corectly handle the output of installation's ContinueCancel popup
+- 2.22.1
+
+-------------------------------------------------------------------
 Wed Jan 25 08:42:18 CET 2012 - jsuchome@suse.cz
 
 - confirmed license

@@ -219,7 +219,7 @@
 		    !Popup::ContinueCancel(OnlineUpdate::more_selected_message))
 		{
 		    // user wants to re-examine the selection
-		    ret	= nil;
+		    ret_sel	= nil;
 		}
 	    }
 	} until (ret_sel == `cancel || ret_sel == `accept);
