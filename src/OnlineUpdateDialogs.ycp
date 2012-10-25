@@ -167,13 +167,9 @@ Repeat the update, including the download, if desired.
 at least one patch is not installed correctly.
 You will need to do the update again.");
 	}
-	else if ( how_to == `suseconfig )
+	else if ( how_to == `done)
 	{
-	    // Warning text for aborting an installation without running SuSEconfig
-	    what_will_happen = _("If you abort the installation now, SuSEconfig will
-not be run. The patches have been installed
-correctly, but without running SuSEconfig
-some of them might not work as expected.");
+	    y2debug ("Aborting after everything should be installed?");
 	}
 	else
 	{

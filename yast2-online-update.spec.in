@@ -6,9 +6,8 @@ License:        GPL-2.0
 BuildRequires:	gcc-c++ libtool update-desktop-files yast2-devtools yast2-packager 
 # changed StartPackage callback signature
 Requires:	yast2-pkg-bindings >= 2.20.3
-# PackagesUI::RunPackageSelector
-# Wizard::SetDesktopTitleAndIcon
-Requires:	yast2 >= 2.21.22
+# Kernel::InformAboutKernelChange
+Requires:	yast2 >= 2.23.8
 # PackageCallbacks::FormatPatchName
 Requires:	yast2-packager >= 2.13.159
 
