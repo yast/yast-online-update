@@ -33,6 +33,7 @@
   import "Confirm";
   import "Directory";
   import "FileUtils";
+  import "Kernel";
   import "Label";
   import "Mode";
   import "OnlineUpdate";
@@ -155,7 +156,6 @@ configured yet. Run configuration workflow now?")))
   list dialog = [
     [ "online_update_select",	[ GetInstArgs::Buttons(false, true) ] ],
     [ "online_update_install",	[ GetInstArgs::Buttons(false, true) ] ],
-    [ "inst_suseconfig",	[ GetInstArgs::Buttons(false,false) ] ]
   ];
 
   integer id = 0;
@@ -181,7 +181,7 @@ configured yet. Run configuration workflow now?")))
 	  continue;
       else if (result == `cancel || result == `abort)
 	  break;
-      else if (result == `next || result == `auto )// SuSEConfig returns `auto
+      else if (result == `next || result == `auto )
 	  id = id + 1;
       else if (result == `back)
 	  id = id - 1;
@@ -195,6 +195,11 @@ configured yet. Run configuration workflow now?")))
               result = `next;
               break;
           }
+  }
+
+  if (result == `next)
+  {
+      Kernel::InformAboutKernelChange ();
   }
 
   Wizard::CloseDialog();

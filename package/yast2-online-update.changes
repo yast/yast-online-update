@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Oct 25 15:40:08 CEST 2012 - jsuchome@suse.cz
+
+- remove the call of obsolete inst_suseconfig
+- 2.23.0 
+
+-------------------------------------------------------------------
 Thu Mar 29 15:36:01 CEST 2012 - jsuchome@suse.cz
 
 - merged proofread texts
