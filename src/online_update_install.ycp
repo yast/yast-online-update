@@ -136,7 +136,7 @@ This could take some time. Download details are shown in the log window.</p>");
 
     if (ret == `cancel && !changed_packages) ret = `abort;
 
-    if (ret == `abort && !OnlineUpdateDialogs::ConfirmAbortUpdate(`suseconfig))
+    if (ret == `abort && !OnlineUpdateDialogs::ConfirmAbortUpdate(`done))
 	ret = `this;
 
     if (!changed_packages && ( ret == `next || ret == `cancel ))
