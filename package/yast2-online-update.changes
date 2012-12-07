@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Dec  7 21:25:49 CET 2012 - jsuchome@suse.cz
+
+- if release notes package was updated, show release notes at the
+  end (fate#314072)
+- 2.23.1 
+
+-------------------------------------------------------------------
 Thu Oct 25 15:40:08 CEST 2012 - jsuchome@suse.cz
 
 - remove the call of obsolete inst_suseconfig

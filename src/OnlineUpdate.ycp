@@ -93,5 +93,10 @@ global string cd_url		= "cd:///";
  */
 global string cd_directory	= "patches";
 
+/**
+ * If release notes should be shown after update
+ */
+global boolean show_release_notes       = false;
+
 /* EOF */
 }
