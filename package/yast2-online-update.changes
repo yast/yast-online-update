@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Dec  7 21:30:47 CET 2012 - jsuchome@suse.cz
+
+- if release notes package was updated, show release notes at the
+  end (fate#314072)
+- 2.17.22
+
+-------------------------------------------------------------------
 Wed Jan 13 08:33:56 CET 2010 - jsuchome@suse.cz
 
 - call inst_suse_register if no update repo is present (bnc#565094)
