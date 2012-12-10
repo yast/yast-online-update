@@ -39,13 +39,6 @@
   import "PackageSystem";
   import "Report";
 
-  // helper to find the name of release notes package
-  // - it is different among products, so let's look at the installed one
-  string get_relnotes_name () {
-    map out     = (map) SCR::Execute (.target.bash_output, "rpm -qa --qf '%{NAME}\n' | grep -m1 release-notes");
-    return deletechars (out["stdout"]:"", "\n");
-  }
-
   if (OnlineUpdate::cd_update)
   {
     boolean canceled	= false;
@@ -234,6 +227,17 @@ without having package %1 installed"), required_package));
     if (patch["status"]:`none == `selected)
     {
 	y2milestone ("selected patch: %1", patch);
+
+        // check if release notes package was selected for update
+        // if so, user should see new release notes (fate#314072)
+        foreach (string name, string version, patch["contents"]:$[], {
+            if (!OnlineUpdate::show_release_notes && issubstring (name, "release-notes"))
+            {
+                OnlineUpdate::show_release_notes        = true;
+                y2milestone ("release notes package '%1' (%2) selected for installation", name, version);
+            }
+        });
+
 	if (patch["reboot_needed"]:false)
 	{
 	    reboot_needed	= true;
@@ -252,17 +256,6 @@ without having package %1 installed"), required_package));
     {
 	y2milestone ("patch needed but not selected: %1", patch);
 	more_patches_needed	= true;
-    }
-  });
-
-  // check if release notes package was selected for update
-  // if so, user should see new release notes (fate#314072)
-  string release_notes  = get_relnotes_name ();
-  foreach (map package, Pkg::ResolvableProperties(get_relnotes_name (), `package, ""), {
-    if (package["status"]:`none == `selected)
-    {
-      y2milestone ("release notes package '%1' selected for installation", package);
-      OnlineUpdate::show_release_notes        = true;
     }
   });
 
