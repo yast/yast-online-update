@@ -39,8 +39,6 @@
   import "PackageSystem";
   import "Report";
 
-  // target and source already initialized in online_update.ycp
-
   if (OnlineUpdate::cd_update)
   {
     boolean canceled	= false;
@@ -229,6 +227,22 @@ without having package %1 installed"), required_package));
     if (patch["status"]:`none == `selected)
     {
 	y2milestone ("selected patch: %1", patch);
+
+        // check if release notes package was selected for update
+        // if so, user should see new release notes (fate#314072)
+        foreach (string name, string version, patch["contents"]:$[], {
+            if (!OnlineUpdate::show_release_notes && issubstring (name, "release-notes"))
+            {
+                foreach (map package, Pkg::ResolvableProperties (name, `package, ""), {
+                  if (package["status"]:`none == `selected)
+                  {
+                    OnlineUpdate::show_release_notes        = true;
+                    y2milestone ("release notes package '%1' (%2) selected for installation", name, version);
+                  }
+                });
+            }
+        });
+
 	if (patch["reboot_needed"]:false)
 	{
 	    reboot_needed	= true;
