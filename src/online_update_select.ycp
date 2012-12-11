@@ -233,8 +233,13 @@ without having package %1 installed"), required_package));
         foreach (string name, string version, patch["contents"]:$[], {
             if (!OnlineUpdate::show_release_notes && issubstring (name, "release-notes"))
             {
-                OnlineUpdate::show_release_notes        = true;
-                y2milestone ("release notes package '%1' (%2) selected for installation", name, version);
+                foreach (map package, Pkg::ResolvableProperties (name, `package, ""), {
+                  if (package["status"]:`none == `selected)
+                  {
+                    OnlineUpdate::show_release_notes        = true;
+                    y2milestone ("release notes package '%1' (%2) selected for installation", name, version);
+                  }
+                });
             }
         });
 
