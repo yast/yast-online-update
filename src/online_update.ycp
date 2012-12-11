@@ -200,6 +200,10 @@ configured yet. Run configuration workflow now?")))
   if (result == `next)
   {
       Kernel::InformAboutKernelChange ();
+      if (OnlineUpdate::show_release_notes)
+      {
+        WFM::CallFunction ("inst_release_notes", [ GetInstArgs::Buttons(false, true) ]);
+      }
   }
 
   Wizard::CloseDialog();
