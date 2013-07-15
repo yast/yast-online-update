@@ -285,6 +285,8 @@ without having package %1 installed"), required_package));
   if (!restart_yast && !normal_patches_selected &&
       !Pkg::IsAnyResolvable(`package, `to_install) && !Pkg::IsAnyResolvable(`package, `to_remove))
   {
+      // run commit to save changes others than selecting package (bnc#811237)
+      Pkg::PkgCommit (0);
       ret = `cancel;
   }
   OnlineUpdate::restart_yast	= restart_yast;
