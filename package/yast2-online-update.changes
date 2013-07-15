@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Jul 15 14:11:23 CEST 2013 - jsuchome@suse.cz
+
+- call PkgCommit to save changes even when nothing was selected
+  for (un)installation (bnc#811237)
+- 2.24.0
+
+-------------------------------------------------------------------
 Fri Dec  7 21:25:49 CET 2012 - jsuchome@suse.cz
 
 - if release notes package was updated, show release notes at the
