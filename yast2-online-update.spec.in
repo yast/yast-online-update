@@ -17,6 +17,8 @@ Provides:	yast2-trans-online-update y2t_online_update
 Obsoletes:	yast2-trans-online-update y2t_online_update
 BuildArchitectures:     noarch
 
+Requires:       yast2-ruby-bindings >= 1.0.0
+
 Summary:    	YaST2 - Online Update (YOU)
 
 %description
@@ -40,12 +42,11 @@ YaST control center.
 %files
 %defattr(-,root,root)
 @scrconfdir@/*.scr
-@clientdir@/online*.ycp
-@clientdir@/cd_update.ycp
-@clientdir@/inst_you.ycp
-@clientdir@/do_online_update_auto.ycp
-@moduledir@/OnlineUpdate*.ycp
-@moduledir@/OnlineUpdate*.ybc
+@clientdir@/online*.rb
+@clientdir@/cd_update.rb
+@clientdir@/inst_you.rb
+@clientdir@/do_online_update_auto.rb
+@moduledir@/OnlineUpdate*.rb
 %doc @docdir@
 
 %package frontend
