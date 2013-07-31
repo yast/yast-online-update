@@ -1,24 +1,21 @@
-#
-# Makefile.am for online-update/src
-#
-rncdir =  $(schemadir)/autoyast/rnc
+# Sources for online-update
 
-client_DATA =				\
-	online_update_select.ycp 	\
-	online_update_install.ycp       \
-	online_update.ycp		\
-	cd_update.ycp			\
-	inst_you.ycp			\
-	do_online_update_auto.ycp
+module_DATA = \
+  modules/OnlineUpdateCallbacks.rb \
+  modules/OnlineUpdateDialogs.rb \
+  modules/OnlineUpdate.rb
 
-module_DATA =				\
-	OnlineUpdate.ycp		\
-	OnlineUpdateDialogs.ycp		\
-	OnlineUpdateCallbacks.ycp
+client_DATA = \
+  clients/inst_you.rb \
+  clients/online_update.rb \
+  clients/do_online_update_auto.rb \
+  clients/online_update_select.rb \
+  clients/online_update_install.rb \
+  clients/cd_update.rb
 
-desktop_DATA =				\
-	online_update.desktop
+desktop_DATA = \
+  desktop/online_update.desktop
 
-EXTRA_DIST = $(client_DATA) $(module_DATA) $(desktop_DATA)
+EXTRA_DIST = $(module_DATA) $(client_DATA) $(desktop_DATA)
 
 include $(top_srcdir)/Makefile.am.common
