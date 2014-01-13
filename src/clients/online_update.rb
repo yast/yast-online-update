@@ -232,11 +232,10 @@ module Yast
       id = 0
       result = :next
 
-      while Ops.greater_or_equal(id, 0) &&
-          Ops.less_than(id, Builtins.size(dialog))
-        page = Ops.get_list(dialog, id, [])
-        module_name = Ops.get_string(page, 0, "")
-        module_args = Ops.get_list(page, 1, [])
+      while id >= 0 && id < dialog.size
+        page = dialog[id]
+        module_name = page.fetch(0, "")
+        module_args = page.fetch(1, [])
 
         Builtins.y2debug(
           "ONLINE: Module: %1 Args: %2",
@@ -257,12 +256,12 @@ module Yast
         elsif result == :cancel || result == :abort
           break
         elsif result == :next || result == :auto
-          id = Ops.add(id, 1)
+          id += 1
         elsif result == :back
-          id = Ops.subtract(id, 1)
+          id -= 1
         elsif result == :finish
           if !Mode.installation && !Mode.update
-            id = Ops.subtract(Builtins.size(dialog), 1) # call last module
+            id = dialog.size - 1 # call last module
           else
             result = :next
             break
