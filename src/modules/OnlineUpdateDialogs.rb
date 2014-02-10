@@ -379,6 +379,14 @@ module Yast
 
     MAX_PATCHES_WIDGET_HEIGHT = 12
 
+    module RebootingPatches
+      module Buttons
+        CONTINUE = :continue
+        BACK     = :cancel
+        SKIP     = :skip
+      end
+    end
+
     def patches_needing_reboot
       Pkg.ResolvableProperties("", :patch, "").select do |patch|
         patch["status"] == :selected && patch["reboot_needed"]
@@ -417,10 +425,10 @@ module Yast
             RichText(Opt(:vstretch), patches_desc.join("<br>"))
           ),
           ButtonBox(
-            PushButton(Id(:continue), Opt(:default), Label.ContinueButton),
-            PushButton(Id(:cancel), Label.BackButton),
+            PushButton(Id(RebootingPatches::Buttons::CONTINUE), Opt(:default), Label.ContinueButton),
+            PushButton(Id(RebootingPatches::Buttons::BACK), Label.BackButton),
             # Push button for Skipping all patches that require rebooting
-            PushButton(Id(:skip), _("&Skip All"))
+            PushButton(Id(RebootingPatches::Buttons::SKIP), _("&Skip All"))
           )
         ),
         HSpacing(2)
@@ -431,6 +439,7 @@ module Yast
     # Returns whether it was successful
     def skip_rebooting_patches
       patches_needing_reboot.each do |patch|
+        log.info "Removing patch #{patch["name"]} from selection"
         Pkg.ResolvableNeutral(patch["name"], :patch, true)
       end
 
@@ -458,11 +467,11 @@ module Yast
       UI.CloseDialog
 
       case user_ret
-        when :continue
+        when RebootingPatches::Buttons::CONTINUE
           return true
-        when :cancel
+        when RebootingPatches::Buttons::BACK
           return false
-        when :skip
+        when RebootingPatches::Buttons::SKIP
           return skip_rebooting_patches
         else
           raise RuntimeError.new "Unhandled return value: #{user_ret}"
