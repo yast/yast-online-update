@@ -40,7 +40,8 @@ Provides:	yast2-trans-online-update y2t_online_update
 Obsoletes:	yast2-trans-online-update y2t_online_update
 BuildArchitectures:     noarch
 
-Requires:       yast2-ruby-bindings >= 1.0.0
+# Added Logger (replacement for y2error, y2milestone, ...)
+Requires:       yast2-ruby-bindings >= 3.1.7
 
 Summary:    	YaST2 - Online Update (YOU)
 
