@@ -461,6 +461,8 @@ module Yast
 
     # Shows dialog with patches that need rebooting and wait for user's decision
     # whether to continue
+    #
+    # @returns [Boolean] whether to continue installing patches (true: continue, false: go_back)
     def confirm_rebooting_patches
       UI.OpenDialog(rebooting_patches_dialog)
       user_ret = UI.UserInput
