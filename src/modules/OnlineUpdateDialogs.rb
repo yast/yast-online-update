@@ -395,7 +395,8 @@ module Yast
 
     # Returns formatted list of patches that need rebooting
     #
-    # @param [Hash] options, :use_html defines whether HTML can be used (default: false)
+    # @param options [Hash], :use_html defines whether HTML can be used (default: false)
+    # @return [Array] of patches (name: summary)
     def formatted_rebooting_patches(options = {})
       patches_needing_reboot.map do |patch|
         if options[:use_html]
@@ -407,6 +408,8 @@ module Yast
     end
 
     # Returns dialog definition for listing all patches that need rebooting
+    #
+    # @return dialog layout
     def rebooting_patches_dialog
       patches_desc = formatted_rebooting_patches(:use_html => true)
 
@@ -435,8 +438,10 @@ module Yast
       )
     end
 
-    # Tries to neutralize all patches that need rebooting
-    # Returns whether it was successful
+    # Tries to neutralize all patches that need rebooting.
+    # Returns whether it was successful.
+    #
+    # @return [Boolean] whether skipping rebooting patches was successful
     def skip_rebooting_patches
       patches_needing_reboot.each do |patch|
         log.info "Removing patch #{patch["name"]} from selection"
@@ -462,7 +467,7 @@ module Yast
     # Shows dialog with patches that need rebooting and wait for user's decision
     # whether to continue
     #
-    # @returns [Boolean] whether to continue installing patches (true: continue, false: go_back)
+    # @return [Boolean] whether to continue installing patches (true: continue, false: go_back)
     def confirm_rebooting_patches
       UI.OpenDialog(rebooting_patches_dialog)
       user_ret = UI.UserInput
@@ -482,7 +487,7 @@ module Yast
 
     # Returns boolean whether to continue with patches installation
     #
-    # @returns [Boolean] whether to continue
+    # @return [Boolean] whether to continue
     def validate_selected_patches
       patches = patches_needing_reboot
       log.info "Patches that need rebooting: #{patches.map{|p| p["name"]}}"
