@@ -413,7 +413,7 @@ module Yast
     def rebooting_patches_dialog
       patches_desc = formatted_rebooting_patches(:use_html => true)
 
-      # 2 is and additional constant for borders
+      # 2 is an additional constant for borders
       min_richtext_heigth = [patches_desc.size, MAX_PATCHES_WIDGET_HEIGHT].min + 2
 
       return HBox(

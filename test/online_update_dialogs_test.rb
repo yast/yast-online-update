@@ -8,21 +8,25 @@ Yast.import "OnlineUpdateDialogs"
 Yast.import "Pkg"
 Yast.import "UI"
 
+DEFAULT_PATCH = {
+    "status" => :selected,
+    "name" => "patch_#{$patch_id}",
+    "reboot_needed" => false,
+    "description" => "...",
+    "arch" => "noarch",
+}
+
+def patch(args = {})
+  $patch_id ||= 0
+  $patch_id += 1
+  DEFAULT_PATCH.merge(args)
+end
+
 # Two patches have "reboot_needed" => true
-PATCHES = [
-  { "status" => :selected, "name" => "patch_1", "reboot_needed" => true,  "description" => "...", "arch" => "noarch" },
-  { "status" => :selected, "name" => "patch_2", "reboot_needed" => false, "description" => "...", "arch" => "noarch" },
-  { "status" => :selected, "name" => "patch_3", "reboot_needed" => true,  "description" => "...", "arch" => "noarch" },
-  { "status" => :selected, "name" => "patch_4", "reboot_needed" => false, "description" => "...", "arch" => "noarch" },
-]
+PATCHES = Array.new(2){ patch("reboot_needed" => true) } + Array.new(2){ patch }
 
 # All patches are "reboot_needed" => false
-PATCHES_WITHOUT_REBOOTING = [
-  { "status" => :selected, "name" => "patch_1", "reboot_needed" => false, "description" => "...", "arch" => "noarch" },
-  { "status" => :selected, "name" => "patch_2", "reboot_needed" => false, "description" => "...", "arch" => "noarch" },
-  { "status" => :selected, "name" => "patch_3", "reboot_needed" => false, "description" => "...", "arch" => "noarch" },
-  { "status" => :selected, "name" => "patch_4", "reboot_needed" => false, "description" => "...", "arch" => "noarch" },
-]
+PATCHES_WITHOUT_REBOOTING = Array.new(4){ patch }
 
 describe "OnlineUpdateDialogs" do
   before(:each) do
