@@ -41,6 +41,7 @@ module Yast
       Yast.import "Wizard"
       Yast.import "PackageSystem"
       Yast.import "Report"
+      Yast.import "OnlineUpdateDialogs"
 
       if OnlineUpdate.cd_update
         @canceled = false
@@ -142,10 +143,22 @@ module Yast
 
       @ret = nil
       @current = "simple"
+
       begin
         @ret = Convert.to_symbol(UI.RunPkgSelection(Id(:selector)))
         Builtins.y2milestone("RunPkgSelection returned %1", @ret)
+
+        # FATE#312509: Show if patch needs a reboot and offer
+        # to delay the patch installation
+        if @ret == :accept
+          if ! OnlineUpdateDialogs.validate_selected_patches
+            @ret = nil
+            next
+          end
+        end
+
         UI.CloseDialog
+
         if @ret == :details
           UI.OpenDialog(
             Opt(:defaultsize),
@@ -213,6 +226,7 @@ module Yast
             PackageSelector(Id(:selector), @widget_options)
           )
         end
+
         if @ret == :accept
           @restart_yast = false
           @normal_patches_selected = false
