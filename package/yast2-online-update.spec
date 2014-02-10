@@ -27,6 +27,7 @@ Group:          System/YaST
 License:        GPL-2.0
 BuildRequires:	gcc-c++ libtool update-desktop-files yast2-packager 
 BuildRequires:  yast2-devtools >= 3.1.10
+BuildRequires:  rubygem-rspec
 # patch contents
 Requires:	yast2-pkg-bindings >= 2.23.0
 # Kernel::InformAboutKernelChange
