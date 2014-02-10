@@ -25,13 +25,15 @@ require "yast"
 
 module Yast
   class OnlineUpdateDialogsClass < Module
+    include Yast::Logger
+
     def main
+      Yast.import "Pkg"
       Yast.import "UI"
 
       textdomain "online-update"
 
       Yast.import "Label"
-      Yast.import "Mode"
       Yast.import "Package"
       Yast.import "Popup"
       Yast.import "Wizard"
@@ -375,6 +377,125 @@ module Yast
       end
     end
 
+    MAX_PATCHES_WIDGET_HEIGHT = 12
+
+    module RebootingPatches
+      module Buttons
+        CONTINUE = :continue
+        BACK     = :cancel
+        SKIP     = :skip
+      end
+    end
+
+    def patches_needing_reboot
+      Pkg.ResolvableProperties("", :patch, "").select do |patch|
+        patch["status"] == :selected && patch["reboot_needed"]
+      end
+    end
+
+    # Returns formatted list of patches that need rebooting
+    #
+    # @param options [Hash], :use_html defines whether HTML can be used (default: false)
+    # @return [Array] of patches (name: summary)
+    def formatted_rebooting_patches(options = {})
+      patches_needing_reboot.map do |patch|
+        if options[:use_html]
+          "<b>#{patch["name"]}</b>: #{patch["summary"]}"
+        else
+          "#{patch["name"]}: #{patch["summary"]}"
+        end
+      end
+    end
+
+    # Returns dialog definition for listing all patches that need rebooting
+    #
+    # @return dialog layout
+    def rebooting_patches_dialog
+      patches_desc = formatted_rebooting_patches(:use_html => true)
+
+      # 2 is an additional constant for borders
+      min_richtext_heigth = [patches_desc.size, MAX_PATCHES_WIDGET_HEIGHT].min + 2
+
+      return HBox(
+        HSpacing(2),
+        VBox(
+          HSpacing(70),
+          # Dialog label above a list of patches
+          Label(_("These patches will need rebooting after instalation")),
+          MinHeight(
+            min_richtext_heigth,
+            RichText(Opt(:vstretch), patches_desc.join("<br>"))
+          ),
+          ButtonBox(
+            PushButton(Id(RebootingPatches::Buttons::CONTINUE), Opt(:default), Label.ContinueButton),
+            PushButton(Id(RebootingPatches::Buttons::BACK), Label.BackButton),
+            # Push button for Skipping all patches that require rebooting
+            PushButton(Id(RebootingPatches::Buttons::SKIP), _("&Skip All"))
+          )
+        ),
+        HSpacing(2)
+      )
+    end
+
+    # Tries to neutralize all patches that need rebooting.
+    # Returns whether it was successful.
+    #
+    # @return [Boolean] whether skipping rebooting patches was successful
+    def skip_rebooting_patches
+      patches_needing_reboot.each do |patch|
+        log.info "Removing patch #{patch["name"]} from selection"
+        Pkg.ResolvableNeutral(patch["name"], :patch, true)
+      end
+
+      # Solver can't solve it automatically
+      return false unless Pkg.PkgSolve(true)
+
+      rebooting_patches = formatted_rebooting_patches
+
+      if ! rebooting_patches.empty?
+        Popup.MessageDetails(
+          _("Online update was unable to unselect some patches that need rebooting."),
+          rebooting_patches.join("\n")
+        )
+        return false
+      end
+
+      true
+    end
+
+    # Shows dialog with patches that need rebooting and wait for user's decision
+    # whether to continue
+    #
+    # @return [Boolean] whether to continue installing patches (true: continue, false: go_back)
+    def confirm_rebooting_patches
+      UI.OpenDialog(rebooting_patches_dialog)
+      user_ret = UI.UserInput
+      UI.CloseDialog
+
+      case user_ret
+        when RebootingPatches::Buttons::CONTINUE
+          return true
+        when RebootingPatches::Buttons::BACK
+          return false
+        when RebootingPatches::Buttons::SKIP
+          return skip_rebooting_patches
+        else
+          raise RuntimeError.new "Unhandled return value: #{user_ret}"
+      end
+    end
+
+    # Returns boolean whether to continue with patches installation
+    #
+    # @return [Boolean] whether to continue
+    def validate_selected_patches
+      patches = patches_needing_reboot
+      log.info "Patches that need rebooting: #{patches.map{|p| p["name"]}}"
+
+      return true if patches.empty?
+
+      confirm_rebooting_patches
+    end
+
     publish :function => :IgnoreWarningPopup, :type => "symbol (string, string)"
     publish :function => :IgnorePopup, :type => "symbol (string, string)"
     publish :function => :SkipPopup, :type => "symbol (string, string)"
@@ -383,6 +504,7 @@ module Yast
     publish :function => :DisplayMsgYou, :type => "boolean (string, string, string, string)"
     publish :function => :DisplayMsgYouOk, :type => "boolean (string, string, string)"
     publish :function => :MessagePopup, :type => "boolean (list <map>, boolean)"
+    publish :function => :validate_selected_patches, :type => "boolean ()"
   end
 
   OnlineUpdateDialogs = OnlineUpdateDialogsClass.new

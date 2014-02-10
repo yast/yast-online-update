@@ -17,7 +17,7 @@
 
 
 Name:           yast2-online-update
-Version:        3.1.1
+Version:        3.1.2
 Release:        0
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
@@ -27,6 +27,7 @@ Group:          System/YaST
 License:        GPL-2.0
 BuildRequires:	gcc-c++ libtool update-desktop-files yast2-packager 
 BuildRequires:  yast2-devtools >= 3.1.10
+BuildRequires:  rubygem-rspec
 # patch contents
 Requires:	yast2-pkg-bindings >= 2.23.0
 # Kernel::InformAboutKernelChange
@@ -40,7 +41,8 @@ Provides:	yast2-trans-online-update y2t_online_update
 Obsoletes:	yast2-trans-online-update y2t_online_update
 BuildArchitectures:     noarch
 
-Requires:       yast2-ruby-bindings >= 1.0.0
+# Added Logger (replacement for y2error, y2milestone, ...)
+Requires:       yast2-ruby-bindings >= 3.1.7
 
 Summary:    	YaST2 - Online Update (YOU)
 

@@ -1,4 +1,13 @@
 -------------------------------------------------------------------
+Mon Feb 10 10:44:16 CET 2014 - locilka@suse.com
+
+- Added functionality which informs user that some of the selected
+  patches (listed) will need rebooting. User can then continue,
+  skip all those patches, or tune the selection of patches manually
+  (FATE#312509).
+- 3.1.2
+
+-------------------------------------------------------------------
 Wed Nov 13 15:56:18 UTC 2013 - jreidinger@suse.com
 
 - Add explicit COPYING file
