@@ -32,20 +32,20 @@ describe "OnlineUpdateDialogs" do
   end
 
   describe "#patches_needing_reboot" do
-    it "returns list of two selected patches that need rebooting" do
+    it "returns list of selected patches that need rebooting" do
       expect(Yast::OnlineUpdateDialogs.patches_needing_reboot.size).to eq 2
     end
   end
 
   describe "#formatted_rebooting_patches" do
-    it "returns list of two selected patches that need rebooting - HTML formatted" do
+    it "returns list of strings describing patch in HTML when :use_html is set" do
       patches = Yast::OnlineUpdateDialogs.formatted_rebooting_patches(:use_html => true)
       expect(patches.size).to eq 2
       expect(patches[0]).to match(/</)
       expect(patches[0]).to match(/>/)
     end
 
-    it "returns list of two selected patches that need rebooting - plaintext formatted" do
+    it "returns list of strings describing patch in plain text when :use_html is not set" do
       patches = Yast::OnlineUpdateDialogs.formatted_rebooting_patches(:use_html => false)
       expect(patches.size).to eq 2
       expect(patches[0]).not_to match(/</)
@@ -54,7 +54,7 @@ describe "OnlineUpdateDialogs" do
   end
 
   describe "#rebooting_patches_dialog" do
-    it "returns non-empty dialog layout" do
+    it "returns dialog layout" do
       expect(Yast::OnlineUpdateDialogs.rebooting_patches_dialog).not_to eq nil
     end
   end

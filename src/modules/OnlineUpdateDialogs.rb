@@ -413,9 +413,8 @@ module Yast
     def rebooting_patches_dialog
       patches_desc = formatted_rebooting_patches(:use_html => true)
 
-      min_richtext_heigth = (patches_desc.size > MAX_PATCHES_WIDGET_HEIGHT ?
-        MAX_PATCHES_WIDGET_HEIGHT : patches_desc.size
-      ) + 2 # Additonal constant for borders
+      # 2 is and additional constant for borders
+      min_richtext_heigth = [patches_desc.size, MAX_PATCHES_WIDGET_HEIGHT].min + 2
 
       return HBox(
         HSpacing(2),
@@ -491,7 +490,10 @@ module Yast
     def validate_selected_patches
       patches = patches_needing_reboot
       log.info "Patches that need rebooting: #{patches.map{|p| p["name"]}}"
-      patches.empty? || confirm_rebooting_patches
+
+      return true if patches.empty?
+
+      confirm_rebooting_patches
     end
 
     publish :function => :IgnoreWarningPopup, :type => "symbol (string, string)"
