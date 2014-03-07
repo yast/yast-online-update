@@ -8,18 +8,20 @@ Yast.import "OnlineUpdateDialogs"
 Yast.import "Pkg"
 Yast.import "UI"
 
-DEFAULT_PATCH = {
+def default_patch
+{
     "status" => :selected,
     "name" => "patch_#{$patch_id}",
     "reboot_needed" => false,
     "description" => "...",
     "arch" => "noarch",
 }
+end
 
 def patch(args = {})
   $patch_id ||= 0
   $patch_id += 1
-  DEFAULT_PATCH.merge(args)
+  default_patch.merge(args)
 end
 
 # Two patches have "reboot_needed" => true
@@ -27,6 +29,53 @@ PATCHES = Array.new(2){ patch("reboot_needed" => true) } + Array.new(2){ patch }
 
 # All patches are "reboot_needed" => false
 PATCHES_WITHOUT_REBOOTING = Array.new(4){ patch }
+
+def default_product
+{
+  "arch" => "x86_64",
+  "category" => "base",
+  "description" => "...",
+  "display_name" => "openSUSE v#{$product_id}",
+  "download_size" => 0,
+  "flags" => [],
+  "flavor" => "dvd-promo",
+  "inst_size" => 0,
+  "locked" => false,
+  "medium_nr" => 0,
+  "name" => "openSUSE",
+  "product_file" => "/etc/products.d/openSUSE.prod",
+  "register_release" => "",
+  "register_target" => "openSUSE-800.#{$product_id}-x86_64",
+  "relnotes_url" => "http://doc.opensuse.org/release-notes/x86_64/openSUSE/800.#{$product_id}/release-notes-openSUSE.rpm",
+  "relnotes_urls" => ["http://doc.opensuse.org/release-notes/x86_64/openSUSE/800.#{$product_id}/release-notes-openSUSE.rpm"],
+  "short_name" => "openSUSE",
+  "source" => -1,
+  "status" => :unknown,
+  "summary" => "openSUSE Product #{$product_id}",
+  "transact_by" => :solver,
+  "type" => "base",
+  "update_urls" => [],
+  "upgrades" => [],
+  "vendor" => "openSUSE",
+  "version" => "800.#{$product_id}-1.123456"
+}
+end
+
+def product(args = {})
+  $product_id ||= 0
+  $product_id += 1
+  default_product.merge(args)
+end
+
+AVAILABLE_PRODUCTS = Array.new(2){ product("status" => :available) }
+
+# Products after end of life
+EOL_TIME = Time.now.to_i - 123456
+EOL_PRODUCTS = Array.new(2){ product("status" => :installed, "eol" => EOL_TIME) }
+
+# Products before end of life
+NON_EOL_TIME = Time.now.to_i + 123456
+NON_EOL_PRODUCTS = Array.new(2){ product("status" => :installed, "eol" => NON_EOL_TIME) }
 
 describe "OnlineUpdateDialogs" do
   before(:each) do
@@ -104,6 +153,29 @@ describe "OnlineUpdateDialogs" do
     it "raises an exception if UI returns unexpected return value" do
       Yast::UI.stub(:UserInput).and_return(:unknown_user_input)
       expect { Yast::OnlineUpdateDialogs.confirm_rebooting_patches }.to raise_error
+    end
+  end
+
+  describe "#report_eol_products" do
+    it "reports all products that have ended their support" do
+      Yast::UI.stub(:OpenDialog).and_return(true)
+      Yast::UI.stub(:UserInput).and_return(:ok)
+      Yast::UI.stub(:CloseDialog).and_return(true)
+
+      # These products are still alive
+      Yast::Pkg.stub(:ResolvableProperties).and_return(AVAILABLE_PRODUCTS + NON_EOL_PRODUCTS)
+      expect(Yast::OnlineUpdateDialogs.report_eol_products).to be_true
+
+      # Some of these products have reached their EOL
+      Yast::Pkg.stub(:ResolvableProperties).and_return(AVAILABLE_PRODUCTS + EOL_PRODUCTS + NON_EOL_PRODUCTS)
+      expect(Yast::OnlineUpdateDialogs.report_eol_products).to be_false
+    end
+  end
+
+  describe "#eol_products" do
+    it "returns all products that are out of support" do
+      Yast::Pkg.stub(:ResolvableProperties).and_return(AVAILABLE_PRODUCTS + EOL_PRODUCTS + NON_EOL_PRODUCTS)
+      expect(Yast::OnlineUpdateDialogs.send(:eol_products)).to eq(EOL_PRODUCTS)
     end
   end
 end
