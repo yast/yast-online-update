@@ -17,7 +17,7 @@
 
 
 Name:           yast2-online-update
-Version:        3.1.2
+Version:        3.1.3
 Release:        0
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
@@ -28,8 +28,8 @@ License:        GPL-2.0
 BuildRequires:	gcc-c++ libtool update-desktop-files yast2-packager 
 BuildRequires:  yast2-devtools >= 3.1.10
 BuildRequires:  rubygem-rspec
-# patch contents
-Requires:	yast2-pkg-bindings >= 2.23.0
+# Product EOL tag
+Requires:	yast2-pkg-bindings >= 3.1.6
 # Kernel::InformAboutKernelChange
 Requires:	yast2 >= 2.23.8
 # PackageCallbacks::FormatPatchName
