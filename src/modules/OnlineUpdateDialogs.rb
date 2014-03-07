@@ -500,10 +500,10 @@ module Yast
     #
     # @return [Boolean] whether all products are still alive
     def report_eol_products
-      report_products = eol_products
-      return true if report_products.empty?
+      products_to_report = eol_products
+      return true if products_to_report.empty?
 
-      product_names = report_products.map do |product|
+      product_names = products_to_report.map do |product|
         log.warn "Product out of support: #{product.inspect}"
         product["display_name"] || product["name"] || product["short_name"]
       end
@@ -535,11 +535,14 @@ module Yast
         HSpacing(2),
         VBox(
           HSpacing(65),
-          # Dialog label above a list of products
-          Label(_(
-            "These products have reached their end of support\n" +
-            "and thus do not provide new updates anymore:"
-          )),
+          # Dialog label above a list of products (out of support)
+          Left(Label(_(
+            "These products have reached their end of general support\n" +
+            "and thus do not provide new updates anymore.\n\n" +
+            "In case that your subscription contains extended support,\n" +
+            "please make sure that you have activated the extension.\n\n" +
+            "Contact us if you need further assistance."
+          ))),
           MinHeight(
             min_richtext_heigth,
             RichText(Opt(:vstretch), products.sort.join("<br>"))
