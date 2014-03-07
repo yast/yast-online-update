@@ -559,7 +559,7 @@ module Yast
       time_now = Time.now.to_i
 
       installed_products.select do |p|
-        p.fetch("eol", time_now).to_i < time_now
+        p["eol"] && p["eol"].to_i < time_now
       end
     end
 
