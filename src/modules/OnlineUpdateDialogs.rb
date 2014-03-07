@@ -496,6 +496,22 @@ module Yast
       confirm_rebooting_patches
     end
 
+    # Reports products that have reached their end of life (EOL) support
+    #
+    # @return [Boolean] whether all products are still alive
+    def report_eol_products
+      report_products = eol_products
+      return true if report_products.empty?
+
+      product_names = report_products.map do |product|
+        log.warn "Product out of support: #{product.inspect}"
+        product["display_name"] || product["name"] || product["short_name"]
+      end
+
+      show_eol_products(product_names)
+      false
+    end
+
     publish :function => :IgnoreWarningPopup, :type => "symbol (string, string)"
     publish :function => :IgnorePopup, :type => "symbol (string, string)"
     publish :function => :SkipPopup, :type => "symbol (string, string)"
@@ -505,6 +521,54 @@ module Yast
     publish :function => :DisplayMsgYouOk, :type => "boolean (string, string, string)"
     publish :function => :MessagePopup, :type => "boolean (list <map>, boolean)"
     publish :function => :validate_selected_patches, :type => "boolean ()"
+    publish :function => :report_eol_products, :type => "boolean ()"
+
+    private
+
+    MAX_PRODUCTS_WIDGET_HEIGHT = 12
+
+    def show_eol_products(products)
+      # 2 is an additional constant for borders
+      min_richtext_heigth = [products.size, MAX_PRODUCTS_WIDGET_HEIGHT].min + 2
+
+      dialog_description = HBox(
+        HSpacing(2),
+        VBox(
+          HSpacing(65),
+          # Dialog label above a list of products
+          Label(_(
+            "These products have reached their end of support\n" +
+            "and thus do not provide new updates anymore:"
+          )),
+          MinHeight(
+            min_richtext_heigth,
+            RichText(Opt(:vstretch), products.sort.join("<br>"))
+          ),
+          PushButton(Id(:ok), Opt(:default), Label.OKButton),
+        ),
+        HSpacing(2)
+      )
+
+      UI.OpenDialog(dialog_description)
+      user_ret = UI.UserInput
+      UI.CloseDialog
+    end
+
+    # Returns all products over the end of life support
+    def eol_products
+      time_now = Time.now.to_i
+
+      installed_products.select do |p|
+        p.fetch("eol", time_now).to_i < time_now
+      end
+    end
+
+    # Returns all installed products
+    def installed_products
+      Pkg.ResolvableProperties("", :product, "").select do |p|
+        p["status"] == :installed
+      end
+    end
   end
 
   OnlineUpdateDialogs = OnlineUpdateDialogsClass.new

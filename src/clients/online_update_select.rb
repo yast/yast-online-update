@@ -71,6 +71,9 @@ module Yast
         return :abort if @canceled
       end
 
+      # FATE#316172: Report products that have reached their end of life
+      OnlineUpdateDialogs.report_eol_products
+
       @restart_yast = false
       @reboot_needed = false
       @relogin_needed = false
