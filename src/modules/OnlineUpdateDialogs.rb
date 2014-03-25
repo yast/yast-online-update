@@ -421,7 +421,7 @@ module Yast
         VBox(
           HSpacing(70),
           # Dialog label above a list of patches
-          Label(_("These patches will need rebooting after instalation")),
+          Label(_("These patches will need rebooting after installation")),
           MinHeight(
             min_richtext_heigth,
             RichText(Opt(:vstretch), patches_desc.join("<br>"))
