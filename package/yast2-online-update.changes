@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Mar 25 11:33:10 CET 2014 - jsuchome@suse.cz
+
+- fixed a typo (bnc#870049)
+- 3.1.4
+
+-------------------------------------------------------------------
 Fri Mar  7 17:21:05 CET 2014 - locilka@suse.com
 
 - Reporting products that have reached their end of support when
