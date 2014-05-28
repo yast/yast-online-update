@@ -198,21 +198,28 @@ module Yast
           end
         end
 
-        # yes/no message
-        if !is_available &&
-            Popup.YesNo(
+        if !is_available
+          # inst_scc is able to register the system and add update repos for SLE,
+          # for openSUSE, let's use repository manager
+          client = (Product.short_name == "openSUSE") ? "repositories" : "inst_scc"
+
+          if WFM.ClientExists(client)
+            if Popup.YesNo(
+              # yes/no question
               _(
                 "No update repository\nconfigured yet. Run configuration workflow now?"
               )
             )
-          # inst_suse_register is able to configure update repo for SLE,
-          # for openSUSE, let's use repository manager
-          client = "inst_suse_register"
-          client = "repositories" if Product.short_name == "openSUSE"
-          res = WFM.CallFunction(client, [])
-          if res != :next && res != :finish
-            Wizard.CloseDialog
-            return :abort
+
+              res = WFM.CallFunction(client, [])
+              if res != :next && res != :finish
+                Wizard.CloseDialog
+                return :abort
+              end
+            end
+          else
+            # error message
+            Report.Error(_("No update repository configured yet."))
           end
         end
       end
