@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed May 28 08:16:10 UTC 2014 - lslezak@suse.cz
+
+- fixed starting registration module (bnc#868211)
+- 3.1.5
+
+-------------------------------------------------------------------
 Tue Mar 25 11:33:10 CET 2014 - jsuchome@suse.cz
 
 - fixed a typo (bnc#870049)
