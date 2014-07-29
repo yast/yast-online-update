@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Jul 29 14:45:05 CEST 2014 - aschnell@suse.de
+
+- fixed spelling in spec file (bnc#889021)
+- 3.1.6
+
+-------------------------------------------------------------------
 Wed May 28 08:16:10 UTC 2014 - lslezak@suse.cz
 
 - fixed starting registration module (bnc#868211)
