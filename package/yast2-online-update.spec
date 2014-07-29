@@ -17,7 +17,7 @@
 
 
 Name:           yast2-online-update
-Version:        3.1.5
+Version:        3.1.6
 Release:        0
 Url:            https://github.com/yast/yast-online-update
 
@@ -50,7 +50,7 @@ Summary:    	YaST2 - Online Update (YOU)
 %description
 YaST Online Update (YOU) provides a convenient way to download and
 install security and other system updates. By default it uses the
-official SuSE mirrors as the update sources, but it can also use local
+official SUSE mirrors as the update sources, but it can also use local
 patch repositories or patch CDs.
 
 This package provides the graphical user interface for YOU which can be
