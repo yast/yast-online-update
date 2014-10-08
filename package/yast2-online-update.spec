@@ -26,9 +26,10 @@ Source0:        %{name}-%{version}.tar.bz2
 
 Group:          System/YaST
 License:        GPL-2.0
-BuildRequires:	gcc-c++ libtool update-desktop-files yast2-packager 
+BuildRequires:	yast2-packager 
 BuildRequires:  yast2-devtools >= 3.1.10
 BuildRequires:  rubygem(rspec)
+BuildRequires:  rubygem(yast-rake)
 # Product EOL tag
 Requires:	yast2-pkg-bindings >= 3.1.6
 # Kernel::InformAboutKernelChange
@@ -40,7 +41,7 @@ Provides:	y2c_online_update yast2-config-online-update
 Obsoletes:	y2c_online_update yast2-config-online-update
 Provides:	yast2-trans-online-update y2t_online_update
 Obsoletes:	yast2-trans-online-update y2t_online_update
-BuildArchitectures:     noarch
+BuildArch:      noarch
 
 # Added Logger (replacement for y2error, y2milestone, ...)
 Requires:       yast2-ruby-bindings >= 3.1.7
@@ -60,12 +61,13 @@ YaST control center.
 %prep
 %setup -n %{name}-%{version}
 
+%check
+rake test:unit
+
 %build
-%yast_build
 
 %install
-%yast_install
-
+rake install DESTDIR="%{buildroot}"
 
 %files
 %defattr(-,root,root)
