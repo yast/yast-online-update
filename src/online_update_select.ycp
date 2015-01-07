@@ -13,6 +13,7 @@
   import "FileUtils";
   import "Label";
   import "OnlineUpdate";
+  import "OnlineUpdateDialogs";
   import "Popup";
   import "ProductFeatures";
   import "Wizard";
@@ -45,6 +46,9 @@ you have inserted the correct CD.
 
 
   Pkg::PkgEstablish();
+
+  // FATE#300591: Report products that have reached their end of life
+  OnlineUpdateDialogs::report_eol_products();
 
   boolean restart_yast	= false;
   boolean reboot_needed	= false;

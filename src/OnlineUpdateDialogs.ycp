@@ -14,6 +14,8 @@
     import "Popup";
     import "Wizard";
 
+    // UI layout constant
+    integer MAX_PRODUCTS_WIDGET_HEIGHT = 12;
 
     define any ErrorPopupGeneric( string message, string details,
 				  symbol type )
@@ -355,6 +357,83 @@ some of them might not work as expected.");
 
 	if ( ret ==  `ok ) return true;
 	else return false;
+    }
+
+    // Returns all installed products
+    list<map> installed_products()
+    {
+        list<map> products = Pkg::ResolvableProperties("", `product, "");
+
+        return (list<map>)filter(map p, products, {
+            return p["status"]:nil == `installed;
+        });
+    }
+
+    // Returns all products over the end of life support
+    list<map> eol_products()
+    {
+        integer time_now = time();
+        list<map> products = installed_products();
+
+        return (list<map>)filter(map p, products, {
+            return p["eol"]:nil != nil && tointeger(p["eol"]:"0") < time_now;
+        });
+    }
+
+    void show_eol_products(list<string> products)
+    {
+      // 2 is an additional constant for borders
+      integer min_richtext_heigth = (size(products) > MAX_PRODUCTS_WIDGET_HEIGHT ?
+          MAX_PRODUCTS_WIDGET_HEIGHT : size(products)) + 2;
+
+      term dialog_description = `HBox(
+          `HSpacing(2),
+          `VBox(
+              `HSpacing(65),
+              // Dialog label above a list of products (out of support)
+              `Left(`Label(_(
+"These products have reached their end of general support
+and thus do not provide new updates anymore.
+
+In case that your subscription contains extended support,
+please make sure that you have activated the extension.
+
+Contact us if you need further assistance."
+              ))),
+              `MinHeight(
+                  min_richtext_heigth,
+                  `RichText(`opt(`vstretch), mergestring(lsort(products), "<br>"))
+              ),
+              `PushButton(`id(`ok), `opt(`default), Label::OKButton())
+          ),
+          `HSpacing(2)
+      );
+
+      UI::OpenDialog(dialog_description);
+      UI::UserInput();
+      UI::CloseDialog();
+    }
+
+    global void report_eol_products()
+    {
+        list<map> products_to_report = eol_products();
+        y2milestone("Number of products out of support: %1", size(products_to_report));
+
+        if (size(products_to_report) == 0)
+        {
+            return;
+        }
+
+        list<string> product_names = [];
+
+        foreach(map product, products_to_report, {
+            y2milestone("Product out of support: %1", product);
+
+            string name = product["display_name"]:product["name"]:product["short_name"]:_("Unknown product");
+            product_names = add(product_names, name);
+        });
+
+        show_eol_products(product_names);
     }
 
 }
