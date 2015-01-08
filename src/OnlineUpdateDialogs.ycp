@@ -373,10 +373,9 @@ some of them might not work as expected.");
     list<map> eol_products()
     {
         integer time_now = time();
-        list<map> products = installed_products();
 
-        return (list<map>)filter(map p, products, {
-            return p["eol"]:nil != nil && tointeger(p["eol"]:"0") < time_now;
+        return (list<map>)filter(map p, installed_products(), {
+            return p["eol"]:nil != nil && p["eol"]:-1 < time_now;
         });
     }
 
@@ -419,13 +418,9 @@ Contact us if you need further assistance."
         list<map> products_to_report = eol_products();
         y2milestone("Number of products out of support: %1", size(products_to_report));
 
-        if (size(products_to_report) == 0)
-        {
-            return;
-        }
+        if (size(products_to_report) == 0) return;
 
         list<string> product_names = [];
-
         foreach(map product, products_to_report, {
             y2milestone("Product out of support: %1", product);
 
