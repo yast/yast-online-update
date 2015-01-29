@@ -215,9 +215,6 @@ module Yast
     def DoneDownload(error_value, error_text)
       Builtins.y2debug("DoneDownload %1, %2", error_value, error_text)
       PackageCallbacks.DoneDownload(error_value, error_text) 
-      # if (last_callback != "FinishDeltaProvide")
-      #     FinishLine (false);
-      # last_callback   = "DoneDownload";
 
       nil
     end
