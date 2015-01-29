@@ -202,7 +202,7 @@ module Yast
     def DoneProvide(error, reason, name)
       ret = PackageCallbacks.DoneProvide(error, reason, name)
       if ret == "I"
-        FinishLine(false) if @last_callback != "FinishPatchDeltaProvide"
+        FinishLine(false) if @last_callback != "FinishDeltaProvide"
         @total_progress = Ops.add(@total_progress, 1)
         if UI.WidgetExists(Id(:you_total_progress))
           UI.ChangeWidget(Id(:you_total_progress), :Value, @total_progress)
@@ -215,9 +215,6 @@ module Yast
     def DoneDownload(error_value, error_text)
       Builtins.y2debug("DoneDownload %1, %2", error_value, error_text)
       PackageCallbacks.DoneDownload(error_value, error_text) 
-      # if (last_callback != "FinishPatchDeltaProvide")
-      #     FinishLine (false);
-      # last_callback   = "DoneDownload";
 
       nil
     end
@@ -323,58 +320,10 @@ module Yast
       nil
     end
 
-    # callback for start of downloading patch
-    def StartPatchDownload(name, download_size)
-      # progress log item (%1 is name of delta RPM)
-      ProgressLog(Ops.add("\n", @indent)) if @last_callback == "StartProvide"
-      # Progress log; lave the space at the end, some other text may follow.
-      ProgressLog(Builtins.sformat(_("Downloading patch RPM %1 "), name))
-      if UI.WidgetExists(Id(:you_patch_progress))
-        UI.ChangeWidget(
-          Id(:you_patch_progress),
-          :Label,
-          # progress bar label
-          _("Patch RPM Download Progress")
-        )
-        UI.ChangeWidget(Id(:you_patch_progress), :Value, 0)
-      end
-      @last_callback = "StartPatchDownload"
-
-      nil
-    end
-
-    # callback for path download progress
-    # @return [Boolean] abort the download?
-    def ProgressPatchDownload(num)
-      Builtins.y2debug("ProgressPatchDownload %1", num)
-      ret = PatchProgressCallback(num)
-      @last_callback = "ProgressPatchDownload"
-      ret
-    end
-
-
-    # callback for problem during aplying delta
-    def ProblemPatchDownload(description)
-      Builtins.y2debug("ProblemPatchDownload: %1", description)
-      ProgressLog(
-        Ops.add(
-          Ops.add(
-            Ops.add("\n", @indent),
-            # progress log item (previous action failed(%1 is reason)
-            Builtins.sformat(_("Failed to download patch RPM: %1"), description)
-          ),
-          "\n"
-        )
-      )
-      @last_callback = "ProblemPatchDownload"
-
-      nil
-    end
-
     # finish of download/application of delta or patch download
-    def FinishPatchDeltaProvide
+    def FinishDeltaProvide
       FinishLine(false) if @last_callback != "DoneDownload"
-      @last_callback = "FinishPatchDeltaProvide"
+      @last_callback = "FinishDeltaProvide"
 
       nil
     end
@@ -552,7 +501,7 @@ module Yast
         fun_ref(method(:ProblemDeltaDownload), "void (string)")
       )
       Pkg.CallbackFinishDeltaDownload(
-        fun_ref(method(:FinishPatchDeltaProvide), "void ()")
+        fun_ref(method(:FinishDeltaProvide), "void ()")
       )
 
       # delta application
@@ -566,21 +515,7 @@ module Yast
         fun_ref(method(:ProblemDeltaApply), "void (string)")
       )
       Pkg.CallbackFinishDeltaApply(
-        fun_ref(method(:FinishPatchDeltaProvide), "void ()")
-      )
-
-      # patch download
-      Pkg.CallbackStartPatchDownload(
-        fun_ref(method(:StartPatchDownload), "void (string, integer)")
-      )
-      Pkg.CallbackProgressPatchDownload(
-        fun_ref(method(:ProgressPatchDownload), "boolean (integer)")
-      )
-      Pkg.CallbackProblemPatchDownload(
-        fun_ref(method(:ProblemPatchDownload), "void (string)")
-      )
-      Pkg.CallbackFinishPatchDownload(
-        fun_ref(method(:FinishPatchDeltaProvide), "void ()")
+        fun_ref(method(:FinishDeltaProvide), "void ()")
       )
 
       # script callbacks
@@ -675,10 +610,6 @@ module Yast
     publish :function => :StartDeltaApply, :type => "void (string)"
     publish :function => :ProgressDeltaApply, :type => "void (integer)"
     publish :function => :ProblemDeltaApply, :type => "void (string)"
-    publish :function => :StartPatchDownload, :type => "void (string, integer)"
-    publish :function => :ProgressPatchDownload, :type => "boolean (integer)"
-    publish :function => :ProblemPatchDownload, :type => "void (string)"
-    publish :function => :FinishPatchDeltaProvide, :type => "void ()"
     publish :function => :ScriptStart, :type => "void (string, string, string, string)"
     publish :function => :ScriptProgress, :type => "boolean (boolean, string)"
     publish :function => :ScriptProblem, :type => "string (string)"
