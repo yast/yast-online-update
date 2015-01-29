@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Jan 29 12:01:20 UTC 2015 - jreidinger@suse.com
+
+- remove obsolete legacy patch callbacks 
+
+-------------------------------------------------------------------
 Thu Dec  4 09:50:39 UTC 2014 - jreidinger@suse.com
 
 - remove X-KDE-Library from desktop file (bnc#899104)
