@@ -49,7 +49,7 @@ module Yast
 
       # popup message
       @restart_message = _(
-        "Packages for package management were updated.\nFinishing and restarting now."
+        "Packages for package management were updated.\nFinishing and restarting YaST now."
       )
 
       # if patch with reboot flag was installed
