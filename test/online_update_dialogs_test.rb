@@ -120,26 +120,26 @@ describe "OnlineUpdateDialogs" do
 
     it "returns true if user decides to continue" do
       Yast::UI.stub(:UserInput).and_return(Yast::OnlineUpdateDialogsClass::RebootingPatches::Buttons::CONTINUE)
-      expect(Yast::OnlineUpdateDialogs.confirm_rebooting_patches).to be_true
+      expect(Yast::OnlineUpdateDialogs.confirm_rebooting_patches).to eq(true)
     end
 
     it "returns false if user decides to go back" do
       Yast::UI.stub(:UserInput).and_return(Yast::OnlineUpdateDialogsClass::RebootingPatches::Buttons::BACK)
-      expect(Yast::OnlineUpdateDialogs.confirm_rebooting_patches).to be_false
+      expect(Yast::OnlineUpdateDialogs.confirm_rebooting_patches).to eq(false)
     end
 
     it "returns true if user decides to skip rebooting patches and they are automatically unselected" do
       # At first, there are some rebooting patches selected, later there are none
       Yast::Pkg.stub(:ResolvableProperties).and_return(PATCHES, PATCHES_WITHOUT_REBOOTING)
       Yast::UI.stub(:UserInput).and_return(Yast::OnlineUpdateDialogsClass::RebootingPatches::Buttons::SKIP)
-      expect(Yast::OnlineUpdateDialogs.confirm_rebooting_patches).to be_true, "Selected patches: #{Yast::Pkg.ResolvableProperties()}"
+      expect(Yast::OnlineUpdateDialogs.confirm_rebooting_patches).to eq(true), "Selected patches: #{Yast::Pkg.ResolvableProperties()}"
     end
 
     it "returns false if user decides to skip rebooting patches but they are not automatically unselected" do
       # At first, there are some rebooting patches selected, later there still the same ones
       Yast::Pkg.stub(:ResolvableProperties).and_return(PATCHES)
       Yast::UI.stub(:UserInput).and_return(Yast::OnlineUpdateDialogsClass::RebootingPatches::Buttons::SKIP)
-      expect(Yast::OnlineUpdateDialogs.confirm_rebooting_patches).to be_false, "Selected patches: #{Yast::Pkg.ResolvableProperties()}"
+      expect(Yast::OnlineUpdateDialogs.confirm_rebooting_patches).to eq(false), "Selected patches: #{Yast::Pkg.ResolvableProperties()}"
     end
 
     it "returns false if user decides to skip rebooting patches but there are solver errors preset" do
@@ -147,7 +147,7 @@ describe "OnlineUpdateDialogs" do
       Yast::Pkg.stub(:ResolvableProperties).and_return(PATCHES, PATCHES_WITHOUT_REBOOTING)
       Yast::UI.stub(:UserInput).and_return(Yast::OnlineUpdateDialogsClass::RebootingPatches::Buttons::SKIP)
       Yast::Pkg.stub(:PkgSolve).and_return(false)
-      expect(Yast::OnlineUpdateDialogs.confirm_rebooting_patches).to be_false, "Selected patches: #{Yast::Pkg.ResolvableProperties()}"
+      expect(Yast::OnlineUpdateDialogs.confirm_rebooting_patches).to eq(false), "Selected patches: #{Yast::Pkg.ResolvableProperties()}"
     end
 
     it "raises an exception if UI returns unexpected return value" do
@@ -164,11 +164,11 @@ describe "OnlineUpdateDialogs" do
 
       # These products are still alive
       Yast::Pkg.stub(:ResolvableProperties).and_return(AVAILABLE_PRODUCTS + NON_EOL_PRODUCTS)
-      expect(Yast::OnlineUpdateDialogs.report_eol_products).to be_true
+      expect(Yast::OnlineUpdateDialogs.report_eol_products).to eq(true)
 
       # Some of these products have reached their EOL
       Yast::Pkg.stub(:ResolvableProperties).and_return(AVAILABLE_PRODUCTS + EOL_PRODUCTS + NON_EOL_PRODUCTS)
-      expect(Yast::OnlineUpdateDialogs.report_eol_products).to be_false
+      expect(Yast::OnlineUpdateDialogs.report_eol_products).to eq(false)
     end
   end
 
