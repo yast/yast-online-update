@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Feb  6 10:37:58 UTC 2015 - lslezak@suse.cz
+
+- updated restart popup message, make clear that only YaST will be
+  restarted (not the system) (bnc#913437)
+- 3.1.10
+
+-------------------------------------------------------------------
 Thu Jan 29 12:01:20 UTC 2015 - jreidinger@suse.com
 
 - remove obsolete legacy patch callbacks 
