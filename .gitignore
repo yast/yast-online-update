@@ -42,5 +42,5 @@ tmp.*
 /test/*.trs
 /testsuite/*.bak
 /testsuite/test.sum
-doc/
+doc/autodocs
 /.yardoc
