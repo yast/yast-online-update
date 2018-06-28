@@ -13,7 +13,7 @@ X-SuSE-YaST-Geometry=
 X-SuSE-YaST-SortKey=10
 X-SuSE-YaST-AutoInstResource=
 X-SuSE-YaST-AutoInst=
-X-SuSE-YaST-Keywords=software,update,online
+X-SuSE-YaST-Keywords=software,update,online,YOU,packages,RPM
 
 Icon=yast-online_update
 Exec=xdg-su -c "/sbin/yast2 online_update"
