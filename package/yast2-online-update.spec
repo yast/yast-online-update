@@ -78,6 +78,7 @@ rake install DESTDIR="%{buildroot}"
 %{yast_clientdir}/do_online_update_auto.rb
 %{yast_moduledir}/OnlineUpdate*.rb
 %doc %{yast_docdir}
+%license COPYING
 
 %package frontend
 Summary:	YaST2 - Online Update (YOU)
