@@ -17,7 +17,7 @@
 
 
 Name:           yast2-online-update
-Version:        4.0.1
+Version:        4.0.2
 Release:        0
 Url:            https://github.com/yast/yast-online-update
 
@@ -77,6 +77,7 @@ rake install DESTDIR="%{buildroot}"
 %{yast_clientdir}/inst_you.rb
 %{yast_clientdir}/do_online_update_auto.rb
 %{yast_moduledir}/OnlineUpdate*.rb
+%{_datadir}/icons/*
 %doc %{yast_docdir}
 %license COPYING
 
