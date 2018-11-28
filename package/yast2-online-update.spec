@@ -77,7 +77,7 @@ rake install DESTDIR="%{buildroot}"
 %{yast_clientdir}/inst_you.rb
 %{yast_clientdir}/do_online_update_auto.rb
 %{yast_moduledir}/OnlineUpdate*.rb
-%{_datadir}/icons/*
+%{yast_icondir}
 %doc %{yast_docdir}
 %license COPYING
 
