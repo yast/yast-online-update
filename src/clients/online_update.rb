@@ -124,7 +124,7 @@ module Yast
     # Main sequence for Online Update
     def OnlineUpdateSequence
       Wizard.CreateDialog
-      Wizard.SetDesktopTitleAndIcon("online_update")
+      Wizard.SetDesktopTitleAndIcon("org.openSUSE.YaST.OnlineUpdate")
       # help text for online-update initialization
       Wizard.RestoreHelp(
         _(
