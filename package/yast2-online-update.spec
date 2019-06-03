@@ -27,7 +27,7 @@ License:        GPL-2.0-only
 Source0:        %{name}-%{version}.tar.bz2
 
 BuildRequires:	yast2-packager 
-BuildRequires:  yast2-devtools >= 3.1.10
+BuildRequires:  yast2-devtools >= 4.2.2
 BuildRequires:  rubygem(rspec)
 BuildRequires:  rubygem(yast-rake)
 
