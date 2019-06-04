@@ -18,6 +18,7 @@ X-SuSE-YaST-Keywords=software,update,online,YOU,packages,RPM
 Icon=yast-update-online
 Exec=xdg-su -c "/sbin/yast2 online_update"
 
-Name=Online Update
-GenericName=Get patches to correct and improve your existing installation
+Name=YaST Online Update
+GenericName=Online Update
+Comment=Get patches to correct and improve your existing installation
 StartupNotify=true

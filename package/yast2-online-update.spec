@@ -12,41 +12,41 @@
 # license that conforms to the Open Source Definition (Version 1.9)
 # published by the Open Source Initiative.
 
-# Please submit bugfixes or comments via http://bugs.opensuse.org/
+# Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
 
 Name:           yast2-online-update
-Version:        4.1.0
+Version:        4.2.0
 Release:        0
 Url:            https://github.com/yast/yast-online-update
-
-BuildRoot:      %{_tmppath}/%{name}-%{version}-build
-Source0:        %{name}-%{version}.tar.bz2
-
+Summary:        YaST2 - Online Update (YOU)
 Group:          System/YaST
 License:        GPL-2.0-only
+
+Source0:        %{name}-%{version}.tar.bz2
+
 BuildRequires:	yast2-packager 
-BuildRequires:  yast2-devtools >= 3.1.10
+BuildRequires:  yast2-devtools >= 4.2.2
 BuildRequires:  rubygem(rspec)
 BuildRequires:  rubygem(yast-rake)
+
 # Product EOL tag
-Requires:	yast2-pkg-bindings >= 3.1.6
+Requires:       yast2-pkg-bindings >= 3.1.6
 # Kernel::InformAboutKernelChange
-Requires:	yast2 >= 2.23.8
+Requires:       yast2 >= 2.23.8
 # PackageCallbacks::FormatPatchName
-Requires:	yast2-packager >= 2.13.159
-
-Provides:	y2c_online_update yast2-config-online-update
-Obsoletes:	y2c_online_update yast2-config-online-update
-Provides:	yast2-trans-online-update y2t_online_update
-Obsoletes:	yast2-trans-online-update y2t_online_update
-BuildArch:      noarch
-
+Requires:       yast2-packager >= 2.13.159
 # Added Logger (replacement for y2error, y2milestone, ...)
 Requires:       yast2-ruby-bindings >= 3.1.7
 
-Summary:    	YaST2 - Online Update (YOU)
+Provides:       y2c_online_update yast2-config-online-update
+Provides:       yast2-trans-online-update y2t_online_update
+
+Obsoletes:      y2c_online_update yast2-config-online-update
+Obsoletes:      yast2-trans-online-update y2t_online_update
+
+BuildArch:      noarch
 
 %description
 YaST Online Update (YOU) provides a convenient way to download and
@@ -58,19 +58,30 @@ This package provides the graphical user interface for YOU which can be
 used with or without the X Window System. It can be started from the
 YaST control center.
 
+%package frontend
+Summary:        YaST2 - Online Update (YOU)
+Requires:       yast2-online-update
+Group:          System/YaST
+
+# PatchCD desktop file moved to yast2-wagon
+Conflicts:      yast2-wagon <= 2.17.3
+
+%description frontend
+Desktop files for YaST2 online update
+
 %prep
-%setup -n %{name}-%{version}
+%setup -q
 
 %check
-rake test:unit
+%yast_check
 
 %build
 
 %install
-rake install DESTDIR="%{buildroot}"
+%yast_install
+%yast_metainfo
 
 %files
-%defattr(-,root,root)
 %{yast_scrconfdir}/*.scr
 %{yast_clientdir}/online*.rb
 %{yast_clientdir}/cd_update.rb
@@ -81,17 +92,8 @@ rake install DESTDIR="%{buildroot}"
 %doc %{yast_docdir}
 %license COPYING
 
-%package frontend
-Summary:	YaST2 - Online Update (YOU)
-Requires:	yast2-online-update
-Group:          System/YaST
-
-# PatchCD desktop file moved to yast2-wagon
-Conflicts:	yast2-wagon <= 2.17.3
-
-%description frontend
-Desktop files for YaST2 online update
-
 %files frontend
-%defattr(-,root,root)
-%{yast_desktopdir}/online_update.desktop
+%{yast_desktopdir}
+%{yast_metainfodir}
+
+%changelog
