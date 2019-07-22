@@ -13,6 +13,9 @@ config.sub
 configure
 configure.ac
 depcomp
+doc/**/*.html
+doc/**/*.css
+doc/**/*.js
 install-sh
 *.pot
 libtool
@@ -30,6 +33,7 @@ tmp.*
 *.log
 *.ybc
 *.m4
+.yardoc/
 /doc/autodocs
 !/doc/autodocs/Makefile.am
 /testsuite/config/
