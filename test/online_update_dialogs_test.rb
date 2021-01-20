@@ -1,5 +1,7 @@
 #! /usr/bin/env rspec
 
+require_relative "test_helper"
+
 Yast.import "OnlineUpdateDialogs"
 Yast.import "Pkg"
 Yast.import "UI"
