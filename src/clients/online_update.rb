@@ -23,8 +23,13 @@
 # Authors:	Gabriele Strattner <gs@suse.de>
 #		Stefan Schubert <schubi@suse.de>
 #              Cornelius Schumacher <cschum@suse.de>
+
+require "y2packager/resolvable"
+
 module Yast
   class OnlineUpdateClient < Client
+    include Yast::Logger
+
     def main
       Yast.import "Pkg"
 
@@ -107,7 +112,7 @@ module Yast
           OnlineUpdate.simple_mode = true
         elsif @arg == path(".auto.get") || @arg == ".auto.get"
           Builtins.y2warning(
-            ".auto.get parameter for online_update is OBSOLETE, use zypper or rug instead."
+            ".auto.get parameter for online_update is OBSOLETE, use zypper instead."
           )
         end
         @arg_n = Ops.add(@arg_n, 1)
@@ -178,30 +183,24 @@ module Yast
       Progress.NextStage
 
       if !OnlineUpdate.cd_update # CD for cd update was not initialized yet
-        is_available = false
-        # FIXME bnc#459527
-        # current update repositories are still not tagged with is_update_repo
-        # foreach (map source, Pkg::SourceEditGet (), {
-        # 	integer srcid   = source["SrcId"]:-1;
-        # 	map data        = Pkg::SourceGeneralData (srcid);
-        # 	if (data["is_update_repo"]:false)
-        # 	{
-        # 	    is_available	= true;
-        # 	    break;
-        # 	}
-        # });
-        # old way: check if there is any patch for installation
-        Builtins.foreach(Pkg.ResolvableProperties("", :patch, "")) do |patch|
-          if Ops.get_symbol(patch, "status", :none) == :available
-            is_available = true
-            raise Break
-          end
+        # an update repository is available?
+        is_available = Pkg.SourceGetCurrent(true).any? do |repo|
+          source_data = Pkg.SourceGeneralData(repo)
+          update_repo = source_data["is_update_repo"]
+          log.info("Update repository found: #{source_data["url"]}") if update_repo
+          update_repo
+        end
+
+        # that repository flag might not be reliable, check if a patch is available
+        if !is_available
+          is_available = Y2Packager::Resolvable.any?(kind: :patch, status: :available)
+          log.info("Patch is available: #{is_available}")
         end
 
         if !is_available
           # inst_scc is able to register the system and add update repos for SLE,
           # for openSUSE, let's use repository manager
-          client = (Product.short_name == "openSUSE") ? "repositories" : "inst_scc"
+          client = Product.short_name.match?(/openSUSE/i) ? "repositories" : "inst_scc"
 
           if WFM.ClientExists(client)
             if Popup.YesNo(
