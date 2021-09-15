@@ -17,7 +17,7 @@
 
 
 Name:           yast2-online-update
-Version:        4.4.2
+Version:        4.4.3
 Release:        0
 Url:            https://github.com/yast/yast-online-update
 Summary:        YaST2 - Online Update (YOU)
@@ -34,8 +34,8 @@ BuildRequires:  update-desktop-files
 
 # Product EOL tag
 Requires:       yast2-pkg-bindings >= 3.1.6
-# Kernel::InformAboutKernelChange
-Requires:       yast2 >= 2.23.8
+# UIExtensionChecker
+Requires:       yast2 >= 4.4.18
 # PackageCallbacks::FormatPatchName
 Requires:       yast2-packager >= 2.13.159
 # Added Logger (replacement for y2error, y2milestone, ...)
