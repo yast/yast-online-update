@@ -17,7 +17,7 @@
 
 
 Name:           yast2-online-update
-Version:        4.4.1
+Version:        4.4.2
 Release:        0
 Url:            https://github.com/yast/yast-online-update
 Summary:        YaST2 - Online Update (YOU)
@@ -46,6 +46,8 @@ Provides:       yast2-trans-online-update y2t_online_update
 
 Obsoletes:      y2c_online_update yast2-config-online-update
 Obsoletes:      yast2-trans-online-update y2t_online_update
+
+Recommends:     yast2-online-update-frontend
 
 BuildArch:      noarch
 
