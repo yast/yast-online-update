@@ -25,6 +25,7 @@
 #              Cornelius Schumacher <cschum@suse.de>
 
 require "y2packager/resolvable"
+require "ui/ui_extension_checker"
 
 module Yast
   class OnlineUpdateClient < Client
@@ -128,6 +129,9 @@ module Yast
 
     # Main sequence for Online Update
     def OnlineUpdateSequence
+      ui_extension_checker = UIExtensionChecker.new("pkg")
+      return :cancel unless ui_extension_checker.ok?
+
       Wizard.CreateDialog
       Wizard.SetDesktopTitleAndIcon("org.opensuse.yast.OnlineUpdate")
       # help text for online-update initialization
