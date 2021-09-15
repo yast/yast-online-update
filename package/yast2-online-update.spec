@@ -35,7 +35,7 @@ BuildRequires:  update-desktop-files
 # Product EOL tag
 Requires:       yast2-pkg-bindings >= 3.1.6
 # UIExtensionChecker
-Requires:       yast2 >= 4.4.18
+Requires:       yast2 >= 4.4.19
 # PackageCallbacks::FormatPatchName
 Requires:       yast2-packager >= 2.13.159
 # Added Logger (replacement for y2error, y2milestone, ...)
