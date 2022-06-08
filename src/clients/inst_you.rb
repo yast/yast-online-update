@@ -44,6 +44,7 @@ module Yast
       Yast.import "ProductFeatures"
       Yast.import "Stage"
       Yast.import "Wizard"
+      Yast.import "Installation"
 
       @saved_path = Ops.add(Directory.vardir, "/selected_patches.ycp")
       @restarted_path = Ops.add(Directory.vardir, "/continue_you")
@@ -114,10 +115,10 @@ module Yast
       PackageCallbacksInit.InitPackageCallbacks
 
       if @after_restart || Hack("init-target-and-sources")
-        Pkg.TargetInit("/", false) # reinitialize target after release notes were read (#232247)
+        Pkg.TargetInit(Installation.destdir, false) # reinitialize target after release notes were read (#232247)
       else
         Pkg.TargetFinish
-        Pkg.TargetInitialize("/")
+        Pkg.TargetInitialize(Installation.destdir)
         Pkg.TargetLoad
       end
       # source data are cleared in registration client, and

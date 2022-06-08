@@ -53,6 +53,7 @@ module Yast
       Yast.import "URL"
       Yast.import "Wizard"
       Yast.import "GetInstArgs"
+      Yast.import "Installation"
 
       # the command line description map
       @cmdline = {
@@ -178,7 +179,7 @@ module Yast
       Progress.NextStage
 
       # initialize target to import all trusted keys (#165849)
-      Pkg.TargetInit("/", false)
+      Pkg.TargetInit(Installation.destdir, false)
 
       Progress.NextStage
 

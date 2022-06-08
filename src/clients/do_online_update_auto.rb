@@ -29,6 +29,7 @@ module Yast
   class DoOnlineUpdateAutoClient < Client
     def main
       Yast.import "Pkg"
+      Yast.import "Installation"
 
       Builtins.y2milestone("----------------------------------------")
       Builtins.y2milestone("do_online_update auto started")
@@ -55,7 +56,7 @@ module Yast
       if @func == "Write"
         @ret = :auto
 
-        Pkg.TargetInit("/", false)
+        Pkg.TargetInit(Installation.destdir, false)
         Pkg.SourceStartManager(true)
         Pkg.PkgSolve(true)
 
