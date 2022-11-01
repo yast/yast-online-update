@@ -182,8 +182,6 @@ module Yast
 
       Progress.NextStage
 
-      OnlineUpdateCallbacks.RefreshAllSources
-
       Progress.NextStage
 
       if !OnlineUpdate.cd_update # CD for cd update was not initialized yet
