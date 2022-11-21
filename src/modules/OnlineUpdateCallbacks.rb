@@ -537,43 +537,6 @@ module Yast
       nil
     end
 
-    # Refresh all sources with autorefresh enabled.
-    # This function is a temporary solution for bug #154990
-    def RefreshAllSources
-      Builtins.y2milestone("Refreshing all sources...")
-      mgr_ok = Pkg.SourceStartManager(true)
-      if !mgr_ok
-        # error popoup (detailed info follows)
-        Report.LongWarning(
-          Ops.add(
-            _("There was an error in the repository initialization.") + "\n",
-            Pkg.LastError
-          )
-        )
-      end
-
-      all_sources = Pkg.SourceEditGet
-
-      # There are no sources, nothing to refresh
-      if all_sources == nil || Ops.less_than(Builtins.size(all_sources), 1)
-        Builtins.y2warning("No sources defined, nothing to refresh...")
-        return
-      end
-      Builtins.foreach(all_sources) do |one_source|
-        source_id = Ops.get_integer(one_source, "SrcId")
-        source_autorefresh = Ops.get_boolean(one_source, "autorefresh", true)
-        source_enabled = Ops.get_boolean(one_source, "enabled", true)
-        if source_id != nil && source_autorefresh == true &&
-            source_enabled == true
-          Builtins.y2milestone("Refreshing source: %1", source_id)
-          Pkg.SourceRefreshNow(source_id)
-        end
-      end
-      Builtins.y2milestone("... refreshing done")
-
-      nil
-    end
-
     # Refresh sources given by argument
     def RefreshSources(sources)
       sources = deep_copy(sources)
@@ -616,7 +579,6 @@ module Yast
     publish :function => :ScriptFinish, :type => "void ()"
     publish :function => :Message, :type => "boolean (string, string, string, string)"
     publish :function => :RegisterOnlineUpdateCallbacks, :type => "void ()"
-    publish :function => :RefreshAllSources, :type => "void ()"
     publish :function => :RefreshSources, :type => "void (list <map>)"
   end
 
