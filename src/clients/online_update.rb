@@ -182,7 +182,15 @@ module Yast
 
       Progress.NextStage
 
-      OnlineUpdateCallbacks.RefreshAllSources
+      enabled_only = true
+      mgr_ok = Pkg.SourceStartManager(enabled_only)
+      if !mgr_ok
+        Report.LongWarning(
+          # TRANSLATORS: error popup (detailed info follows)
+          _("There was an error in the repository initialization.") + "\n" +
+          Pkg.LastError
+        )
+      end
 
       Progress.NextStage
 
