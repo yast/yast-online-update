@@ -17,7 +17,7 @@
 
 
 Name:           yast2-online-update
-Version:        4.5.1
+Version:        4.5.2
 Release:        0
 Url:            https://github.com/yast/yast-online-update
 Summary:        YaST2 - Online Update (YOU)

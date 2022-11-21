@@ -304,12 +304,6 @@ module Yast
 
       detailsButton = PushButton(Id(:details), detailsStringOff)
 
-      detailsTerm = HBox(
-        HSpacing(0.5),
-        HWeight(1, RichText(Opt(:plainText), details)),
-        HSpacing(0.5)
-      )
-
       buttons = nil
       if pre
         buttons = HBox(
@@ -553,7 +547,7 @@ module Yast
       )
 
       UI.OpenDialog(dialog_description)
-      user_ret = UI.UserInput
+      UI.UserInput
       UI.CloseDialog
     end
 
