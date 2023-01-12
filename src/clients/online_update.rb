@@ -23,6 +23,18 @@
 # Authors:	Gabriele Strattner <gs@suse.de>
 #		Stefan Schubert <schubi@suse.de>
 #              Cornelius Schumacher <cschum@suse.de>
+
+# bsc#1205913
+# 1. We may update a rubygem
+# 2. inst_release_notes may be called, which (indirectly) requires dbus
+# Then rubygems would try loading the gemspec of the uninstalled older gem
+# and crash. Prevent it by requiring dbus early.
+begin
+      require "dbus"
+rescue LoadError
+      # Call site will check if it's there
+end
+
 module Yast
   class OnlineUpdateClient < Client
     def main
