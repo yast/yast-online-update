@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Mar  9 08:41:43 UTC 2023 - Martin Vidner <mvidner@suse.com>
+
+- Fix showing of release notes when we update a rubygem
+  (bsc#1205913)
+- 4.5.3
+
+-------------------------------------------------------------------
 Mon Nov 21 11:45:35 UTC 2022 - Michal Filka <mfilka@suse.com>
 
 - bsc#1204907
