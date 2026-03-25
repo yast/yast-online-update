@@ -17,7 +17,7 @@
 
 
 Name:           yast2-online-update
-Version:        5.0.0
+Version:        5.0.1
 Release:        0
 Url:            https://github.com/yast/yast-online-update
 Summary:        YaST2 - Online Update (YOU)
@@ -30,7 +30,6 @@ BuildRequires:	yast2-packager
 BuildRequires:  yast2-devtools >= 4.2.2
 BuildRequires:  rubygem(%{rb_default_ruby_abi}:rspec)
 BuildRequires:  rubygem(%{rb_default_ruby_abi}:yast-rake)
-BuildRequires:  update-desktop-files
 
 # Product EOL tag
 Requires:       yast2-pkg-bindings >= 3.1.6
